@@ -19,6 +19,7 @@ from apps.ingestion.services.access import presentation_asset_ids
 from apps.practice.models import Attempt, GradeEvent, PracticeSession, SessionItem
 from apps.practice.services import exposure
 from apps.question_bank.models import QuestionVersion
+from apps.question_bank.services import sealing
 
 
 def _latest_mapping_revision(version: QuestionVersion) -> int:
@@ -155,6 +156,14 @@ def create_session(
             raise InvalidInput(message="题目没有已发布版本，不能用于练习", details={"question_id": question_id})
         if str(version.question.subject_id) != str(subject.id):
             raise ScopeViolation(message="题目不属于当前科目", details={"question_id": question_id})
+        # C03: a sealed question (or a question of a sealed family) never enters a
+        # practice/verification session. The decision comes from the single
+        # resolver, so this path cannot disagree with search or the planner; a
+        # material parent appends its children below and each child is re-checked
+        # on its own iteration.
+        sealing.assert_not_sealed(
+            question=version.question, project=project, action="进入练习/验证会话"
+        )
         if not version.is_scorable_leaf:
             # A material parent is never a submittable item; use its children.
             for child_id in version.material_child_version_ids or []:

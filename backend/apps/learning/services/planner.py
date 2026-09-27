@@ -35,6 +35,7 @@ from apps.learning.services import pairing as pairing_service
 from apps.memory.services import scheduler as memory_service
 from apps.practice.models import LearningEvidence, PracticeSession
 from apps.question_bank.models import Question
+from apps.question_bank.services import sealing
 
 RULE_VERSION = "p0-1"
 DEFAULT_MINUTES_BY_TYPE = {"constructed_response": 15, "fill_blank": 3}
@@ -129,6 +130,13 @@ def _eligible_question(question: Question | None) -> tuple[bool, str]:
     version = question.current_published_version
     if version is None or version.status != QuestionVersionStatus.PUBLISHED:
         return False, "题目没有已发布版本"
+    # C03: sealing is checked through the single resolver, on every candidate
+    # category at once — a sealed question can never be scheduled, no matter
+    # whether it arrived through a mapping, a pairing, a memory card or the
+    # general pool (and `start_task` re-checks the same function).
+    sealed, seal_code = sealing.is_sealed(question)
+    if sealed:
+        return False, sealing.reason_message(seal_code)
     answer = version.answer_keys.filter(verification_status="checked", is_disputed=False).first()
     if answer is None:
         return False, "题目缺少已核对且无争议的答案"
@@ -620,9 +628,25 @@ def plan_payload(plan: StudyPlan | None, *, now=None) -> dict:
     if plan is None:
         return {"plan": None, "tasks": [], "notes": ["今日还没有计划：可点击“生成今日计划”"]}
     moment = now or timezone.now()
+    rows = list(plan.tasks.select_related("question", "knowledge_node", "subject").order_by("created_at"))
+    # C03: a task created before its question was sealed must not be *shown* as
+    # part of today's plan either — the plan payload is the surface the learner
+    # reads, so the resolver decides here too (the candidates above never build
+    # such a task in the first place).
+    sealed_ids: set[str] = set()
+    questions_by_project: dict[str, list[str]] = {}
+    for task in rows:
+        if task.question_id:
+            questions_by_project.setdefault(str(task.project_id), []).append(str(task.question_id))
+    for project_id, question_ids in questions_by_project.items():
+        sealed_ids |= sealing.sealed_question_ids(project=project_id, question_ids=question_ids)
     tasks = []
-    for task in plan.tasks.select_related("question", "knowledge_node", "subject").order_by("created_at"):
+    hidden_sealed = 0
+    for task in rows:
         review = getattr(task, "review_task", None)
+        if task.question_id and str(task.question_id) in sealed_ids:
+            hidden_sealed += 1
+            continue
         tasks.append(
             {
                 "task_id": str(task.id),
@@ -660,7 +684,8 @@ def plan_payload(plan: StudyPlan | None, *, now=None) -> dict:
             "generated_at": plan.generated_at.isoformat(),
         },
         "tasks": tasks,
-        "notes": plan.notes,
+        "notes": list(plan.notes or [])
+        + ([f"有 {hidden_sealed} 个任务因题目已封存（holdout）未在本计划中展示。"] if hidden_sealed else []),
     }
 
 

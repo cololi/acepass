@@ -1,4 +1,11 @@
-"""Question-bank API: question list/detail, drafts, publish/withdraw, mappings."""
+"""Question-bank API: question list/detail, drafts, publish/withdraw, mappings.
+
+P2/C03 additions (all owner-scoped, all additive): sealing a question or a family,
+listing what is sealed and why, and the family surface (list/create/patch, adding
+and removing a member, merge preview and merge). Every sealing decision goes
+through :mod:`apps.question_bank.services.sealing`; family membership and merging
+go through :mod:`apps.question_bank.services.families`.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +19,9 @@ from apps.common.api import auth, idempotency_key, project_scoped_router
 from apps.common.errors import InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.question_bank import services
-from apps.question_bank.models import AnswerKeyVersion, Question, QuestionVersion, RubricVersion
+from apps.question_bank.models import AnswerKeyVersion, Question, QuestionFamily, QuestionVersion, RubricVersion
+from apps.question_bank.services import families as family_services
+from apps.question_bank.services import sealing
 
 question_api_router = project_scoped_router(tags=["question-bank"])
 
@@ -118,6 +127,157 @@ class SourceRegionOut(Schema):
     crop_asset_id: str | None
 
 
+class ReasonIn(Schema):
+    reason: str = ""
+
+
+class SealOut(Schema):
+    policy_id: str
+    target: str
+    question_id: str | None
+    family_id: str | None
+    revision: int
+    is_holdout: bool
+    change_reason: str
+    changed_at: str
+    sealed: bool
+    sealed_reason: str
+    sealed_question_ids: list[str]
+
+
+class SealedContentOut(Schema):
+    project_id: str
+    questions: list[dict[str, Any]]
+    families: list[dict[str, Any]]
+    counts: dict[str, int]
+    reason_codes: list[str]
+    generated_at: str
+
+
+class FamilyOut(Schema):
+    id: str
+    subject_id: str
+    name: str
+    revision: int
+    relation_confirmed: bool
+    note: str
+    member_count: int
+    sealed: bool
+    sealed_reason: str
+    sealed_member_count: int
+    merged_into_id: str | None
+    merged_at: str | None
+
+
+class FamilyIn(Schema):
+    subject_id: str
+    name: str
+    note: str = ""
+
+
+class FamilyPatchIn(Schema):
+    name: str | None = None
+    relation_confirmed: bool | None = None
+    note: str | None = None
+
+
+class FamilyQuestionIn(Schema):
+    question_id: str
+
+
+class FamilyQuestionOut(Schema):
+    family_id: str
+    question_id: str
+    changed: bool
+    member_count: int
+    sealed: bool
+    sealed_reason: str
+
+
+class MergeImpactOut(Schema):
+    project_id: str
+    source_family_id: str
+    target_family_id: str
+    source_family_name: str
+    target_family_name: str
+    already_merged: bool
+    questions_to_move: int
+    questions_in_target_after: int
+    evidence_rows_to_invalidate: int
+    affected_user_ids: list[str]
+    exposed_before_merge: int
+    exposed_after_merge: int
+    exposed_question_ids_before_merge: list[str]
+
+
+class MergeIn(Schema):
+    target_family_id: str
+    reason: str = ""
+
+
+class MergeOut(Schema):
+    project_id: str
+    source_family_id: str
+    target_family_id: str
+    merge_revision: int
+    questions_moved: int
+    questions_in_target_after: int
+    evidence_invalidated: int
+    states_recomputed: int
+    exposed_before_merge: int
+    exposed_after_merge: int
+    exposure_changes: list[dict[str, Any]]
+    affected_user_ids: list[str]
+    noop: bool
+    content_revision_id: str | None
+
+
+def _question_scope(project, question_id: str) -> Question:
+    question = Question.objects.filter(id=question_id, subject__project=project).select_related("subject").first()
+    if question is None:
+        raise ScopeViolation(message="题目不存在或不属于该项目")
+    return question
+
+
+def _family_scope(project, family_id: str) -> QuestionFamily:
+    family = (
+        QuestionFamily.objects.filter(id=family_id, subject__project=project).select_related("subject").first()
+    )
+    if family is None:
+        raise ScopeViolation(message="题族不存在或不属于该项目")
+    return family
+
+
+def _seal_out(*, policy, project) -> dict[str, Any]:
+    """Report what the new policy revision means *now*, through the resolver."""
+    if policy.question_id:
+        target_question_ids = [str(policy.question_id)]
+    else:
+        target_question_ids = [
+            str(value)
+            for value in Question.objects.filter(family_id=policy.family_id).values_list("id", flat=True)
+        ]
+    sealed_ids = sorted(sealing.sealed_question_ids(project=project, question_ids=target_question_ids))
+    sealed_reason = ""
+    if sealed_ids:
+        sealed_reason = sealing.is_sealed(
+            Question.objects.filter(id=sealed_ids[0]).first(), project=project
+        )[1]
+    return {
+        "policy_id": str(policy.id),
+        "target": "question" if policy.question_id else "family",
+        "question_id": str(policy.question_id) if policy.question_id else None,
+        "family_id": str(policy.family_id) if policy.family_id else None,
+        "revision": policy.revision,
+        "is_holdout": policy.is_holdout,
+        "change_reason": policy.change_reason,
+        "changed_at": policy.created_at.isoformat(),
+        "sealed": bool(sealed_ids),
+        "sealed_reason": sealed_reason,
+        "sealed_question_ids": sealed_ids,
+    }
+
+
 @question_api_router.get("/projects/{project_id}/questions", auth=auth, response=list[QuestionListItem])
 def list_questions(
     request,
@@ -178,13 +338,19 @@ def list_questions(
 
 @question_api_router.get("/projects/{project_id}/questions/{question_id}", auth=auth, response=QuestionPreviewOut)
 def get_question(request, project_id: str, question_id: str):
-    """Metadata view of the current published version (no answers, no file URLs)."""
+    """Metadata view of the current published version (no answers, no file URLs).
+
+    C03: sealed content is not previewable. The stem is the sealed content, and
+    this endpoint would both deliver it and log a ``stem_delivered`` exposure, so
+    it refuses with the sealing reason instead.
+    """
     from apps.practice.services import exposure
 
     project = require_project(request.user, project_id)
     question = Question.objects.filter(id=question_id, subject__project=project).select_related("subject").first()
     if question is None:
         raise ScopeViolation(message="题目不存在或不属于该项目")
+    sealing.assert_not_sealed(question=question, project=project, action="题库预览")
     version = question.current_published_version or question.versions.order_by("-version").first()
     if version is None:
         raise ScopeViolation(message="该题目尚无版本")
@@ -462,3 +628,216 @@ def get_rubric(request, project_id: str, rubric_id: str):
         "usage_note": rubric.usage_note,
         "checked_at": rubric.checked_at.isoformat() if rubric.checked_at else None,
     }
+
+
+# --------------------------------------------------------------------------
+# P2 / C03: sealing, sealed-content inventory and the family surface
+# --------------------------------------------------------------------------
+@question_api_router.post("/projects/{project_id}/questions/{question_id}/seal", auth=auth, response={201: SealOut})
+def seal_question(request, project_id: str, question_id: str, payload: ReasonIn):
+    """Seal one question by appending a new policy revision (never an edit)."""
+    project = require_project(request.user, project_id)
+    question = _question_scope(project, question_id)
+    policy = sealing.seal_question(project=project, question=question, actor=request.user, reason=payload.reason)
+    return 201, _seal_out(policy=policy, project=project)
+
+
+@question_api_router.post("/projects/{project_id}/questions/{question_id}/unseal", auth=auth, response={201: SealOut})
+def unseal_question(request, project_id: str, question_id: str, payload: ReasonIn):
+    """Clear the holdout for one question with a new policy revision."""
+    project = require_project(request.user, project_id)
+    question = _question_scope(project, question_id)
+    policy = sealing.unseal(project=project, question=question, actor=request.user, reason=payload.reason)
+    return 201, _seal_out(policy=policy, project=project)
+
+
+@question_api_router.post(
+    "/projects/{project_id}/question-families/{family_id}/seal", auth=auth, response={201: SealOut}
+)
+def seal_family(request, project_id: str, family_id: str, payload: ReasonIn):
+    """Seal a whole family: every member is sealed through the resolver."""
+    project = require_project(request.user, project_id)
+    family = _family_scope(project, family_id)
+    policy = sealing.seal_family(project=project, family=family, actor=request.user, reason=payload.reason)
+    return 201, _seal_out(policy=policy, project=project)
+
+
+@question_api_router.post(
+    "/projects/{project_id}/question-families/{family_id}/unseal", auth=auth, response={201: SealOut}
+)
+def unseal_family(request, project_id: str, family_id: str, payload: ReasonIn):
+    """Clear a family's holdout; members sealed on their own stay sealed."""
+    project = require_project(request.user, project_id)
+    family = _family_scope(project, family_id)
+    policy = sealing.unseal(project=project, family=family, actor=request.user, reason=payload.reason)
+    return 201, _seal_out(policy=policy, project=project)
+
+
+@question_api_router.get("/projects/{project_id}/sealed-content", auth=auth, response=SealedContentOut)
+def list_sealed_content(request, project_id: str):
+    """What is sealed in this project, and which policy revision sealed it."""
+    project = require_project(request.user, project_id)
+    return sealing.sealed_content_report(project=project)
+
+
+# --------------------------------------------------------------------------
+# Family surface: list / create / patch, membership, merge preview and merge
+# --------------------------------------------------------------------------
+@question_api_router.get("/projects/{project_id}/question-families", auth=auth, response=list[FamilyOut])
+def list_question_families(request, project_id: str, subject_id: str | None = None):
+    project = require_project(request.user, project_id)
+    queryset = QuestionFamily.objects.filter(subject__project=project).select_related("subject")
+    if subject_id:
+        require_subject(request.user, project, subject_id)
+        queryset = queryset.filter(subject_id=subject_id)
+    return [
+        family_services.family_payload(project=project, family=family)
+        for family in queryset.order_by("subject__display_order", "name")
+    ]
+
+
+@question_api_router.post("/projects/{project_id}/question-families", auth=auth, response={201: FamilyOut})
+def create_question_family(request, project_id: str, payload: FamilyIn):
+    """Create one family. Names are unique per subject."""
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, payload.subject_id)
+    key = idempotency_key(request)
+    scope = f"question_families.create:{project_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    family = family_services.create_family(
+        project=project, subject=subject, name=payload.name, note=payload.note, actor=request.user
+    )
+    result = family_services.family_payload(project=project, family=family)
+    idempotency.record_result(
+        request.user, scope, key, status_code=201, response_body=result, resource_type="question_family", resource_id=family.id
+    )
+    return 201, result
+
+
+@question_api_router.patch(
+    "/projects/{project_id}/question-families/{family_id}", auth=auth, response=FamilyOut
+)
+def patch_question_family(request, project_id: str, family_id: str, payload: FamilyPatchIn):
+    """Rename / confirm the near-duplicate relation / annotate one family."""
+    project = require_project(request.user, project_id)
+    family = _family_scope(project, family_id)
+    family = family_services.update_family(
+        project=project,
+        family=family,
+        actor=request.user,
+        name=payload.name,
+        relation_confirmed=payload.relation_confirmed,
+        note=payload.note,
+    )
+    return family_services.family_payload(project=project, family=family)
+
+
+@question_api_router.post(
+    "/projects/{project_id}/question-families/{family_id}/questions",
+    auth=auth,
+    response={201: FamilyQuestionOut},
+)
+def add_question_to_family(request, project_id: str, family_id: str, payload: FamilyQuestionIn):
+    """Put one question into a family (refused for sealed content)."""
+    project = require_project(request.user, project_id)
+    family = _family_scope(project, family_id)
+    question = _question_scope(project, payload.question_id)
+    key = idempotency_key(request)
+    scope = f"question_families.add:{family_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    question, changed = family_services.add_question_to_family(
+        project=project, family=family, question=question, actor=request.user
+    )
+    result = _family_question_out(project=project, family=family, question=question, changed=changed)
+    idempotency.record_result(
+        request.user, scope, key, status_code=201, response_body=result, resource_type="question_family", resource_id=family.id
+    )
+    return 201, result
+
+
+@question_api_router.delete(
+    "/projects/{project_id}/question-families/{family_id}/questions/{question_id}",
+    auth=auth,
+    response=FamilyQuestionOut,
+)
+def remove_question_from_family(request, project_id: str, family_id: str, question_id: str):
+    """Move one question out of a family (back to "no family")."""
+    project = require_project(request.user, project_id)
+    family = _family_scope(project, family_id)
+    question = _question_scope(project, question_id)
+    question, changed = family_services.remove_question_from_family(
+        project=project, family=family, question=question, actor=request.user
+    )
+    return _family_question_out(project=project, family=family, question=question, changed=changed)
+
+
+def _family_question_out(*, project, family: QuestionFamily, question: Question, changed: bool) -> dict[str, Any]:
+    payload = family_services.family_payload(project=project, family=family)
+    return {
+        "family_id": str(family.id),
+        "question_id": str(question.id),
+        "changed": changed,
+        "member_count": payload["member_count"],
+        "sealed": payload["sealed"],
+        "sealed_reason": payload["sealed_reason"],
+    }
+
+
+@question_api_router.get(
+    "/projects/{project_id}/question-families/{family_id}/merge-impact",
+    auth=auth,
+    response=MergeImpactOut,
+)
+def question_family_merge_impact(request, project_id: str, family_id: str, target_family_id: str):
+    """Preview a merge: how many questions move, how much evidence goes stale."""
+    project = require_project(request.user, project_id)
+    source_family = _family_scope(project, family_id)
+    target_family = _family_scope(project, target_family_id)
+    return family_services.merge_impact(
+        project=project, source_family=source_family, target_family=target_family
+    )
+
+
+@question_api_router.post(
+    "/projects/{project_id}/question-families/{family_id}/merge", auth=auth, response={201: MergeOut}
+)
+def merge_question_family(request, project_id: str, family_id: str, payload: MergeIn):
+    """Merge one family into another (Idempotency-Key required).
+
+    Re-checks old exposure, invalidates the evidence that relied on family
+    distinctness and recomputes the affected knowledge states; repeating the same
+    merge is a no-op.
+    """
+    project = require_project(request.user, project_id)
+    source_family = _family_scope(project, family_id)
+    target_family = _family_scope(project, payload.target_family_id)
+    key = idempotency_key(request)
+    scope = f"question_families.merge:{family_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    result = family_services.merge_families(
+        project=project,
+        source_family=source_family,
+        target_family=target_family,
+        actor=request.user,
+        reason=payload.reason,
+    )
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="question_family",
+        resource_id=target_family.id,
+    )
+    outbox.after_commit_dispatch()
+    return 201, result

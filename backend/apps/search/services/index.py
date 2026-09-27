@@ -9,15 +9,17 @@ Two responsibilities live here on purpose, because they must agree:
   answer-leak rule of ``apps/search/models.py`` holds by construction.
 * **What may be retrieved** — ``visibility_filter`` is the authoritative gate:
   owner-scoped project, published (not withdrawn) question versions, the
-  subject's own project, and holdout families excluded. It re-derives all of
-  this from the live relations on every query, so a stale ``is_searchable`` flag
-  can never widen the result set. ``SearchDocument.is_searchable`` only records
-  what the last index run decided, together with the reason.
+  subject's own project, and sealed (holdout) questions/families excluded. It
+  re-derives all of this from the live relations on every query, so a stale
+  ``is_searchable`` flag can never widen the result set.
+  ``SearchDocument.is_searchable`` only records what the last index run decided,
+  together with the reason.
 
-This module is the hook the later P2 sealing work extends: sealing will add
-predicates to ``visibility_filter`` (and the matching index-time eligibility
-checks) rather than to individual callers, and every caller — the HTTP API, the
-evaluation command and the tests — inherits them by construction.
+P2 sealing is wired in here through
+:mod:`apps.question_bank.services.sealing` — the single resolver — so both the
+index-time eligibility check (:func:`question_eligibility`) and the retrieval gate
+(:func:`visibility_filter`) use one rule, and every caller (the HTTP API, the
+evaluation command and the tests) inherits it by construction.
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ import logging
 from typing import Any
 
 from django.db import transaction
-from django.db.models import Exists, F, OuterRef, Q, QuerySet
+from django.db.models import F, Q, QuerySet
 from django.utils import timezone
 
 from ai.providers.base import AiError
@@ -36,7 +38,8 @@ from ai.providers.embeddings import get_embedding_provider
 from apps.common.enums import QuestionVersionStatus
 from apps.common.errors import InvalidInput
 from apps.knowledge.models import KnowledgeNode
-from apps.question_bank.models import QuestionPoolPolicy, QuestionVersion
+from apps.question_bank.models import QuestionVersion
+from apps.question_bank.services import sealing
 from apps.search.models import SearchDocument, SearchDocumentKind
 from apps.search.services.tokenize import TOKENIZER_VERSION, term_frequencies, tokenize
 
@@ -144,13 +147,17 @@ def node_revision(node: KnowledgeNode) -> str:
 # Eligibility (index time) — kept in step with visibility_filter below
 # --------------------------------------------------------------------------
 def holdout_reason(question, project) -> str:
-    """Exclusion reason when the question or its family is a sealed holdout."""
-    policies = QuestionPoolPolicy.objects.filter(project=project, is_holdout=True)
-    target = Q(question_id=question.id)
-    if question.family_id:
-        target |= Q(family_id=question.family_id)
-    if policies.filter(target).exists():
-        return "题目或题族已标记为保留（holdout），不参与检索"
+    """Exclusion reason when the question or its family is sealed (C03).
+
+    The decision itself is not made here: it comes from
+    :mod:`apps.question_bank.services.sealing`, the single resolver every entry
+    point calls. This function only turns that decision into the wording the
+    index stores, so the search index and the practice path can never disagree
+    about which content is sealed.
+    """
+    sealed, _code = sealing.is_sealed(question, project=project)
+    if sealed:
+        return sealing.SEARCH_EXCLUSION_REASON
     return ""
 
 
@@ -189,10 +196,14 @@ def visibility_filter(*, user, project, subject=None) -> QuerySet[SearchDocument
     against the target's real relations, so a mis-written row cannot be
     retrieved either. ``is_searchable`` is *not* consulted here: it is an
     index-time record, and the live predicates below are what protect the data.
+
+    Sealed content is excluded through
+    :func:`apps.question_bank.services.sealing.sealed_question_ids` rather than
+    by re-reading ``QuestionPoolPolicy`` here: the resolver owns the "latest
+    revision per target" rule, so a seal (or a later unseal) takes effect on
+    retrieval immediately and identically to every other entry point. Knowledge
+    node documents carry no question and are never removed by this predicate.
     """
-    holdout_policies = QuestionPoolPolicy.objects.filter(project=project, is_holdout=True).filter(
-        Q(question_id=OuterRef("question_id")) | Q(family_id=OuterRef("question__family_id"))
-    )
     queryset = SearchDocument.objects.filter(project=project, project__owner=user).filter(
         Q(
             kind=SearchDocumentKind.QUESTION,
@@ -211,7 +222,10 @@ def visibility_filter(*, user, project, subject=None) -> QuerySet[SearchDocument
         queryset = queryset.filter(
             Q(question_version__question__subject=subject) | Q(knowledge_node__syllabus_version__subject=subject)
         )
-    return queryset.annotate(search_holdout=Exists(holdout_policies)).filter(search_holdout=False)
+    sealed_ids = sorted(sealing.sealed_question_ids(project=project))
+    if sealed_ids:
+        queryset = queryset.filter(Q(question_id__isnull=True) | ~Q(question_id__in=sealed_ids))
+    return queryset
 
 
 def searchable_documents(*, user, project, subject=None) -> QuerySet[SearchDocument]:

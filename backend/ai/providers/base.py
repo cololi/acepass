@@ -45,12 +45,18 @@ P0_CAPABILITIES = ("extract_question", "explain")
 #: ``suggest_tags`` is deliberately absent: the knowledge tag queue is only ever
 #: filled by a real text model, so "no provider" stays an explicit
 #: ``ai_not_configured`` instead of an empty stub proposal.
+#:
+#: ``propose_variant`` *is* present, but its payload is an honest placeholder
+#: that deliberately fails the variant validator (no answer at all): a demo run
+#: produces a candidate that is visibly blocked, never a publishable variant, so
+#: the stub can never be mistaken for a real generator.
 STUB_CAPABILITIES = (
     "extract_question",
     "transcribe_handwriting",
     "explain",
     "diagnose",
     "estimate_grade",
+    "propose_variant",
 )
 
 
@@ -158,6 +164,10 @@ class OpenAICompatibleProvider(BaseProvider):
         capabilities = []
         if text_model:
             capabilities.extend(["explain", "diagnose", "suggest_tags", "estimate_grade"])
+            # Variant generation is a text job with the same contract as the
+            # other structured prompts: capability -> prompt version -> JSON
+            # validation. A vision-only provider must not be asked to do it.
+            capabilities.append("propose_variant")
         if vision_model:
             # Handwriting transcription is a vision job: a text-only provider must
             # never be asked to read a photo.
@@ -362,6 +372,33 @@ class StubProvider(BaseProvider):
             )
         if request.capability == "suggest_tags":
             return self._result(request, {"tags": []})
+        if request.capability == "propose_variant":
+            # An honest placeholder, not a variant: it carries no answer at all,
+            # so ``validate_variant_payload`` rejects it and the proposal can only
+            # ever be stored as a blocked candidate. Anything else would let a
+            # test/demo run look like a real generator.
+            return self._result(
+                request,
+                {
+                    "question_type": "single_choice",
+                    "content": {
+                        "blocks": [
+                            {
+                                "kind": "text",
+                                "text": "【stub 变式】这是测试/演示模式的占位题干，不是模型生成的可用变式。",
+                            }
+                        ],
+                        "options": [
+                            {"id": "opt_a", "label": "A", "blocks": [{"kind": "text", "text": "占位选项A"}]},
+                            {"id": "opt_b", "label": "B", "blocks": [{"kind": "text", "text": "占位选项B"}]},
+                        ],
+                    },
+                    "answer_payload": {},
+                    "difficulty_note": "stub 不评估难度",
+                    "rationale": "stub 不产生可用变式：必须配置真实 provider 或人工录入",
+                    "doubts": ["stub 输出缺少答案，必然无法通过变式校验，也不会被发布"],
+                },
+            )
         raise AiUnavailable(f"stub 未实现能力：{request.capability}")
 
     def _result(self, request: AiRequest, payload: dict[str, Any]) -> AiCallResult:

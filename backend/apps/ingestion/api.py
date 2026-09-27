@@ -8,10 +8,11 @@ from django.http import Http404, StreamingHttpResponse
 from ninja import File, Form, Schema
 from ninja.files import UploadedFile
 
+from ai.providers import base as providers
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
 from apps.common.enums import AssetRole, SourceKind
-from apps.common.errors import InvalidInput, ScopeViolation
+from apps.common.errors import AiNotConfigured, DependencyUnavailable, InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.exams.models import ExamSpecVersion
 from apps.ingestion import services as ingestion_services
@@ -26,6 +27,9 @@ from apps.ingestion.services.core import (
     validate_image,
 )
 from apps.ingestion.storage import get_storage
+from apps.knowledge.models import KnowledgeNode
+from apps.question_bank.models import QuestionVersion
+from apps.question_bank.services import variants as variant_services
 
 ingestion_router = project_scoped_router(tags=["ingestion"])
 
@@ -161,6 +165,87 @@ class SourceDocumentOut(Schema):
 
 class TextParseIn(Schema):
     text: str
+
+
+# --------------------------------------------------------------------------
+# P2 batch 2: AI-generated variants (acceptance C02)
+# --------------------------------------------------------------------------
+class VariantProposeIn(Schema):
+    """Either the stable question or one explicit version may be the source."""
+
+    source_question_id: str | None = None
+    source_version_id: str | None = None
+    node_id: str
+    count: int = 1
+    difficulty_note: str = ""
+
+
+class VariantCandidateOut(Schema):
+    candidate_id: str
+    job_id: str
+    status: str
+    awaiting_human_review: bool
+    question_type: str | None
+    review_issues: list[dict[str, Any]]
+    blocking_issues: list[dict[str, Any]]
+    #: The model's answer is a proposal: publishing stays blocked until a human
+    #: confirms it (the ordinary ``answer_status_known`` confirmation).
+    answer_needs_confirmation: bool
+    answer_source_type: str
+    content_digest: str
+    source_question_id: str
+    source_version_id: str
+    node_id: str
+    llm_run_id: str
+    is_stub_output: bool
+    publication_question_id: str | None
+    publication_version_id: str | None
+    created_at: str
+
+
+class VariantProposeOut(Schema):
+    job_id: str
+    job_status: str
+    project_id: str
+    subject_id: str
+    source_question_id: str
+    source_version_id: str
+    node_id: str
+    node_name: str
+    provider: str
+    model: str
+    is_stub: bool
+    prompt_version: str
+    origin_type: str
+    requested_count: int
+    count: int
+    count_capped: bool
+    candidates: list[VariantCandidateOut]
+    validation: dict[str, Any]
+    nothing_passed: bool
+    problems: list[dict[str, Any]]
+    notes: list[str]
+
+
+class VariantJobOut(Schema):
+    job_id: str
+    project_id: str
+    subject_id: str | None
+    status: str
+    input_kind: str
+    extractor_version: str
+    progress_percent: int
+    problems: list[dict[str, Any]]
+    candidate_count: int
+    candidate_status_counts: dict[str, int]
+    candidates: list[VariantCandidateOut]
+    created_at: str
+
+
+class VariantListOut(Schema):
+    count: int
+    limit: int
+    jobs: list[VariantJobOut]
 
 
 def _asset_out(asset) -> dict:
@@ -740,3 +825,99 @@ def publish_candidate(request, project_id: str, candidate_id: str, payload: Cand
     )
     outbox.after_commit_dispatch()
     return result
+
+
+# --------------------------------------------------------------------------
+# P2 batch 2: AI-generated variants (acceptance C02)
+# --------------------------------------------------------------------------
+def _raise_ai_error(exc: providers.AiError, *, action: str) -> None:
+    """Map provider failures the way the rest of the product does.
+
+    Mirrors the helper in ``apps/practice/api.py``: a missing capability is
+    "AI not configured" (503) and anything else the provider raised is a
+    dependency failure (503) — never a fabricated result.
+    """
+    if isinstance(exc, providers.AiUnavailable):
+        raise AiNotConfigured(
+            message=f"{action}需要配置 AI 能力：{exc}", details={"error_code": exc.code}
+        ) from exc
+    raise DependencyUnavailable(message=f"{action}失败：{exc}", details={"error_code": exc.code}) from exc
+
+
+def _variant_source_version(user, project, payload: VariantProposeIn) -> QuestionVersion:
+    """Owner-scoped source version; a foreign or unknown id is a 404."""
+    queryset = QuestionVersion.objects.filter(question__subject__project=project).select_related(
+        "question__subject"
+    )
+    if payload.source_version_id:
+        version = queryset.filter(id=payload.source_version_id).first()
+    else:
+        version = (
+            queryset.filter(question_id=payload.source_question_id, status="published")
+            .order_by("-version")
+            .first()
+        )
+    if version is None:
+        raise ScopeViolation(message="源题目版本不存在或不属于该项目")
+    return version
+
+
+@ingestion_router.post(
+    "/projects/{project_id}/variants/propose", auth=auth, response={201: VariantProposeOut}
+)
+def propose_variants(request, project_id: str, payload: VariantProposeIn):
+    """Propose AI variants of one question as reviewable candidates (C02).
+
+    The response contains candidates and their problems — never published
+    content. Publishing stays the ordinary human gate
+    (``…/import-candidates/{id}/publish``); there is deliberately no second path.
+    """
+    project = require_project(request.user, project_id)
+    if not payload.source_question_id and not payload.source_version_id:
+        raise InvalidInput(message="必须提供 source_question_id 或 source_version_id")
+    if payload.count < 1:
+        raise InvalidInput(message="count 必须至少为 1")
+    version = _variant_source_version(request.user, project, payload)
+    node = (
+        KnowledgeNode.objects.filter(id=payload.node_id, syllabus_version__subject__project=project)
+        .select_related("syllabus_version__subject")
+        .first()
+    )
+    if node is None:
+        raise ScopeViolation(message="考点不存在或不属于该项目")
+    key = idempotency_key(request)
+    scope = f"variants.propose:{project_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    try:
+        result = variant_services.propose_variants(
+            project=project,
+            source_version=version,
+            node=node,
+            actor=request.user,
+            count=payload.count,
+            difficulty_note=payload.difficulty_note,
+        )
+    except providers.AiError as exc:
+        _raise_ai_error(exc, action="生成变式")
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="import_job",
+        resource_id=result["job_id"],
+    )
+    return 201, result
+
+
+@ingestion_router.get("/projects/{project_id}/variants", auth=auth, response=VariantListOut)
+def list_variants(request, project_id: str, limit: int = 20):
+    """Variant batches of this project and their candidates, newest first."""
+    project = require_project(request.user, project_id)
+    bounded = max(1, min(int(limit), 50))
+    jobs = variant_services.variant_jobs(project=project, user=request.user, limit=bounded)
+    return {"count": len(jobs), "limit": bounded, "jobs": jobs}

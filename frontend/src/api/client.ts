@@ -1838,3 +1838,543 @@ export function declareQuestionExternalSeen(
     body: { seen: payload.seen, note: payload.note },
   }).then(normalizeExposureState)
 }
+
+/**
+ * The server's own sentence for a failed call, verbatim.
+ *
+ * `describeError` replaces `ai_not_configured` with a generic hint; the C02/C03
+ * surfaces must show the server's *own* explanation instead (which provider
+ * capability is missing, which sealing policy refused, which problems a 422
+ * carried), so nothing here is rewritten or summarised.
+ */
+export function serverMessageOf(error: unknown): string {
+  if (error instanceof ApiError) return error.message
+  if (error instanceof Error) return error.message
+  return '请求失败'
+}
+
+/* ============================================ P2 批次 2：封存 holdout（C03） */
+/**
+ * 封存（holdout）：题目与家族的保留策略。
+ *
+ * The server is the only judge: what `GET /sealed-content` reports is what is
+ * sealed *now*, and nothing here derives a state from a local guess. Sealing is
+ * an **appended policy revision**, never an edit — so a repeated click is a new
+ * revision, which is exactly what the audit trail wants.
+ *
+ * Every write sends one fresh `Idempotency-Key`; only the endpoints that claim
+ * the key consume it (family create / membership / merge, variant proposal) and
+ * the others ignore the header.
+ */
+
+/** One appended policy revision and what it means right now. */
+export interface SealOut {
+  policy_id: string
+  /** `question` or `family`. */
+  target: string
+  question_id: string | null
+  family_id: string | null
+  revision: number
+  is_holdout: boolean
+  change_reason: string
+  changed_at: string
+  /**
+   * Whether this revision leaves **any** question sealed, resolved through the
+   * server's sealing service. A family with no members reports `false` here even
+   * though the family itself is sealed — the family's own state comes from the
+   * family list (`FamilyOut.sealed`), never from this field.
+   */
+  sealed: boolean
+  sealed_reason: string
+  sealed_question_ids: string[]
+}
+
+/** One sealed question with the policy revision that sealed it. */
+export interface SealedContentQuestionRow {
+  question_id: string
+  display_label: string
+  subject_id: string
+  family_id: string | null
+  family_name: string
+  /** `sealed_question_policy` or `sealed_family_policy`. */
+  reason_code: string
+  /** The server's own sentence for that code. */
+  reason_message: string
+  policy_id: string | null
+  policy_revision: number | null
+  policy_target: string | null
+  change_reason: string
+  changed_at: string | null
+}
+
+/** One sealed family (an empty family can be sealed too). */
+export interface SealedContentFamilyRow {
+  family_id: string
+  name: string
+  subject_id: string | null
+  reason_code: string
+  reason_message: string
+  policy_id: string
+  policy_revision: number | null
+  change_reason: string
+  changed_at: string | null
+  question_ids: string[]
+}
+
+export interface SealedContentOut {
+  project_id: string
+  questions: SealedContentQuestionRow[]
+  families: SealedContentFamilyRow[]
+  counts: { questions: number; question_versions: number; families: number }
+  reason_codes: string[]
+  generated_at: string
+}
+
+function normalizeSealedQuestionRow(raw: unknown): SealedContentQuestionRow {
+  const row = (raw ?? {}) as Record<string, unknown>
+  return {
+    question_id: String(row.question_id ?? ''),
+    display_label: String(row.display_label ?? ''),
+    subject_id: String(row.subject_id ?? ''),
+    family_id: row.family_id === null || row.family_id === undefined ? null : String(row.family_id),
+    family_name: String(row.family_name ?? ''),
+    reason_code: String(row.reason_code ?? ''),
+    reason_message: String(row.reason_message ?? ''),
+    policy_id: row.policy_id === null || row.policy_id === undefined ? null : String(row.policy_id),
+    policy_revision: asNumberOrNull(row.policy_revision),
+    policy_target: row.policy_target === null || row.policy_target === undefined ? null : String(row.policy_target),
+    change_reason: String(row.change_reason ?? ''),
+    changed_at: row.changed_at === null || row.changed_at === undefined ? null : String(row.changed_at),
+  }
+}
+
+function normalizeSealedFamilyRow(raw: unknown): SealedContentFamilyRow {
+  const row = (raw ?? {}) as Record<string, unknown>
+  return {
+    family_id: String(row.family_id ?? ''),
+    name: String(row.name ?? ''),
+    subject_id: row.subject_id === null || row.subject_id === undefined ? null : String(row.subject_id),
+    reason_code: String(row.reason_code ?? ''),
+    reason_message: String(row.reason_message ?? ''),
+    policy_id: String(row.policy_id ?? ''),
+    policy_revision: asNumberOrNull(row.policy_revision),
+    change_reason: String(row.change_reason ?? ''),
+    changed_at: row.changed_at === null || row.changed_at === undefined ? null : String(row.changed_at),
+    question_ids: asStringArray(row.question_ids),
+  }
+}
+
+/** Normalized so a missing shape is visibly empty instead of `undefined` in the UI. */
+export function normalizeSealedContent(payload: unknown): SealedContentOut | null {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null
+  const row = payload as Record<string, unknown>
+  const counts = (row.counts ?? {}) as Record<string, unknown>
+  return {
+    project_id: String(row.project_id ?? ''),
+    questions: Array.isArray(row.questions) ? row.questions.map(normalizeSealedQuestionRow) : [],
+    families: Array.isArray(row.families) ? row.families.map(normalizeSealedFamilyRow) : [],
+    counts: {
+      questions: asNumberOrNull(counts.questions) ?? 0,
+      question_versions: asNumberOrNull(counts.question_versions) ?? 0,
+      families: asNumberOrNull(counts.families) ?? 0,
+    },
+    reason_codes: asStringArray(row.reason_codes),
+    generated_at: String(row.generated_at ?? ''),
+  }
+}
+
+export function sealQuestion(projectId: string, questionId: string, reason: string) {
+  return apiRequest<SealOut>(`/projects/${projectId}/questions/${questionId}/seal`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('question-seal'),
+    body: { reason },
+  })
+}
+
+export function unsealQuestion(projectId: string, questionId: string, reason: string) {
+  return apiRequest<SealOut>(`/projects/${projectId}/questions/${questionId}/unseal`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('question-unseal'),
+    body: { reason },
+  })
+}
+
+export function sealQuestionFamily(projectId: string, familyId: string, reason: string) {
+  return apiRequest<SealOut>(`/projects/${projectId}/question-families/${familyId}/seal`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('family-seal'),
+    body: { reason },
+  })
+}
+
+export function unsealQuestionFamily(projectId: string, familyId: string, reason: string) {
+  return apiRequest<SealOut>(`/projects/${projectId}/question-families/${familyId}/unseal`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('family-unseal'),
+    body: { reason },
+  })
+}
+
+/**
+ * What is sealed in this project and why.
+ *
+ * The endpoint is **project-scoped** (it takes no `subject_id`): the UI filters
+ * the returned rows by subject for display instead of asking the server for a
+ * narrower answer it cannot give.
+ */
+export function fetchSealedContent(projectId: string): Promise<SealedContentOut | null> {
+  return apiRequest<unknown>(`/projects/${projectId}/sealed-content`).then(normalizeSealedContent)
+}
+
+/* ======================================== P2 批次 2：题目家族与合并（C03） */
+/** One family as the server reports it (membership is a count, not a list). */
+export interface QuestionFamilyOut {
+  id: string
+  subject_id: string
+  name: string
+  revision: number
+  relation_confirmed: boolean
+  note: string
+  member_count: number
+  /** The family's own latest policy revision says holdout. */
+  sealed: boolean
+  /** `sealed_family_policy` when `sealed`, otherwise empty. */
+  sealed_reason: string
+  /**
+   * Members sealed by any policy (the family's or their own): a partially
+   * sealed family stays visible instead of looking untouched.
+   */
+  sealed_member_count: number
+  merged_into_id: string | null
+  merged_at: string | null
+}
+
+export interface FamilyQuestionOut {
+  family_id: string
+  question_id: string
+  changed: boolean
+  member_count: number
+  sealed: boolean
+  sealed_reason: string
+}
+
+/** The merge preview: the counts a human compares with the outcome. */
+export interface FamilyMergeImpactOut {
+  project_id: string
+  source_family_id: string
+  target_family_id: string
+  source_family_name: string
+  target_family_name: string
+  already_merged: boolean
+  questions_to_move: number
+  questions_in_target_after: number
+  evidence_rows_to_invalidate: number
+  affected_user_ids: string[]
+  exposed_before_merge: number
+  exposed_after_merge: number
+  exposed_question_ids_before_merge: string[]
+}
+
+export interface FamilyMergeExposureChange {
+  user_id: string
+  question_id: string
+  seen_before: boolean
+  seen_after: boolean
+  reasons: string[]
+}
+
+/** The performed merge, with the same counts the preview promised. */
+export interface FamilyMergeOut {
+  project_id: string
+  source_family_id: string
+  target_family_id: string
+  merge_revision: number
+  questions_moved: number
+  questions_in_target_after: number
+  evidence_invalidated: number
+  states_recomputed: number
+  exposed_before_merge: number
+  exposed_after_merge: number
+  exposure_changes: FamilyMergeExposureChange[]
+  affected_user_ids: string[]
+  /** True when the same merge had already happened: nothing was written. */
+  noop: boolean
+  content_revision_id: string | null
+}
+
+export function fetchQuestionFamilies(projectId: string, subjectId: string) {
+  return apiRequest<QuestionFamilyOut[]>(
+    `/projects/${projectId}/question-families?subject_id=${subjectId}`,
+  )
+}
+
+export function createQuestionFamily(
+  projectId: string,
+  payload: { subject_id: string; name: string; note: string },
+) {
+  return apiRequest<QuestionFamilyOut>(`/projects/${projectId}/question-families`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('family-create'),
+    body: payload,
+  })
+}
+
+export function patchQuestionFamily(
+  projectId: string,
+  familyId: string,
+  patch: { name?: string; relation_confirmed?: boolean; note?: string },
+) {
+  return apiRequest<QuestionFamilyOut>(`/projects/${projectId}/question-families/${familyId}`, {
+    method: 'PATCH',
+    idempotencyKey: newIdempotencyKey('family-patch'),
+    body: patch,
+  })
+}
+
+export function addQuestionToFamily(projectId: string, familyId: string, questionId: string) {
+  return apiRequest<FamilyQuestionOut>(
+    `/projects/${projectId}/question-families/${familyId}/questions`,
+    {
+      method: 'POST',
+      idempotencyKey: newIdempotencyKey('family-member-add'),
+      body: { question_id: questionId },
+    },
+  )
+}
+
+/** The one membership call the server does not guard with an idempotency key. */
+export function removeQuestionFromFamily(projectId: string, familyId: string, questionId: string) {
+  return apiRequest<FamilyQuestionOut>(
+    `/projects/${projectId}/question-families/${familyId}/questions/${questionId}`,
+    { method: 'DELETE', idempotencyKey: newIdempotencyKey('family-member-remove') },
+  )
+}
+
+/** The preview a merge must show before anyone confirms it. */
+export function fetchFamilyMergeImpact(projectId: string, familyId: string, targetFamilyId: string) {
+  return apiRequest<FamilyMergeImpactOut>(
+    `/projects/${projectId}/question-families/${familyId}/merge-impact?target_family_id=${targetFamilyId}`,
+  )
+}
+
+export function mergeQuestionFamily(
+  projectId: string,
+  familyId: string,
+  payload: { target_family_id: string; reason: string },
+) {
+  return apiRequest<FamilyMergeOut>(
+    `/projects/${projectId}/question-families/${familyId}/merge`,
+    {
+      method: 'POST',
+      idempotencyKey: newIdempotencyKey('family-merge'),
+      body: payload,
+    },
+  )
+}
+
+/* ======================================= P2 批次 2：AI 变式候选（C02） */
+/** One deterministic problem of a candidate (422 bodies carry the same shape). */
+export interface VariantIssueOut {
+  code: string
+  message: string
+  severity: string
+  path: string
+  [key: string]: unknown
+}
+
+function normalizeVariantIssue(raw: unknown): VariantIssueOut {
+  const row = (raw ?? {}) as Record<string, unknown>
+  return {
+    ...row,
+    code: String(row.code ?? ''),
+    message: String(row.message ?? ''),
+    // The server defaults to blocking when severity is absent; the UI must not
+    // downgrade a problem it did not understand.
+    severity: String(row.severity ?? 'blocking'),
+    path: String(row.path ?? ''),
+  }
+}
+
+/** One stored proposal: kept even when it failed validation (失败留候选). */
+export interface VariantCandidateOut {
+  candidate_id: string
+  job_id: string
+  status: string
+  awaiting_human_review: boolean
+  question_type: string | null
+  review_issues: VariantIssueOut[]
+  blocking_issues: VariantIssueOut[]
+  /** The model's answer is a proposal: publishing still needs a human. */
+  answer_needs_confirmation: boolean
+  answer_source_type: string
+  content_digest: string
+  source_question_id: string
+  source_version_id: string
+  node_id: string
+  llm_run_id: string
+  is_stub_output: boolean
+  publication_question_id: string | null
+  publication_version_id: string | null
+  created_at: string
+}
+
+export interface VariantValidationOut {
+  requested_count: number
+  count: number
+  accepted: number
+  rejected: number
+  blocking_problem_count: number
+  nothing_passed: boolean
+}
+
+export interface VariantProposeOut {
+  job_id: string
+  job_status: string
+  project_id: string
+  subject_id: string
+  source_question_id: string
+  source_version_id: string
+  node_id: string
+  node_name: string
+  provider: string
+  model: string
+  is_stub: boolean
+  prompt_version: string
+  origin_type: string
+  requested_count: number
+  /** What the server actually generated (capped at 3). */
+  count: number
+  count_capped: boolean
+  candidates: VariantCandidateOut[]
+  validation: VariantValidationOut
+  nothing_passed: boolean
+  problems: VariantIssueOut[]
+  /** The server's own sentences, e.g. the cap notice. Never reworded. */
+  notes: string[]
+}
+
+export interface VariantJobOut {
+  job_id: string
+  project_id: string
+  subject_id: string | null
+  status: string
+  input_kind: string
+  extractor_version: string
+  progress_percent: number
+  problems: VariantIssueOut[]
+  candidate_count: number
+  candidate_status_counts: Record<string, number>
+  candidates: VariantCandidateOut[]
+  created_at: string
+}
+
+export interface VariantListOut {
+  count: number
+  limit: number
+  jobs: VariantJobOut[]
+}
+
+function normalizeVariantCandidate(raw: unknown): VariantCandidateOut {
+  const row = (raw ?? {}) as Record<string, unknown>
+  return {
+    candidate_id: String(row.candidate_id ?? ''),
+    job_id: String(row.job_id ?? ''),
+    status: String(row.status ?? ''),
+    awaiting_human_review: row.awaiting_human_review === undefined ? true : Boolean(row.awaiting_human_review),
+    question_type: row.question_type === null || row.question_type === undefined ? null : String(row.question_type),
+    review_issues: Array.isArray(row.review_issues) ? row.review_issues.map(normalizeVariantIssue) : [],
+    blocking_issues: Array.isArray(row.blocking_issues) ? row.blocking_issues.map(normalizeVariantIssue) : [],
+    answer_needs_confirmation:
+      row.answer_needs_confirmation === undefined ? true : Boolean(row.answer_needs_confirmation),
+    answer_source_type: String(row.answer_source_type ?? ''),
+    content_digest: String(row.content_digest ?? ''),
+    source_question_id: String(row.source_question_id ?? ''),
+    source_version_id: String(row.source_version_id ?? ''),
+    node_id: String(row.node_id ?? ''),
+    llm_run_id: String(row.llm_run_id ?? ''),
+    is_stub_output: Boolean(row.is_stub_output),
+    publication_question_id:
+      row.publication_question_id === null || row.publication_question_id === undefined
+        ? null
+        : String(row.publication_question_id),
+    publication_version_id:
+      row.publication_version_id === null || row.publication_version_id === undefined
+        ? null
+        : String(row.publication_version_id),
+    created_at: String(row.created_at ?? ''),
+  }
+}
+
+function normalizeVariantJob(raw: unknown): VariantJobOut {
+  const row = (raw ?? {}) as Record<string, unknown>
+  const statuses = (row.candidate_status_counts ?? {}) as Record<string, unknown>
+  return {
+    job_id: String(row.job_id ?? ''),
+    project_id: String(row.project_id ?? ''),
+    subject_id: row.subject_id === null || row.subject_id === undefined ? null : String(row.subject_id),
+    status: String(row.status ?? ''),
+    input_kind: String(row.input_kind ?? ''),
+    extractor_version: String(row.extractor_version ?? ''),
+    progress_percent: asNumberOrNull(row.progress_percent) ?? 0,
+    problems: Array.isArray(row.problems) ? row.problems.map(normalizeVariantIssue) : [],
+    candidate_count: asNumberOrNull(row.candidate_count) ?? 0,
+    candidate_status_counts: Object.fromEntries(
+      Object.entries(statuses).map(([status, count]) => [status, asNumberOrNull(count) ?? 0]),
+    ),
+    candidates: Array.isArray(row.candidates) ? row.candidates.map(normalizeVariantCandidate) : [],
+    created_at: String(row.created_at ?? ''),
+  }
+}
+
+/**
+ * Ask the configured provider for variants of one question.
+ *
+ * `count` above the server's cap is not clipped here: the server performs the
+ * cap, says so in `notes`, and the UI shows that sentence instead of pretending
+ * it was asked for the same thing.
+ */
+export function proposeVariants(
+  projectId: string,
+  payload: {
+    source_question_id?: string
+    source_version_id?: string
+    node_id: string
+    count: number
+    difficulty_note: string
+  },
+) {
+  return apiRequest<unknown>(`/projects/${projectId}/variants/propose`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('variants-propose'),
+    body: payload,
+  }).then((raw) => {
+    const row = (raw ?? {}) as Record<string, unknown>
+    const validation = (row.validation ?? {}) as Record<string, unknown>
+    return {
+      ...(row as unknown as VariantProposeOut),
+      candidates: Array.isArray(row.candidates) ? row.candidates.map(normalizeVariantCandidate) : [],
+      problems: Array.isArray(row.problems) ? row.problems.map(normalizeVariantIssue) : [],
+      notes: asStringArray(row.notes),
+      validation: {
+        requested_count: asNumberOrNull(validation.requested_count) ?? 0,
+        count: asNumberOrNull(validation.count) ?? 0,
+        accepted: asNumberOrNull(validation.accepted) ?? 0,
+        rejected: asNumberOrNull(validation.rejected) ?? 0,
+        blocking_problem_count: asNumberOrNull(validation.blocking_problem_count) ?? 0,
+        nothing_passed: Boolean(validation.nothing_passed),
+      },
+    } satisfies VariantProposeOut
+  })
+}
+
+/** Variant batches of this project, newest first (payloaded as `{count, limit, jobs}`). */
+export function fetchVariantJobs(projectId: string, limit = 20): Promise<VariantListOut> {
+  return apiRequest<unknown>(`/projects/${projectId}/variants?limit=${limit}`).then((raw) => {
+    const row = (raw ?? {}) as Record<string, unknown>
+    return {
+      count: asNumberOrNull(row.count) ?? 0,
+      limit: asNumberOrNull(row.limit) ?? limit,
+      jobs: Array.isArray(row.jobs) ? row.jobs.map(normalizeVariantJob) : [],
+    }
+  })
+}

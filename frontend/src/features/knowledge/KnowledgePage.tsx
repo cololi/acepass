@@ -24,6 +24,7 @@ import {
   type VerificationPairingOut,
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
+import { FamiliesPanel } from './FamiliesPanel'
 
 const SUMMARY_LABELS: Record<string, string> = {
   undiagnosed: '未诊断',
@@ -1178,6 +1179,9 @@ export function KnowledgePage() {
           </>
         )}
       </div>
+
+      {/* C03: 题目家族（成员、封存、两步合并）— subject-scoped like the rest of this page. */}
+      <FamiliesPanel questions={questionsQuery.data ?? []} />
 
       <div className="card">
         <h2>人工配对验证（A / B / C）</h2>

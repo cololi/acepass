@@ -48,6 +48,15 @@ class QuestionFamily(BaseModel):
     relation_confirmed = models.BooleanField(default=False)
     revision = models.PositiveIntegerField(default=1)
     note = models.CharField(max_length=500, blank=True)
+    #: Merge audit (P2/C03). Both fields are written on the *source* family when
+    #: its questions are absorbed: ``merged_into`` names the surviving family and
+    #: ``merged_at`` says when. A family that has at least one ``merged_from`` row
+    #: is a *merged* family: its members stop being distinct "variants" of each
+    #: other, which is what :mod:`apps.learning.services.contamination` reads.
+    merged_into = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="merged_from"
+    )
+    merged_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "question_bank_family"
@@ -312,7 +321,10 @@ class QuestionPoolPolicy(BaseModel):
         Question, null=True, blank=True, on_delete=models.CASCADE, related_name="pool_policies"
     )
     revision = models.PositiveIntegerField(default=1)
-    is_holdout = models.BooleanField(default=False, help_text="保留待验证（P0 仅记录，不参与封存判定）")
+    #: P2/C03: the latest revision per target decides sealing; see
+    #: :mod:`apps.question_bank.services.sealing`, which is the only reader of
+    #: this column. Older revisions are history and never decide anything.
+    is_holdout = models.BooleanField(default=False, help_text="保留待验证（最新修订参与封存判定，见 services/sealing.py）")
     change_reason = models.CharField(max_length=500, blank=True)
     changed_by = models.ForeignKey(
         "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="pool_policy_changes"

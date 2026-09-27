@@ -11,6 +11,7 @@ import {
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
 import { LAYOUT_ISSUE_LABELS, LayoutDiagnostics } from './LayoutReview'
+import { VariantsList } from './VariantsList'
 
 const STATUS_LABELS: Record<string, string> = {
   queued: '排队中',
@@ -382,6 +383,9 @@ export function ImportsPage() {
           </table>
         </div>
       </div>
+
+      {/* C02: AI 变式任务与候选；与其它导入入口并列，校对与发布仍走同一条路径。 */}
+      <VariantsList />
 
       {selectedJob ? (
         <>

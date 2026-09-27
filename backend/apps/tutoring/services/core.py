@@ -78,6 +78,7 @@ def _blocks_text(blocks: Any) -> str:
 def assert_tutoring_allowed(item: SessionItem, purpose: str) -> None:
     """Server-side gate. Hiding the button in the UI is not a control."""
     from apps.practice.services import verification_gate
+    from apps.question_bank.services import sealing
 
     session = item.session
     if session.status != SessionStatus.ACTIVE:
@@ -90,6 +91,15 @@ def assert_tutoring_allowed(item: SessionItem, purpose: str) -> None:
         raise PurposeNotAllowed(message="该题项按计划不提供辅导（例如延迟验证题）")
     if purpose not in TutorPurpose.values:
         raise InvalidInput(message="辅导用途无效")
+    # C03: a sealed question is never sent to a model at all — the prompt is built
+    # from this item's stem, answer and rubric, so the refusal must happen before
+    # the prompt exists. `assert_job_deliverable` repeats it at read time for jobs
+    # stored before the seal.
+    sealing.assert_not_sealed(
+        question=item.question_version.question,
+        project=session.project,
+        action="生成 AI 提示/讲解",
+    )
     # B02: an explanation delivers the answer. The item being a *practice* item
     # is not enough — the same content may be under a running verification in
     # another tab, session or project, and that run's integrity does not depend
@@ -361,15 +371,24 @@ def _model_identifier(capability: str) -> str:
 
 def assert_job_deliverable(job: TutorJob) -> None:
     """A queued or stored explanation may only be delivered while its content is
-    not part of a running verification.
+    neither sealed nor part of a running verification.
 
     Checked at *read* time as well as at creation time: a job created before the
     verification started still holds the answer, so the cached result is exactly
-    the bypass B02 described ("旧任务结果读取没有内容门禁").
+    the bypass B02 described ("旧任务结果读取没有内容门禁"). C03 adds the mirror
+    case for sealing — a job created before the question was sealed must not be
+    delivered (nor replayed through the stream / segments / SSE surfaces, which
+    all call this function) afterwards.
     """
     from apps.practice.services import verification_gate
+    from apps.question_bank.services import sealing
 
     item = job.tutor_session.session_item
+    sealing.assert_not_sealed(
+        question=item.question_version.question,
+        project=job.project,
+        action="读取讲解与答案",
+    )
     verification_gate.assert_content_not_in_active_verification(
         user=job.user,
         question_version=item.question_version,
@@ -536,13 +555,21 @@ def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str, c
         assert_job_deliverable(job)
     except PurposeNotAllowed as exc:
         # Terminal, honest refusal: nothing is stored, and the reason is on the
-        # job so a later read does not look like an unexplained failure.
+        # job so a later read does not look like an unexplained failure. C03 adds
+        # the sealed-content case; the code names which gate refused.
+        from apps.question_bank.services import sealing
+
+        refusal = (getattr(exc, "details", None) or {}).get("reason", "")
         _write_job_result(
             job=job,
             claim=claim,
             fields={
                 "status": TutorRequestStatus.FAILED,
-                "error_code": "blocked_by_active_verification",
+                "error_code": (
+                    "blocked_by_sealed_content"
+                    if refusal in sealing.SEALED_REASON_CODES
+                    else "blocked_by_active_verification"
+                ),
                 "error_message": str(getattr(exc, "message", exc))[:500],
                 "result_blocks": [],
             },

@@ -534,6 +534,16 @@ def refresh_candidate_issues(candidate: ImportCandidate) -> list[dict]:
                 "pages": continues_on_pages,
             }
         )
+    # P2 batch 2 (C02): an AI-generated variant is re-checked here, inside the
+    # single publish gate, against its *stored* payload. That is what makes a
+    # rejection durable — "failed proposals stay candidates" cannot be undone by
+    # editing an unrelated field, and a variant can never be published while it
+    # still duplicates published content, has an unverifiable answer, or targets
+    # a node outside the question's syllabus.
+    if candidate.job.input_kind == "ai_variant":
+        from apps.question_bank.services import variants as variant_services
+
+        issues.extend(variant_services.variant_review_issues(candidate))
 
     if question_type and content:
         digest = hashlib.sha256(
@@ -745,6 +755,12 @@ def publish_candidate(
     blocking = [issue for issue in issues if issue.get("severity") == "blocking"]
     if blocking:
         raise StructureInvalid(message="候选仍有未解决的问题，不能发布", details={"problems": blocking})
+    if locked.job.input_kind == "ai_variant":
+        # P2 batch 2 (C02): a variant is AI content by construction. The caller
+        # cannot relabel it as user-authored to make it countable as real
+        # material — the origin decides `is_demo`, and only `ai_generated`
+        # guarantees the cycle analysis and the PaperItem rule keep it out.
+        origin_type = OriginType.AI_GENERATED
 
     declared_score = _to_decimal(payload.get("practice_max_score"))
     if declared_score is None and exam_spec_version is not None:

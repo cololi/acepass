@@ -1,9 +1,21 @@
 import { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiRequest, newIdempotencyKey, type QuestionListItem, type SyllabusOut } from '../../api/client'
+import {
+  apiRequest,
+  fetchSealedContent,
+  newIdempotencyKey,
+  problemsOf,
+  serverMessageOf,
+  type ApiProblemRow,
+  type QuestionListItem,
+  type SealedContentQuestionRow,
+  type SyllabusOut,
+} from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
 import { ExposurePanel, ExposureToggle } from './ExposurePanel'
+import { QuestionSealingPanel, SealedContentList } from './SealingControls'
+import { VariantProposePanel } from './VariantProposePanel'
 
 const TYPE_LABELS: Record<string, string> = {
   single_choice: '单选题',
@@ -47,6 +59,21 @@ export function QuestionBankPage() {
   const [importError, setImportError] = useState('')
   /** One question's exposure explanation is expanded at a time. */
   const [exposureQuestionId, setExposureQuestionId] = useState<string | null>(null)
+  /** Same for the sealing confirm step and the variant proposal form (C03/C02). */
+  const [sealPanelQuestionId, setSealPanelQuestionId] = useState<string | null>(null)
+  const [variantPanelQuestionId, setVariantPanelQuestionId] = useState<string | null>(null)
+  /**
+   * The server's own refusal for the last 开始练习 click.
+   *
+   * A sealed question cannot enter a session, and the server answers 403
+   * `purpose_not_allowed` with the sealing reason. That sentence is kept on
+   * screen verbatim instead of being dropped into a toast that fades away.
+   */
+  const [practiceRefusal, setPracticeRefusal] = useState<{
+    label: string
+    message: string
+    problems: ApiProblemRow[]
+  } | null>(null)
 
   const projectId = currentProject?.id ?? null
 
@@ -61,6 +88,24 @@ export function QuestionBankPage() {
     },
     enabled: Boolean(projectId),
   })
+
+  /**
+   * C03: what the server says is sealed right now (latest policy per target).
+   *
+   * The question list itself carries no sealing flag, so this inventory is the
+   * only source of per-question state — and when it cannot be read the page
+   * says so instead of rendering every question as "未封存".
+   */
+  const sealedQuery = useQuery({
+    queryKey: ['sealed-content', projectId],
+    queryFn: () => fetchSealedContent(projectId as string),
+    enabled: Boolean(projectId),
+    retry: false,
+  })
+
+  const sealedByQuestion = new Map<string, SealedContentQuestionRow>()
+  for (const row of sealedQuery.data?.questions ?? []) sealedByQuestion.set(row.question_id, row)
+  const sealedStateUnknown = sealedQuery.isError || (sealedQuery.isSuccess && sealedQuery.data === null)
 
   const syllabusQuery = useQuery({
     queryKey: ['syllabus', projectId, currentSubject?.id],
@@ -100,8 +145,11 @@ export function QuestionBankPage() {
   })
 
   const createSession = useMutation({
-    mutationFn: (questionId: string) =>
-      apiRequest<{ session_id: string }>(`/projects/${projectId}/practice-sessions`, {
+    mutationFn: (questionId: string) => {
+      // A new attempt clears the previous refusal: no stale sentence stays on
+      // screen while the server is being asked again.
+      setPracticeRefusal(null)
+      return apiRequest<{ session_id: string }>(`/projects/${projectId}/practice-sessions`, {
         method: 'POST',
         idempotencyKey: newIdempotencyKey('session-create'),
         body: {
@@ -110,7 +158,8 @@ export function QuestionBankPage() {
           question_ids: [questionId],
           purpose: 'practice',
         },
-      }),
+      })
+    },
     onSuccess: (data) => {
       // Carry the project and subject in the URL: the workbench is also reachable
       // from a task in another project, and it must not create the next session
@@ -120,7 +169,16 @@ export function QuestionBankPage() {
       if (currentSubject?.id) params.set('subject', currentSubject.id)
       navigate(`/practice?${params.toString()}`)
     },
-    onError: (err) => toast.push(describeError(err), 'error'),
+    onError: (err, questionId) => {
+      // Show the server's own refusal (e.g. 封存内容不可进入练习/验证会话：…) as-is:
+      // a sealed question is never offered a "practice anyway" path, it is
+      // reported the way the server reported it.
+      const label =
+        (questionsQuery.data ?? []).find((question) => question.id === questionId)?.display_label ||
+        questionId.slice(0, 8)
+      setPracticeRefusal({ label, message: serverMessageOf(err), problems: problemsOf(err) })
+      toast.push(serverMessageOf(err), 'error')
+    },
   })
 
   if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
@@ -211,6 +269,31 @@ export function QuestionBankPage() {
           </div>
         </div>
         {questionsQuery.isLoading ? <p className="muted">读取中…</p> : null}
+        {sealedStateUnknown ? (
+          <div className="notice warn" data-testid="sealed-state-unknown">
+            无法从服务端读取封存清单
+            {sealedQuery.isError ? `：${serverMessageOf(sealedQuery.error)}` : '：服务端没有返回可用内容'}。
+            下面的题目不会显示为「未封存」，开始练习时仍以服务端判定为准。
+          </div>
+        ) : null}
+        {practiceRefusal ? (
+          <div className="notice danger" data-testid="practice-refusal" role="alert">
+            <strong>服务端拒绝了这个操作（{practiceRefusal.label}）</strong>
+            <div>{practiceRefusal.message}</div>
+            {practiceRefusal.problems.length ? (
+              <ul style={{ margin: '6px 0 0 18px' }}>
+                {practiceRefusal.problems.map((problem, index) => (
+                  <li key={`${problem.code}-${index}`}>
+                    {problem.message}（{problem.code}）
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <div className="small">
+              封存内容不可用于练习、检索、AI 生成提示、导出与原页预览：这里不提供「仍然练习」的入口。
+            </div>
+          </div>
+        ) : null}
         {questionsQuery.data?.length === 0 ? (
           <div className="empty-state">
             该科目还没有题目。可以先粘贴文字导入，或用手工录入路径（导入候选即人工录入入口）。
@@ -226,62 +309,135 @@ export function QuestionBankPage() {
                   <th>可信答案</th>
                   <th>考点</th>
                   <th>严格独立</th>
+                  <th>封存</th>
                   <th>操作</th>
                 </tr>
               </thead>
               <tbody>
-                {(questionsQuery.data ?? []).map((question) => (
-                  <Fragment key={question.id}>
-                    <tr>
-                      <td>
-                        {question.display_label || '（无标签）'}
-                        {question.is_demo ? <span className="pill warn" style={{ marginLeft: 6 }}>演示</span> : null}
-                      </td>
-                      <td>{question.question_type ? (TYPE_LABELS[question.question_type] ?? question.question_type) : '—'}</td>
-                      <td className="small">{ORIGIN_LABELS[question.origin_type] ?? question.origin_type}</td>
-                      <td>
-                        {question.has_trusted_answer ? (
-                          <span className="pill ok">已核对</span>
-                        ) : (
-                          <span className="pill danger">无</span>
-                        )}
-                      </td>
-                      <td className="small">{question.knowledge_nodes.join('、') || '未映射'}</td>
-                      <td>
-                        <ExposureToggle
-                          open={exposureQuestionId === question.id}
-                          onToggle={() =>
-                            setExposureQuestionId((current) => (current === question.id ? null : question.id))
-                          }
-                        />
-                      </td>
-                      <td>
-                        <div className="row">
-                          <button
-                            className="btn small"
-                            disabled={!question.has_trusted_answer || !currentSubject}
-                            onClick={() => createSession.mutate(question.id)}
-                            title={question.has_trusted_answer ? '开始练习' : '缺少已核对答案，不能进入计分练习'}
-                          >
-                            开始练习
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    {exposureQuestionId === question.id ? (
-                      <tr>
-                        <td colSpan={7} style={{ padding: 0, background: '#fbfcfe' }}>
-                          <ExposurePanel questionId={question.id} />
+                {(questionsQuery.data ?? []).map((question) => {
+                  const sealedRow = sealedByQuestion.get(question.id) ?? null
+                  return (
+                    <Fragment key={question.id}>
+                      <tr data-testid="question-row" data-question-id={question.id}>
+                        <td>
+                          {question.display_label || '（无标签）'}
+                          {question.is_demo ? <span className="pill warn" style={{ marginLeft: 6 }}>演示</span> : null}
+                        </td>
+                        <td>{question.question_type ? (TYPE_LABELS[question.question_type] ?? question.question_type) : '—'}</td>
+                        <td className="small">{ORIGIN_LABELS[question.origin_type] ?? question.origin_type}</td>
+                        <td>
+                          {question.has_trusted_answer ? (
+                            <span className="pill ok">已核对</span>
+                          ) : (
+                            <span className="pill danger">无</span>
+                          )}
+                        </td>
+                        <td className="small">{question.knowledge_nodes.join('、') || '未映射'}</td>
+                        <td>
+                          <ExposureToggle
+                            open={exposureQuestionId === question.id}
+                            onToggle={() =>
+                              setExposureQuestionId((current) => (current === question.id ? null : question.id))
+                            }
+                          />
+                        </td>
+                        <td>
+                          <div className="row">
+                            {sealedRow ? (
+                              <span
+                                className="pill danger"
+                                data-testid="question-sealed-state"
+                                data-question-id={question.id}
+                                title={`${sealedRow.reason_message}（原因码：${sealedRow.reason_code}）`}
+                              >
+                                已封存
+                              </span>
+                            ) : null}
+                            <button
+                              className="btn small"
+                              data-testid={sealedRow ? 'question-unseal' : 'question-seal'}
+                              data-question-id={question.id}
+                              onClick={() =>
+                                setSealPanelQuestionId((current) => (current === question.id ? null : question.id))
+                              }
+                            >
+                              {sealedRow ? '解除封存' : '封存'}
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="row">
+                            <button
+                              className="btn small"
+                              disabled={!question.has_trusted_answer || !currentSubject}
+                              onClick={() => createSession.mutate(question.id)}
+                              title={question.has_trusted_answer ? '开始练习' : '缺少已核对答案，不能进入计分练习'}
+                            >
+                              开始练习
+                            </button>
+                            <button
+                              className="btn small ghost"
+                              data-testid="variant-propose"
+                              data-question-id={question.id}
+                              title={
+                                sealedRow
+                                  ? '已封存：封存内容不参与练习、检索与 AI 生成提示；服务端的封存拦截不包含变式生成'
+                                  : '用 AI 生成待校对变式候选'
+                              }
+                              onClick={() =>
+                                setVariantPanelQuestionId((current) => (current === question.id ? null : question.id))
+                              }
+                            >
+                              生成变式
+                            </button>
+                          </div>
+                          {sealedRow ? (
+                            <div className="tiny muted">已封存：不参与练习、检索与 AI 生成提示</div>
+                          ) : null}
                         </td>
                       </tr>
-                    ) : null}
-                  </Fragment>
-                ))}
+                      {exposureQuestionId === question.id ? (
+                        <tr>
+                          <td colSpan={8} style={{ padding: 0, background: '#fbfcfe' }}>
+                            <ExposurePanel questionId={question.id} />
+                          </td>
+                        </tr>
+                      ) : null}
+                      {sealPanelQuestionId === question.id ? (
+                        <tr>
+                          <td colSpan={8} style={{ padding: 0, background: '#fbfcfe' }}>
+                            <QuestionSealingPanel
+                              projectId={projectId as string}
+                              question={question}
+                              sealedRow={sealedRow}
+                              stateUnknown={sealedStateUnknown}
+                              onClose={() => setSealPanelQuestionId(null)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                      {variantPanelQuestionId === question.id ? (
+                        <tr>
+                          <td colSpan={8} style={{ padding: 0, background: '#fbfcfe' }}>
+                            <VariantProposePanel
+                              projectId={projectId as string}
+                              question={question}
+                              sourceSealed={Boolean(sealedRow)}
+                              onClose={() => setVariantPanelQuestionId(null)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                    </Fragment>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
+
+      <SealedContentList projectId={projectId as string} />
 
       <div className="card">
         <h2>大纲与考点</h2>

@@ -19,6 +19,11 @@ evaluation and every entry point consumes it, so a new caller cannot skip a rule
 * ``lineage_seen_in_other_project`` — the same *content* (``ContentLineage``) was
   already exposed in another of this owner's projects; exposure follows the
   lineage while learning state stays per project.
+* ``family_variant_seen`` — the question belongs to a **merged** family
+  (``QuestionFamily.merged_into`` is set for a family absorbed into it, written by
+  :mod:`apps.question_bank.services.families`) and *any other member of that
+  merged family* was already exposed. C03: 合并家族后，旧暴露必须让整个家族都不再是
+  "陌生变式" — the members are no longer distinct variants of each other.
 * ``stem_delivered`` / ``hint_delivered`` / ``explanation_delivered`` /
   ``answer_delivered`` / ``feedback_delivered`` — a delivery the server already
   logged for this user on this question.
@@ -59,6 +64,7 @@ REASON_ORDER: tuple[str, ...] = (
     "stem_delivered",
     "presented_without_submit",
     "lineage_seen_in_other_project",
+    "family_variant_seen",
 )
 
 #: Reasons that never expire: recorded once, they contaminate the question for
@@ -93,6 +99,7 @@ REASON_MESSAGES: dict[str, str] = {
     "stem_delivered": "本题题干已下发过（重复练习按重复统计，不能作为首次接触或陌生变式证据）",
     "presented_without_submit": "本题曾展示但未提交（已展示未提交的题不能重新标为严格未见）",
     "lineage_seen_in_other_project": "同一内容在本人其他项目中已暴露（内容谱系跨项目计为已见，不能重新标为严格未见）",
+    "family_variant_seen": "同家族（合并后）的其他题目已暴露：家族合并后不再构成不同家族证据，不能作为陌生变式或严格首次接触",
 }
 
 #: ``ExposureEvent.source`` values written by this module.
@@ -131,6 +138,10 @@ def _source_label(fact: _Fact) -> str:
     if fact.evidence_type == "session_item":
         prefix = "lineage_session_item" if fact.cross_project else "session_item"
         return f"{prefix}:presented_without_submit"
+    if fact.evidence_type == "family_member":
+        # C03: the proving row is a fact about *another* member of the merged
+        # family, so the label names that question instead of an exposure kind.
+        return f"merged_family_member:{fact.question_id}"
     prefix = "lineage_exposure" if fact.cross_project else "exposure_event"
     return f"{prefix}:{fact.exposure_kind}"
 
@@ -176,6 +187,78 @@ def _reason_rows(facts: list[_Fact]) -> tuple[list[dict], list[_Fact]]:
     return rows, chosen
 
 
+def _merged_family_scope(questions: dict) -> dict[str, list[str]]:
+    """``requested question id -> every member of its merged family`` (else absent).
+
+    A family counts as *merged* when it has absorbed at least one other family,
+    i.e. some ``QuestionFamily`` row names it as its ``merged_into``. Before any
+    merge exists this returns ``{}`` after a single indexed query, so the C04
+    rules below are unchanged for ordinary families.
+    """
+    from apps.question_bank.models import Question, QuestionFamily
+
+    family_ids = {str(question.family_id) for question in questions.values() if question.family_id}
+    if not family_ids:
+        return {}
+    merged_targets = {
+        str(value)
+        for value in QuestionFamily.objects.filter(merged_into_id__in=sorted(family_ids)).values_list(
+            "merged_into_id", flat=True
+        )
+    }
+    if not merged_targets:
+        return {}
+    members: dict[str, list[str]] = {}
+    for question_id, family_id in Question.objects.filter(family_id__in=sorted(merged_targets)).values_list(
+        "id", "family_id"
+    ):
+        members.setdefault(str(family_id), []).append(str(question_id))
+    return {
+        question_id: sorted(members[str(question.family_id)])
+        for question_id, question in questions.items()
+        if question.family_id and str(question.family_id) in members
+    }
+
+
+def _apply_merged_family_facts(
+    *, facts: dict[str, list[_Fact]], questions: dict, family_map: dict[str, list[str]]
+) -> None:
+    """C03: a member of a merged family is seen if *any* member was seen.
+
+    The proving fact is the earliest fact of any other member, copied onto this
+    question under the ``family_variant_seen`` code so the ledger row that proves
+    it is still identifiable. The question's own facts are not copied: they are
+    already reported under their own codes.
+    """
+    for question_id in questions:
+        member_ids = family_map.get(question_id)
+        if not member_ids:
+            continue
+        best: _Fact | None = None
+        for member_id in member_ids:
+            if member_id == question_id:
+                continue
+            for fact in facts.get(member_id, []):
+                if fact.code == "family_variant_seen":
+                    continue
+                if best is None or _earlier(fact, best):
+                    best = fact
+        if best is None:
+            continue
+        facts[question_id].append(
+            _Fact(
+                code="family_variant_seen",
+                at=best.at,
+                evidence_id=best.evidence_id,
+                evidence_type="family_member",
+                exposure_kind=best.exposure_kind,
+                question_id=best.question_id,
+                project_id=best.project_id,
+                session_item_id=best.session_item_id,
+            )
+        )
+
+
 def _evaluate(
     *,
     user,
@@ -206,9 +289,23 @@ def _evaluate(
     if not questions:
         return facts
 
+    # C03: merged-family siblings are evaluated alongside the requested questions
+    # (their facts are what proves the family was already seen), but the returned
+    # mapping still holds the requested ids only.
+    family_map = _merged_family_scope(questions)
+    sibling_ids = sorted(
+        {member_id for member_ids in family_map.values() for member_id in member_ids} - set(questions)
+    )
+    if sibling_ids:
+        for sibling in Question.objects.filter(id__in=sibling_ids).select_related("subject"):
+            questions[str(sibling.id)] = sibling
+        for sibling_id in sibling_ids:
+            facts.setdefault(sibling_id, [])
+    evaluated_ids = sorted(questions)
+
     # ---- 1. exposures the server already logged for this user on this question.
     direct = ExposureEvent.objects.filter(user=user).filter(
-        Q(question_version__question_id__in=ids) | Q(question_id__in=ids)
+        Q(question_version__question_id__in=evaluated_ids) | Q(question_id__in=evaluated_ids)
     )
     if excluded_items:
         direct = direct.exclude(session_item_id__in=excluded_items)
@@ -239,7 +336,7 @@ def _evaluate(
     # ---- 2. items delivered but never submitted (C04 source 3).
     items = SessionItem.objects.filter(
         session__user=user,
-        question_version__question_id__in=ids,
+        question_version__question_id__in=evaluated_ids,
         first_delivered_at__isnull=False,
         attempt__isnull=True,
     ).select_related("session", "question_version")
@@ -357,7 +454,13 @@ def _evaluate(
                     )
                 )
 
-    return facts
+    # ---- 4. merged families (C03): a member is seen if any member was seen.
+    _apply_merged_family_facts(
+        facts=facts,
+        questions={question_id: questions[question_id] for question_id in ids if question_id in questions},
+        family_map=family_map,
+    )
+    return {question_id: facts.get(question_id, []) for question_id in ids}
 
 
 def exposure_state(
@@ -395,6 +498,13 @@ def exposure_state(
     the learner has already practised has necessarily been delivered, so it is
     ``seen`` from then on — which is exactly why a repeat of it can never be
     first contact again.
+
+    C03 adds one *family* rule on top of the delivery rules: a question in a
+    **merged** family is seen when any other member of that family was seen (see
+    :func:`_apply_merged_family_facts`). The sibling facts respect the same
+    ``before`` window, so a rebuild of an old attempt is judged against what was
+    knowable when that item was presented, while a merge-time check (no window)
+    sees the whole history.
     """
     evaluated = _evaluate(
         user=user,
