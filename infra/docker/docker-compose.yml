@@ -1,0 +1,154 @@
+# AcePass Compose 编排（P0）。
+#
+# 未在真实目标机器上执行验证（本机 Docker 守护进程未运行，也没有被授权的部署目标）。
+# 首次部署前请按 README 逐条验证，尤其是健康检查、持久化卷与备份恢复。
+
+name: acepass
+
+x-backend-image: &backend-image
+  build:
+    context: ../..
+    dockerfile: infra/docker/backend.Dockerfile
+  image: acepass-backend:${ACEPASS_IMAGE_TAG:-p0}
+
+x-backend-env: &backend-env
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  ACEPASS_RUNTIME_MODE: production
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set DJANGO_SECRET_KEY in .env}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:?set DJANGO_ALLOWED_HOSTS in .env}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:?set DJANGO_CSRF_TRUSTED_ORIGINS in .env}
+  POSTGRES_DB: ${POSTGRES_DB:-acepass}
+  POSTGRES_USER: ${POSTGRES_USER:-acepass}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/0
+  CELERY_RESULT_BACKEND: redis://redis:6379/1
+  CACHE_URL: redis://redis:6379/2
+  ACEPASS_PRIVATE_MEDIA_ROOT: /data/private-media
+  ACEPASS_STORAGE_BACKEND: local
+  # AI 未配置时产品仍可完整使用（手动录题、作答、判分、复习）。
+  ACEPASS_AI_PROVIDER: ${ACEPASS_AI_PROVIDER:-none}
+  ACEPASS_AI_BASE_URL: ${ACEPASS_AI_BASE_URL:-}
+  ACEPASS_AI_API_KEY: ${ACEPASS_AI_API_KEY:-}
+  ACEPASS_AI_TEXT_MODEL: ${ACEPASS_AI_TEXT_MODEL:-}
+  ACEPASS_AI_VISION_MODEL: ${ACEPASS_AI_VISION_MODEL:-}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-acepass}
+      POSTGRES_USER: ${POSTGRES_USER:-acepass}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      TZ: UTC
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-acepass} -d ${POSTGRES_DB:-acepass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [private]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [private]
+    restart: unless-stopped
+
+  api:
+    <<: *backend-image
+    command: ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+    environment:
+      <<: *backend-env
+    volumes:
+      - private-media:/data/private-media
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=5).status==200 else 1)\""]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks: [private]
+    restart: unless-stopped
+
+  worker-ingestion:
+    <<: *backend-image
+    command: ["celery", "-A", "config", "worker", "-Q", "ingestion", "-c", "2", "-l", "INFO"]
+    environment:
+      <<: *backend-env
+    volumes:
+      - private-media:/data/private-media
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [private]
+    restart: unless-stopped
+
+  worker-tutoring:
+    <<: *backend-image
+    command: ["celery", "-A", "config", "worker", "-Q", "tutoring", "-c", "2", "-l", "INFO"]
+    environment:
+      <<: *backend-env
+    volumes:
+      - private-media:/data/private-media
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [private]
+    restart: unless-stopped
+
+  worker-projection:
+    <<: *backend-image
+    command: ["celery", "-A", "config", "worker", "-Q", "projection", "-c", "2", "-l", "INFO"]
+    environment:
+      <<: *backend-env
+    volumes:
+      - private-media:/data/private-media
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [private]
+    restart: unless-stopped
+
+  scheduler:
+    <<: *backend-image
+    command: ["celery", "-A", "config", "beat", "-l", "INFO"]
+    environment:
+      <<: *backend-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks: [private]
+    restart: unless-stopped
+
+  web:
+    image: nginx:1.27-alpine
+    volumes:
+      - ../proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../frontend/dist:/usr/share/nginx/html:ro
+    ports:
+      - "${ACEPASS_HTTP_PORT:-8080}:80"
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [private]
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  private-media:
+
+networks:
+  private:
+    driver: bridge

@@ -40,11 +40,13 @@ mkdir -p "$TARGET_MEDIA"
 tar -xzf "$SRC/media.tar.gz" -C "$TARGET_MEDIA"
 
 echo "==> 4/4 校验文件清单"
-if [ -s "$SRC/media-manifest.sha256" ]; then
-  (cd "$TARGET_MEDIA" && shasum -a 256 -c "$SRC/media-manifest.sha256" --quiet) \
-    && echo "    文件校验通过（内容与备份一致）"
+MANIFEST="$(cd "$SRC" && pwd)/media-manifest.sha256"
+if [ -s "$MANIFEST" ]; then
+  # Verify inside the restored media root; the manifest holds relative paths.
+  (cd "$TARGET_MEDIA" && shasum -a 256 -c "$MANIFEST" --quiet) \
+    && echo "    media manifest verified: restored bytes match the backup"
 else
-  echo "    （备份中没有文件清单）"
+  echo "    (backup has no media manifest)"
 fi
 
 echo "==> 恢复完成。用下面命令核对业务事实："

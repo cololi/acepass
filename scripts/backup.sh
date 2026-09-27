@@ -33,6 +33,7 @@ echo "==> 2/3 private media at ${MEDIA}"
 if [ -d "$MEDIA" ]; then
   # A manifest makes it possible to prove which objects a restore recovered.
   (cd "$MEDIA" && find . -type f -print0 | sort -z | xargs -0 shasum -a 256) > "$OUT/media-manifest.sha256"
+  echo "    文件数：$(wc -l < "$OUT/media-manifest.sha256" | tr -d " ")"
   tar -czf "$OUT/media.tar.gz" -C "$MEDIA" .
 else
   echo "    （媒体目录不存在，记录为空清单）"

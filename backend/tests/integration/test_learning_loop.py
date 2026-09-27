@@ -428,7 +428,7 @@ def test_recent_failures_downgrade_the_summary(owner, project_a, subject_a1):
 
 # --------------------------------------------------------------------- planner
 def test_budget_is_split_with_largest_remainder_and_rotates(owner, project_a, project_b):
-    settings_obj = ensure_settings(owner, daily_budget_minutes=60, project_budget_percent={})
+    ensure_settings(owner, daily_budget_minutes=60, project_budget_percent={})
     allocation = planner_service.allocate_budget(owner, [project_a, project_b], 60, date(2026, 3, 1))
     minutes = [row["minutes"] for row in allocation["projects"]]
     assert sum(minutes) == 60
@@ -604,7 +604,7 @@ def test_datetime_utc_storage_uses_user_timezone_only_for_local_date(owner):
     settings_obj = ensure_settings(owner, timezone="Pacific/Kiritimati")  # UTC+14
     import datetime as dt
 
-    moment = dt.datetime(2026, 3, 1, 20, 0, tzinfo=dt.timezone.utc)
+    moment = dt.datetime(2026, 3, 1, 20, 0, tzinfo=dt.UTC)
     assert settings_obj.local_date(moment) == date(2026, 3, 2)
     settings_obj = ensure_settings(owner, timezone="Pacific/Honolulu")  # UTC-10
     assert settings_obj.local_date(moment) == date(2026, 3, 1)
