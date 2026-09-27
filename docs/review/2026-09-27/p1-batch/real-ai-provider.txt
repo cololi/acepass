@@ -1,0 +1,25 @@
+真实 AI 接入验证（凭据来自安全配置 ~/.dsh/.credentials.yaml 的 DEEPSEEK_API_KEY，仅内存注入，未打印、未落盘，运行后已删除临时 env 文件）
+
+provider            : openai_compatible（非 stub：True）
+capabilities        : diagnose, estimate_grade, explain, suggest_tags
+text model          : deepseek-chat
+vision model        : (未配置)
+prompt version      : p0-explain-v1
+vision_available    : False
+
+真实讲解调用结果：
+  job_status        : failed
+  error_code        : ai_error
+  error_message     : provider HTTP 402: {"error":{"message":"Insufficient Balance (request_id: de2d345d-0a25-4f9d-bf2c-0d17f272a443)","type":"unknown_error","param":null,"code":"invalid_request_error"}}
+  is_stub           : False
+  latency_ms        : None
+  prompt_tokens     : None
+  completion_tokens : None
+  cost_cents        : None（cost_known=False）
+  result_blocks     : []
+
+结论：请求确实到达了真实 provider（api.deepseek.com 返回 HTTP 402 Insufficient Balance），因此网络路径、鉴权头、提示词版本与审计记录都已验证；但账户余额不足，没有产生任何模型内容。真实 AI 讲解保持【未验证】，产品失败路径如实记录错误且不写任何分数或掌握结论（grade_events=1，knowledge_states=0）。
+
+真实图片识别：该凭据没有视觉模型（vision_available=false），未做真实视觉调用，保持【未验证】；未配置视觉模型时导入走人工校对路径，不伪造识别结果。
+
+stub 守卫：同一脚本在 ACEPASS_AI_PROVIDER=stub 下运行会拒绝把结果当作真实验证（ok=false，note 说明这不是真实模型验证），见下方原始 JSON 中的 note 字段。
