@@ -3,7 +3,7 @@
 按里程碑记录**实际实现范围、验证方式与未完成项**。未运行的测试不写“通过”，
 未经过真实时间的不写“已验证”。逐条验收结果见 [`acceptance-results.md`](acceptance-results.md)。
 
-- 代码版本：`906cfd9`
+- 代码版本：`5428018`
 - 最近一次全量校验：`cd backend && .venv/bin/python -m pytest tests -q` → **119 passed in 61.01s**；
   `cd frontend && npx playwright test` → **desktop 8 passed / mobile 8 passed**
 

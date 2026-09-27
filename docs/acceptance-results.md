@@ -11,7 +11,7 @@
 
 运行环境与命令见 `README.md`；实现范围见 `docs/implementation-status.md`。
 
-- 代码版本：`906cfd9`（`git rev-parse --short HEAD`）
+- 代码版本：`5428018`（`git rev-parse --short HEAD`）
 - 夹具：`load_demo_fixture`，两个项目、三个科目、33 个可计分叶子题（单选 9、多选 6、判断 6、填空 6、大题 6）+ 3 个共享材料父题
 - 实测命令：
   - `cd backend && .venv/bin/python -m pytest tests -q` → **119 passed in 61.01s**
