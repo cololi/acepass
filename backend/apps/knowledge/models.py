@@ -7,7 +7,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.common.enums import KnowledgeNodeKind
+from apps.common.enums import KnowledgeNodeKind, KnowledgeRelationType, SuggestionStatus
 from apps.common.models import BaseModel
 
 
@@ -199,3 +199,110 @@ class VerificationPairing(BaseModel):
             errors["node"] = "考点必须属于该科目的大纲版本"
         if errors:
             raise ValidationError(errors)
+
+
+class KnowledgeRelation(BaseModel):
+    """Directed edge between two knowledge points of one syllabus version.
+
+    ``from_node`` is the prerequisite and ``to_node`` depends on it, so the
+    planner can schedule the foundation before the weak point that needs it.
+    The edge is soft-deactivated (``is_active=False``) instead of deleted, so a
+    historical recommendation can still be explained afterwards.
+    """
+
+    syllabus_version = models.ForeignKey(
+        "exams.SyllabusVersion", on_delete=models.CASCADE, related_name="knowledge_relations"
+    )
+    from_node = models.ForeignKey(KnowledgeNode, on_delete=models.CASCADE, related_name="outgoing_relations")
+    to_node = models.ForeignKey(KnowledgeNode, on_delete=models.CASCADE, related_name="incoming_relations")
+    relation_type = models.CharField(
+        max_length=24, choices=KnowledgeRelationType.choices, default=KnowledgeRelationType.PREREQUISITE
+    )
+    is_active = models.BooleanField(default=True, db_index=True)
+    note = models.CharField(max_length=300, blank=True)
+    created_by = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="created_knowledge_relations"
+    )
+
+    class Meta:
+        db_table = "knowledge_relation"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["from_node", "to_node", "relation_type"], name="uniq_knowledge_relation_edge"
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(from_node=models.F("to_node")), name="knowledge_relation_no_self_loop"
+            ),
+        ]
+        indexes = [models.Index(fields=["syllabus_version", "relation_type", "is_active"])]
+        ordering = ["syllabus_version", "relation_type", "created_at"]
+        verbose_name = "考点关系"
+        verbose_name_plural = "考点关系"
+
+    def __str__(self) -> str:
+        return f"{self.from_node_id}->{self.to_node_id} ({self.relation_type})"
+
+    def clean(self) -> None:
+        errors: dict[str, str] = {}
+        if self.from_node_id and self.to_node_id and self.from_node_id == self.to_node_id:
+            errors["to_node"] = "考点不能以自身为前置或相关关系"
+        for field in ("from_node", "to_node"):
+            node = getattr(self, field, None)
+            if node is not None and self.syllabus_version_id and node.syllabus_version_id != self.syllabus_version_id:
+                errors[field] = "关系两端的考点必须属于同一大纲版本"
+        if errors:
+            raise ValidationError(errors)
+
+
+class TagSuggestion(BaseModel):
+    """A machine-proposed set of knowledge tags for one question version.
+
+    The proposal is inert data: accepting it writes a **new mapping revision**
+    through the ordinary mapping service, and it can never create or rename a
+    knowledge node, nor invent a template. Names that do not resolve to an
+    existing node inside the syllabus stay listed in ``unresolved_names`` and
+    need a human decision.
+    """
+
+    project = models.ForeignKey("exams.ExamProject", on_delete=models.CASCADE, related_name="tag_suggestions")
+    question_version = models.ForeignKey(
+        "question_bank.QuestionVersion", on_delete=models.CASCADE, related_name="tag_suggestions"
+    )
+    run = models.ForeignKey(
+        "audit.LLMRun", null=True, blank=True, on_delete=models.SET_NULL, related_name="tag_suggestions"
+    )
+    status = models.CharField(
+        max_length=16, choices=SuggestionStatus.choices, default=SuggestionStatus.PROPOSED, db_index=True
+    )
+    #: ``[{"name": "...", "confidence": 0.8, "rationale": "..."}]`` as proposed.
+    proposals = models.JSONField(default=list, blank=True)
+    model_identifier = models.CharField(max_length=120, blank=True)
+    prompt_version = models.CharField(max_length=40, blank=True)
+    is_stub = models.BooleanField(default=False, help_text="由测试/演示 stub 产生，不代表真实模型结果")
+    #: Mapping revision written when a human accepted the proposal.
+    accepted_mapping_revision = models.PositiveIntegerField(null=True, blank=True)
+    unresolved_names = models.JSONField(default=list, blank=True)
+    decided_by = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="decided_tag_suggestions"
+    )
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_note = models.CharField(max_length=500, blank=True)
+    created_by = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="created_tag_suggestions"
+    )
+
+    class Meta:
+        db_table = "knowledge_tag_suggestion"
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(status__in=["proposed", "accepted", "rejected", "superseded"]),
+                name="tag_suggestion_status_known",
+            ),
+        ]
+        indexes = [models.Index(fields=["project", "status", "-created_at"])]
+        ordering = ["-created_at"]
+        verbose_name = "标签建议"
+        verbose_name_plural = "标签建议"
+
+    def __str__(self) -> str:
+        return f"tag-suggestion {self.question_version_id} ({self.status})"

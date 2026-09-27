@@ -21,8 +21,10 @@ from apps.exams.api import project_router, projects_router
 from apps.ingestion.api import ingestion_router
 from apps.knowledge.api import knowledge_router
 from apps.learning.api import learning_router, plan_tasks_router
+from apps.memory.api import memory_router
 from apps.practice.api import practice_router
 from apps.question_bank.api import question_api_router
+from apps.search.api import search_router
 from apps.tutoring.api import tutor_router
 
 api = NinjaAPI(
@@ -47,4 +49,6 @@ api.add_router("", ingestion_router)
 api.add_router("", question_api_router)
 api.add_router("", knowledge_router)
 api.add_router("", practice_router)
+api.add_router("", memory_router)
+api.add_router("", search_router)
 api.add_router("", tutor_router)

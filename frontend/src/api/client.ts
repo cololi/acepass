@@ -736,3 +736,391 @@ export interface AiRunRow {
   error_code: string
   created_at: string
 }
+
+/* ------------------------------------------------------------------ P1: 前置关系 */
+export interface KnowledgeRelationEdge {
+  id: string
+  syllabus_version_id: string
+  from_node_id: string
+  from_node_name: string
+  to_node_id: string
+  to_node_name: string
+  relation_type: string
+  is_active: boolean
+  note: string
+}
+
+export interface KnowledgeRelationGraph {
+  edges: KnowledgeRelationEdge[]
+  node_count: number
+  edge_count: number
+  generated_at: string
+  /** Present in the server payload; the UI does not need it yet. */
+  unmet_prerequisites?: Array<Record<string, unknown>>
+}
+
+export interface NodePrerequisiteRow {
+  node_id: string
+  node_name: string
+  state: string
+  reason?: string
+}
+
+export interface NodePrerequisitesOut {
+  node_id: string
+  node_name: string
+  prerequisites: NodePrerequisiteRow[]
+  unmet: NodePrerequisiteRow[]
+}
+
+/** Edge that would close a cycle is refused with the offending path names. */
+export function cycleNamesOf(error: unknown): string[] {
+  if (!(error instanceof ApiError)) return []
+  const raw = error.details?.cycle_names
+  if (!Array.isArray(raw)) return []
+  return raw.map((value) => String(value)).filter((value) => value.length > 0)
+}
+
+export function fetchKnowledgeRelations(projectId: string, subjectId?: string | null) {
+  const params = new URLSearchParams()
+  if (subjectId) params.set('subject_id', subjectId)
+  const suffix = params.toString()
+  return apiRequest<KnowledgeRelationGraph>(
+    `/projects/${projectId}/knowledge-relations${suffix ? `?${suffix}` : ''}`,
+  )
+}
+
+export function createKnowledgeRelation(
+  projectId: string,
+  payload: {
+    syllabus_version_id: string
+    from_node_id: string
+    to_node_id: string
+    relation_type: string
+    note: string
+  },
+) {
+  return apiRequest<KnowledgeRelationEdge>(`/projects/${projectId}/knowledge-relations`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('knowledge-relation-create'),
+    body: payload,
+  })
+}
+
+export function deactivateKnowledgeRelation(projectId: string, relationId: string, reason: string) {
+  const params = new URLSearchParams()
+  if (reason) params.set('reason', reason)
+  const suffix = params.toString()
+  return apiRequest<KnowledgeRelationEdge>(
+    `/projects/${projectId}/knowledge-relations/${relationId}${suffix ? `?${suffix}` : ''}`,
+    { method: 'DELETE' },
+  )
+}
+
+export function fetchNodePrerequisites(projectId: string, nodeId: string) {
+  return apiRequest<NodePrerequisitesOut>(`/projects/${projectId}/knowledge-nodes/${nodeId}/prerequisites`)
+}
+
+/* --------------------------------------------------------------- P1: 标签建议 */
+export interface TagProposal {
+  name: string
+  confidence: number
+  rationale?: string
+}
+
+export interface TagMappingRow {
+  node_id: string
+  node_name: string
+  /** Decimal string: the primary mapping sums to exactly 1, auxiliary rows are 0. */
+  weight: string
+  is_primary: boolean
+}
+
+export interface TagSuggestionOut {
+  id: string
+  project_id: string
+  question_version_id: string
+  question_label: string
+  status: string
+  proposals: TagProposal[]
+  model_identifier: string
+  prompt_version: string
+  is_stub: boolean
+  created_at: string
+  decided_at: string | null
+  accepted_mapping_revision: number | null
+  unresolved_names: string[]
+  decision_note: string
+  latest_mappings: TagMappingRow[]
+}
+
+/** Result of accepting: a new auxiliary mapping revision, never a new node. */
+export interface TagSuggestionDecisionOut {
+  suggestion_id: string
+  status: string
+  mapping_revision: number | null
+  added_node_names: string[]
+  unresolved_names: string[]
+}
+
+export function fetchTagSuggestions(projectId: string, versionId: string) {
+  return apiRequest<TagSuggestionOut[]>(
+    `/projects/${projectId}/question-versions/${versionId}/tag-suggestions`,
+  )
+}
+
+export function createTagSuggestion(projectId: string, versionId: string) {
+  return apiRequest<TagSuggestionOut>(`/projects/${projectId}/question-versions/${versionId}/tag-suggestions`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('tag-suggestion-create'),
+  })
+}
+
+export function acceptTagSuggestion(
+  projectId: string,
+  suggestionId: string,
+  payload: { node_names: string[] | null; note: string },
+) {
+  return apiRequest<TagSuggestionDecisionOut>(`/projects/${projectId}/tag-suggestions/${suggestionId}/accept`, {
+    method: 'POST',
+    body: payload,
+  })
+}
+
+export function rejectTagSuggestion(
+  projectId: string,
+  suggestionId: string,
+  payload: { node_names: string[] | null; note: string },
+) {
+  return apiRequest<TagSuggestionOut>(`/projects/${projectId}/tag-suggestions/${suggestionId}/reject`, {
+    method: 'POST',
+    body: payload,
+  })
+}
+
+/* ------------------------------------------------------------------ P1: 检索 */
+export interface SearchResultRow {
+  document_id: string
+  /** `question` or `node`. */
+  kind: string
+  question_id: string | null
+  question_version_id: string | null
+  knowledge_node_id: string | null
+  subject_id: string | null
+  display_label: string
+  excerpt: string
+  keyword_score: number | null
+  keyword_rank: number | null
+  vector_score: number | null
+  vector_rank: number | null
+  fused_score: number
+  channels: string[]
+  matched_terms: string[]
+}
+
+export interface SearchChannelStatus {
+  requested?: boolean
+  used?: boolean
+  available: boolean
+  /** The server's own explanation; `available_reason` is accepted as an alias. */
+  reason?: string | null
+  available_reason?: string | null
+  hits?: number
+  documents_scored?: number
+  documents_with_embeddings?: number
+  model?: string | null
+  is_stub?: boolean
+}
+
+export interface SearchResponseOut {
+  project_id: string
+  subject_id: string | null
+  query: string
+  query_tokens: string[]
+  channel: string
+  limit: number
+  candidate_documents: number
+  tokenizer_version: string
+  fusion: { method: string; k: number } | null
+  channels: { keyword: SearchChannelStatus; vector: SearchChannelStatus }
+  notes: string[]
+  results: SearchResultRow[]
+}
+
+export interface SearchReindexOut {
+  project_id: string
+  subject_id: string | null
+  indexed: number
+  excluded: number
+  embeddings: number
+  embedding_unavailable_reason: string
+  embedding_model: string
+  documents_total: number
+  documents_in_index: number
+  tokenizer_version: string
+}
+
+export function searchChannelReason(status: SearchChannelStatus | undefined | null): string {
+  if (!status) return ''
+  return (status.reason ?? status.available_reason ?? '').toString()
+}
+
+export function fetchSearchResults(
+  projectId: string,
+  params: { q: string; subjectId?: string | null; limit?: number; channel?: string },
+) {
+  const query = new URLSearchParams()
+  query.set('q', params.q)
+  if (params.subjectId) query.set('subject_id', params.subjectId)
+  query.set('limit', String(params.limit ?? 10))
+  if (params.channel) query.set('channel', params.channel)
+  return apiRequest<SearchResponseOut>(`/projects/${projectId}/search?${query.toString()}`)
+}
+
+export function reindexSearch(projectId: string, body: { subject_id?: string }) {
+  return apiRequest<SearchReindexOut>(`/projects/${projectId}/search/reindex`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('search-reindex'),
+    body,
+  })
+}
+
+/* ---------------------------------------------------------------- P1: 记忆卡 */
+export type MemoryRating = 'again' | 'hard' | 'good' | 'easy'
+
+export interface MemoryCardOut {
+  card_id: string
+  project_id: string
+  subject_id: string
+  question_id: string
+  question_label: string
+  stem_excerpt: string
+  knowledge_node_id: string | null
+  knowledge_node_name: string
+  phase: string
+  due_at: string | null
+  last_reviewed_at: string | null
+  stability: number
+  difficulty: number
+  /** `null` for a card that has never been reviewed. */
+  retrievability: number | null
+  reps: number
+  lapses: number
+  learning_step: number
+  is_suspended: boolean
+  suspended_reason: string
+  scheduler_version: string
+  params_version: string
+  desired_retention: number
+}
+
+export interface MemoryReviewOut {
+  card_id: string
+  log_id: string
+  rating: string
+  phase: string
+  phase_before: string
+  due_at: string | null
+  reviewed_at: string
+  interval_days: number
+  elapsed_days: number
+  scheduled_days: number
+  retrievability: number
+  stability: number
+  difficulty: number
+  is_lapse: boolean
+  reps: number
+  lapses: number
+  scheduler_version: string
+  params_version: string
+}
+
+export interface MemoryReviewLogOut {
+  log_id: string
+  card_id: string
+  rating: string
+  reviewed_at: string
+  elapsed_days: number
+  scheduled_days: number
+  interval_days: number
+  retrievability: number
+  is_lapse: boolean
+  phase_before: string
+  phase_after: string
+  stability_before: number
+  stability_after: number
+  difficulty_before: number
+  difficulty_after: number
+  due_before: string | null
+  due_after: string | null
+  scheduler_version: string
+  params_version: string
+  source_session_item_id: string | null
+  note: string
+}
+
+export interface MemoryRebuildOut {
+  matches: boolean
+  rebuilt: Record<string, unknown>
+  stored: Record<string, unknown>
+  log_count: number
+  compared_fields: string[]
+  differing_fields: string[]
+  unknown_params_versions: string[]
+}
+
+export function fetchMemoryCards(
+  projectId: string,
+  options: { dueBefore?: string | null; includeSuspended?: boolean; limit?: number } = {},
+) {
+  const params = new URLSearchParams()
+  if (options.dueBefore) params.set('due_before', options.dueBefore)
+  params.set('include_suspended', options.includeSuspended ? 'true' : 'false')
+  params.set('limit', String(options.limit ?? 50))
+  return apiRequest<MemoryCardOut[]>(`/projects/${projectId}/memory-cards?${params.toString()}`)
+}
+
+export function createMemoryCard(projectId: string, questionId: string) {
+  return apiRequest<MemoryCardOut>(`/projects/${projectId}/memory-cards`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('memory-card-create'),
+    body: { question_id: questionId },
+  })
+}
+
+/** One click = one fresh key: a repeat click can never review the same card twice. */
+export function reviewMemoryCard(projectId: string, cardId: string, rating: MemoryRating) {
+  return apiRequest<MemoryReviewOut>(`/projects/${projectId}/memory-cards/${cardId}/review`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('memory-review'),
+    body: { rating },
+  })
+}
+
+export function fetchMemoryCardLogs(projectId: string, cardId: string, limit = 50) {
+  return apiRequest<MemoryReviewLogOut[]>(
+    `/projects/${projectId}/memory-cards/${cardId}/logs?limit=${limit}`,
+  )
+}
+
+export function rebuildMemoryCard(projectId: string, cardId: string) {
+  return apiRequest<MemoryRebuildOut>(`/projects/${projectId}/memory-cards/${cardId}/rebuild`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('memory-card-rebuild'),
+  })
+}
+
+export function suspendMemoryCard(projectId: string, cardId: string, reason: string) {
+  return apiRequest<MemoryCardOut>(`/projects/${projectId}/memory-cards/${cardId}/suspend`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('memory-card-suspend'),
+    body: { reason },
+  })
+}
+
+export function resumeMemoryCard(projectId: string, cardId: string) {
+  return apiRequest<MemoryCardOut>(`/projects/${projectId}/memory-cards/${cardId}/resume`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('memory-card-resume'),
+  })
+}

@@ -117,6 +117,14 @@ class StudyTask(BaseModel):
     origin_session_item = models.ForeignKey(
         "practice.SessionItem", null=True, blank=True, on_delete=models.SET_NULL, related_name="derived_tasks"
     )
+    memory_card = models.ForeignKey(
+        "memory.MemoryCard",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="study_tasks",
+        help_text="记忆卡复习任务；只表示复习安排，不产生解题能力证据",
+    )
     #: The event that created this task (confirmed grade, explanation, ...).
     trigger_event = models.CharField(max_length=60, blank=True)
     delay_anchor_at = models.DateTimeField(null=True, blank=True)

@@ -28,9 +28,11 @@ from apps.common.enums import (
 )
 from apps.common.errors import InvalidInput, ScopeViolation
 from apps.exams.models import ExamProject
-from apps.knowledge.models import QuestionKnowledge, VerificationPairing
+from apps.knowledge.models import KnowledgeNode, QuestionKnowledge, VerificationPairing
+from apps.knowledge.services import relations as relations_service
 from apps.learning.models import LearnerKnowledgeState, StudyPlan, StudyTask
 from apps.learning.services import pairing as pairing_service
+from apps.memory.services import scheduler as memory_service
 from apps.practice.models import LearningEvidence, PracticeSession
 from apps.question_bank.models import Question
 
@@ -180,51 +182,140 @@ def _task_candidate(task: StudyTask, *, reason_codes: list[str], status: dict | 
     }
 
 
-def weakly_known_candidates(*, user, project, limit: int = 20) -> list[dict]:
-    """Confirmed weak points with an eligible paired or mapped question."""
+def _question_for_node(*, project, node_id) -> Question | None:
+    """Best eligible question for one node: a reviewed pairing, else a mapping."""
+    for pairing in VerificationPairing.objects.filter(
+        project=project, node_id=node_id, is_active=True
+    ).select_related("immediate_question"):
+        ok, _reason = _eligible_question(pairing.immediate_question)
+        if ok:
+            return pairing.immediate_question
+    mapping = (
+        QuestionKnowledge.objects.filter(node_id=node_id, is_primary=True, question_version__status="published")
+        .select_related("question_version__question")
+        .first()
+    )
+    if mapping is None:
+        return None
+    question = mapping.question_version.question
+    ok, _reason = _eligible_question(question)
+    return question if ok else None
+
+
+def memory_review_candidates(*, user, project, now=None, limit: int = 10) -> list[dict]:
+    """Due FSRS cards, highest priority first, as explainable plan candidates.
+
+    A card is only offered when its question still has a published version and a
+    checked answer, exactly like every other task: a withdrawn question must not
+    come back through the memory channel. Memory review is a *recall* exercise,
+    so the task carries ``memory_card`` and never claims solving ability.
+    """
     rows: list[dict] = []
-    states = (
+    moment = now or timezone.now()
+    for item in memory_service.review_candidates(user=user, project=project, now=moment, limit=limit):
+        due_at = memory_service.parse_moment(item.get("due_at"))
+        if due_at is not None and due_at > moment:
+            # Only work that is actually due enters today's plan; a card that is
+            # still waiting out its interval is not "reviewed early".
+            continue
+        question = Question.objects.filter(id=item["question_id"]).first()
+        ok, _reason = _eligible_question(question)
+        if not ok:
+            continue
+        rows.append(
+            {
+                "task_id": None,
+                "task_kind": TaskKind.MEMORY_REVIEW,
+                "question_id": str(question.id),
+                "question_label": question.display_label,
+                "knowledge_node_id": item.get("knowledge_node_id"),
+                "knowledge_node_name": item.get("knowledge_node_name", ""),
+                "project_id": str(project.id),
+                "subject_id": item["subject_id"],
+                # Recall is deliberately cheap: half of the solving estimate, at least a minute.
+                "estimated_minutes": max(1, _question_minutes(question) // 2),
+                "reason_codes": ["memory_due", *list(item.get("reason_codes") or [])],
+                "evidence_ids": [],
+                "pairing_version": None,
+                "not_before": None,
+                "deficit_notice": "",
+                "memory_card_id": item["card_id"],
+            }
+        )
+    return rows
+
+
+def weakly_known_candidates(*, user, project, limit: int = 20) -> list[dict]:
+    """Confirmed weak points, reordered by the prerequisite graph.
+
+    A weak point whose foundation is not demonstrated yet is not practised
+    directly: the prerequisite is scheduled first and the reason codes say so.
+    When the prerequisite has no eligible question the weak point is still
+    offered, but the missing foundation is reported instead of hidden.
+    """
+    rows: list[dict] = []
+    states = list(
         LearnerKnowledgeState.objects.filter(user=user, project=project, needs_review=True)
         .select_related("node", "syllabus_version")
         .order_by("-needs_review", "as_of")[: max(1, min(limit, 50))]
     )
+    state_by_node = {
+        str(node_id): summary
+        for node_id, summary in LearnerKnowledgeState.objects.filter(user=user, project=project).values_list(
+            "node_id", "summary"
+        )
+    }
+    scheduled_questions: set[str] = set()
     for state in states:
+        unmet = relations_service.unmet_prerequisites(node=state.node, state_by_node=state_by_node)
         chosen = None
-        for pairing in VerificationPairing.objects.filter(
-            project=project, node=state.node, is_active=True
-        ).select_related("immediate_question"):
-            ok, _reason = _eligible_question(pairing.immediate_question)
-            if ok:
-                chosen = pairing.immediate_question
+        target = state.node
+        used_fallback = False
+        reason_codes = ["weakness_repair", f"state_{state.summary}"]
+        if unmet:
+            for gap in unmet:
+                question = _question_for_node(project=project, node_id=gap["node_id"])
+                if question is None:
+                    continue
+                chosen = question
+                target = KnowledgeNode.objects.get(id=gap["node_id"])
+                reason_codes = [
+                    "prerequisite_first",
+                    gap["reason"],
+                    f"unblocks:{state.node.canonical_name}"[:120],
+                    f"blocked_state_{state.summary}",
+                ]
                 break
+            if chosen is None:
+                used_fallback = True
+                reason_codes.append("prerequisite_missing_question")
         if chosen is None:
-            mapping = (
-                QuestionKnowledge.objects.filter(node=state.node, is_primary=True, question_version__status="published")
-                .select_related("question_version__question")
-                .first()
+            chosen = _question_for_node(project=project, node_id=state.node_id)
+            target = state.node
+        if chosen is None or str(chosen.id) in scheduled_questions:
+            continue
+        scheduled_questions.add(str(chosen.id))
+        deficit_notice = ""
+        if unmet and used_fallback:
+            deficit_notice = (
+                f"前置考点「{unmet[0]['node_name']}」尚无可练习题目：先用可用题目练习，前置缺口已记录，不计入该考点的独立掌握证据"
             )
-            if mapping is None:
-                continue
-            ok, _reason = _eligible_question(mapping.question_version.question)
-            if not ok:
-                continue
-            chosen = mapping.question_version.question
         rows.append(
             {
                 "task_id": None,
                 "task_kind": TaskKind.WEAKNESS_REPAIR,
                 "question_id": str(chosen.id),
                 "question_label": chosen.display_label,
-                "knowledge_node_id": str(state.node_id),
-                "knowledge_node_name": state.node.canonical_name,
+                "knowledge_node_id": str(target.id),
+                "knowledge_node_name": target.canonical_name,
                 "project_id": str(project.id),
-                "subject_id": str(state.syllabus_version.subject_id),
+                "subject_id": str(chosen.subject_id),
                 "estimated_minutes": _question_minutes(chosen),
-                "reason_codes": ["weakness_repair", f"state_{state.summary}"],
+                "reason_codes": reason_codes,
                 "evidence_ids": list(state.source_evidence_ids or [])[:10],
                 "pairing_version": None,
                 "not_before": None,
-                "deficit_notice": "",
+                "deficit_notice": deficit_notice,
             }
         )
     return rows
@@ -399,6 +490,7 @@ def _plan_project(*, user, project, plan, minutes: int, undiagnosed_share: int, 
     reserve = int(minutes * undiagnosed_share / 100)
     categories = [
         ("due_delayed_verification", delayed_task_candidates(user=user, project=project, now=now)),
+        ("memory_review", memory_review_candidates(user=user, project=project, now=now)),
         ("weakness_repair", weakly_known_candidates(user=user, project=project)),
         ("undiagnosed_probe", undiagnosed_candidates(user=user, project=project)),
         ("general_practice", general_candidates(user=user, project=project)),
@@ -441,6 +533,20 @@ def _materialise_task(*, user, project, plan, candidate: dict) -> StudyTask | No
     question = Question.objects.filter(id=candidate["question_id"]).first()
     if question is None:
         return None
+    memory_card_id = candidate.get("memory_card_id")
+    if memory_card_id:
+        # A refresh must not queue the same card twice: reuse the open task.
+        existing = StudyTask.objects.filter(
+            user=user,
+            memory_card_id=memory_card_id,
+            task_kind=TaskKind.MEMORY_REVIEW,
+            status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED],
+        ).first()
+        if existing is not None:
+            existing.plan = plan
+            existing.reason_codes = list(candidate["reason_codes"])
+            existing.save(update_fields=["plan", "reason_codes", "updated_at"])
+            return existing
     return StudyTask.objects.create(
         plan=plan,
         user=user,
@@ -450,6 +556,7 @@ def _materialise_task(*, user, project, plan, candidate: dict) -> StudyTask | No
         status=TaskStatus.PENDING,
         question=question,
         knowledge_node_id=candidate.get("knowledge_node_id"),
+        memory_card_id=memory_card_id,
         estimated_minutes=max(1, int(candidate["estimated_minutes"])),
         reason_codes=list(candidate["reason_codes"]),
         evidence_ids=list(candidate.get("evidence_ids") or [])[:20],

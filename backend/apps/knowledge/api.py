@@ -4,17 +4,22 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.utils import timezone
 from ninja import Schema
 
+from ai.providers import base as providers
 from apps.audit.services import idempotency
 from apps.common.api import auth, idempotency_key, project_scoped_router
-from apps.common.errors import InvalidInput, ScopeViolation
+from apps.common.errors import AiNotConfigured, DependencyUnavailable, InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.exams.models import SyllabusVersion
 from apps.knowledge import services
-from apps.knowledge.models import KnowledgeNode, QuestionTemplate, VerificationPairing
+from apps.knowledge.models import KnowledgeNode, KnowledgeRelation, QuestionTemplate, TagSuggestion, VerificationPairing
 from apps.knowledge.services import outline as outline_services
-from apps.question_bank.models import Question
+from apps.knowledge.services import relations as relations_service
+from apps.knowledge.services import suggestions as suggestion_services
+from apps.learning.models import LearnerKnowledgeState
+from apps.question_bank.models import Question, QuestionVersion
 
 knowledge_router = project_scoped_router(tags=["knowledge"])
 
@@ -423,3 +428,282 @@ def patch_node(request, project_id: str, node_id: str, payload: NodePatch):
         move=payload.move,
     )
     return _node_out(updated)
+
+
+# --------------------------------------------------------------------------
+# P1: prerequisite graph (acceptance B04)
+# --------------------------------------------------------------------------
+class RelationIn(Schema):
+    syllabus_version_id: str
+    from_node_id: str
+    to_node_id: str
+    relation_type: str = "prerequisite"
+    note: str = ""
+
+
+class RelationOut(Schema):
+    id: str
+    syllabus_version_id: str
+    from_node_id: str
+    from_node_name: str
+    to_node_id: str
+    to_node_name: str
+    relation_type: str
+    is_active: bool
+    note: str
+
+
+class GraphOut(Schema):
+    edges: list[RelationOut]
+    node_count: int
+    edge_count: int
+    generated_at: str
+    unmet_prerequisites: list[dict] = []
+
+
+def _relation_out(relation) -> dict:
+    return {
+        "id": str(relation.id),
+        "syllabus_version_id": str(relation.syllabus_version_id),
+        "from_node_id": str(relation.from_node_id),
+        "from_node_name": relation.from_node.canonical_name,
+        "to_node_id": str(relation.to_node_id),
+        "to_node_name": relation.to_node.canonical_name,
+        "relation_type": relation.relation_type,
+        "is_active": relation.is_active,
+        "note": relation.note,
+    }
+
+
+@knowledge_router.get("/projects/{project_id}/knowledge-relations", auth=auth, response=GraphOut)
+def list_relations(request, project_id: str, syllabus_version_id: str | None = None, subject_id: str | None = None):
+    """Active prerequisite/related edges, plus how many nodes they connect."""
+    project = require_project(request.user, project_id)
+    syllabi = SyllabusVersion.objects.filter(subject__project=project)
+    if subject_id:
+        require_subject(request.user, project, subject_id)
+        syllabi = syllabi.filter(subject_id=subject_id)
+    if syllabus_version_id:
+        syllabi = syllabi.filter(id=syllabus_version_id)
+    edges = []
+    for syllabus in syllabi:
+        edges.extend(relations_service.active_relations(syllabus_version=syllabus))
+    summary = {
+        "edges": [_relation_out(relation) for relation in edges],
+        "node_count": KnowledgeNode.objects.filter(syllabus_version__in=syllabi).count(),
+        "edge_count": len(edges),
+        "generated_at": timezone.now().isoformat(),
+        "unmet_prerequisites": [],
+    }
+    return summary
+
+
+@knowledge_router.post("/projects/{project_id}/knowledge-relations", auth=auth, response={201: RelationOut})
+def create_relation(request, project_id: str, payload: RelationIn):
+    """Add one edge; an edge that would close a cycle is refused with the path."""
+    project = require_project(request.user, project_id)
+    syllabus = SyllabusVersion.objects.filter(
+        id=payload.syllabus_version_id, subject__project=project
+    ).first()
+    if syllabus is None:
+        raise ScopeViolation(message="大纲版本不存在或不属于该项目")
+    nodes = {
+        str(node.id): node
+        for node in KnowledgeNode.objects.filter(
+            id__in=[payload.from_node_id, payload.to_node_id], syllabus_version=syllabus
+        )
+    }
+    from_node = nodes.get(str(payload.from_node_id))
+    to_node = nodes.get(str(payload.to_node_id))
+    if from_node is None or to_node is None:
+        raise ScopeViolation(message="关系两端的考点必须属于该大纲版本")
+    key = idempotency_key(request)
+    scope = f"relations.create:{project_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    relation = relations_service.add_relation(
+        syllabus_version=syllabus,
+        from_node=from_node,
+        to_node=to_node,
+        relation_type=payload.relation_type,
+        actor=request.user,
+        note=payload.note,
+    )
+    relation = KnowledgeRelation.objects.select_related("from_node", "to_node").get(id=relation.id)
+    result = _relation_out(relation)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="knowledge_relation",
+        resource_id=relation.id,
+    )
+    return 201, result
+
+
+@knowledge_router.delete("/projects/{project_id}/knowledge-relations/{relation_id}", auth=auth, response=RelationOut)
+def deactivate_relation(request, project_id: str, relation_id: str, reason: str = ""):
+    project = require_project(request.user, project_id)
+    relation = KnowledgeRelation.objects.filter(
+        id=relation_id, syllabus_version__subject__project=project
+    ).select_related("from_node", "to_node").first()
+    if relation is None:
+        raise ScopeViolation(message="关系不存在或不属于该项目")
+    relations_service.deactivate_relation(relation=relation, actor=request.user, reason=reason)
+    return _relation_out(relation)
+
+
+@knowledge_router.get("/projects/{project_id}/knowledge-nodes/{node_id}/prerequisites", auth=auth)
+def node_prerequisites(request, project_id: str, node_id: str):
+    """Direct prerequisites and, given the learner's states, which ones block."""
+    project = require_project(request.user, project_id)
+    node = KnowledgeNode.objects.filter(id=node_id, syllabus_version__subject__project=project).first()
+    if node is None:
+        raise ScopeViolation(message="考点不存在或不属于该项目")
+    prerequisites = relations_service.prerequisite_nodes(node)
+    states = {
+        str(state.node_id): state.summary
+        for state in LearnerKnowledgeState.objects.filter(
+            user=request.user, project=project, node__in=prerequisites
+        )
+    }
+    return {
+        "node_id": str(node.id),
+        "node_name": node.canonical_name,
+        "prerequisites": [
+            {
+                "node_id": str(item.id),
+                "node_name": item.canonical_name,
+                "state": states.get(str(item.id), "undiagnosed"),
+            }
+            for item in prerequisites
+        ],
+        "unmet": relations_service.unmet_prerequisites(node=node, state_by_node=states),
+    }
+
+
+# --------------------------------------------------------------------------
+# P1: knowledge-tag suggestions (acceptance B04)
+# --------------------------------------------------------------------------
+class TagSuggestionOut(Schema):
+    id: str
+    project_id: str
+    question_version_id: str
+    question_label: str
+    status: str
+    proposals: list[dict]
+    model_identifier: str
+    prompt_version: str
+    is_stub: bool
+    created_at: str
+    decided_at: str | None
+    accepted_mapping_revision: int | None
+    unresolved_names: list[str]
+    decision_note: str
+    latest_mappings: list[dict]
+
+
+class SuggestionDecisionIn(Schema):
+    node_names: list[str] | None = None
+    note: str = ""
+
+
+def _suggestion_out(suggestion: TagSuggestion) -> dict:
+    version = suggestion.question_version
+    return {
+        "id": str(suggestion.id),
+        "project_id": str(suggestion.project_id),
+        "question_version_id": str(version.id),
+        "question_label": version.question.display_label,
+        "status": suggestion.status,
+        "proposals": suggestion.proposals or [],
+        "model_identifier": suggestion.model_identifier,
+        "prompt_version": suggestion.prompt_version,
+        "is_stub": suggestion.is_stub,
+        "created_at": suggestion.created_at.isoformat(),
+        "decided_at": suggestion.decided_at.isoformat() if suggestion.decided_at else None,
+        "accepted_mapping_revision": suggestion.accepted_mapping_revision,
+        "unresolved_names": suggestion.unresolved_names or [],
+        "decision_note": suggestion.decision_note,
+        "latest_mappings": suggestion_services.mapping_context(version),
+    }
+
+
+def _require_version(project, version_id: str) -> QuestionVersion:
+    version = QuestionVersion.objects.filter(id=version_id, question__subject__project=project).select_related(
+        "question__subject"
+    ).first()
+    if version is None:
+        raise ScopeViolation(message="题目版本不存在或不属于该项目")
+    return version
+
+
+@knowledge_router.get(
+    "/projects/{project_id}/question-versions/{version_id}/tag-suggestions",
+    auth=auth,
+    response=list[TagSuggestionOut],
+)
+def list_tag_suggestions(request, project_id: str, version_id: str):
+    project = require_project(request.user, project_id)
+    version = _require_version(project, version_id)
+    queryset = TagSuggestion.objects.filter(question_version=version).select_related("question_version__question")
+    return [_suggestion_out(suggestion) for suggestion in queryset[:50]]
+
+
+@knowledge_router.post(
+    "/projects/{project_id}/question-versions/{version_id}/tag-suggestions",
+    auth=auth,
+    response={201: TagSuggestionOut},
+)
+def create_tag_suggestion(request, project_id: str, version_id: str):
+    """Ask the provider for tag candidates. No provider → explicit failure."""
+    project = require_project(request.user, project_id)
+    version = _require_version(project, version_id)
+    key = idempotency_key(request)
+    scope = f"tag_suggestions.create:{version_id}"
+    replay = idempotency.claim(request.user, scope, key, {"version_id": version_id})
+    if replay is not None:
+        return replay.status_code, replay.body
+    try:
+        suggestion = suggestion_services.propose_tags(version=version, user=request.user, actor=request.user)
+    except providers.AiUnavailable as exc:
+        # "AI 未配置" is a documented state, not a server bug: report it as such.
+        raise AiNotConfigured(str(exc)) from exc
+    except providers.AiError as exc:
+        raise DependencyUnavailable(f"模型调用失败：{exc.code}", details={"ai_error": exc.code}) from exc
+    suggestion = TagSuggestion.objects.select_related("question_version__question").get(id=suggestion.id)
+    result = _suggestion_out(suggestion)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="tag_suggestion",
+        resource_id=suggestion.id,
+    )
+    return 201, result
+
+
+@knowledge_router.post("/projects/{project_id}/tag-suggestions/{suggestion_id}/accept", auth=auth)
+def accept_tag_suggestion(request, project_id: str, suggestion_id: str, payload: SuggestionDecisionIn):
+    """Accept into a new auxiliary mapping revision; never creates a node."""
+    project = require_project(request.user, project_id)
+    suggestion = suggestion_services.require_suggestion(project=project, suggestion_id=suggestion_id)
+    return suggestion_services.accept_suggestion(
+        suggestion=suggestion, actor=request.user, node_names=payload.node_names, note=payload.note
+    )
+
+
+@knowledge_router.post("/projects/{project_id}/tag-suggestions/{suggestion_id}/reject", auth=auth,
+                       response=TagSuggestionOut)
+def reject_tag_suggestion(request, project_id: str, suggestion_id: str, payload: SuggestionDecisionIn):
+    project = require_project(request.user, project_id)
+    suggestion = suggestion_services.require_suggestion(project=project, suggestion_id=suggestion_id)
+    suggestion_services.reject_suggestion(suggestion=suggestion, actor=request.user, note=payload.note)
+    suggestion.refresh_from_db()
+    return _suggestion_out(suggestion)

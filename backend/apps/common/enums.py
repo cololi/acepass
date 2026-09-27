@@ -208,6 +208,7 @@ class TaskKind(models.TextChoices):
     WEAKNESS_REPAIR = "weakness_repair", "补弱练习"
     UNDIAGNOSED_PROBE = "undiagnosed_probe", "未诊断考点"
     GENERAL_PRACTICE = "general_practice", "一般练习"
+    MEMORY_REVIEW = "memory_review", "记忆卡复习"
 
 
 class TaskStatus(models.TextChoices):
@@ -297,3 +298,45 @@ class ContentLineageBasis(models.TextChoices):
 class UnitConversionKind(models.TextChoices):
     NONE = "none", "无单位换算"
     WHITELIST = "whitelist", "白名单单位换算"
+
+
+class KnowledgeRelationType(models.TextChoices):
+    """Edges between knowledge points inside one syllabus version."""
+
+    PREREQUISITE = "prerequisite", "前置考点"
+    RELATED = "related", "相关考点"
+
+
+class SuggestionStatus(models.TextChoices):
+    """Review state of every machine-proposed editorial change.
+
+    A proposal never mutates controlled vocabulary or scoring facts directly;
+    it only becomes effective after a human accepts it.
+    """
+
+    PROPOSED = "proposed", "待审核"
+    ACCEPTED = "accepted", "已采纳"
+    REJECTED = "rejected", "已否决"
+    SUPERSEDED = "superseded", "已被替代"
+
+
+class MemoryRating(models.TextChoices):
+    """FSRS review grade chosen by the learner."""
+
+    AGAIN = "again", "忘记"
+    HARD = "hard", "困难"
+    GOOD = "good", "记得"
+    EASY = "easy", "简单"
+
+
+class MemoryCardPhase(models.TextChoices):
+    NEW = "new", "未学"
+    LEARNING = "learning", "学习中"
+    REVIEW = "review", "复习中"
+    RELEARNING = "relearning", "重学中"
+
+
+class SearchChannel(models.TextChoices):
+    KEYWORD = "keyword", "关键词"
+    VECTOR = "vector", "向量"
+    HYBRID = "hybrid", "混合"

@@ -9,6 +9,8 @@ import { CandidateReviewPage } from '../features/imports/CandidateReviewPage'
 import { PracticePage } from '../features/practice/PracticePage'
 import { GradingPage } from '../features/practice/GradingPage'
 import { KnowledgePage } from '../features/knowledge/KnowledgePage'
+import { SearchPage } from '../features/search/SearchPage'
+import { MemoryPage } from '../features/memory/MemoryPage'
 import { ReviewPage } from '../features/review/ReviewPage'
 import { ReportsPage } from '../features/reports/ReportsPage'
 import { SettingsPage } from '../features/settings/SettingsPage'
@@ -43,8 +45,14 @@ export function AppShell() {
           <NavLink to="/knowledge" onClick={() => setMenuOpen(false)}>
             考点地图
           </NavLink>
+          <NavLink to="/search" onClick={() => setMenuOpen(false)}>
+            检索
+          </NavLink>
           <NavLink to="/review" onClick={() => setMenuOpen(false)}>
             错题与复习
+          </NavLink>
+          <NavLink to="/memory" onClick={() => setMenuOpen(false)}>
+            记忆卡
           </NavLink>
           <NavLink to="/grading" onClick={() => setMenuOpen(false)}>
             人工评分
@@ -108,7 +116,9 @@ export function AppShell() {
           <Route path="/imports" element={<ImportsPage />} />
           <Route path="/imports/:jobId/candidates/:candidateId" element={<CandidateReviewPage />} />
           <Route path="/knowledge" element={<KnowledgePage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/review" element={<ReviewPage />} />
+          <Route path="/memory" element={<MemoryPage />} />
           <Route path="/grading" element={<GradingPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />

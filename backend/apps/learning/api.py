@@ -217,6 +217,9 @@ def get_task(request, task_id: str):
         "pairing_id": str(task.pairing_id) if task.pairing_id else None,
         "pairing_version": task.pairing_version,
         "origin_session_item_id": str(task.origin_session_item_id) if task.origin_session_item_id else None,
+        # Memory review is a recall exercise: the link is explicit so the UI can
+        # say "记忆卡复习" instead of presenting it as solving practice.
+        "memory_card_id": str(task.memory_card_id) if task.memory_card_id else None,
     }
 
 
