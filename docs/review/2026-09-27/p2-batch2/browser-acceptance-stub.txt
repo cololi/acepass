@@ -1,0 +1,403 @@
+[WebServer] 2026-09-27 23:10:25,780 WARNING apps.audit request log write failed path=/health/live
+[WebServer] [27/Sep/2026 23:10:25] "GET /health/live HTTP/1.1" 200 42
+[WebServer] (node:39646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+Operations to perform:
+  Apply all migrations: accounts, admin, analytics, audit, auth, contenttypes, exams, ingestion, knowledge, learning, memory, practice, question_bank, search, sessions, tutoring
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying exams.0001_initial... OK
+  Applying ingestion.0001_initial... OK
+  Applying question_bank.0001_initial... OK
+  Applying analytics.0001_initial... OK
+  Applying analytics.0002_initial... OK
+  Applying analytics.0003_p0_1_grading_and_regrade_semantics... OK
+  Applying analytics.0004_p0_2_regrade_generation_sequence... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_p0_1_outbox_lease_and_recovery... OK
+  Applying exams.0002_initial... OK
+  Applying ingestion.0002_p1_pdf_import_and_paper_link... OK
+  Applying ingestion.0003_p2_layout_import... OK
+  Applying knowledge.0001_initial... OK
+  Applying knowledge.0002_knowledgerelation_tagsuggestion... OK
+  Applying learning.0001_initial... OK
+  Applying practice.0001_initial... OK
+  Applying practice.0002_p0_1_grading_and_regrade_semantics... OK
+  Applying memory.0001_initial... OK
+  Applying learning.0002_initial... OK
+  Applying learning.0003_alter_studytask_options_and_more... OK
+  Applying learning.0004_studytask_memory_card_alter_studytask_task_kind... OK
+  Applying practice.0003_p1_transcription_and_follow_ups... OK
+  Applying practice.0004_transcription_origin... OK
+  Applying question_bank.0002_questionfamily_merged_at_questionfamily_merged_into_and_more... OK
+  Applying search.0001_initial... OK
+  Applying sessions.0001_initial... OK
+  Applying tutoring.0001_initial... OK
+  Applying tutoring.0002_p0_2_tutor_job_finalized_at... OK
+  Applying tutoring.0003_b08_tutor_segment... OK
+已创建账户：acceptance@acepass.local
+已创建账户：empty@acepass.local
+email=acceptance@acepass.local
+project_a=6d595133-899a-4522-990d-539ab053d42f
+project_b=b570aaf1-a7ac-4c10-b392-25ccbfb60d1a
+project_c=f60a5baa-7c9c-4882-a340-e294f4316737
+subjects=5
+published_versions=28
+delayed_verification_tasks=2
+cycle_subject_id=714ff79e-14e2-4a9e-9475-a6e4b3c00e58
+cycle_subject_name=验收历年科目·周期统计
+complete_cycles=['2019', '2020', '2021', '2022', '2023']
+incomplete_cycle=2024
+cycle_scored_items=10
+
+Running 8 tests using 1 worker
+
+(node:39686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:34,095 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:34,106 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:34] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:34] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/200eafde-dad8-4a9d-a62a-1df2dcdffdd1 HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/8da85eba-b571-40f6-ac00-4bf9c0118525/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:34] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets HTTP/1.1" 201 470
+[WebServer] [27/Sep/2026 23:10:34] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/0034852b-629f-4991-b529-ac8a70255352 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:35] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/8da85eba-b571-40f6-ac00-4bf9c0118525/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/200eafde-dad8-4a9d-a62a-1df2dcdffdd1 HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/8da85eba-b571-40f6-ac00-4bf9c0118525/presentation HTTP/1.1" 200 878
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8 HTTP/1.1" 200 1823
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 200 257
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/200eafde-dad8-4a9d-a62a-1df2dcdffdd1 HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8 HTTP/1.1" 200 1823
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 200 257
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/0034852b-629f-4991-b529-ac8a70255352 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:35] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 201 719
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 200 976
+[WebServer] [27/Sep/2026 23:10:35] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/transcriptions/d3d8a9d4-6463-45cd-a2a5-afef0b985f06/confirm HTTP/1.1" 200 821
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 200 1040
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/grading-queue?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 1928
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/0034852b-629f-4991-b529-ac8a70255352 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/transcriptions HTTP/1.1" 200 1040
+[WebServer] [27/Sep/2026 23:10:35] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/ai-estimate HTTP/1.1" 200 347
+[WebServer] 2026-09-27 23:10:35,891 ERROR django.request Service Unavailable: /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/ai-estimate
+[WebServer] [27/Sep/2026 23:10:35] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a45cdbf5-5b0c-4b5b-961f-1c63a2871ee8/ai-estimate HTTP/1.1" 503 273
+  ✓  1 [desktop] › tests/acceptance/p1-batch3.spec.ts:181:3 › P1 batch 3 stub-provider run › @stub a stub transcription is labelled, confirmable, and the estimate stays inert (2.1s)
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:36,128 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:36,137 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:36] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:36] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/189e2593-53d1-481f-8c39-a3c132fdc08a HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/7976f4d7-8a4f-419e-a30c-7f2fcd394973/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:36] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/7976f4d7-8a4f-419e-a30c-7f2fcd394973/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/189e2593-53d1-481f-8c39-a3c132fdc08a HTTP/1.1" 200 2403
+[WebServer] [27/Sep/2026 23:10:36] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/885989bb-4398-4880-a3aa-e98d8a1d02e1 HTTP/1.1" 200 1704
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/885989bb-4398-4880-a3aa-e98d8a1d02e1/transcriptions HTTP/1.1" 200 181
+[WebServer] [27/Sep/2026 23:10:37] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/885989bb-4398-4880-a3aa-e98d8a1d02e1/ai-diagnosis HTTP/1.1" 200 1271
+[WebServer] [27/Sep/2026 23:10:37] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/diagnosis-follow-ups/280dbd87-ba53-4c79-95bc-f802d4d46b7e/answer HTTP/1.1" 200 602
+  ✓  2 [desktop] › tests/acceptance/p1-batch3.spec.ts:212:3 › P1 batch 3 stub-provider run › @stub diagnosis proposes an unproven cause honestly and asks a follow-up (1.3s)
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:37,401 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:37,411 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:37] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:37] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:38] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/a256fd41-7a74-49d9-8a8c-a0ca995ad89a HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/6112d91f-9f86-4f29-9f2b-fbaa540ecd3c/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:38] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/6112d91f-9f86-4f29-9f2b-fbaa540ecd3c/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/a256fd41-7a74-49d9-8a8c-a0ca995ad89a HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/c34723b1-3844-4eba-a4f8-8f0e4632d62e HTTP/1.1" 200 1741
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/c34723b1-3844-4eba-a4f8-8f0e4632d62e/transcriptions HTTP/1.1" 200 181
+[WebServer] [27/Sep/2026 23:10:38] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-sessions HTTP/1.1" 201 412
+[WebServer] [27/Sep/2026 23:10:38] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-sessions/b35259a1-bdd3-4138-abc4-248e6bf839ee/messages HTTP/1.1" 201 1028
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/61dba00d-bc44-41dd-a548-1994ee49167a/stream HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/61dba00d-bc44-41dd-a548-1994ee49167a/stream HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/ai-runs?limit=50 HTTP/1.1" 200 1566
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/61dba00d-bc44-41dd-a548-1994ee49167a/stream?poll_seconds=0.05&max_seconds=5 HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/61dba00d-bc44-41dd-a548-1994ee49167a/stream?after=0&poll_seconds=0.05&max_seconds=5 HTTP/1.1" 200 625
+[WebServer] [27/Sep/2026 23:10:38] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/ai-runs?limit=50 HTTP/1.1" 200 1566
+  ✓  3 [desktop] › tests/acceptance/p1-batch3.spec.ts:235:3 › P1 batch 3 stub-provider run › @stub validated segments stream, and reconnecting does not call the model again (1.6s)
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:39,021 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:39,029 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:39] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:39] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/knowledge-nodes?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 879
+[WebServer] [27/Sep/2026 23:10:39] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/variants/propose HTTP/1.1" 201 6776
+  ✓  4 [desktop] › tests/acceptance/p2-batch2.spec.ts:136:3 › P2 batch 2 stub-provider run › @stub the offline stub can never produce a usable variant (961ms)
+(node:39875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:40,252 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:40,261 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:40] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:40] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/0c2fb47d-d774-47e9-a7c1-5926d3cbe25d HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:40] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/c2b8356d-f9e9-4488-9681-b42575ad584a/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:41] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets HTTP/1.1" 201 470
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/6fb1047e-f872-44b8-8d39-8f07850da5c3 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:41] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/c2b8356d-f9e9-4488-9681-b42575ad584a/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/0c2fb47d-d774-47e9-a7c1-5926d3cbe25d HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/c2b8356d-f9e9-4488-9681-b42575ad584a/presentation HTTP/1.1" 200 878
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 200 257
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad HTTP/1.1" 200 1823
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/0c2fb47d-d774-47e9-a7c1-5926d3cbe25d HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad HTTP/1.1" 200 1823
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 200 257
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/6fb1047e-f872-44b8-8d39-8f07850da5c3 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:41] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 201 719
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 200 976
+[WebServer] [27/Sep/2026 23:10:41] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/transcriptions/c35cabd9-1a80-441a-9418-5efd5d5f1212/confirm HTTP/1.1" 200 821
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 200 1040
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/grading-queue?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 7511
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/assets/6fb1047e-f872-44b8-8d39-8f07850da5c3 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/transcriptions HTTP/1.1" 200 1040
+[WebServer] [27/Sep/2026 23:10:41] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/ai-estimate HTTP/1.1" 200 347
+[WebServer] 2026-09-27 23:10:41,993 ERROR django.request Service Unavailable: /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/ai-estimate
+[WebServer] [27/Sep/2026 23:10:41] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/510db10d-4317-4ee3-b7d2-b19bf9c6e6ad/ai-estimate HTTP/1.1" 503 273
+  ✓  5 [mobile] › tests/acceptance/p1-batch3.spec.ts:181:3 › P1 batch 3 stub-provider run › @stub a stub transcription is labelled, confirmable, and the estimate stays inert (2.0s)
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:42,267 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:42,275 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:42] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:42] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/cbda240c-82c0-4b7e-b49e-023c82f93d4c HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:42] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/71a36221-d008-4c33-9f8f-cb348318a5ae/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:43] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/71a36221-d008-4c33-9f8f-cb348318a5ae/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/cbda240c-82c0-4b7e-b49e-023c82f93d4c HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a15c20f9-cb90-486d-9c01-32d6310086d1 HTTP/1.1" 200 1705
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a15c20f9-cb90-486d-9c01-32d6310086d1/transcriptions HTTP/1.1" 200 181
+[WebServer] [27/Sep/2026 23:10:43] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/a15c20f9-cb90-486d-9c01-32d6310086d1/ai-diagnosis HTTP/1.1" 200 1271
+[WebServer] [27/Sep/2026 23:10:43] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/diagnosis-follow-ups/17577cf4-e218-41a2-b980-f18a00a68927/answer HTTP/1.1" 200 602
+  ✓  6 [mobile] › tests/acceptance/p1-batch3.spec.ts:212:3 › P1 batch 3 stub-provider run › @stub diagnosis proposes an unproven cause honestly and asks a follow-up (1.4s)
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:43,639 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:43,649 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:43] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:44] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/47232fbd-b632-4bb9-8892-789620397968 HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/7e567e34-1c85-48d8-837a-fe88f0816e43/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 23:10:44] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/session-items/7e567e34-1c85-48d8-837a-fe88f0816e43/submit HTTP/1.1" 200 1438
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/practice-sessions/47232fbd-b632-4bb9-8892-789620397968 HTTP/1.1" 200 2404
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/04828189-83fd-48c9-8afd-01a0488f2e1b HTTP/1.1" 200 1741
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/attempts/04828189-83fd-48c9-8afd-01a0488f2e1b/transcriptions HTTP/1.1" 200 181
+[WebServer] [27/Sep/2026 23:10:44] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-sessions HTTP/1.1" 201 412
+[WebServer] [27/Sep/2026 23:10:44] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-sessions/37e8c496-b497-4d05-b7e3-e38dff6221e4/messages HTTP/1.1" 201 1028
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/f2d56d81-96ed-49ba-b77d-3d4d1e685e19/stream HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/f2d56d81-96ed-49ba-b77d-3d4d1e685e19/stream HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/ai-runs?limit=50 HTTP/1.1" 200 3526
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/f2d56d81-96ed-49ba-b77d-3d4d1e685e19/stream?poll_seconds=0.05&max_seconds=5 HTTP/1.1" 200 883
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/tutor-jobs/f2d56d81-96ed-49ba-b77d-3d4d1e685e19/stream?after=0&poll_seconds=0.05&max_seconds=5 HTTP/1.1" 200 625
+[WebServer] [27/Sep/2026 23:10:44] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/ai-runs?limit=50 HTTP/1.1" 200 3526
+  ✓  7 [mobile] › tests/acceptance/p1-batch3.spec.ts:235:3 › P1 batch 3 stub-provider run › @stub validated segments stream, and reconnecting does not call the model again (1.6s)
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 23:10:45,288 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 23:10:45,297 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 23:10:45] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/sealed-content HTTP/1.1" 200 274
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/syllabus-versions?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/questions?limit=100&subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 23:10:45] "GET /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/knowledge-nodes?subject_id=d41f95fb-02d6-41d2-b86e-4a2be92fed9c HTTP/1.1" 200 879
+[WebServer] [27/Sep/2026 23:10:45] "POST /api/v1/projects/6d595133-899a-4522-990d-539ab053d42f/variants/propose HTTP/1.1" 201 8314
+  ✓  8 [mobile] › tests/acceptance/p2-batch2.spec.ts:136:3 › P2 batch 2 stub-provider run › @stub the offline stub can never produce a usable variant (860ms)
+
+  8 passed (21.1s)
