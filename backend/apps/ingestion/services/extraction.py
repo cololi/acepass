@@ -122,6 +122,10 @@ def extract_image_candidate(*, import_job_id: str, document_id: str, candidate_i
     if document is None:
         return "document_missing"
 
+    # B06: pin the input revision before the model call. A human proofreading the
+    # draft while the provider is working must win over the late model output.
+    captured_revision = int(candidate.revision)
+
     provider = providers.get_provider()
     provider_name = provider.name
     model_name = ""
@@ -222,14 +226,61 @@ def extract_image_candidate(*, import_job_id: str, document_id: str, candidate_i
         )
         return "rejected"
 
-    _apply_extraction(candidate=candidate, clean=clean, call=call, problems=problems)
+    _apply_extraction(
+        candidate=candidate,
+        clean=clean,
+        call=call,
+        problems=problems,
+        expected_revision=captured_revision,
+    )
     return "ok"
 
 
-def _apply_extraction(*, candidate: ImportCandidate, clean: dict, call, problems: list[dict]) -> None:
-    """Store the machine output and open the manual proofreading step."""
+def _apply_extraction(
+    *, candidate: ImportCandidate, clean: dict, call, problems: list[dict], expected_revision: int | None = None
+) -> str:
+    """Store the machine output and open the manual proofreading step.
+
+    ``expected_revision`` is the candidate revision captured when the extraction
+    *started* (B06). The model call takes seconds and a human can proofread the
+    draft while it runs, so the write is conditional: if the draft moved on, the
+    late machine output is kept aside as the untouched extractor record and the
+    human's version is left exactly as it is. Discarding it silently would be just
+    as wrong as overwriting the human — the reviewer loses the comparison.
+
+    When the caller does not pin a revision explicitly, the revision of the
+    ``candidate`` object it holds *is* its snapshot: writing "whatever is newest
+    now" is the unconditional overwrite this function exists to prevent.
+    """
+    if expected_revision is None:
+        expected_revision = int(candidate.revision)
     with transaction.atomic():
         locked = ImportCandidate.objects.select_for_update().get(id=candidate.id)
+        machine_payload = {
+            "extractor": "vision",
+            "is_stub_output": bool(call.is_stub),
+            "provider": call.provider,
+            "model": call.model,
+            "prompt_version": call.prompt_version,
+            "raw_excerpt": call.raw_text[:4000],
+        }
+        if expected_revision is not None and int(locked.revision) != int(expected_revision):
+            locked.machine_payload = {
+                **machine_payload,
+                "stale_revision": True,
+                "extraction_started_revision": int(expected_revision),
+                "applied_revision": int(locked.revision),
+                "pending_clean_payload": clean,
+            }
+            locked.save(update_fields=["machine_payload", "updated_at"])
+            ingestion.add_job_problem(
+                locked.job,
+                "vision_extracted_stale",
+                "视觉识别完成时该候选已被人工修改：模型结果只作为机器记录保留，未覆盖人工内容。"
+                "如需要模型版本，请在机器记录中对比后手工采用。",
+                severity="warning",
+            )
+            return "stale_skipped"
         payload = {
             "question_type": clean.get("question_type") or QuestionType.SINGLE_CHOICE,
             "display_label": clean.get("display_label") or locked.draft_payload.get("display_label", ""),
@@ -240,14 +291,7 @@ def _apply_extraction(*, candidate: ImportCandidate, clean: dict, call, problems
             "needs_manual_structure": True,
             "doubts": clean.get("doubts") or [],
         }
-        locked.machine_payload = {
-            "extractor": "vision",
-            "is_stub_output": bool(call.is_stub),
-            "provider": call.provider,
-            "model": call.model,
-            "prompt_version": call.prompt_version,
-            "raw_excerpt": call.raw_text[:4000],
-        }
+        locked.machine_payload = machine_payload
         locked.draft_payload = payload
         locked.is_stub_output = bool(call.is_stub)
         locked.extractor_version = "vision-v1"
@@ -276,6 +320,7 @@ def _apply_extraction(*, candidate: ImportCandidate, clean: dict, call, problems
         )
         if job.status == ImportJobStatus.PROCESSING:
             ingestion.maybe_complete_job(job)
+        return "applied"
 
 
 def _mark_extraction_failed(candidate: ImportCandidate, message: str) -> None:

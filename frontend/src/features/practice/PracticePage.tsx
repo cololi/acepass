@@ -22,6 +22,47 @@ type AnswerState = Record<string, unknown>
 const DRAFT_PREFIX = 'acepass.draft.'
 const MAX_ATTACHMENTS = 6
 
+/**
+ * Versioned draft envelope (B06).
+ *
+ * The first version stored the answer state alone, so an uploaded photo was
+ * never part of the draft: `setAttachments([])` on load plus a text-only payload
+ * meant a refresh silently dropped it. The envelope keeps both halves in one
+ * server-side record, and the revision check still protects concurrent tabs.
+ */
+type DraftEnvelope = { draft_version: 2; answer: AnswerState; asset_ids: string[] }
+
+function readDraft(raw: unknown): { answer: AnswerState | null; assetIds: string[] } {
+  if (!raw || typeof raw !== 'object') return { answer: null, assetIds: [] }
+  const value = raw as Record<string, unknown>
+  if (value.draft_version === 2 && value.answer && typeof value.answer === 'object') {
+    const assetIds = Array.isArray(value.asset_ids) ? value.asset_ids.map(String) : []
+    return { answer: value.answer as AnswerState, assetIds }
+  }
+  // A draft written before the envelope existed is still an answer state; read it
+  // rather than discarding the learner's work.
+  return { answer: Object.keys(value).length > 0 ? (value as AnswerState) : null, assetIds: [] }
+}
+
+function safeParse(raw: string): unknown {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+/** A draft stores attachment ids; the editor only needs the id to render. */
+function restoredAttachments(ids: string[]): UploadedAsset[] {
+  return ids.map((id) => ({
+    id,
+    role: 'user_attachment',
+    content_type: '',
+    size_bytes: 0,
+    original_filename: '',
+  }))
+}
+
 const QUESTION_TYPE_LABELS: Record<string, string> = {
   single_choice: '单选题',
   multiple_choice: '多选题',
@@ -119,15 +160,15 @@ export function PracticePage() {
     if (!presentation || attempt) return
     const cacheKey = `${DRAFT_PREFIX}${presentation.session_item_id}`
     const cached = window.localStorage.getItem(cacheKey)
-    const serverDraft = (presentation.draft ?? {}) as AnswerState
+    const localDraft = cached ? readDraft(safeParse(cached)) : { answer: null, assetIds: [] }
+    const storedDraft = readDraft(presentation.draft)
     const initial =
-      cached && Object.keys(cached).length > 0
-        ? (JSON.parse(cached) as AnswerState)
-        : Object.keys(serverDraft).length > 0
-          ? serverDraft
-          : emptyAnswer(presentation.stem.question_type, presentation)
+      localDraft.answer ?? storedDraft.answer ?? emptyAnswer(presentation.stem.question_type, presentation)
     setAnswer(initial)
-    setAttachments([])
+    // Attachments are restored from the draft that supplied the answer. Text used
+    // to come back while the photo silently disappeared; the ids are part of the
+    // same record now, so a refresh (or another device) restores the same set.
+    setAttachments(restoredAttachments(localDraft.answer ? localDraft.assetIds : storedDraft.assetIds))
     draftRevision.current = presentation.draft_revision
     setStartedAt(Date.now())
     setReveal(null)
@@ -149,17 +190,19 @@ export function PracticePage() {
   }, [deepLinkItem, session, activeIndex])
 
   const syncDraft = useCallback(
-    async (value: AnswerState) => {
+    async (value: AnswerState, assets: UploadedAsset[] | string[]) => {
       if (!presentation || !projectId) return
       const cacheKey = `${DRAFT_PREFIX}${presentation.session_item_id}`
-      window.localStorage.setItem(cacheKey, JSON.stringify(value))
+      const assetIds = assets.map((item) => (typeof item === 'string' ? item : item.id))
+      const envelope: DraftEnvelope = { draft_version: 2, answer: value, asset_ids: assetIds }
+      window.localStorage.setItem(cacheKey, JSON.stringify(envelope))
       setDraftStatus('saving')
       try {
         const result = await apiRequest<{ draft_revision: number }>(
           `/projects/${projectId}/session-items/${presentation.session_item_id}/draft`,
           {
             method: 'PUT',
-            body: { draft: value, draft_revision: draftRevision.current },
+            body: { draft: envelope, draft_revision: draftRevision.current },
           },
         )
         draftRevision.current = result.draft_revision
@@ -176,9 +219,12 @@ export function PracticePage() {
 
   useEffect(() => {
     if (!answer || attempt) return
-    const timer = window.setTimeout(() => void syncDraft(answer), 700)
+    // A photo is content: adding or removing one must be saved by the same
+    // debounced path as typing, otherwise the draft on the server is older than
+    // what the learner sees.
+    const timer = window.setTimeout(() => void syncDraft(answer, attachments), 700)
     return () => window.clearTimeout(timer)
-  }, [answer, attempt, syncDraft])
+  }, [answer, attachments, attempt, syncDraft])
 
   /* ------------------------------------------------------------ mutations */
   const createSession = useMutation({

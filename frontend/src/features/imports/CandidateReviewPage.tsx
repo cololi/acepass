@@ -109,6 +109,48 @@ export function CandidateReviewPage() {
     [patchContent],
   )
 
+  /**
+   * The visible blank editor and the answer JSON are one source of truth.
+   *
+   * The structured editor used to write `content.blanks` only, so a reviewer who
+   * filled in the accepted answer visually saved a question whose official
+   * `answer_payload` was still empty — the question graded as "no rule for this
+   * blank" (B06). Every visible field is mirrored into the payload, and the
+   * JSON stays editable for the advanced cases it exists for.
+   */
+  const syncBlanksToAnswerJson = useCallback(
+    (nextBlanks: Array<Record<string, unknown>>, removedIds: string[] = []) => {
+      try {
+        const parsed = answerJson.trim() ? JSON.parse(answerJson) : {}
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return
+        const payload = parsed as Record<string, unknown>
+        const previous = (payload.blanks ?? {}) as Record<string, Record<string, unknown>>
+        const merged: Record<string, Record<string, unknown>> = {}
+        for (const [key, value] of Object.entries(previous)) {
+          if (!removedIds.includes(key)) merged[key] = value
+        }
+        for (const blank of nextBlanks) {
+          const id = String(blank.blank_id ?? '')
+          if (!id) continue
+          const spec: Record<string, unknown> = { mismatch_policy: 'review', ...(merged[id] ?? {}) }
+          spec.accepted_values = ((blank.accepted_values as string[]) ?? []).filter((value) => value !== '')
+          if (blank.max_score !== undefined && blank.max_score !== null && String(blank.max_score) !== '') {
+            spec.max_score = String(blank.max_score)
+          } else {
+            delete spec.max_score
+          }
+          merged[id] = spec
+        }
+        payload.kind = typeof payload.kind === 'string' && payload.kind ? payload.kind : 'fill_blank'
+        payload.blanks = merged
+        setAnswerJson(JSON.stringify(payload, null, 2))
+      } catch {
+        /* the answer JSON is already invalid; leave the author's text alone */
+      }
+    },
+    [answerJson],
+  )
+
   const save = useMutation({
     mutationFn: () => {
       if (!candidateQuery.data || !draft) throw new Error('尚未加载')
@@ -209,43 +251,29 @@ export function CandidateReviewPage() {
 
   const addBlank = () => {
     const blankId = `b${blanks.length + 1}`
-    patchContent({
-      blanks: [
-        ...blanks,
-        { blank_id: blankId, label: `第 ${blanks.length + 1} 空`, accepted_values: [], max_score: '' },
-      ],
-    })
+    const next = [
+      ...blanks,
+      { blank_id: blankId, label: `第 ${blanks.length + 1} 空`, accepted_values: [], max_score: '' },
+    ]
+    patchContent({ blanks: next })
     // Keep the answer JSON in step so the common case needs no JSON editing.
-    try {
-      const parsed = answerJson.trim() ? JSON.parse(answerJson) : { kind: 'fill_blank' }
-      if (!parsed.blanks) parsed.blanks = {}
-      parsed.blanks[blankId] = { accepted_values: [], mismatch_policy: 'review' }
-      setAnswerJson(JSON.stringify(parsed, null, 2))
-    } catch {
-      /* the answer JSON is already invalid; leave the author's text alone */
-    }
+    syncBlanksToAnswerJson(next)
   }
 
   const removeBlank = (index: number) => {
     const removed = blanks[index]
-    patchContent({ blanks: blanks.filter((_, position) => position !== index) })
+    const next = blanks.filter((_, position) => position !== index)
+    patchContent({ blanks: next })
     const blankId = String(removed?.blank_id ?? '')
     if (!blankId) return
-    try {
-      const parsed = JSON.parse(answerJson)
-      if (parsed?.blanks) {
-        delete parsed.blanks[blankId]
-        setAnswerJson(JSON.stringify(parsed, null, 2))
-      }
-    } catch {
-      /* ignore */
-    }
+    syncBlanksToAnswerJson(next, [blankId])
   }
 
-  const setBlankField = (index: number, field: string, value: unknown) =>
-    patchContent({
-      blanks: blanks.map((blank, position) => (position === index ? { ...blank, [field]: value } : blank)),
-    })
+  const setBlankField = (index: number, field: string, value: unknown) => {
+    const next = blanks.map((blank, position) => (position === index ? { ...blank, [field]: value } : blank))
+    patchContent({ blanks: next })
+    syncBlanksToAnswerJson(next)
+  }
 
   return (
     <>

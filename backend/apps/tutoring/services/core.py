@@ -69,6 +69,8 @@ def _blocks_text(blocks: Any) -> str:
 
 def assert_tutoring_allowed(item: SessionItem, purpose: str) -> None:
     """Server-side gate. Hiding the button in the UI is not a control."""
+    from apps.practice.services import verification_gate
+
     session = item.session
     if session.status != SessionStatus.ACTIVE:
         raise PurposeNotAllowed(message="会话已结束；如需辅导请新建练习会话")
@@ -80,6 +82,16 @@ def assert_tutoring_allowed(item: SessionItem, purpose: str) -> None:
         raise PurposeNotAllowed(message="该题项按计划不提供辅导（例如延迟验证题）")
     if purpose not in TutorPurpose.values:
         raise InvalidInput(message="辅导用途无效")
+    # B02: an explanation delivers the answer. The item being a *practice* item
+    # is not enough — the same content may be under a running verification in
+    # another tab, session or project, and that run's integrity does not depend
+    # on which endpoint is asked. The check is content-based and server-side.
+    verification_gate.assert_content_not_in_active_verification(
+        user=session.user,
+        question_version=item.question_version,
+        action="请求讲解与答案",
+        exclude_item_id=item.id,
+    )
 
 
 def _allowed_citation_ids(item: SessionItem) -> tuple[list[str], dict[str, Any]]:
@@ -339,9 +351,39 @@ def _model_identifier(capability: str) -> str:
     return getattr(provider, "text_model", "") or ""
 
 
+def assert_job_deliverable(job: TutorJob) -> None:
+    """A queued or stored explanation may only be delivered while its content is
+    not part of a running verification.
+
+    Checked at *read* time as well as at creation time: a job created before the
+    verification started still holds the answer, so the cached result is exactly
+    the bypass B02 described ("旧任务结果读取没有内容门禁").
+    """
+    from apps.practice.services import verification_gate
+
+    item = job.tutor_session.session_item
+    verification_gate.assert_content_not_in_active_verification(
+        user=job.user,
+        question_version=item.question_version,
+        action="读取讲解与答案",
+        exclude_item_id=item.id,
+    )
+
+
 def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str) -> TutorJob:
     """Execute one provider call, validate it, and store only the validated result."""
     if job.status in {TutorRequestStatus.SUCCEEDED, TutorRequestStatus.FAILED, TutorRequestStatus.UNAVAILABLE}:
+        return job
+    try:
+        assert_job_deliverable(job)
+    except PurposeNotAllowed as exc:
+        # Terminal, honest refusal: nothing is stored, and the reason is on the
+        # job so a later read does not look like an unexplained failure.
+        job.status = TutorRequestStatus.FAILED
+        job.error_code = "blocked_by_active_verification"
+        job.error_message = str(getattr(exc, "message", exc))[:500]
+        job.result_blocks = []
+        job.save(update_fields=["status", "error_code", "error_message", "result_blocks", "updated_at"])
         return job
     provider = providers.get_provider()
     run = job.llm_run

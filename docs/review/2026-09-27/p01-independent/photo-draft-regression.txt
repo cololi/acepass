@@ -1,0 +1,80 @@
+[WebServer] [27/Sep/2026 08:53:44] "GET /health/live HTTP/1.1" 200 42
+[WebServer] (node:82229) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:82233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 08:53:45,319 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 08:53:45,327 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 08:53:45] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/subjects HTTP/1.1" 200 970
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/subjects HTTP/1.1" 200 970
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/subjects HTTP/1.1" 200 970
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/syllabus-versions?subject_id=6c747764-d141-4e22-90b3-485318105dd9 HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/questions?limit=100&subject_id=6c747764-d141-4e22-90b3-485318105dd9 HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 08:53:45] "POST /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/practice-sessions HTTP/1.1" 201 874
+[WebServer] [27/Sep/2026 08:53:45] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/practice-sessions/68414e33-d19c-40f1-b25f-2bc64bb0e95b HTTP/1.1" 200 874
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/session-items/950e4a99-653f-49ae-8d8a-c492f397fec8/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 08:53:46] "POST /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/assets HTTP/1.1" 201 470
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/assets/c4cc90b3-4db2-4a5c-a8a4-504433b8d90e HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 08:53:46] "PUT /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/session-items/950e4a99-653f-49ae-8d8a-c492f397fec8/draft HTTP/1.1" 200 151
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/subjects HTTP/1.1" 200 970
+[WebServer] [27/Sep/2026 08:53:46] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:47] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/subjects HTTP/1.1" 200 970
+[WebServer] [27/Sep/2026 08:53:47] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:47] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/practice-sessions/68414e33-d19c-40f1-b25f-2bc64bb0e95b HTTP/1.1" 200 903
+[WebServer] [27/Sep/2026 08:53:47] "GET /api/v1/projects HTTP/1.1" 200 621
+[WebServer] [27/Sep/2026 08:53:47] "GET /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/session-items/950e4a99-653f-49ae-8d8a-c492f397fec8/presentation HTTP/1.1" 200 998
+PHOTO_COUNT_AFTER_RELOAD 0
+[WebServer] [27/Sep/2026 08:53:47] "PUT /api/v1/projects/a82182f5-5285-4fb3-9b48-97e8b945eb99/session-items/950e4a99-653f-49ae-8d8a-c492f397fec8/draft HTTP/1.1" 200 151
+  ✘  1 [desktop] › ../../../../private/tmp/acepass-p01-independent.EuVSqr/draft-regression.spec.ts:4:5 › unsubmitted photo draft survives refresh (6.1s)
+
+
+  1) [desktop] › ../../../../private/tmp/acepass-p01-independent.EuVSqr/draft-regression.spec.ts:4:5 › unsubmitted photo draft survives refresh 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('attachment-editor').locator('img')
+    Expected: 1
+    Received: 0
+    Timeout:  4000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('attachment-editor').locator('img') with timeout 4000ms
+      - waiting for getByTestId('attachment-editor').locator('img')
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      15 |   await expect(page.getByPlaceholder('写下你的推导过程与结论')).toHaveValue('独立复验：未提交照片草稿。')
+      16 |   console.log('PHOTO_COUNT_AFTER_RELOAD',await page.getByTestId('attachment-editor').locator('img').count())
+    > 17 |   await expect(page.getByTestId('attachment-editor').locator('img')).toHaveCount(1)
+         |                                                                      ^
+      18 | })
+      19 | function makePng(width: number, height: number): Buffer {
+      20 |   const crcTable: number[] = []
+        at /private/tmp/acepass-p01-independent.EuVSqr/draft-regression.spec.ts:17:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-p01-independent.EuVSqr/draft-results/draft-regression-unsubmitted-photo-draft-survives-refresh-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../tmp/acepass-p01-independent.EuVSqr/draft-results/draft-regression-unsubmitted-photo-draft-survives-refresh-desktop/error-context.md
+
+  1 failed
+    [desktop] › ../../../../private/tmp/acepass-p01-independent.EuVSqr/draft-regression.spec.ts:4:5 › unsubmitted photo draft survives refresh 

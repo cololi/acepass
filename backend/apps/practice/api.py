@@ -327,6 +327,12 @@ def get_attempt(request, project_id: str, attempt_id: str):
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
     session = attempt.session_item.session
+    # B02: an already stored grade is the same disclosure as a fresh one, so the
+    # read path is gated too (a result written before the verification started
+    # must not become a bypass).
+    verification_gate.assert_grading_not_blocked(
+        item=attempt.session_item, action="读取此题的有效评分"
+    )
     return {
         "attempt_id": str(attempt.id),
         "session_item_id": str(attempt.session_item_id),

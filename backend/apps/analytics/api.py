@@ -31,6 +31,10 @@ class ReportOut(Schema):
     notes: list[str]
     #: Attempts excluded from every bucket because their run is still hidden.
     hidden_verification_attempts: int = 0
+    #: Attempts excluded because their content (same question, family or content
+    #: lineage) is part of a running verification, so an aggregate over them would
+    #: leak the very answer the verification is checking (B02).
+    hidden_verification_content_attempts: int = 0
 
 
 class RegradeIn(Schema):

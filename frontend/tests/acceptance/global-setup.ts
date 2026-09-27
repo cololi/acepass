@@ -17,6 +17,17 @@ import { fileURLToPath } from 'node:url'
 
 export const ACCEPTANCE_EMAIL = process.env.ACEPASS_BROWSER_EMAIL ?? 'acceptance@acepass.local'
 export const ACCEPTANCE_PASSWORD = process.env.ACEPASS_BROWSER_PASSWORD ?? 'AcceptanceBrowser!2026'
+/**
+ * A second account with *nothing* in it.
+ *
+ * The reviewed objection was that `bootstrap_acceptance` pre-builds projects,
+ * subjects, specs and questions, so the suite never proved a brand-new user can
+ * reach the loop. This account is created but deliberately not bootstrapped: the
+ * empty-account test has to build the project, subject, spec, imported question
+ * and its first graded answer entirely through the UI.
+ */
+export const EMPTY_EMAIL = process.env.ACEPASS_EMPTY_BROWSER_EMAIL ?? 'empty@acepass.local'
+export const EMPTY_PASSWORD = process.env.ACEPASS_EMPTY_BROWSER_PASSWORD ?? 'EmptyBrowser!2026'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const backend = path.resolve(here, '../../../backend')
@@ -59,6 +70,8 @@ export default function globalSetup() {
 
   run(['manage.py', 'migrate', '--noinput'])
   run(['manage.py', 'create_account', ACCEPTANCE_EMAIL, '--password', ACCEPTANCE_PASSWORD, '--display-name', '验收用户'])
+  // The second account is created empty on purpose: no bootstrap, no fixture.
+  run(['manage.py', 'create_account', EMPTY_EMAIL, '--password', EMPTY_PASSWORD, '--display-name', '空账户用户'])
   // `--allow` names the database explicitly so a typo cannot touch a real one.
   run(['manage.py', 'bootstrap_acceptance', '--email', ACCEPTANCE_EMAIL, '--password', ACCEPTANCE_PASSWORD, '--allow', database])
 }

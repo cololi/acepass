@@ -1,5 +1,12 @@
 # AcePass P0 验收结果
 
+> **P0.2 收尾完成（2026-09-27，基线 f809365）：B01—B07 与发布门槛已关闭。**
+> 后端 177 passed、新版浏览器验收 36 passed、原浏览器套件 16 passed；复验者原始 11 条后端反例
+> （`docs/review/2026-09-27/p01-independent`，未修改）与 2 条归档浏览器反例全部转为通过。
+> 逐条证据见 [P0.2 收尾验证报告](11-p0-2-closeout-verification.md) 与
+> [p02-closeout 资产](review/2026-09-27/p02-closeout/README.md)。
+> 问题基线 [P0.1 独立复验](09-p0-1-independent-reacceptance.md) 保留不删。
+
 > **独立验收（2026-09-27）：P0 暂不通过。** 下文为原交付验收记录；当时复跑原套件通过，
 > 新增后端回归 13 failed / 1 passed、新增浏览器回归 3 failed。见 [独立验收报告](06-independent-p0-review.md)。
 >

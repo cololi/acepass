@@ -156,8 +156,13 @@ services:
 
   web:
     image: nginx:1.27-alpine
+    environment:
+      # 明文入口 301 的目标端口。nginx 官方镜像的入口脚本会把
+      # /etc/nginx/templates/*.template 中的 ${ACEPASS_HTTPS_PORT} 替换成本值，
+      # 所以跳转始终指向实际公开的 HTTPS 端口，而不是容器内的 443。
+      ACEPASS_HTTPS_PORT: ${ACEPASS_HTTPS_PORT:-8443}
     volumes:
-      - ../proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ../../frontend/dist:/usr/share/nginx/html:ro
       # TLS 证书：tls.crt / tls.key；默认 ./certs，可用 ACEPASS_TLS_DIR 覆盖。
       - ${ACEPASS_TLS_DIR:-./certs}:/etc/nginx/certs:ro

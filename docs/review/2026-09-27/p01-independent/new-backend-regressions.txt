@@ -1,0 +1,369 @@
+2026-09-27 08:55:43,673 INFO celery.app.trace Task projection.refresh_paper_stats[115cf769-4e77-4655-8004-b730b7a38610] succeeded in 0.028338000000076136s: 'ok'
+2026-09-27 08:55:43,677 INFO celery.app.trace Task projection.refresh_paper_stats[59895ae5-b9c1-4020-b14a-5f1825835f5f] succeeded in 0.0018332920008106157s: 'ok'
+2026-09-27 08:55:43,774 INFO celery.app.trace Task projection.rebuild_attempt_evidence[8f929df4-6a5b-41b4-8a5a-461992037f7b] succeeded in 0.04466329100250732s: 'evidence_rows=6'
+2026-09-27 08:55:43,851 INFO celery.app.trace Task learning.on_attempt_graded[cce4453f-bb7e-489b-88eb-2d7858ed54e8] succeeded in 0.07391779200042947s: 'paired_tasks=0'
+parallel practice submit 200 {'grade_event_id': '7b051aec-626b-463e-b0c8-cb042c240a1c', 'status': 'confirmed', 'method': 'deterministic', 'grading_revision': 1, 'confirmed_score': '2.00', 'max_score': '2.00', 'pending_max_score': '0', 'estimated_score': None, 'is_fully_confirmed': True, 'is_correct': True, 'parts': [{'part_id': 'statement', 'score': '2.00', 'max_score': '2.00', 'status': 'confirmed', 'method': 'deterministic', 'detail': {'outcome': 'correct'}}], 'rule_version': 'p0-1', 'rule_snapshot': {'spec_version_id': '033b3e3e-326f-4e0c-9d15-c4eb9e9fd07f', 'question_type': 'true_false', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'max_score': '2.00'}, 'grader_is_self': False, 'comment': '', 'superseded': False}
+F2026-09-27 08:55:44,605 INFO celery.app.trace Task projection.refresh_paper_stats[629f51b1-f548-4771-bd47-c3f865543712] succeeded in 0.004205459001241252s: 'ok'
+2026-09-27 08:55:44,610 INFO celery.app.trace Task projection.refresh_paper_stats[b05b5031-bb17-4ceb-8aa3-c2dafcbff0f3] succeeded in 0.00313099999766564s: 'ok'
+2026-09-27 08:55:44,639 INFO celery.app.trace Task projection.rebuild_attempt_evidence[bddd611d-ccaf-4595-9c35-58787be2bc39] succeeded in 0.027287667002383387s: 'evidence_rows=6'
+2026-09-27 08:55:44,687 INFO celery.app.trace Task learning.on_attempt_graded[d1957984-f1af-42bd-a1c6-df41ea156eed] succeeded in 0.04577595899900189s: 'paired_tasks=0'
+2026-09-27 08:55:44,709 INFO celery.app.trace Task projection.rebuild_attempt_evidence[90faf0fa-bf00-40c2-8a52-02faf5d07aff] succeeded in 0.019679332999658072s: 'evidence_rows=6'
+2026-09-27 08:55:44,747 INFO celery.app.trace Task learning.on_attempt_graded[722a7558-25ec-438e-9563-0f114885b1ae] succeeded in 0.036578832998202415s: 'paired_tasks=1'
+old deadline 2026-09-27 06:55:44.533333+00:00 latest training 2026-09-27 08:54:44.533333+00:00 start HTTP 201
+Fdelay evidence {'dimension': EvidenceDimension.DELAYED_VERIFICATION, 'node': <KnowledgeNode: 数与式>, 'qualifies': True, 'is_correct': True, 'score_fraction': Decimal('1.0000'), 'exclusion_reasons': [], 'detail': {'delay_anchor_at': '2026-09-26T07:55:45.235651+00:00', 'anchor_source': 'prior_attempt', 'delay_hours_required': 24, 'purpose': 'practice'}}
+Fdisputed target result confirmed 2.00 True
+FF2026-09-27 08:55:45,770 WARNING apps.audit.outbox outbox delivery failed topic=learning.refresh_delayed_tasks attempts=1 exhausted=False error=older consumer failed after newer one completed
+FF2026-09-27 08:55:46,262 INFO celery.app.trace Task projection.refresh_paper_stats[19a6203d-dc3f-49c3-891b-6e5fb0bbc543] succeeded in 0.0019879160026903264s: 'ok'
+2026-09-27 08:55:46,265 INFO celery.app.trace Task projection.refresh_paper_stats[ccf924e5-40bf-4546-81ab-6643d481a50d] succeeded in 0.0015225829993141815s: 'ok'
+2026-09-27 08:55:46,314 INFO celery.app.trace Task tutoring.run_job[50a00b52-a199-498a-9ada-d6a38538c839] succeeded in 0.0015117080001800787s: 'succeeded'
+parallel tutor session: 201
+parallel tutor job: 201 {'tutor_job_id': '7d0b4238-f3a5-41a5-a5b0-98b5c36e347c', 'tutor_session_id': 'cba7c129-1232-4f79-9f87-9c285247fa4f', 'session_item_id': '00cfbfcc-4713-4ab6-a898-8f1f41ae1bbd', 'purpose': 'explanation', 'status': 'succeeded', 'reveals_answer': True, 'is_stale': False, 'is_stub': True, 'provider': 'stub', 'model': 'stub-model', 'prompt_version': 'p0-explain-v1', 'error_code': '', 'error_message': '', 'delivered_at': '2026-09-27T08:55:46.306567+00:00', 'result_blocks': [{'kind': 'text', 'text': '【stub 讲解】这是测试/演示模式的占位讲解，不是真实模型输出。'}, {'kind': 'text', 'text': '请以已审核的人工解析为准；系统不会把 stub 内容当作真实结果。'}], 'citations': [], 'missing_information': [], 'suggested_next': ['重新独立作答同一考点题目']}
+Flate extraction resulting payload {'doubts': [], 'content': {'blocks': [{'kind': 'text', 'text': 'STALE_MODEL_OUTPUT'}]}, 'display_label': '', 'question_type': 'true_false', 'answer_payload': {}, 'answer_status_known': False, 'needs_manual_structure': True}
+F2026-09-27 08:55:47,303 ERROR apps.api unhandled API error
+Traceback (most recent call last):
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/operation.py", line 133, in run
+    result = self.view_func(request, **values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/apps/analytics/api.py", line 134, in create_regrade
+    run = report_service.request_regrade(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/apps/analytics/services/reports.py", line 388, in request_regrade
+    return attempt_services.start_regrade_run(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/apps/practice/services/attempts.py", line 806, in start_regrade_run
+    .first()
+     ^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1106, in first
+    for obj in queryset[:1]:
+               ~~~~~~~~^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 386, in __iter__
+    self._fetch_all()
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/query.py", line 273, in __iter__
+    for row in compiler.results_iter(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1572, in results_iter
+    results = self.execute_sql(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1610, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 846, in as_sql
+    raise TransactionManagementError(
+django.db.transaction.TransactionManagementError: select_for_update cannot be used outside of a transaction.
+2026-09-27 08:55:47,309 ERROR django.request Internal Server Error: /api/v1/projects/b8f6c483-1331-4580-a68d-ace36420ebea/regrades
+regrade HTTP 500 {"error": {"code": "internal_error", "message": "\u670d\u52a1\u5668\u5185\u90e8\u9519\u8bef", "details": {}}}
+Fconcurrent generations 1 [2, 2]
+F
+=================================== FAILURES ===================================
+_____ test_parallel_practice_submit_cannot_reveal_live_verification_score ______
+
+caller = <tests.conftest.ApiCaller object at 0x10f23d340>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_parallel_practice_submit_cannot_reveal_live_verification_score(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        verification = start_session(caller, project_a, subject_a1, version.question, mode='verification')
+        present(caller, project_a, verification['items'][0]['session_item_id'])
+        practice = start_session(caller, project_a, subject_a1, version.question)
+        item_id = practice['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        response = submit(caller, project_a, item_id, {'type': 'true_false', 'value': True}, key='parallel-grade')
+        print('parallel practice submit', response.status_code, response.json().get('grade'))
+>       assert response.status_code == 403 or response.json().get('grade') is None
+E       assert (200 == 403 or {'comment': '', 'confirmed_score': '2.00', 'estimated_score': None, 'grade_event_id': '7b051aec-626b-463e-b0c8-cb042c240a1c', ...} is None)
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+E        +  and   {'comment': '', 'confirmed_score': '2.00', 'estimated_score': None, 'grade_event_id': '7b051aec-626b-463e-b0c8-cb042c240a1c', ...} = <built-in method get of dict object at 0x109e65e00>('grade')
+E        +    where <built-in method get of dict object at 0x109e65e00> = {'attempt_id': '8960efae-7741-493d-a6d8-ffb5d583a703', 'grade': {'comment': '', 'confirmed_score': '2.00', 'estimated_...one, 'grade_event_id': '7b051aec-626b-463e-b0c8-cb042c240a1c', ...}, 'grading_revision': 1, 'receipt_only': False, ...}.get
+E        +      where {'attempt_id': '8960efae-7741-493d-a6d8-ffb5d583a703', 'grade': {'comment': '', 'confirmed_score': '2.00', 'estimated_...one, 'grade_event_id': '7b051aec-626b-463e-b0c8-cb042c240a1c', ...}, 'grading_revision': 1, 'receipt_only': False, ...} = functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x10f223bc0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x10f223bc0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">) = <HttpResponse status_code=200, "application/json; charset=utf-8">.json
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:47: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[115cf769-4e77-4655-8004-b730b7a38610] succeeded in 0.028338000000076136s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[59895ae5-b9c1-4020-b14a-5f1825835f5f] succeeded in 0.0018332920008106157s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[8f929df4-6a5b-41b4-8a5a-461992037f7b] succeeded in 0.04466329100250732s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[cce4453f-bb7e-489b-88eb-2d7858ed54e8] succeeded in 0.07391779200042947s: 'paired_tasks=0'
+______ test_delayed_task_rechecks_latest_training_at_direct_session_start ______
+
+caller = <tests.conftest.ApiCaller object at 0x109e86270>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_delayed_task_rechecks_latest_training_at_direct_session_start(caller, project_a, subject_a1):
+        pair, a, b, _c = make_pairing(subject_a1)
+        for version in (a, b, _c):
+            content_services.replace_knowledge_mappings(version, [{'node_id': str(pair.node_id), 'is_primary': True, 'score_weight': '1'}], actor=project_a.owner)
+        now = timezone.now()
+        old = now - timedelta(hours=26)
+        item_b, attempt_b = make_service_attempt(project_a, subject_a1, b, old-timedelta(minutes=1), old)
+        pairing_services.on_attempt_graded(str(attempt_b.id))
+        task = StudyTask.objects.get(pairing=pair, origin_session_item=item_b, task_kind='delayed_verification')
+        assert task.not_before < now
+        _item_a, attempt_a = make_service_attempt(project_a, subject_a1, a, now-timedelta(minutes=2), now-timedelta(minutes=1))
+        response = caller.post(f'/api/v1/projects/{project_a.id}/practice-sessions', {
+            'mode': 'verification', 'subject_id': str(subject_a1.id), 'task_id': str(task.id)}, key='latest-anchor')
+        print('old deadline', task.not_before, 'latest training', attempt_a.submitted_at, 'start HTTP', response.status_code)
+>       assert response.status_code in {400,403,409}
+E       assert 201 in {400, 403, 409}
+E        +  where 201 = <HttpResponse status_code=201, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:63: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[629f51b1-f548-4771-bd47-c3f865543712] succeeded in 0.004205459001241252s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[b05b5031-bb17-4ceb-8aa3-c2dafcbff0f3] succeeded in 0.00313099999766564s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[bddd611d-ccaf-4595-9c35-58787be2bc39] succeeded in 0.027287667002383387s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[d1957984-f1af-42bd-a1c6-df41ea156eed] succeeded in 0.04577595899900189s: 'paired_tasks=0'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[90faf0fa-bf00-40c2-8a52-02faf5d07aff] succeeded in 0.019679332999658072s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[722a7558-25ec-438e-9563-0f114885b1ae] succeeded in 0.036578832998202415s: 'paired_tasks=1'
+_______ test_delayed_evidence_uses_completion_not_start_of_last_training _______
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_delayed_evidence_uses_completion_not_start_of_last_training(project_a, subject_a1):
+        pair, _a, b, c = make_pairing(subject_a1)
+        for version in (b, c):
+            content_services.replace_knowledge_mappings(version, [{'node_id': str(pair.node_id), 'is_primary': True, 'score_weight': '1'}], actor=project_a.owner)
+        now = timezone.now()
+        make_service_attempt(project_a, subject_a1, b, now-timedelta(hours=25), now-timedelta(hours=1))
+        _item_c, attempt_c = make_service_attempt(project_a, subject_a1, c, now-timedelta(minutes=1), now)
+        dimension = next(x for x in compute_dimensions(attempt_c)
+            if x['dimension']=='delayed_verification' and x['node'].id==pair.node_id)
+        print('delay evidence', dimension)
+>       assert dimension['qualifies'] is False
+E       assert True is False
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:75: AssertionError
+____ test_target_disputed_between_regrade_request_and_execution_is_refused _____
+
+caller = <tests.conftest.ApiCaller object at 0x10f51e2d0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_target_disputed_between_regrade_request_and_execution_is_refused(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        now=timezone.now()
+        item, attempt = make_service_attempt(project_a, subject_a1, version, now-timedelta(minutes=1), now)
+        target = AnswerKeyVersion.objects.create(question_version=version, version=2,
+            answer_payload=item.answer_key_version.answer_payload, verification_status='checked', checked_by=project_a.owner)
+        run=request_regrade(question=version.question, target_answer_key_version=target,
+            actor=project_a.owner, reason='queued before dispute')
+        content_services.dispute_answer_key_version(target, actor=project_a.owner, reason='new evidence target wrong')
+        execute_regrade_run(str(run.id))
+        attempt.refresh_from_db()
+        print('disputed target result', attempt.current_grade_event.status, attempt.current_grade_event.confirmed_score,
+            attempt.current_grade_event.answer_key_version.is_disputed)
+>       assert attempt.current_grade_event.status != 'confirmed'
+E       AssertionError: assert 'confirmed' != 'confirmed'
+E        +  where 'confirmed' = <GradeEvent: grade r2 confirmed>.status
+E        +    where <GradeEvent: grade r2 confirmed> = <Attempt: attempt#50254c45-4ff1-471f-aee9-d2f970427321>.current_grade_event
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:90: AssertionError
+________________ test_real_consumer_refuses_another_live_claim _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10f5f22d0>
+settings = <pytest_django.fixtures.Settings object at 0x10f5f2900>
+
+    def test_real_consumer_refuses_another_live_claim(monkeypatch, settings):
+        settings.ACEPASS_INLINE_TASKS = False
+        from apps.learning.services import evidence
+        spy = Mock(return_value=0)
+        monkeypatch.setattr(evidence, 'rebuild_for_attempt', spy)
+        event = outbox.enqueue('projection.rebuild_attempt_evidence', {'attempt_id':'irrelevant'})
+        claim = outbox.claim_event(str(event.id))
+        assert claim is not None
+        rebuild_attempt_evidence.run(attempt_id='irrelevant',outbox_event_id=str(event.id))
+        event.refresh_from_db()
+>       assert spy.call_count == 0, f'real consumer executed {spy.call_count} times while another lease was active; status={event.status}'
+E       AssertionError: real consumer executed 1 times while another lease was active; status=processed
+E       assert 1 == 0
+E        +  where 1 = <Mock id='4552856864'>.call_count
+
+docs/review/2026-09-27/p01-independent/test_outbox_gaps.py:22: AssertionError
+_______________ test_stale_failure_cannot_reopen_processed_event _______________
+
+    def test_stale_failure_cannot_reopen_processed_event():
+        event = outbox.enqueue('learning.refresh_delayed_tasks', {})
+        outbox.mark_processed(str(event.id))
+        outbox.mark_retryable_failure(event, 'older consumer failed after newer one completed')
+        event.refresh_from_db()
+>       assert event.status == OutboxStatus.PROCESSED, f'completed event changed to {event.status} while processed_at={event.processed_at}'
+E       AssertionError: completed event changed to pending while processed_at=2026-09-27 08:55:45.769368+00:00
+E       assert 'pending' == OutboxStatus.PROCESSED
+E         
+E         - processed
+E         + pending
+
+docs/review/2026-09-27/p01-independent/test_outbox_gaps.py:29: AssertionError
+___________ test_successfully_sent_but_lost_messages_obey_retry_cap ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10f550f50>
+settings = <pytest_django.fixtures.Settings object at 0x10f552540>
+
+    def test_successfully_sent_but_lost_messages_obey_retry_cap(monkeypatch, settings):
+        settings.ACEPASS_INLINE_TASKS = False
+        from config.celery import app
+        monkeypatch.setattr(app, 'send_task', Mock())
+        event = outbox.enqueue('learning.refresh_delayed_tasks', {})
+        event.max_attempts = 1
+        event.save(update_fields=['max_attempts'])
+        outbox.dispatch_pending()
+        OutboxEvent.objects.filter(id=event.id).update(lease_expires_at=timezone.now()-timedelta(seconds=1))
+        outbox.dispatch_pending()
+        event.refresh_from_db()
+>       assert event.attempts <= event.max_attempts, f'redelivery exceeded cap: {event.attempts}>{event.max_attempts}'
+E       AssertionError: redelivery exceeded cap: 2>1
+E       assert 2 <= 1
+E        +  where 2 = <OutboxEvent: OutboxEvent object (ce41af55-0171-4c5e-82a1-141359446df1)>.attempts
+E        +  and   1 = <OutboxEvent: OutboxEvent object (ce41af55-0171-4c5e-82a1-141359446df1)>.max_attempts
+
+docs/review/2026-09-27/p01-independent/test_outbox_gaps.py:42: AssertionError
+______________________ test_parallel_practice_tutor_gate _______________________
+
+caller = <tests.conftest.ApiCaller object at 0x10f5e6540>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_parallel_practice_tutor_gate(caller, project_a, subject_a1):
+        version=published(subject_a1, 'true_false')
+        verify=start_session(caller,project_a,subject_a1,version.question,mode='verification',key='audit-verify')
+        present(caller,project_a,verify['items'][0]['session_item_id'])
+        practice=start_session(caller,project_a,subject_a1,version.question,mode='practice',key='audit-practice')
+        item=practice['items'][0]['session_item_id']
+        opened=caller.post(f'/api/v1/projects/{project_a.id}/tutor-sessions',{'session_item_id':item,'purpose':'explanation'},key='audit-tutor')
+        print('parallel tutor session:',opened.status_code)
+        if opened.status_code == 201:
+            session=opened.json()['tutor_session_id']
+            response=caller.post(f'/api/v1/projects/{project_a.id}/tutor-sessions/{session}/messages',{'user_question':'请讲解这道题'},key='audit-message')
+            print('parallel tutor job:',response.status_code,response.json())
+>       assert opened.status_code == 403, opened.content
+E       AssertionError: b'{"tutor_session_id": "cba7c129-1232-4f79-9f87-9c285247fa4f", "session_item_id": "00cfbfcc-4713-4ab6-a898-8f1f41ae1bb...8", "answer_key_version_id": "f1931543-2e07-4f76-82f8-6a77c63c0ee5", "created_at": "2026-09-27T08:55:46.288368+00:00"}'
+E       assert 201 == 403
+E        +  where 201 = <HttpResponse status_code=201, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/p01-independent/test_tutor_and_import_gaps.py:18: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[19a6203d-dc3f-49c3-891b-6e5fb0bbc543] succeeded in 0.0019879160026903264s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[ccf924e5-40bf-4546-81ab-6643d481a50d] succeeded in 0.0015225829993141815s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task tutoring.run_job[50a00b52-a199-498a-9ada-d6a38538c839] succeeded in 0.0015117080001800787s: 'succeeded'
+_____________ test_late_extraction_must_not_overwrite_human_review _____________
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_late_extraction_must_not_overwrite_human_review(project_a, subject_a1):
+        import io
+        from PIL import Image
+        from ai.providers.base import AiCallResult
+        from apps.ingestion.services.core import create_image_document, update_candidate
+        from apps.ingestion.services.imports import start_image_import
+        from apps.ingestion.services.extraction import _apply_extraction
+        buffer=io.BytesIO(); Image.new('RGB',(8,8),'white').save(buffer,format='PNG')
+        document=create_image_document(owner=project_a.owner,project=project_a,content=buffer.getvalue(),content_type='image/png',subject=subject_a1)
+        job=start_image_import(owner=project_a.owner,project=project_a,documents=[document],subject=subject_a1,use_vision=False)
+        candidate=job.candidates.get()
+        edited={**candidate.draft_payload, 'question_type':'true_false','content':{'blocks':[{'kind':'text','text':'HUMAN_REVIEW_MARKER'}]},'answer_payload':{'kind':'true_false','value':True},'answer_status_known':True}
+        update_candidate(candidate,payload=edited,actor=project_a.owner,expected_revision=candidate.revision)
+        stale={'question_type':'true_false','content':{'blocks':[{'kind':'text','text':'STALE_MODEL_OUTPUT'}]},'answer_payload':{},'answer_status_known':False}
+        _apply_extraction(candidate=candidate,clean=stale,call=AiCallResult(payload=stale,is_stub=True),problems=[])
+        candidate.refresh_from_db()
+        print('late extraction resulting payload',candidate.draft_payload)
+>       assert candidate.draft_payload['content']['blocks'][0]['text']=='HUMAN_REVIEW_MARKER'
+E       AssertionError: assert 'STALE_MODEL_OUTPUT' == 'HUMAN_REVIEW_MARKER'
+E         
+E         - HUMAN_REVIEW_MARKER
+E         + STALE_MODEL_OUTPUT
+
+docs/review/2026-09-27/p01-independent/test_tutor_and_import_gaps.py:37: AssertionError
+__________ test_regrade_http_works_without_test_wrapping_transaction ___________
+
+caller = <tests.conftest.ApiCaller object at 0x10f659be0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_regrade_http_works_without_test_wrapping_transaction(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        answer = AnswerKeyVersion.objects.get(question_version=version)
+        response = caller.post(f'/api/v1/projects/{project_a.id}/regrades', {
+            'question_id': str(version.question_id), 'target_answer_key_version_id': str(answer.id),
+            'reason': 'independent API autocommit acceptance'}, key='audit-regrade-autocommit')
+        print('regrade HTTP', response.status_code, response.content.decode())
+>       assert response.status_code == 201
+E       assert 500 == 201
+E        +  where 500 = <HttpResponse status_code=500, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:36: AssertionError
+________ test_concurrent_regrade_requests_receive_distinct_generations _________
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109e84fe0>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_concurrent_regrade_requests_receive_distinct_generations(project_a, subject_a1, monkeypatch):
+        from concurrent.futures import ThreadPoolExecutor
+        from threading import Barrier
+        from django.db import transaction, connections
+        from apps.analytics.models import RegradeRun
+        from apps.question_bank.models import Question
+        from apps.accounts.models import User
+        version = published(subject_a1, 'true_false')
+        answer = AnswerKeyVersion.objects.get(question_version=version)
+        with transaction.atomic():
+            seed = request_regrade(question=version.question, target_answer_key_version=answer,
+                actor=project_a.owner, reason='seed generation')
+        barrier = Barrier(2, timeout=10)
+        original_create = RegradeRun.objects.create
+        def synchronized_create(*args, **kwargs):
+            result = original_create(*args, **kwargs)
+            barrier.wait()
+            return result
+        monkeypatch.setattr(RegradeRun.objects, 'create', synchronized_create)
+        def launch(i):
+            try:
+                with transaction.atomic():
+                    run = request_regrade(question=Question.objects.get(id=version.question_id),
+                        target_answer_key_version=AnswerKeyVersion.objects.get(id=answer.id),
+                        actor=User.objects.get(id=project_a.owner_id), reason=f'concurrent {i}')
+                    return run.generation
+            finally:
+                connections.close_all()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            futures = [pool.submit(launch, i) for i in range(2)]
+            generations = [f.result(timeout=20) for f in futures]
+        print('concurrent generations', seed.generation, generations)
+>       assert len(set(generations)) == 2
+E       assert 1 == 2
+E        +  where 1 = len({2})
+E        +    where {2} = set([2, 2])
+
+docs/review/2026-09-27/p01-independent/test_data_gaps.py:125: AssertionError
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_parallel_practice_submit_cannot_reveal_live_verification_score
+FAILED backend::test_delayed_task_rechecks_latest_training_at_direct_session_start
+FAILED backend::test_delayed_evidence_uses_completion_not_start_of_last_training
+FAILED backend::test_target_disputed_between_regrade_request_and_execution_is_refused
+FAILED backend::test_real_consumer_refuses_another_live_claim - AssertionErro...
+FAILED backend::test_stale_failure_cannot_reopen_processed_event - AssertionE...
+FAILED backend::test_successfully_sent_but_lost_messages_obey_retry_cap - Ass...
+FAILED backend::test_parallel_practice_tutor_gate - AssertionError: b'{"tutor...
+FAILED backend::test_late_extraction_must_not_overwrite_human_review - Assert...
+FAILED backend::test_regrade_http_works_without_test_wrapping_transaction - a...
+FAILED backend::test_concurrent_regrade_requests_receive_distinct_generations
+11 failed, 3 warnings in 7.73s

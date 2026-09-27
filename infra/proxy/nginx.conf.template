@@ -23,6 +23,22 @@ map $https $forwarded_proto {
     default http;
 }
 
+# 明文入口的 301 必须落到实际公开的 HTTPS 端口。
+#
+# Compose 把宿主 ${ACEPASS_HTTP_PORT:-8080} 映射到容器 80、${ACEPASS_HTTPS_PORT:-8443}
+# 映射到容器 443，所以容器里的 443 并不是公网端口：直接 `return 301 https://$host`
+# 会丢掉 :8443，把用户送到一个没有监听的地址。这里只改写带端口的 Host
+# （`host:port` → `host:${ACEPASS_HTTPS_PORT}`）；没有端口的 Host 保持不变，真实
+# 443 部署因此不受影响。
+#
+# `${ACEPASS_HTTPS_PORT}` 由 nginx 镜像的 envsubst 入口脚本替换（compose 的 web
+# 服务把该变量传进容器）；nginx 自己的变量（$http_host、$request_uri 等）不在环境
+# 变量列表里，原样保留。
+map $http_host $acepass_https_authority {
+    default                                   $http_host;
+    "~^(?<acepass_public_host>[^:]+):[0-9]+$" "$acepass_public_host:${ACEPASS_HTTPS_PORT}";
+}
+
 server {
     listen 80;
     server_name _;
@@ -36,9 +52,9 @@ server {
         default_type "text/plain";
     }
 
-    # 其余明文请求一律升级到 HTTPS（公共方案始终是 HTTPS）。
+    # 其余明文请求一律升级到 HTTPS（公共方案始终是 HTTPS），并带上真实公开端口。
     location / {
-        return 301 https://$host$request_uri;
+        return 301 https://$acepass_https_authority$request_uri;
     }
 }
 

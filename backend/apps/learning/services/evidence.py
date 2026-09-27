@@ -114,66 +114,24 @@ def _question_seen_before(attempt: Attempt) -> list[str]:
 
 
 def _last_relevant_anchor(attempt: Attempt, node_id) -> tuple[object | None, str]:
-    """Anchor for the delayed dimension: the latest related teaching/answer event.
+    """Anchor for the delayed dimension: the latest related *completed* event.
 
-    The anchor is the most recent relevant attempt or tutoring event *before*
-    this item was presented; a mid-way explanation updates it.
+    B04: this used to read ``SessionItem.first_delivered_at``, i.e. when the
+    question was put on screen. A learner who opened the previous question 25
+    hours ago and submitted it 1 hour ago was credited with a 25-hour delay even
+    though the training completed an hour ago. The anchor is now the shared
+    definition in :mod:`apps.learning.services.anchors` — the most recent moment
+    a related learning event completed at or before this attempt was submitted.
     """
-    from apps.practice.models import SessionItem
+    from apps.learning.services.anchors import latest_learning_anchor
 
-    delivered_at = attempt.session_item.first_delivered_at or attempt.submitted_at
-    latest = None
-    source = ""
-    if node_id is not None:
-        prior_items = (
-            SessionItem.objects.filter(
-                session__user=attempt.user,
-                session__project=attempt.project_id,
-                question_version__knowledge_mappings__node_id=node_id,
-                first_delivered_at__lt=delivered_at,
-            )
-            .exclude(id=attempt.session_item_id)
-            .values_list("first_delivered_at", flat=True)
-        )
-        for value in prior_items:
-            if value and (latest is None or value > latest):
-                latest = value
-                source = "prior_attempt"
-    if latest is None:
-        prior_real = (
-            Attempt.objects.filter(
-                user=attempt.user,
-                project_id=attempt.project_id,
-                session_item__question_version__knowledge_mappings__node_id=node_id,
-                submitted_at__lt=delivered_at,
-            )
-            .exclude(id=attempt.id)
-            .values_list("submitted_at", flat=True)
-        )
-        for value in prior_real:
-            if value and (latest is None or value > latest):
-                latest = value
-                source = "prior_attempt"
-    return latest, source
-
-
-def _tutoring_anchor(attempt: Attempt, node_id) -> object | None:
-    from apps.tutoring.models import TutorJob
-
-    delivered_at = attempt.session_item.first_delivered_at or attempt.submitted_at
-    jobs = TutorJob.objects.filter(
+    return latest_learning_anchor(
         user=attempt.user,
-        project_id=attempt.project_id,
-        status="succeeded",
-        delivered_at__isnull=False,
-        delivered_at__lt=delivered_at,
-        tutor_session__session_item__question_version__knowledge_mappings__node_id=node_id,
-    ).values_list("delivered_at", flat=True)
-    latest = None
-    for value in jobs:
-        if value and (latest is None or value > latest):
-            latest = value
-    return latest
+        project=attempt.project_id,
+        node_id=node_id,
+        before=attempt.submitted_at,
+        exclude_attempt_id=attempt.id,
+    )
 
 
 def compute_dimensions(attempt: Attempt) -> list[dict]:
@@ -341,15 +299,14 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
         )
 
         anchor, anchor_source = _last_relevant_anchor(attempt, node_id)
-        tutoring_anchor = _tutoring_anchor(attempt, node_id)
-        if tutoring_anchor and (anchor is None or tutoring_anchor > anchor):
-            anchor, anchor_source = tutoring_anchor, "tutoring"
         delay_hours = getattr(settings, "DELAYED_VERIFICATION_HOURS", 24)
         delayed_reasons: list[str] = []
         if anchor is None:
             delayed_reasons.append("没有可用的延迟锚点（本题是该考点首次接触）")
         else:
-            elapsed = (item.first_delivered_at or attempt.submitted_at) - anchor
+            # Measured from the completion of *this* attempt: the exposure of the
+            # question is not training, so it cannot start the clock (B04).
+            elapsed = attempt.submitted_at - anchor
             if elapsed < timedelta(hours=delay_hours):
                 delayed_reasons.append(
                     f"距最近相关训练/教学仅 {elapsed.total_seconds() / 3600:.2f} 小时，未达到 {delay_hours} 小时"

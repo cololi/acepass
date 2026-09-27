@@ -155,6 +155,9 @@ def get_job(request, project_id: str, job_id: str):
     job = TutorJob.objects.filter(id=job_id, project=project, user=request.user).select_related("llm_run").first()
     if job is None:
         raise ScopeViolation(message="辅导任务不存在或不在当前权限范围")
+    # B02: a cached job still holds the answer. Reading it must obey the same
+    # content gate as asking for a new one.
+    tutor_services.assert_job_deliverable(job)
     return tutor_services.job_payload(job)
 
 

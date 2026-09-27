@@ -107,8 +107,16 @@ if [ -d "$TARGET_MEDIA" ] && [ -n "$(find "$TARGET_MEDIA" -mindepth 1 -print -qu
   fail "目标媒体目录非空：${TARGET_MEDIA}。恢复只写入空目录，避免覆盖已有文件；请先自行备份并清空该目录。"
 fi
 
-if psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d postgres -tAc \
-  "SELECT 1 FROM pg_database WHERE datname='$TARGET_DB'" | grep -q 1; then
+# 目标数据库必须不存在 —— 恢复只恢复到干净位置。
+#
+# 连接失败与"数据库不存在"必须区分开：以前这条 `psql | grep -q 1` 在数据库端口
+# 不可连时同样返回非零，脚本于是认定"目标库不存在"，dry-run 还会 exit 0 声称
+# 前置检查全部通过。现在先确认查询本身成功，再判断存在性。
+if ! DB_EXISTS="$(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d postgres -tAc \
+  "SELECT 1 FROM pg_database WHERE datname='$TARGET_DB'")"; then
+  fail "无法连接数据库 ${POSTGRES_USER}@${POSTGRES_HOST}:${POSTGRES_PORT}：恢复前置检查无法完成，已拒绝（不是「目标库不存在」）。"
+fi
+if [ "$DB_EXISTS" = "1" ]; then
   fail "目标数据库 $TARGET_DB 已存在：恢复必须恢复到空位置，避免覆盖现有数据。"
 fi
 

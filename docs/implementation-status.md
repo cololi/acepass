@@ -1,5 +1,10 @@
 # AcePass 实施状态
 
+> **P0.2 收尾完成（2026-09-27，基线 f809365）：B01—B07 与三项发布门槛已修复并有本轮实测证据。**
+> 逐条改动、命令与结果见 [P0.2 收尾验证报告](11-p0-2-closeout-verification.md)；
+> 问题基线（P0.1 独立复验，仍作为历史保留）见 [09复验报告](09-p0-1-independent-reacceptance.md)。
+> 真实 provider、真实隔天与真实学习效果仍为**未验证**。
+
 > **独立验收（2026-09-27）：P0 暂不通过。** 已复现的缺口见
 > [独立验收报告](06-independent-p0-review.md)，修复顺序见 [P0 修复计划](07-p0-repair-plan.md)。
 > 原套件通过不能视为全部业务闭环通过。
@@ -11,16 +16,17 @@
 按里程碑记录**实际实现范围、验证方式与未完成项**。未运行的测试不写“通过”，
 未经过真实时间的不写“已验证”。逐条验收结果见 [`acceptance-results.md`](acceptance-results.md)。
 
-- 代码版本：`4eb1de0`（P0.1 前端/浏览器验收/运维）、`a794b1a`（P0.1 后端）；
-  问题基线为 `5428018`
-- 最近一次全量校验：
-  - 后端 `cd backend && .venv/bin/python -m pytest -q` → **164 passed**
-    （原 119 + P0 回归 35 + outbox 契约 10）
-  - 原浏览器套件（已加固且强制隔离）→ **16 passed**（desktop 8 + mobile 8）
-  - 新增浏览器验收（独立库/Redis/端口/媒体 + 真实 Worker）→ **30 passed, 0 skipped**
-    （desktop 15 + mobile 15）
-  - 真实 Worker 端到端 `scripts/verify_worker_e2e.py` → **ok: true**，
-    outbox 全量 processed、`unresolved={}`
+- 代码版本：`f809365`（P0.2 基线）；本轮改动见
+  [P0.2 收尾验证报告](11-p0-2-closeout-verification.md) §1
+- 最近一次全量校验（P0.2 收尾，本轮实际执行）：
+  - 后端 `cd backend && .venv/bin/python -m pytest -q` → **177 passed**
+    （原 164 + 本轮迁入的 13 条 P0.2 回归）
+  - 复验者原始反例 `docs/review/2026-09-27/p01-independent`（未修改）→ **11 passed**
+  - 新版浏览器验收（独立库/Redis/端口/媒体 + 真实 Worker）→ **36 passed**
+    （含照片草稿、可视填空答案、空账户 UI 闭环与收紧后的跨项目断言）
+  - 复验者归档浏览器反例（`playwright.remaining.config.cjs`，未修改）→ 通过
+  - 原浏览器套件（独立库/端口）→ 见 P0.2 报告 §2.4
+  - 真实故障注入 `scripts/verify_worker_e2e.py`（真 `SIGKILL` + 真 Redis `FLUSHALL`）→ 见 P0.2 报告 §2.5
 
 ## 0. 环境（实测）
 

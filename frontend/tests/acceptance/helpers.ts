@@ -13,6 +13,14 @@ export const PASSWORD = process.env.ACEPASS_BROWSER_PASSWORD ?? 'AcceptanceBrows
 
 export const PROJECT_A = '验收项目A·基础能力'
 export const PROJECT_B = '验收项目B·专业实务'
+/**
+ * The delayed-verification chain lives in its own project.
+ *
+ * Its deadline moves whenever a *new* training or explanation happens on the
+ * same knowledge point (correctly — that is the B04 rule), so any other scenario
+ * revealing an answer on that point would un-do the fixture's "C is due" setup.
+ */
+export const PROJECT_C = '验收项目C·延迟验证'
 
 export async function login(page: Page) {
   await page.goto('/')

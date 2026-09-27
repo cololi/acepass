@@ -20,7 +20,7 @@ from django.utils import timezone
 from apps.common.enums import TaskKind, TaskStatus
 from apps.knowledge.models import VerificationPairing
 from apps.learning.models import ReviewTask, StudyTask
-from apps.practice.models import Attempt, ExposureEvent, SessionItem
+from apps.practice.models import Attempt, SessionItem
 from apps.question_bank.models import Question
 
 logger = logging.getLogger("apps.learning.pairing")
@@ -33,7 +33,10 @@ def _published_version(question: Question):
 
 
 def _anchor_for(*, user, project, node_id, before, include_moment=None) -> tuple[object, str]:
-    """Most recent related teaching/attempt event, at or before ``before``.
+    """Most recent completed related learning event, at or before ``before``.
+
+    Delegates to :mod:`apps.learning.services.anchors`, which is the single
+    definition shared by task creation, task start and evidence projection (B04).
 
     ``include_moment`` is the event that *triggered* this task. For the delayed
     C task that is the just-graded B attempt, and it must always be able to be
@@ -41,41 +44,13 @@ def _anchor_for(*, user, project, node_id, before, include_moment=None) -> tuple
     due immediately (the review's R06). The anchor is the latest related learning
     event, which for "B was just completed" is B itself.
     """
-    anchor = None
-    source = ""
-    jobs = (
-        ExposureEvent.objects.filter(
-            user=user,
-            project_id=project,
-            reveals_answer=True,
-            server_time__lte=before,
-            question_version__knowledge_mappings__node_id=node_id,
-        )
-        .order_by("-server_time")
-        .values_list("server_time", flat=True)
-        .first()
-    )
-    if jobs:
-        anchor, source = jobs, "teaching_exposure"
-    attempt_time = (
-        Attempt.objects.filter(
-            user=user,
-            project_id=project,
-            submitted_at__lte=before,
-            session_item__question_version__knowledge_mappings__node_id=node_id,
-        )
-        .order_by("-submitted_at")
-        .values_list("submitted_at", flat=True)
-        .first()
-    )
-    if attempt_time and (anchor is None or attempt_time > anchor):
-        anchor, source = attempt_time, "prior_attempt"
-    trigger = None
-    if include_moment is not None:
-        trigger = include_moment
-        if anchor is None or trigger >= anchor:
-            anchor, source = trigger, "trigger_event"
+    from apps.learning.services.anchors import latest_learning_anchor
+
+    anchor, source = latest_learning_anchor(user=user, project=project, node_id=node_id, before=before)
+    if include_moment is not None and (anchor is None or include_moment >= anchor):
+        anchor, source = include_moment, "trigger_event"
     if anchor is None:
+        # No related event at all: the triggering event itself is the anchor.
         anchor, source = before, "current_event"
     return anchor, source
 
@@ -326,13 +301,35 @@ def reconcile_delayed_tasks() -> int:
     return updated
 
 
+def _delay_hours_for(task: StudyTask, review: ReviewTask | None) -> int:
+    """The interval this delayed task was created with.
+
+    Read from the ``ReviewTask`` when it exists, then from the frozen reason
+    codes, then from settings — never silently defaulted to "no delay".
+    """
+    if review is not None and review.delay_hours:
+        return int(review.delay_hours)
+    for code in task.reason_codes or []:
+        if isinstance(code, str) and code.startswith("delay_") and code.endswith("h"):
+            try:
+                return int(code[len("delay_") : -1])
+            except ValueError:
+                continue
+    return int(getattr(settings, "DELAYED_VERIFICATION_HOURS", 24))
+
+
 def delayed_interval_status(*, task: StudyTask, now=None) -> dict:
     """Re-check the real interval before starting a delayed task.
 
-    The rule is read from the ``StudyTask`` itself when the ``ReviewTask`` row is
-    missing. Returning "no delay required" in that case used to delete the gate
-    entirely after a crash between the two writes, so the task could be started
-    immediately.
+    The stored ``not_before`` is not trusted on its own (B04). It is a snapshot
+    taken when the task was created, and a *new* training event on the same
+    knowledge point — a fresh B attempt, a new explanation — moves the real
+    deadline forward. A task whose stored deadline has passed may therefore not
+    be startable any more, so the interval is recomputed here from the same
+    authoritative anchor the evidence projection uses.
+
+    A task with no stored deadline at all stays unstartable: "we forgot to freeze
+    a deadline" must not silently become "no delay required".
     """
     moment = now or timezone.now()
     review = getattr(task, "review_task", None)
@@ -347,17 +344,44 @@ def delayed_interval_status(*, task: StudyTask, now=None) -> dict:
             "reason": "延迟验证任务缺少可开始的截止时间，需重新核对锚点后再开始",
             "not_before": None,
         }
-    if moment < task.not_before:
-        remaining = (task.not_before - moment).total_seconds() / 3600
+    delay_hours = _delay_hours_for(task, review)
+    stored_anchor = (review.delay_anchor_at if review else None) or task.delay_anchor_at
+    anchor, source = _anchor_for(
+        user=task.user,
+        project=task.project,
+        node_id=task.knowledge_node_id,
+        before=moment,
+    )
+    # Only a learning event that happened *after the task was created* moves the
+    # deadline. The stored anchor is the creation-time anchor, so re-deriving it
+    # from the same rows the task was built from changes nothing — while a manual
+    # correction of ``not_before`` (an operator bringing a check forward) must stay
+    # a correction rather than being silently undone on the next request.
+    recomputed = None
+    if anchor is not None and (stored_anchor is None or anchor > stored_anchor):
+        recomputed = anchor + timedelta(hours=delay_hours)
+    required_at = max(value for value in (task.not_before, recomputed) if value is not None)
+    if moment < required_at:
+        remaining = (required_at - moment).total_seconds() / 3600
+        moved = recomputed is not None and recomputed > task.not_before
         return {
             "required": True,
             "satisfied": False,
-            "reason": f"延迟验证需等待：还需约 {remaining:.2f} 小时（锚点 {anchor_source or 'unknown'}）",
-            "not_before": task.not_before.isoformat(),
+            "reason": (
+                f"延迟验证需等待：还需约 {remaining:.2f} 小时（锚点 {source or anchor_source or 'unknown'}"
+                f"{'，期间有新的训练/讲解，截止时间已顺延' if moved else ''}）"
+            ),
+            "not_before": required_at.isoformat(),
+            "stored_not_before": task.not_before.isoformat(),
+            "recomputed_not_before": recomputed.isoformat() if recomputed else None,
+            "anchor_source": source or anchor_source,
         }
     return {
         "required": True,
         "satisfied": True,
         "reason": "",
-        "not_before": task.not_before.isoformat(),
+        "not_before": required_at.isoformat(),
+        "stored_not_before": task.not_before.isoformat(),
+        "recomputed_not_before": recomputed.isoformat() if recomputed else None,
+        "anchor_source": source or anchor_source,
     }

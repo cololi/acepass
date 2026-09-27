@@ -7,6 +7,7 @@ never merged into one "official" number.
 
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 
 from django.db import transaction
@@ -26,6 +27,8 @@ from apps.common.enums import (
 from apps.common.errors import InvalidInput
 from apps.practice.models import Attempt, GradeEvent, LearningEvidence
 from apps.practice.services import attempts as attempt_services
+
+logger = logging.getLogger("apps.analytics.reports")
 
 
 def _bucket() -> dict:
@@ -62,7 +65,16 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
     verification or mock exam) are excluded from every bucket. Their scores are
     not "pending": they are deliberately not disclosable yet, and an aggregate
     would leak them just as effectively as a direct field.
+
+    B02 closed the same hole for *parallel* sessions: a practice attempt on the
+    same content (or the same near-duplicate family / content lineage) would put
+    the score of a question that is currently being verified into a bucket, which
+    is again the answer by arithmetic. Those attempts are excluded by the same
+    content gate the other entry points use, and the exclusion is reported.
     """
+    from apps.practice.services import verification_gate
+
+    blocked_versions = verification_gate.blocked_question_version_ids(user=user)
     attempts = (
         Attempt.objects.filter(project=project, user=user)
         .exclude(
@@ -74,6 +86,19 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
         )
         .order_by("-submitted_at")
     )
+    content_hidden_count = 0
+    if blocked_versions:
+        content_hidden_count = (
+            Attempt.objects.filter(
+                project=project, user=user, session_item__question_version_id__in=blocked_versions
+            )
+            .exclude(
+                Q(session_item__session__status=SessionStatus.ACTIVE)
+                & Q(session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
+            )
+            .count()
+        )
+        attempts = attempts.exclude(session_item__question_version_id__in=blocked_versions)
     if subject is not None:
         attempts = attempts.filter(session_item__question_version__question__subject=subject)
     attempts = list(attempts[:1000])
@@ -168,6 +193,11 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
         notes.append(
             f"有 {hidden_count} 次作答属于尚未结束的验证/考试：在结束前不计入任何统计，也不会通过报告泄露分数。"
         )
+    if content_hidden_count:
+        notes.append(
+            f"另有 {content_hidden_count} 次作答与正在进行的验证内容相同（同题、同题族或同源内容）："
+            "在验证结束前同样不计入任何统计，避免用平行练习的分数反推答案。"
+        )
     if not attempts:
         notes.append("本项目还没有作答记录：报告不显示任何推算数据。")
 
@@ -210,6 +240,7 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
             "ai_estimated": _bucket_out(ai_estimated),
         },
         "hidden_verification_attempts": hidden_count,
+        "hidden_verification_content_attempts": content_hidden_count,
         "by_question_type": {key: _bucket_out(value) for key, value in by_type.items()},
         "by_knowledge_node": {
             key: {**_bucket_out(value), "node_name": value["node_name"], "weight": value["weight"]}
@@ -296,80 +327,158 @@ def paper_coverage(*, subject) -> list[dict]:
 # Regrade execution
 # --------------------------------------------------------------------------
 def execute_regrade_run(regrade_run_id: str) -> str:
-    run = (
-        RegradeRun.objects.select_related("question", "target_answer_key_version", "target_rubric_version")
-        .filter(id=regrade_run_id)
-        .first()
-    )
-    if run is None:
-        return "missing"
-    if run.status == RegradeStatus.SUCCEEDED:
-        return "already_done"
-    run.status = RegradeStatus.RUNNING
-    run.started_at = timezone.now()
-    run.save(update_fields=["status", "started_at", "updated_at"])
-    attempts = (
-        Attempt.objects.filter(session_item__question_version__question=run.question, project=run.project)
-        .select_related("session_item__question_version")
-        .order_by("submitted_at")
-    )
-    regraded = 0
-    stale = 0
-    invalidated = 0
-    errors: list[str] = []
-    for attempt in attempts:
-        if str(attempt.session_item.question_version_id) != str(run.target_answer_key_version.question_version_id):
-            # A different content version: the old answer cannot mechanically
-            # re-grade it, so the evidence is invalidated instead.
-            invalidated += LearningEvidence.objects.filter(attempt=attempt, is_active=True).update(
-                is_active=False,
-                invalidated_at=timezone.now(),
-                invalidated_reason="题干版本不同，无法用新答案重判；证据失效",
+    """Execute one queued regrade; all-or-nothing, and trust is re-checked.
+
+    Two properties B01/B03 require:
+
+    * **One transaction.** The previous version wrote ``running`` before doing
+      the work and wrote the counters afterwards, so a crash (or an exception
+      between the two writes) left a ``running`` row with no result — a
+      half-finished run. Everything now happens inside one atomic block: the run
+      either reaches a terminal state with consistent counters, or it rolls back
+      to ``queued`` and stays recoverable.
+    * **Trust re-checked at execution time.** A run is queued against a reviewed
+      revision; that revision can be disputed before a worker picks the run up.
+      The target is re-read under lock, and when it is disputed or no longer
+      ``checked`` the run is refused: no confirmed score is written, and the
+      attempts it covers are moved to human review instead of keeping a settled
+      number for content under dispute.
+
+    The run row is locked for the whole execution, so an inline "run now" and a
+    worker redelivery cannot both apply the same run.
+    """
+    with transaction.atomic():
+        # Lock first, then load the relations: PostgreSQL refuses ``FOR UPDATE``
+        # on the nullable side of an outer join, and ``target_rubric_version`` is
+        # nullable.
+        run_row = RegradeRun.objects.select_for_update().filter(id=regrade_run_id).first()
+        if run_row is None:
+            return "missing"
+        run = (
+            RegradeRun.objects.select_related("question", "target_answer_key_version", "target_rubric_version")
+            .filter(id=run_row.id)
+            .first()
+        )
+        if run is None:  # pragma: no cover - the row existed a moment ago
+            return "missing"
+        if run.status == RegradeStatus.SUCCEEDED:
+            return "already_done"
+        attempts = list(
+            Attempt.objects.filter(session_item__question_version__question=run.question, project=run.project)
+            .select_related("session_item__question_version", "current_grade_event")
+            .order_by("submitted_at")
+        )
+
+        def refuse_untrusted(reason: str, exc_details: dict | None = None) -> str:
+            """Terminal refusal: no confirmed score, attempts go to human review."""
+            refused = attempt_services.invalidate_for_untrusted_regrade_target(
+                attempts=attempts, actor=run.requested_by, reason=reason
             )
-            continue
+            run.regraded_attempts = 0
+            run.stale_skipped_attempts = 0
+            run.invalidated_evidence = refused
+            run.status = RegradeStatus.FAILED
+            run.error_message = f"重判被拒绝：{reason}"[:500]
+            run.started_at = run.started_at or timezone.now()
+            run.finished_at = timezone.now()
+            run.save(
+                update_fields=[
+                    "regraded_attempts",
+                    "stale_skipped_attempts",
+                    "invalidated_evidence",
+                    "status",
+                    "error_message",
+                    "started_at",
+                    "finished_at",
+                    "updated_at",
+                ]
+            )
+            _rebuild_after_regrade(attempts)
+            logger.warning(
+                "regrade run refused run=%s details=%s", run.id, exc_details or {"reason": "target_untrusted"}
+            )
+            return f"refused_target_untrusted={refused}"
+
         try:
-            grade = attempt_services.regrade_attempt(
-                attempt=attempt,
-                target_answer_key_version=run.target_answer_key_version,
-                target_rubric_version=run.target_rubric_version,
-                actor=run.requested_by,
-                reason=run.reason,
-                regrade_generation=run.generation,
+            target_answer_key_version, target_rubric_version = attempt_services.recheck_regrade_target(
+                run.target_answer_key_version, run.target_rubric_version
             )
-            if grade is None:
-                stale += 1
-            else:
-                regraded += 1
-        except Exception as exc:  # pragma: no cover - defensive
-            errors.append(f"{attempt.id}: {exc}")
-    run.regraded_attempts = regraded
-    run.stale_skipped_attempts = stale
-    run.invalidated_evidence = invalidated
-    run.status = RegradeStatus.SUCCEEDED if not errors else RegradeStatus.FAILED
-    run.error_message = "; ".join(errors)[:500]
-    run.finished_at = timezone.now()
-    run.save(
-        update_fields=[
-            "regraded_attempts",
-            "stale_skipped_attempts",
-            "invalidated_evidence",
-            "status",
-            "error_message",
-            "finished_at",
-            "updated_at",
-        ]
-    )
-    # Rebuild projections once, so counts are not double-applied per attempt.
+        except attempt_services.RegradeTargetUntrusted as exc:
+            return refuse_untrusted(str(getattr(exc, "message", exc)), getattr(exc, "details", None))
+
+        run.status = RegradeStatus.RUNNING
+        run.started_at = timezone.now()
+        run.save(update_fields=["status", "started_at", "updated_at"])
+        regraded = 0
+        stale = 0
+        invalidated = 0
+        errors: list[str] = []
+        try:
+            # A savepoint around the loop: if the target is disputed mid-run the
+            # partial writes are discarded, and the refusal path below records
+            # one complete terminal state instead of a half-applied run.
+            with transaction.atomic():
+                for attempt in attempts:
+                    if str(attempt.session_item.question_version_id) != str(
+                        target_answer_key_version.question_version_id
+                    ):
+                        # A different content version: the old answer cannot
+                        # mechanically re-grade it, so the evidence is invalidated.
+                        invalidated += LearningEvidence.objects.filter(attempt=attempt, is_active=True).update(
+                            is_active=False,
+                            invalidated_at=timezone.now(),
+                            invalidated_reason="题干版本不同，无法用新答案重判；证据失效",
+                        )
+                        continue
+                    grade = attempt_services.regrade_attempt(
+                        attempt=attempt,
+                        target_answer_key_version=target_answer_key_version,
+                        target_rubric_version=target_rubric_version,
+                        actor=run.requested_by,
+                        reason=run.reason,
+                        regrade_generation=run.generation,
+                    )
+                    if grade is None:
+                        stale += 1
+                    else:
+                        regraded += 1
+        except attempt_services.RegradeTargetUntrusted as exc:
+            # The target was disputed between the pre-check and this attempt.
+            return refuse_untrusted(str(getattr(exc, "message", exc)), getattr(exc, "details", None))
+        except InvalidInput as exc:
+            errors.append(f"{getattr(exc, 'message', exc)}")
+        run.regraded_attempts = regraded
+        run.stale_skipped_attempts = stale
+        run.invalidated_evidence = invalidated
+        run.status = RegradeStatus.SUCCEEDED if not errors else RegradeStatus.FAILED
+        run.error_message = "; ".join(errors)[:500]
+        run.finished_at = timezone.now()
+        run.save(
+            update_fields=[
+                "regraded_attempts",
+                "stale_skipped_attempts",
+                "invalidated_evidence",
+                "status",
+                "error_message",
+                "finished_at",
+                "updated_at",
+            ]
+        )
+        _rebuild_after_regrade(attempts)
+        enqueue(
+            "projection.refresh_paper_stats",
+            {"paper_id": str(run.subject_id)},
+            dedupe_key=f"regrade-report-refresh:{run.id}",
+        )
+        return f"regraded={regraded} stale={stale} invalidated={invalidated}"
+
+
+def _rebuild_after_regrade(attempts) -> None:
+    """Rebuild projections once, so counts are not double-applied per attempt."""
     from apps.learning.services import state as state_service
 
     for attempt in attempts:
         state_service.refresh_states_for_attempt(str(attempt.id))
-    enqueue(
-        "projection.refresh_paper_stats",
-        {"paper_id": ""},
-        dedupe_key=f"regrade-report-refresh:{run.id}",
-    )
-    return f"regraded={regraded} stale={stale} invalidated={invalidated}"
 
 
 def request_regrade(

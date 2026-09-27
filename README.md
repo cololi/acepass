@@ -1,8 +1,11 @@
 # AcePass
 
-> **2026-09-27 独立验收：P0 暂不通过。** 下文为原交付记录，完成状态以
-> [独立验收报告](docs/06-independent-p0-review.md) 为准。原测试可通过，但新增回归发现业务阻断；
-> 下一步执行 [P0 修复计划](docs/07-p0-repair-plan.md)，交接入口见 [DeepSeek 修复任务](DEEPSEEK_P0_FIX_HANDOFF.md)。
+> **2026-09-27 P0.2 收尾完成：B01—B07 与三项发布门槛已修复并有本轮实测证据。**
+> 后端 177 passed、新版浏览器验收 36 passed、原浏览器套件 16 passed、复验者原始 11 条后端反例与
+> 2 条浏览器反例全部转为通过；真实故障注入（真 `SIGKILL` + 真 Redis `FLUSHALL`）`ok: true`。
+> 逐条改动与命令见 [P0.2 收尾验证报告](docs/11-p0-2-closeout-verification.md)，
+> 问题基线见 [P0.1 独立复验](docs/09-p0-1-independent-reacceptance.md)（保留不删）。
+> **真实 AI provider、真实隔天体验与 Compose 全栈仍未验证。**
 
 以考试得分为目标的个性化刷题、补弱与学习验证系统。**本仓库已包含可运行的 P0 实现**，
 不只是规格文档：多项目/多科目、五种题型、导入校对、确定性判分与人工评分、暴露台账、

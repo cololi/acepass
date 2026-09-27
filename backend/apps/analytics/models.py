@@ -6,7 +6,7 @@ watermark; missing data is reported as missing, never as zero.
 
 from __future__ import annotations
 
-from django.db import models
+from django.db import models, transaction
 
 from apps.common.enums import RecomputeStatus, RegradeStatus
 from apps.common.models import BaseModel
@@ -87,9 +87,14 @@ class RegradeRun(BaseModel):
     status = models.CharField(
         max_length=16, choices=RegradeStatus.choices, default=RegradeStatus.QUEUED, db_index=True
     )
-    #: Monotonic request order. Every request gets the next number, so a task
-    #: issued earlier can never overwrite a result written by a later request
-    #: even when the older task is executed last.
+    #: Monotonic request order, allocated by the PostgreSQL sequence
+    #: ``analytics_regrade_generation_seq`` (see
+    #: ``apps.analytics.services.reports._next_regrade_generation``). Every
+    #: request gets a number no other row can share, so a task issued earlier can
+    #: never overwrite a result written by a later request even when the older
+    #: task is executed last. ``nextval`` replaced "MAX + 1", which let two
+    #: concurrent requests read the same maximum and insert the same number
+    #: (B01); ``uniq_regrade_question_generation`` is the database backstop.
     generation = models.PositiveIntegerField(default=0, db_index=True)
     affected_attempts = models.PositiveIntegerField(default=0)
     regraded_attempts = models.PositiveIntegerField(default=0)
@@ -109,3 +114,42 @@ class RegradeRun(BaseModel):
         ordering = ["-created_at"]
         verbose_name = "重判运行"
         verbose_name_plural = "重判运行"
+        constraints = [
+            # The database, not application bookkeeping, is what makes a
+            # duplicate generation impossible under concurrency.
+            models.UniqueConstraint(
+                fields=["question", "generation"], name="uniq_regrade_question_generation"
+            ),
+        ]
+
+    #: Database sequence that hands out regrade generations. Created by migration
+    #: ``analytics.0004_p0_2_regrade_generation_sequence``.
+    GENERATION_SEQUENCE = "analytics_regrade_generation_seq"
+
+    @classmethod
+    def allocate_generation(cls) -> int:
+        """Return the next regrade generation number.
+
+        ``nextval`` is atomic, monotonic and never blocks on another consumer, so
+        two concurrent requests can never receive the same number. It also never
+        rolls back with a failed transaction, which is exactly what a
+        "requests-issued-so-far" counter must not do: a rolled-back request must
+        not be allowed to hand its number to a later request that would then
+        execute before the original one.
+
+        On a non-PostgreSQL backend (the project targets PostgreSQL everywhere;
+        this is a defensive fallback) the newest existing row is locked instead,
+        which serialises requests but keeps the uniqueness guarantee.
+        """
+        from django.db import connections
+
+        connection = connections[cls.objects.db]
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT nextval('{cls.GENERATION_SEQUENCE}')")
+                return int(cursor.fetchone()[0])
+        with transaction.atomic():
+            newest = (
+                cls.objects.select_for_update().order_by("-generation").values_list("generation", flat=True).first()
+            )
+            return int(newest or 0) + 1

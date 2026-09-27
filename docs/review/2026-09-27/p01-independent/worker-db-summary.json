@@ -1,0 +1,11 @@
+{
+  "database": "acepass_acceptance_p01_independent",
+  "attempts": 22,
+  "evidence": 144,
+  "knowledge_states": 3,
+  "review_tasks": 7,
+  "outbox_status": {
+    "processed": 50
+  },
+  "unresolved_topics": {}
+}

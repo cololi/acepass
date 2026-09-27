@@ -101,8 +101,17 @@ def _backoff_seconds(attempts: int) -> int:
     return min(base * (2 ** max(0, attempts - 1)), MAX_BACKOFF_SECONDS)
 
 
-def mark_retryable_failure(event: OutboxEvent, error: str, *, recoverable: bool = True) -> None:
-    """Record a failed attempt and schedule the next one."""
+def mark_retryable_failure(
+    event: OutboxEvent, error: str, *, recoverable: bool = True, claim_token: str | None = None
+) -> bool:
+    """Record a failed attempt and schedule the next one.
+
+    Refuses to touch a row that already reached a terminal success (B05): a
+    consumer that failed after a newer one completed used to flip ``processed``
+    back to ``pending``, which turned a completed effect into a permanent retry
+    loop. Only the holder of the current claim may record a failure for a claim,
+    which is what ``claim_token`` enforces.
+    """
     attempts = event.attempts + 1
     exhausted = attempts >= int(event.max_attempts or 8)
     updates: dict[str, Any] = {
@@ -120,7 +129,17 @@ def mark_retryable_failure(event: OutboxEvent, error: str, *, recoverable: bool 
         updates["status"] = OutboxStatus.FAILED
         # Keep it recoverable later: the scan still revisits `failed` rows.
         updates["available_at"] = timezone.now() + timedelta(seconds=MAX_BACKOFF_SECONDS)
-    OutboxEvent.objects.filter(id=event.id).update(**updates)
+    filters: dict[str, Any] = {"id": event.id, "processed_at__isnull": True}
+    if claim_token:
+        filters["claim_token"] = claim_token
+    updated = OutboxEvent.objects.filter(**filters).update(**updates)
+    if not updated:
+        logger.warning(
+            "ignored stale failure for terminal event topic=%s id=%s (already confirmed)",
+            event.topic,
+            event.id,
+        )
+        return False
     for key, value in updates.items():
         setattr(event, key, value)
     logger.warning(
@@ -130,6 +149,7 @@ def mark_retryable_failure(event: OutboxEvent, error: str, *, recoverable: bool 
         exhausted,
         str(error)[:200],
     )
+    return True
 
 
 def claim_event(event_id: str, *, lease_seconds: int | None = None) -> OutboxEvent | None:
@@ -171,8 +191,69 @@ def mark_processed(event_id: str, *, claim_token: str = "") -> bool:
     return bool(updated)
 
 
+def confirm_claim(claim: OutboxEvent) -> bool:
+    """Confirm the exact claim, so a consumer cannot confirm someone else's work."""
+    return mark_processed(str(claim.id), claim_token=claim.claim_token)
+
+
+def fail_claim(claim: OutboxEvent, error: str, *, recoverable: bool = True) -> bool:
+    """Record a failure for the exact claim, never for a terminal row."""
+    return mark_retryable_failure(claim, error, recoverable=recoverable, claim_token=claim.claim_token)
+
+
+def run_leased(event_id: str | None, action):
+    """Run ``action`` while holding the outbox lease for ``event_id``.
+
+    Every real consumer goes through this (B05). Before, only the inline path
+    called :func:`claim_event`; the Celery tasks executed business logic first and
+    told the outbox afterwards, so two consumers — an inline "run now" and a
+    worker redelivery, or two workers after a visibility timeout — could both
+    apply the effect, and the second completion could overwrite a terminal state.
+
+    Returns ``(executed, result)``: ``executed`` is ``False`` when another live
+    consumer holds the lease or the row is already terminal, in which case
+    ``action`` is never called.
+
+    ``event_id`` of ``None`` (a direct call with no outbox row, e.g. a manual
+    invocation in a test or a management command) runs the action without a
+    lease, because there is nothing to serialise on.
+    """
+    if not event_id:
+        return True, action()
+    claim = claim_event(str(event_id))
+    if claim is None:
+        logger.info("outbox event %s is not claimable by this consumer; skipping", event_id)
+        return False, None
+    try:
+        result = action()
+    except Exception as exc:
+        fail_claim(claim, str(exc))
+        raise
+    confirm_claim(claim)
+    return True, result
+
+
 def dispatch_event(event: OutboxEvent) -> bool:
     """Deliver one event to its consumer."""
+    # The attempt cap binds *redelivery* as well, not only failures (B05). A
+    # message that reached the broker but was never confirmed used to be re-sent
+    # on every scan forever, so ``attempts`` climbed past ``max_attempts``.
+    if int(event.attempts) >= int(event.max_attempts or 8):
+        now = timezone.now()
+        OutboxEvent.objects.filter(id=event.id, processed_at__isnull=True).update(
+            status=OutboxStatus.FAILED,
+            claimed_at=None,
+            claim_token="",
+            lease_expires_at=None,
+            last_error=(event.last_error or "投递次数已达上限，停止自动重投")[:500],
+            updated_at=now,
+        )
+        logger.warning(
+            "outbox event %s reached max_attempts=%s without confirmation; not redelivering",
+            event.id,
+            event.max_attempts,
+        )
+        return False
     if inline_mode():
         return _run_inline(event)
     from config.celery import app as celery_app
@@ -209,9 +290,9 @@ def _run_inline(event: OutboxEvent) -> bool:
     if task is None:
         mark_retryable_failure(event, f"unknown topic {event.topic}", recoverable=False)
         return False
-    claim = claim_event(str(event.id))
-    if claim is None:
-        return False
+    # The consumer claims its own lease (``run_leased``), exactly like a real
+    # worker does. This path must therefore *not* pre-claim: a nested claim would
+    # find the lease already held by this very call and skip the work.
     try:
         result = task.apply(kwargs={"outbox_event_id": str(event.id), **event.payload}, throw=False)
     except Exception as exc:  # pragma: no cover - defensive
@@ -220,12 +301,15 @@ def _run_inline(event: OutboxEvent) -> bool:
     if getattr(result, "failed", lambda: False)():
         mark_retryable_failure(event, str(getattr(result, "result", "consumer failed")))
         return False
-    # The consumer's own `_mark_outbox(ok=True)` is authoritative. Confirm it
-    # here only when the consumer did not, so this path can never downgrade a
-    # `processed` row back to `dispatched` (the original bug).
+    # A consumer that succeeded has already confirmed with its own token. Confirm
+    # here only in the narrow case "returned normally, still holds its own claim,
+    # never confirmed", so the row cannot get stuck. Two other outcomes are NOT
+    # successes and must be left alone: a consumer that reported a failure leaves
+    # the row in ``pending``/``failed``, and a consumer that skipped because
+    # another lease was live leaves that other consumer's token in place.
     event.refresh_from_db()
-    if event.processed_at is None:
-        mark_processed(str(event.id), claim_token=claim.claim_token)
+    if event.processed_at is None and event.status == OutboxStatus.PROCESSING and not event.claim_token:
+        mark_processed(str(event.id))
     return True
 
 

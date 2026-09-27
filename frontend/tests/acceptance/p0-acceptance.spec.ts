@@ -3,6 +3,7 @@ import zlib from 'node:zlib'
 import {
   PROJECT_A,
   PROJECT_B,
+  PROJECT_C,
   TYPE_LABELS,
   login,
   openWorkbench,
@@ -240,6 +241,9 @@ test.describe('acceptance: verification never leaks', () => {
   })
 
   test('an active verification returns no score anywhere and blocks reveal', async ({ page }) => {
+    // The delayed-verification chain lives in its own project so that no other
+    // scenario's training or explanation can move its 24-hour anchor.
+    await switchProject(page, PROJECT_C)
     await page.goto('/review')
     await expect(page.getByRole('heading', { name: /延迟验证任务/ })).toBeVisible()
     const startButton = page.getByRole('button', { name: '开始验证' }).first()
@@ -431,10 +435,12 @@ test.describe('acceptance: cross-project tasks and server-side mode', () => {
   })
 
   test('starting a delayed-verification task fixes the mode and the project server-side', async ({ page }) => {
-    // The acceptance fixture drives a real A -> B -> C chain and only then makes
-    // C due, so this exercises the actual anchoring logic rather than a
-    // hand-written task row.
-    await switchProject(page, PROJECT_A)
+    // The acceptance fixture drives a real A -> B -> C chain in its own project
+    // and only then makes C due, so this exercises the actual anchoring logic
+    // rather than a hand-written task row. The task's project is asserted below:
+    // the session must be created in the task's project, not in whichever
+    // project happened to be selected in the UI.
+    await switchProject(page, PROJECT_C)
     await page.goto('/review')
     await expect(page.getByRole('heading', { name: /延迟验证任务/ })).toBeVisible()
     const row = page.locator('table.data tbody tr').first()
@@ -445,17 +451,29 @@ test.describe('acceptance: cross-project tasks and server-side mode', () => {
     const startResponse = page.waitForResponse((r) => r.url().includes('/study-tasks/') && r.url().endsWith('/start'))
     await startButton.click()
     const started = (await (await startResponse).json()) as {
+      project_id: string
+      subject_id: string
       create_session_hint: { subject_id: string; task_id: string; purpose: string }
     }
     expect(started.create_session_hint.purpose).toBe('delayed_verification')
+    expect(started.create_session_hint.subject_id, '会话提示必须指向任务自己的科目').toBe(started.subject_id)
 
     const createResponse = page.waitForResponse(
       (r) => r.url().includes('/practice-sessions') && r.request().method() === 'POST',
     )
     await expect(page.getByRole('heading', { name: '刷题工作台' })).toBeVisible()
     await page.getByRole('button', { name: '创建练习会话' }).click()
-    const created = (await (await createResponse).json()) as { mode: string; session_id: string }
+    const created = (await (await createResponse).json()) as {
+      mode: string
+      session_id: string
+      project_id: string
+      subject_id: string
+    }
     expect(created.mode, '服务端必须按任务用途固定验证模式，不接受客户端降级为 practice').toBe('verification')
+    // The session must land in the task's own project and subject, not in
+    // whichever project happened to be selected in the UI.
+    expect(created.project_id, '会话必须创建在任务所属项目').toBe(started.project_id)
+    expect(created.subject_id, '会话必须创建在任务所属科目').toBe(started.subject_id)
 
     const state = (await (
       await page.waitForResponse((r) => r.url().includes(`/practice-sessions/${created.session_id}`))

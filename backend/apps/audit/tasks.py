@@ -1,8 +1,11 @@
 """Celery tasks.
 
-Each task is idempotent and takes an ``outbox_event_id`` so a redelivery cannot
-double-apply an effect. Business state lives in PostgreSQL; Redis only carries
-the trigger.
+Each task is idempotent, and each one *claims the outbox lease* before doing any
+work: the lease is what makes "two consumers saw the same message" safe, and it
+was previously only used by the inline path (B05). Completion and failure go back
+through the same claim token, so a consumer can never confirm or reopen another
+consumer's attempt, and a redelivery that finds the event already terminal is
+skipped instead of re-applied.
 """
 
 from __future__ import annotations
@@ -11,41 +14,42 @@ import logging
 
 from celery import shared_task
 
+from apps.audit.services import outbox
+
 logger = logging.getLogger("apps.tasks")
 
 
-def _mark_outbox(event_id: str | None, *, ok: bool, error: str = "") -> None:
+def _mark_outbox(event_id: str | None, *, ok: bool, error: str = "", claim_token: str = "") -> None:
     """Confirm or re-queue one outbox row from the consumer side.
 
-    Success goes through :func:`outbox.mark_processed`, which is the only thing
-    that sets ``processed_at``. Failure is scheduled with backoff and an attempt
-    cap instead of being retried forever with no bound.
+    Kept for callers that do not go through :func:`outbox.run_leased` (the tutor
+    task already holds a claim). Success goes through ``outbox.mark_processed``,
+    the only thing that sets ``processed_at``, and it is token-checked so a stale
+    consumer cannot confirm a row another consumer now owns.
     """
     if not event_id:
         return
     from apps.audit.models import OutboxEvent
-    from apps.audit.services import outbox
 
     if ok:
-        outbox.mark_processed(event_id)
+        outbox.mark_processed(event_id, claim_token=claim_token)
         return
     event = OutboxEvent.objects.filter(id=event_id).first()
     if event is None:
         return
-    outbox.mark_retryable_failure(event, error)
+    outbox.mark_retryable_failure(event, error, claim_token=claim_token or None)
 
 
 @shared_task(name="projection.rebuild_attempt_evidence", ignore_result=True)
 def rebuild_attempt_evidence(attempt_id: str, outbox_event_id: str | None = None) -> str:
     from apps.learning.services import evidence as evidence_service
 
-    try:
-        count = evidence_service.rebuild_for_attempt(attempt_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("evidence rebuild failed attempt=%s", attempt_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+    def action() -> int:
+        return evidence_service.rebuild_for_attempt(attempt_id)
+
+    executed, count = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return f"evidence_rows={count}"
 
 
@@ -54,28 +58,27 @@ def regrade_effects(attempt_id: str, grade_event_id: str, outbox_event_id: str |
     from apps.learning.services import evidence as evidence_service
     from apps.learning.services import state as state_service
 
-    try:
+    def action() -> str:
         evidence_service.rebuild_for_attempt(attempt_id)
         state_service.refresh_states_for_attempt(attempt_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("regrade effects failed attempt=%s", attempt_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
-    return "ok"
+        return "ok"
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
+    return result
 
 
 @shared_task(name="projection.run_regrade", ignore_result=True)
 def run_regrade(regrade_run_id: str, outbox_event_id: str | None = None) -> str:
     from apps.analytics.services import regrade as regrade_service
 
-    try:
-        result = regrade_service.execute_regrade_run(regrade_run_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("regrade run failed run=%s", regrade_run_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+    def action() -> str:
+        return regrade_service.execute_regrade_run(regrade_run_id)
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return result
 
 
@@ -85,13 +88,12 @@ def rebuild_after_answer_change(
 ) -> str:
     from apps.learning.services import evidence as evidence_service
 
-    try:
-        count = evidence_service.invalidate_for_answer_version(answer_key_version_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("answer-change rebuild failed answer=%s", answer_key_version_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+    def action() -> int:
+        return evidence_service.invalidate_for_answer_version(answer_key_version_id)
+
+    executed, count = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return f"invalidated={count}"
 
 
@@ -99,14 +101,14 @@ def rebuild_after_answer_change(
 def refresh_paper_stats(paper_id: str, outbox_event_id: str | None = None) -> str:
     from apps.analytics.services import reports as report_service
 
-    try:
+    def action() -> str:
         report_service.mark_project_stale_for_paper(paper_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("paper stats refresh failed paper=%s", paper_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
-    return "ok"
+        return "ok"
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
+    return result
 
 
 @shared_task(name="learning.on_attempt_graded", ignore_result=True)
@@ -116,15 +118,14 @@ def on_attempt_graded(attempt_id: str, grade_event_id: str, outbox_event_id: str
     from apps.learning.services import pairing as pairing_service
     from apps.learning.services import state as state_service
 
-    try:
+    def action() -> int:
         evidence_service.rebuild_for_attempt(attempt_id)
         state_service.refresh_states_for_attempt(attempt_id)
-        created = pairing_service.on_attempt_graded(attempt_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("on_attempt_graded failed attempt=%s", attempt_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+        return pairing_service.on_attempt_graded(attempt_id)
+
+    executed, created = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return f"paired_tasks={created}"
 
 
@@ -132,14 +133,14 @@ def on_attempt_graded(attempt_id: str, grade_event_id: str, outbox_event_id: str
 def on_session_finished(session_id: str, outbox_event_id: str | None = None) -> str:
     from apps.learning.services import state as state_service
 
-    try:
+    def action() -> str:
         state_service.refresh_session_states(session_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("session finish handling failed session=%s", session_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
-    return "ok"
+        return "ok"
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
+    return result
 
 
 @shared_task(name="learning.refresh_delayed_tasks", ignore_result=True)
@@ -147,13 +148,12 @@ def refresh_delayed_tasks(outbox_event_id: str | None = None) -> str:
     """Re-anchor pending delayed tasks whose anchor moved, and expire overdue ones."""
     from apps.learning.services import pairing as pairing_service
 
-    try:
-        updated = pairing_service.reconcile_delayed_tasks()
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("delayed task reconciliation failed")
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+    def action() -> int:
+        return pairing_service.reconcile_delayed_tasks()
+
+    executed, updated = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return f"updated={updated}"
 
 
@@ -168,13 +168,12 @@ def reconcile_plan(plan_id: str = "", outbox_event_id: str | None = None) -> str
     """
     from apps.learning.services import planner as planner_service
 
-    try:
-        result = planner_service.reconcile_plan(plan_id=plan_id)
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("plan reconciliation failed plan=%s", plan_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+    def action() -> str:
+        return planner_service.reconcile_plan(plan_id=plan_id)
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return result
 
 
@@ -187,15 +186,14 @@ def extract_candidate(
 ) -> str:
     from apps.ingestion.services import extraction
 
-    try:
-        result = extraction.extract_image_candidate(
+    def action() -> str:
+        return extraction.extract_image_candidate(
             import_job_id=import_job_id, document_id=document_id, candidate_id=candidate_id
         )
-    except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("image extraction failed candidate=%s", candidate_id)
-        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
-        raise
-    _mark_outbox(outbox_event_id, ok=True)
+
+    executed, result = outbox.run_leased(outbox_event_id, action)
+    if not executed:
+        return "skipped_lease_not_held"
     return result
 
 

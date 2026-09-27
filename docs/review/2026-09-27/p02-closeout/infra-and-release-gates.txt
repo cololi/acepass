@@ -1,0 +1,12 @@
+== docker compose config ==
+OK
+
+== nginx -t (rendered template) ==
+/docker-entrypoint.sh: Configuration complete; ready for start up
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+== plain HTTP 301 ==
+Host: 127.0.0.1:18080 -> https://127.0.0.1:18443/login
+Host: acepass.example.com -> https://acepass.example.com/login
+TLS entry status: 200

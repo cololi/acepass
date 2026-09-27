@@ -1,8 +1,10 @@
 # AcePass CI: the checks that must pass before a change is considered done.
 #
 # PostgreSQL is a real service here: the consistency and constraint tests must
-# never fall back to SQLite. The browser job runs the Playwright suite against a
-# real API and a real browser; a green API run does not replace it.
+# never fall back to SQLite. Every browser job runs against its own database,
+# Redis, media directory and ports, and against a real Worker (never inline
+# consumers), because "the UI looked right" is not evidence that the async chain
+# works.
 name: ci
 
 on:
@@ -16,7 +18,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: acepass
+          # A dedicated CI database name: the pytest run creates `test_<name>`,
+          # and no CI step may point at the name a developer's database uses.
+          POSTGRES_DB: acepass_ci
           POSTGRES_USER: acepass
           POSTGRES_PASSWORD: acepass_dev_pw
         ports: ["5432:5432"]
@@ -33,7 +37,7 @@ jobs:
       ACEPASS_RUNTIME_MODE: test
       POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: acepass
+      POSTGRES_DB: acepass_ci
       POSTGRES_USER: acepass
       POSTGRES_PASSWORD: acepass_dev_pw
       REDIS_URL: redis://127.0.0.1:6379/0
@@ -67,13 +71,21 @@ jobs:
           # security.W021（HSTS preload，需域名所有者决定）在 prod.py 中显式静音。
           ACEPASS_RUNTIME_MODE=production DJANGO_SETTINGS_MODULE=config.settings.prod \
             .venv/bin/python manage.py check --deploy --fail-level WARNING
+      - name: Migrations are complete and reversible
+        working-directory: backend
+        env:
+          DJANGO_SECRET_KEY: ci-only-long-random-secret-key-value-0123456789abcdef
+          DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+        run: |
+          DJANGO_SETTINGS_MODULE=config.settings.dev .venv/bin/python manage.py makemigrations --check --dry-run
       - name: Tests (real PostgreSQL)
         working-directory: backend
         run: .venv/bin/python -m pytest tests -q
 
   infra:
-    # 发布门槛的部署侧校验：Compose 变量/YAML 合并、nginx 配置语法与 shell 语法。
-    # 都不需要 Docker 守护进程之外的部署目标，也不会碰任何真实环境。
+    # 发布门槛的部署侧校验：Compose 变量/YAML 合并、nginx 模板渲染与语法、明文入口
+    # 301 的目标端口，以及 shell 语法。都不需要 Docker 守护进程之外的部署目标，
+    # 也不会碰任何真实环境。
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,15 +93,66 @@ jobs:
         run: |
           cp infra/docker/.env.example infra/docker/.env
           docker compose -f infra/docker/docker-compose.yml config --quiet
-      - name: Generate throwaway TLS certs and validate nginx config
+      - name: Generate throwaway TLS certs
+        run: bash scripts/gen-dev-certs.sh infra/docker/certs localhost
+      - name: Render and validate the nginx template
+        # 与生产完全相同的路径：nginx 镜像的入口脚本用 envsubst 渲染
+        # /etc/nginx/templates/default.conf.template，再执行 nginx -t。
         run: |
-          bash scripts/gen-dev-certs.sh infra/docker/certs localhost
           docker run --rm --add-host api:127.0.0.1 \
-            -v "$PWD/infra/proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro" \
+            -e ACEPASS_HTTPS_PORT=8443 \
+            -v "$PWD/infra/proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
             -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
             nginx:1.27-alpine nginx -t
+      - name: Plain HTTP redirects to the published HTTPS port
+        # 默认宿主端口是 8080/8443，而容器内是 80/443：跳转必须落到实际公开端口，
+        # 否则用户被送到一个没有监听的地址（这正是不做真实请求就发现不了的缺陷）。
+        run: |
+          set -euo pipefail
+          docker rm -f acepass-nginx-redirect >/dev/null 2>&1 || true
+          docker run -d --name acepass-nginx-redirect \
+            -e ACEPASS_HTTPS_PORT=18443 \
+            -v "$PWD/infra/proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
+            -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
+            -p 18080:80 -p 18443:443 nginx:1.27-alpine >/dev/null
+          for _ in $(seq 1 30); do
+            if curl -s -o /dev/null http://127.0.0.1:18080/login; then break; fi
+            sleep 1
+          done
+          location="$(curl -s -o /dev/null -D - http://127.0.0.1:18080/login | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')"
+          echo "Location: ${location}"
+          test "${location}" = "https://127.0.0.1:18443/login" || {
+            echo "明文入口跳转目标错误：期望 https://127.0.0.1:18443/login，实际 ${location}"; exit 1; }
+          # 没有端口的 Host（真实 443 部署）必须原样保留，不能凭空加上端口。
+          vhost="$(curl -s -o /dev/null -D - -H 'Host: acepass.example.com' http://127.0.0.1:18080/login | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')"
+          echo "Location (no port): ${vhost}"
+          test "${vhost}" = "https://acepass.example.com/login" || {
+            echo "无端口 Host 跳转目标错误：实际 ${vhost}"; exit 1; }
+          # 跳转目标必须真的能完成 TLS 握手并返回页面，而不只是一个字符串。
+          code="$(curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:18443/login)"
+          echo "HTTPS entry status: ${code}"
+          test "${code}" = "200" || { echo "跳转目标不是可登录入口（HTTP ${code}）"; exit 1; }
+          docker rm -f acepass-nginx-redirect >/dev/null
       - name: Shell script syntax
         run: for f in scripts/*.sh; do echo "bash -n $f"; bash -n "$f"; done
+      - name: Restore refuses an unreachable database (dry-run)
+        # 连接失败必须非零退出；以前它被当成「目标库不存在」，dry-run 还会谎报通过。
+        run: |
+          set -euo pipefail
+          backup="$(mktemp -d)"
+          media="$(mktemp -d)/media"
+          echo "not-a-dump" > "${backup}/database.dump"
+          tar -czf "${backup}/media.tar.gz" -T /dev/null
+          : > "${backup}/media-manifest.sha256"
+          set +e
+          POSTGRES_HOST=127.0.0.1 POSTGRES_PORT=59999 POSTGRES_USER=acepass \
+            bash scripts/restore.sh --dry-run "${backup}" acepass_restore_unreachable "${media}" \
+            >/tmp/restore-out.txt 2>&1
+          status=$?
+          set -e
+          cat /tmp/restore-out.txt
+          test "${status}" -ne 0 || { echo "数据库不可连时 dry-run 必须失败"; exit 1; }
+          grep -q "无法连接数据库" /tmp/restore-out.txt || { echo "必须明确报告连接失败"; exit 1; }
 
   frontend:
     runs-on: ubuntu-latest
@@ -109,30 +172,44 @@ jobs:
           npx tsc -b
           npx vite build
 
-  browser:
+  browser-acceptance:
+    # 新版浏览器验收：空账户 + 真实结构夹具，隔离数据库/Redis/媒体/端口，并且
+    # 必须接真实 Worker（ACEPASS_INLINE_TASKS=false）。运行 30 条原验收场景加
+    # P0.2 新增反例（照片草稿、可视填空答案）。
     runs-on: ubuntu-latest
     needs: [backend, frontend]
     services:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: acepass
+          POSTGRES_DB: acepass_acceptance_ci
           POSTGRES_USER: acepass
           POSTGRES_PASSWORD: acepass_dev_pw
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U acepass" --health-interval 10s
           --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7
+        ports: ["6380:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 10
     env:
       POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: acepass
+      POSTGRES_DB: acepass_acceptance_ci
       POSTGRES_USER: acepass
       POSTGRES_PASSWORD: acepass_dev_pw
-      ACEPASS_PRIVATE_MEDIA_ROOT: ${{ github.workspace }}/var/private-media
+      REDIS_URL: redis://127.0.0.1:6380/0
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      ACEPASS_INLINE_TASKS: "false"
+      ACEPASS_PRIVATE_MEDIA_ROOT: ${{ github.workspace }}/var/private-media-acceptance
+      ACEPASS_BROWSER_API_PORT: "8011"
+      ACEPASS_BROWSER_WEB_PORT: "5181"
       DJANGO_SECRET_KEY: ci-only-long-random-secret-key-value-0123456789abcdef
       DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
-      DJANGO_CSRF_TRUSTED_ORIGINS: http://127.0.0.1:5173,http://localhost:5173
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://127.0.0.1:5181,http://127.0.0.1:8011
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -156,11 +233,129 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
-      - name: Browser acceptance
+      - name: Start the real Worker
+        working-directory: backend
+        run: |
+          mkdir -p ../var/logs
+          nohup .venv/bin/celery -A config worker --pool=solo \
+            -Q ingestion,tutoring,projection -c 1 -l INFO \
+            > ../var/logs/acceptance-worker.log 2>&1 &
+          echo $! > ../var/logs/acceptance-worker.pid
+          for _ in $(seq 1 30); do
+            if grep -q "ready" ../var/logs/acceptance-worker.log 2>/dev/null; then break; fi
+            sleep 1
+          done
+          tail -5 ../var/logs/acceptance-worker.log
+      - name: Browser acceptance (isolated DB, Redis, media and ports)
         working-directory: frontend
-        run: npx playwright test
+        run: npx playwright test --config playwright.acceptance.config.ts
+      - name: Worker consumed every outbox event
+        # 只有 processed_at 才算完成：正常路径结束后不得留下未确认事件（给在途事件
+        # 一点时间，但不能把「还没好」当成「没问题」）。
+        if: always()
+        working-directory: backend
+        run: |
+          for _ in $(seq 1 30); do
+            summary="$(.venv/bin/python manage.py shell -c "
+          from apps.audit.services import outbox
+          print(outbox.unresolved_summary())
+          ")"
+            echo "unresolved outbox events: ${summary}"
+            case "${summary}" in
+              *"{}"*) exit 0 ;;
+            esac
+            sleep 2
+          done
+          echo "仍有未确认的 outbox 事件"; exit 1
+      - name: Worker log
+        if: always()
+        run: tail -50 var/logs/acceptance-worker.log || true
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
-          path: frontend/test-results
+          name: playwright-acceptance-report
+          path: var/browser-acceptance
+
+  browser-original:
+    # 原 16 条浏览器套件：自己的数据库、Redis、媒体目录与端口，自己的演示夹具。
+    # 与验收套件分开运行，因为两者的 globalSetup 都要求一个空的媒体目录。
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: acepass_browser_audit_ci
+          POSTGRES_USER: acepass
+          POSTGRES_PASSWORD: acepass_dev_pw
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U acepass" --health-interval 10s
+          --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7
+        ports: ["6381:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 10
+    env:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: acepass_browser_audit_ci
+      POSTGRES_USER: acepass
+      POSTGRES_PASSWORD: acepass_dev_pw
+      REDIS_URL: redis://127.0.0.1:6381/0
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      ACEPASS_PRIVATE_MEDIA_ROOT: ${{ github.workspace }}/var/private-media-original
+      ACEPASS_BROWSER_API_PORT: "8012"
+      ACEPASS_BROWSER_WEB_PORT: "5182"
+      DJANGO_SECRET_KEY: ci-only-long-random-secret-key-value-0123456789abcdef
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://127.0.0.1:5182,http://127.0.0.1:8012
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements/*.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend
+        working-directory: backend
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements/lock.txt
+      - name: Install frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Start the real Worker
+        working-directory: backend
+        run: |
+          mkdir -p ../var/logs
+          nohup .venv/bin/celery -A config worker --pool=solo \
+            -Q ingestion,tutoring,projection -c 1 -l INFO \
+            > ../var/logs/original-worker.log 2>&1 &
+          echo $! > ../var/logs/original-worker.pid
+          for _ in $(seq 1 30); do
+            if grep -q "ready" ../var/logs/original-worker.log 2>/dev/null; then break; fi
+            sleep 1
+          done
+          tail -5 ../var/logs/original-worker.log
+      - name: Browser suite (original 16)
+        working-directory: frontend
+        run: npx playwright test
+      - name: Worker log
+        if: always()
+        run: tail -50 var/logs/original-worker.log || true
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-original-report
+          path: var/browser-e2e

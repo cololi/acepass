@@ -1,0 +1,14 @@
+== restore dry-run against an unreachable database (must fail) ==
+psql: error: connection to server at "127.0.0.1", port 59999 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+错误：无法连接数据库 acepass@127.0.0.1:59999：恢复前置检查无法完成，已拒绝（不是「目标库不存在」）。
+exit=1
+
+== restore dry-run against the real backup (must pass) ==
+    清单条目：2；目标目录文件：0
+    missing（清单有、目标目录没有）：
+      ./7636acfe-848c-4c4e-beba-1cc001e0a379/647e8793-1fd2-4cff-bb8f-a20d1971a3ef/source/52/5218b9f8048165dff31fccc568dfdb94.png
+      ./7636acfe-848c-4c4e-beba-1cc001e0a379/647e8793-1fd2-4cff-bb8f-a20d1971a3ef/source/f2/f2adaff28e900a0d5bb1cdb741374665.png
+==> dry-run 通过：前置检查全部满足，可以执行真实恢复（去掉 --dry-run）。
+    注意：dry-run 不解压、不校验备份包内字节与清单是否一致，真实恢复会做完整校验。
+exit=0

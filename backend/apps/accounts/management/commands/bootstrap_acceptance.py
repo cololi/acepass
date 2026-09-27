@@ -46,7 +46,10 @@ ALLOWED_DB_PREFIXES = ("acepass_browser_audit_", "acepass_acceptance_", "test_ac
 
 PROJECT_A = "验收项目A·基础能力"
 PROJECT_B = "验收项目B·专业实务"
+PROJECT_C = "验收项目C·延迟验证"
 SUBJECT_NAMES = ("验收科目一·数量关系", "验收科目二·判断推理", "验收科目三·专业实务")
+#: The delayed-verification chain has its own project: see `build` for why.
+SUBJECT_C = "验收延迟科目·数量关系"
 
 
 class Command(BaseCommand):
@@ -90,7 +93,7 @@ def build(*, email: str, password: str, display_name: str) -> dict:
     settings_obj.daily_budget_minutes = 90
     settings_obj.save(update_fields=["daily_budget_minutes", "updated_at"])
 
-    for name in (PROJECT_A, PROJECT_B):
+    for name in (PROJECT_A, PROJECT_B, PROJECT_C):
         existing = ExamProject.objects.filter(owner=user, name=name).first()
         if existing is not None:
             exams_services.archive_project(existing, reason="验收夹具重建")
@@ -117,12 +120,35 @@ def build(*, email: str, password: str, display_name: str) -> dict:
         published += len(versions)
         built.append((subject, nodes, versions))
 
-    delayed_tasks = _seed_delayed_verification(built[0], user)
+    # The delayed-verification chain lives in its own project.
+    #
+    # Its deadline is time-sensitive by design: any *new* training or explanation
+    # on the same knowledge point legitimately pushes it forward (B04). Sharing a
+    # project with the other scenarios meant an earlier test revealing an answer
+    # on the same knowledge point silently un-did the fixture's "C is due" setup,
+    # so the browser test measured test ordering instead of the anchor rule. In
+    # its own project the chain is driven only by the chain.
+    project_c = exams_services.create_project(user, name=PROJECT_C)
+    subject_c = exams_services.create_subject(project_c, name=SUBJECT_C, total_score=100, pass_score=60)
+    spec_c = _published_spec(subject_c, user, partial_credit=False)
+    syllabus_c = _published_syllabus(subject_c, user)
+    nodes_c = _nodes(syllabus_c, ["验收延迟考点一", "验收延迟考点二", "验收延迟考点三"])
+    versions_c = _seed_subject(
+        project=project_c,
+        subject=subject_c,
+        spec=spec_c,
+        nodes=nodes_c,
+        user=user,
+        label_prefix="验收延迟",
+    )
+    published += len(versions_c)
+    delayed_tasks = _seed_delayed_verification((subject_c, nodes_c, versions_c), user)
 
     return {
         "email": email,
         "project_a": str(project_a.id),
         "project_b": str(project_b.id),
+        "project_c": str(project_c.id),
         "subjects": Subject.objects.filter(project__owner=user).count(),
         "published_versions": published,
         "delayed_verification_tasks": delayed_tasks,
