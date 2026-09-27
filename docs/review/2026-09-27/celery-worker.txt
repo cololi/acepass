@@ -1,0 +1,23 @@
+[2026-09-27 07:08:52,296: ERROR/MainProcess] Received unregistered task of type 'learning.reconcile_plan'.
+The message has been ignored and discarded.
+
+Did you remember to import the module containing this task?
+Or maybe you're using relative imports?
+
+Please see
+https://docs.celeryq.dev/en/latest/internals/protocol.html
+for more information.
+
+The full contents of the message body was:
+b'[[], {"outbox_event_id": "ff8c1007-0ac6-4a0b-99e8-fc9016315dcd", "plan_id": "02ca8458-8e68-4f43-8850-adeea44c03b7"}, {"callbacks": null, "errbacks": null, "chain": null, "chord": null}]' (185b)
+
+The full contents of the message headers:
+{'lang': 'py', 'task': 'learning.reconcile_plan', 'id': '5c6d478b-f239-404e-9aa5-dfc666bf79a9', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '5c6d478b-f239-404e-9aa5-dfc666bf79a9', 'parent_id': None, 'argsrepr': '()', 'kwargsrepr': "{'outbox_event_id': 'ff8c1007-0ac6-4a0b-99e8-fc9016315dcd', 'plan_id': '02ca8458-8e68-4f43-8850-adeea44c03b7'}", 'origin': 'gen44626@Cololis-Mac-mini.local', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}}
+
+The delivery info for this task is:
+{'exchange': '', 'routing_key': 'ingestion'}
+Traceback (most recent call last):
+  File "/Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/celery/worker/consumer/consumer.py", line 662, in on_task_received
+    strategy = strategies[type_]
+               ~~~~~~~~~~^^^^^^^
+KeyError: 'learning.reconcile_plan'

@@ -1,0 +1,404 @@
+2026-09-27 07:12:45,571 INFO celery.app.trace Task projection.refresh_paper_stats[4936c16c-50c8-4643-8a36-4aca73c63906] succeeded in 0.021339082999475067s: 'ok'
+2026-09-27 07:12:45,573 INFO celery.app.trace Task projection.refresh_paper_stats[cd125744-f83f-4c8c-a984-5412f41c6d46] succeeded in 0.0014102080003794981s: 'ok'
+2026-09-27 07:12:45,621 INFO celery.app.trace Task projection.rebuild_attempt_evidence[6edf45af-afab-4a15-b807-79750a0296ac] succeeded in 0.02631262500108278s: 'evidence_rows=6'
+2026-09-27 07:12:45,655 INFO celery.app.trace Task learning.on_attempt_graded[ade15fae-d839-468a-9ac0-97d3df39c11e] succeeded in 0.03375383300044632s: 'paired_tasks=0'
+VERIFICATION_LEAK {'score_visible': False, 'confirmed_score': '2.00', 'report': {'attempts': 1, 'confirmed_score': '2.00', 'max_score': '2.00', 'pending_max_score': '0.00', 'confirmed_fraction': '1.0000'}}
+F2026-09-27 07:12:46,010 INFO celery.app.trace Task projection.refresh_paper_stats[645c017c-b0c3-40be-85d1-54bf23cbdb13] succeeded in 0.0009043749996635597s: 'ok'
+2026-09-27 07:12:46,012 INFO celery.app.trace Task projection.refresh_paper_stats[143ec048-a2e9-4087-bc94-3b294659b0d9] succeeded in 0.0007803329990565544s: 'ok'
+2026-09-27 07:12:46,035 INFO celery.app.trace Task projection.rebuild_attempt_evidence[bdbf167c-8e1b-458e-80cb-5290a0bb6c0e] succeeded in 0.011451708998720278s: 'evidence_rows=6'
+2026-09-27 07:12:46,054 INFO celery.app.trace Task learning.on_attempt_graded[b1e43977-42c5-4dfa-85fd-92c430f6959c] succeeded in 0.01885020900044765s: 'paired_tasks=0'
+2026-09-27 07:12:46,080 INFO celery.app.trace Task projection.rebuild_attempt_evidence[1879d00e-70c4-416c-a361-7b260cefbb51] succeeded in 0.009663333999924362s: 'evidence_rows=6'
+2026-09-27 07:12:46,095 INFO celery.app.trace Task learning.on_attempt_graded[51894dfc-e2e3-469c-97c9-5c55600b25fb] succeeded in 0.015073417000166955s: 'paired_tasks=0'
+MANUAL_PARTIAL {'status': 'pending_review', 'confirmed_score': '8.00', 'max_score': '10.00', 'pending_max_score': '2.00', 'is_fully_confirmed': False} [{'part_id': 'c1', 'score': '0', 'max_score': '2.00', 'status': 'confirmed', 'method': 'self_confirmed', 'detail': {'text': '正确列出已知条件', 'comment': ''}}, {'part_id': 'c2', 'score': '3.00', 'max_score': '3.00', 'status': 'confirmed', 'method': 'self_confirmed', 'detail': {'text': '推导过程正确', 'comment': ''}}, {'part_id': 'c3', 'score': '5.00', 'max_score': '5.00', 'status': 'confirmed', 'method': 'self_confirmed', 'detail': {'text': '结论正确且单位完整', 'comment': ''}}]
+F2026-09-27 07:12:46,346 INFO celery.app.trace Task projection.refresh_paper_stats[dbb086e8-97e5-49aa-b3df-f31a46bcd089] succeeded in 0.0009267910008929903s: 'ok'
+2026-09-27 07:12:46,347 INFO celery.app.trace Task projection.refresh_paper_stats[784e5245-f3af-4b8e-b53d-0680083d4842] succeeded in 0.0007136660005926387s: 'ok'
+2026-09-27 07:12:46,362 INFO celery.app.trace Task projection.rebuild_after_answer_change[641f594a-d3bc-4fa6-ad76-81d1c982f304] succeeded in 0.0009425000007468043s: 'invalidated=0'
+2026-09-27 07:12:46,373 INFO celery.app.trace Task projection.rebuild_attempt_evidence[b9d573d6-bab4-468a-81e9-c00aef72fd77] succeeded in 0.010669042001609341s: 'evidence_rows=6'
+2026-09-27 07:12:46,389 INFO celery.app.trace Task learning.on_attempt_graded[6502069b-ad80-4db5-9536-e7aac5e5f31c] succeeded in 0.01623562499844411s: 'paired_tasks=0'
+DISPUTED_SUBMISSION {'grade_event_id': '42709326-63e3-456d-babb-4b80c02f3b89', 'status': 'confirmed', 'method': 'deterministic', 'grading_revision': 1, 'confirmed_score': '2.00', 'max_score': '2.00', 'pending_max_score': '0', 'estimated_score': None, 'is_fully_confirmed': True, 'parts': [{'part_id': 'choice', 'score': '2.00', 'max_score': '2.00', 'status': 'confirmed', 'method': 'deterministic', 'detail': {'outcome': 'correct'}}], 'rule_version': 'p0-1', 'rule_snapshot': {'spec_version_id': 'e3ca7588-fa6d-4fbd-b2d4-7c10a1454f72', 'question_type': 'single_choice', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'max_score': '2.00'}, 'grader_is_self': False, 'comment': '', 'superseded': False}
+F2026-09-27 07:12:46,624 INFO celery.app.trace Task projection.refresh_paper_stats[1282e9bc-4a69-4563-bc2e-ff4077fa6366] succeeded in 0.0008690840004419442s: 'ok'
+2026-09-27 07:12:46,625 INFO celery.app.trace Task projection.refresh_paper_stats[bb43e97e-8a9d-41c8-9ab0-477482732aeb] succeeded in 0.0007379170001513558s: 'ok'
+2026-09-27 07:12:46,651 INFO celery.app.trace Task projection.rebuild_attempt_evidence[7d18610f-8335-43bd-9dfd-9485aa0bb3fb] succeeded in 0.015581040999677498s: 'evidence_rows=6'
+2026-09-27 07:12:46,678 INFO celery.app.trace Task learning.on_attempt_graded[93a7baca-7497-44d0-bfb9-df5ebe366827] succeeded in 0.026519082999584498s: 'paired_tasks=0'
+LATE_OLD_REGRADE {'effective_key_version': 2, 'score': '0.00', 'revision': 3}
+FPAIR_DELAY {'hours_after_b': -1.0, 'anchor': '2026-09-26T06:12:46.966673+00:00'}
+F2026-09-27 07:12:47,214 INFO celery.app.trace Task projection.refresh_paper_stats[4ea60e58-96e8-4df0-a0a9-946be081d641] succeeded in 0.0010704169999371516s: 'ok'
+2026-09-27 07:12:47,215 INFO celery.app.trace Task projection.refresh_paper_stats[c590182d-ad7a-4e1a-ac65-c7545dcc85e4] succeeded in 0.0007061670003167819s: 'ok'
+PARALLEL_REVEAL {'http_status': 200, 'answer_payload': {'kind': 'true_false', 'value': True}}
+F2026-09-27 07:12:47,457 INFO celery.app.trace Task projection.refresh_paper_stats[b35c4bcd-da39-4863-9a5f-fb399ce8bb61] succeeded in 0.0007882909994805232s: 'ok'
+2026-09-27 07:12:47,458 INFO celery.app.trace Task projection.refresh_paper_stats[87b973ac-e55e-40e0-9f02-cda5cb0cedeb] succeeded in 0.0007132079990697093s: 'ok'
+2026-09-27 07:12:47,480 INFO celery.app.trace Task projection.rebuild_attempt_evidence[9183df2a-b587-4b18-99f7-8b4adcf841de] succeeded in 0.010790332999022212s: 'evidence_rows=6'
+2026-09-27 07:12:47,496 INFO celery.app.trace Task learning.on_attempt_graded[25763c9b-e47c-4fde-a221-76bc97ab1a02] succeeded in 0.01636375000089174s: 'paired_tasks=0'
+ZERO_SCORE_CHECK {'score': '0', 'status': 'confirmed', 'fully': False, 'independent_qualifies': False, 'independent_correct': False}
+.2026-09-27 07:12:47,755 INFO celery.app.trace Task projection.refresh_paper_stats[40be3d5e-d085-4986-807c-773fdefe6cbe] succeeded in 0.001036084000588744s: 'ok'
+2026-09-27 07:12:47,757 INFO celery.app.trace Task projection.refresh_paper_stats[53bcf55d-ae2f-429e-8ad7-1e06bb8998d8] succeeded in 0.0009247910002159188s: 'ok'
+2026-09-27 07:12:47,787 INFO celery.app.trace Task projection.rebuild_attempt_evidence[eaa4d4a5-c086-484c-81c3-a0b763b5ef9a] succeeded in 0.017203208000864834s: 'evidence_rows=6'
+2026-09-27 07:12:47,821 INFO celery.app.trace Task learning.on_attempt_graded[56e08282-fdc4-4328-b546-7bb4e73af113] succeeded in 0.03410670800076332s: 'paired_tasks=1'
+DIRECT_TASK_DELAY_BYPASS {'status': 201, 'task_status': 'in_progress', 'due_future': '2026-09-28T07:12:47.766128+00:00'}
+F2026-09-27 07:12:48,112 WARNING django.request Bad Request: /api/v1/projects/494f5937-0ca7-4371-88ea-5a4643c42480/imports/images
+F2026-09-27 07:12:48,397 INFO celery.app.trace Task projection.refresh_paper_stats[7b0d0849-dcad-4e22-9f86-b9b0ff37a250] succeeded in 0.0015137499995034887s: 'ok'
+2026-09-27 07:12:48,398 INFO celery.app.trace Task projection.refresh_paper_stats[1b208624-df6d-4e03-8a9e-6f187e619864] succeeded in 0.000985791999482899s: 'ok'
+2026-09-27 07:12:48,433 INFO celery.app.trace Task projection.rebuild_attempt_evidence[81e74bad-167f-44c9-9ec8-c9830a7d41ad] succeeded in 0.0181486670007871s: 'evidence_rows=6'
+2026-09-27 07:12:48,460 INFO celery.app.trace Task learning.on_attempt_graded[de0c675d-409e-4d57-9931-ef3f7746d96d] succeeded in 0.026466249999430147s: 'paired_tasks=0'
+TUTOR_CONTEXT {'raw_answer_in_prompt': False, 'steps_in_prompt': False}
+F2026-09-27 07:12:48,738 WARNING django.request Not Found: /api/v1/projects/0b3ca133-ff75-4571-9797-c29697f545dc/learning-states
+LEARNING_ROUTE learning-states 404
+F2026-09-27 07:12:48,966 WARNING django.request Not Found: /api/v1/projects/6fb9cc49-462e-4c11-8f1b-2108ba095532/evidence
+LEARNING_ROUTE evidence 404
+F2026-09-27 07:12:49,187 WARNING django.request Not Found: /api/v1/projects/4fa7c0d1-39dc-40b5-9dc2-0b5db3b7b422/review-tasks
+LEARNING_ROUTE review-tasks 404
+FVISION_SERVICE_NOT_WIRED {'supports': True, 'calls': [], 'input_kind': 'image_manual', 'extract_runs': 0}
+F
+=================================== FAILURES ===================================
+_______________ test_active_verification_never_serializes_score ________________
+
+caller = <tests.conftest.ApiCaller object at 0x109677350>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_active_verification_never_serializes_score(caller, project_a, subject_a1):
+        version, sess, item, res = make_attempt(caller, project_a, subject_a1, 'true_false', 'verification')
+        assert res['receipt_only'] is True and res['grade'] is None
+        state = caller.get(f'/api/v1/projects/{project_a.id}/practice-sessions/{sess["session_id"]}').json()
+        report = caller.get(f'/api/v1/projects/{project_a.id}/reports/practice').json()
+        print('VERIFICATION_LEAK', {'score_visible':state['score_visible'], 'confirmed_score':state['confirmed_score'], 'report':report['totals']['fully_confirmed']})
+>       assert state.get('confirmed_score') is None and state.get('pending_max_score') is None
+E       AssertionError: assert ('2.00' is None)
+E        +  where '2.00' = <built-in method get of dict object at 0x10e8a8e40>('confirmed_score')
+E        +    where <built-in method get of dict object at 0x10e8a8e40> = {'confirmed_score': '2.00', 'created_at': '2026-09-27T07:12:45.538089+00:00', 'finished_at': None, 'grading_hidden': True, ...}.get
+
+docs/review/2026-09-27/test_p0_regressions.py:33: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[4936c16c-50c8-4643-8a36-4aca73c63906] succeeded in 0.021339082999475067s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[cd125744-f83f-4c8c-a984-5412f41c6d46] succeeded in 0.0014102080003794981s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[6edf45af-afab-4a15-b807-79750a0296ac] succeeded in 0.02631262500108278s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[ade15fae-d839-468a-9ac0-97d3df39c11e] succeeded in 0.03375383300044632s: 'paired_tasks=0'
+____________ test_all_manual_parts_confirmed_partial_score_is_final ____________
+
+caller = <tests.conftest.ApiCaller object at 0x10966a000>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_all_manual_parts_confirmed_partial_score_is_final(caller, project_a, subject_a1):
+        v, sess, item, res = make_attempt(caller, project_a, subject_a1, 'constructed_response')
+        criteria = item.rubric_version.criteria
+        parts = [{'part_id': c['criterion_id'], 'score': str(Decimal(c['max_score']))} for c in criteria]
+        parts[0]['score'] = '0'
+        result = caller.post(f'/api/v1/projects/{project_a.id}/attempts/{res["attempt_id"]}/confirm-grade', {'expected_grading_revision':res['grading_revision'], 'answer_key_version_id':str(item.answer_key_version_id), 'rubric_version_id':str(item.rubric_version_id), 'parts':parts}).json()
+        print('MANUAL_PARTIAL', {k:result[k] for k in ['status','confirmed_score','max_score','pending_max_score','is_fully_confirmed']}, result['parts'])
+>       assert result['status'] == 'confirmed' and Decimal(result['pending_max_score']) == 0
+E       AssertionError: assert ('pending_review' == 'confirmed'
+E         
+E         - confirmed
+E         + pending_review)
+
+docs/review/2026-09-27/test_p0_regressions.py:42: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[645c017c-b0c3-40be-85d1-54bf23cbdb13] succeeded in 0.0009043749996635597s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[143ec048-a2e9-4087-bc94-3b294659b0d9] succeeded in 0.0007803329990565544s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[bdbf167c-8e1b-458e-80cb-5290a0bb6c0e] succeeded in 0.011451708998720278s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[b1e43977-42c5-4dfa-85fd-92c430f6959c] succeeded in 0.01885020900044765s: 'paired_tasks=0'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[1879d00e-70c4-416c-a361-7b260cefbb51] succeeded in 0.009663333999924362s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[51894dfc-e2e3-469c-97c9-5c55600b25fb] succeeded in 0.015073417000166955s: 'paired_tasks=0'
+_____________ test_dispute_before_submit_must_not_use_disputed_key _____________
+
+caller = <tests.conftest.ApiCaller object at 0x10ed544a0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_dispute_before_submit_must_not_use_disputed_key(caller, project_a, subject_a1):
+        v = published(subject_a1, 'single_choice')
+        answer = answer_for(v)
+        sess = start_session(caller, project_a, subject_a1, v.question)
+        item_id = sess['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        key = AnswerKeyVersion.objects.get(question_version=v)
+        content_services.dispute_answer_key_version(key, actor=project_a.owner, reason='review dispute before submit')
+        result = submit(caller, project_a, item_id, answer, key='after-dispute').json()
+        print('DISPUTED_SUBMISSION', result['grade'])
+>       assert result['grade']['status'] == 'pending_review'
+E       AssertionError: assert 'confirmed' == 'pending_review'
+E         
+E         - pending_review
+E         + confirmed
+
+docs/review/2026-09-27/test_p0_regressions.py:54: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[dbb086e8-97e5-49aa-b3df-f31a46bcd089] succeeded in 0.0009267910008929903s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[784e5245-f3af-4b8e-b53d-0680083d4842] succeeded in 0.0007136660005926387s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_after_answer_change[641f594a-d3bc-4fa6-ad76-81d1c982f304] succeeded in 0.0009425000007468043s: 'invalidated=0'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[b9d573d6-bab4-468a-81e9-c00aef72fd77] succeeded in 0.010669042001609341s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[6502069b-ad80-4db5-9536-e7aac5e5f31c] succeeded in 0.01623562499844411s: 'paired_tasks=0'
+___________ test_older_regrade_late_completion_cannot_override_newer ___________
+
+caller = <tests.conftest.ApiCaller object at 0x10ec42ed0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_older_regrade_late_completion_cannot_override_newer(caller, project_a, subject_a1):
+        v, sess, item, res = make_attempt(caller, project_a, subject_a1)
+        original = item.answer_key_version
+        good = original.answer_payload['correct_option_id']
+        bad = next(o['id'] for o in v.content['options'] if o['id'] != good)
+        key2 = AnswerKeyVersion.objects.create(question_version=v, version=2, answer_payload={'correct_option_id':bad}, verification_status='checked', checked_by=project_a.owner)
+        key3 = AnswerKeyVersion.objects.create(question_version=v, version=3, answer_payload={'correct_option_id':good}, verification_status='checked', checked_by=project_a.owner)
+        old = request_regrade(question=v.question, target_answer_key_version=key2, actor=project_a.owner, reason='older requested target')
+        new = request_regrade(question=v.question, target_answer_key_version=key3, actor=project_a.owner, reason='newer requested target')
+        execute_regrade_run(str(new.id))
+        execute_regrade_run(str(old.id))
+        attempt = Attempt.objects.get(id=res['attempt_id'])
+        print('LATE_OLD_REGRADE', {'effective_key_version':attempt.current_grade_event.answer_key_version.version, 'score':str(attempt.current_grade_event.confirmed_score), 'revision':attempt.grading_revision})
+>       assert attempt.current_grade_event.answer_key_version_id == key3.id
+E       AssertionError: assert UUID('8c21da1a-58ba-4f4e-949b-804aac92ee45') == UUID('fe0c0060-38a9-4266-8dff-ffe0a622a491')
+E        +  where UUID('8c21da1a-58ba-4f4e-949b-804aac92ee45') = <GradeEvent: grade r3 confirmed>.answer_key_version_id
+E        +    where <GradeEvent: grade r3 confirmed> = <Attempt: attempt#0478edf5-ffed-4ebe-8cba-8254f1e2e7f8>.current_grade_event
+E        +  and   UUID('fe0c0060-38a9-4266-8dff-ffe0a622a491') = <AnswerKeyVersion: answer v3 (checked)>.id
+
+docs/review/2026-09-27/test_p0_regressions.py:69: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[1282e9bc-4a69-4563-bc2e-ff4077fa6366] succeeded in 0.0008690840004419442s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[bb43e97e-8a9d-41c8-9ab0-477482732aeb] succeeded in 0.0007379170001513558s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[7d18610f-8335-43bd-9dfd-9485aa0bb3fb] succeeded in 0.015581040999677498s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[93a7baca-7497-44d0-bfb9-df5ebe366827] succeeded in 0.026519082999584498s: 'paired_tasks=0'
+__________________ test_pairing_c_waits_24h_from_b_submission __________________
+
+caller = <tests.conftest.ApiCaller object at 0x10e80f200>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_pairing_c_waits_24h_from_b_submission(caller, project_a, subject_a1):
+        pair, a, b, c = make_pairing(subject_a1)
+        t_b = timezone.now()
+        t_a = t_b - timedelta(hours=25)
+        sa = session_services.create_session(user=project_a.owner, project=project_a, subject=subject_a1, question_ids=[str(a.question_id)])
+        ia = sa.items.get()
+        session_services.presentation(item=ia,user=project_a.owner, now=t_a-timedelta(minutes=1))
+        aa, ga = attempt_services.submit_attempt(session_item_id=str(ia.id), user=project_a.owner, raw_answer=answer_for(a), now=t_a)
+        sb = session_services.create_session(user=project_a.owner, project=project_a, subject=subject_a1, question_ids=[str(b.question_id)])
+        ib = sb.items.get()
+        session_services.presentation(item=ib,user=project_a.owner, now=t_b-timedelta(minutes=1))
+        ab, gb = attempt_services.submit_attempt(session_item_id=str(ib.id), user=project_a.owner, raw_answer=answer_for(b), now=t_b)
+        pairing_services.on_attempt_graded(str(ab.id))
+        task = StudyTask.objects.get(pairing=pair, origin_session_item=ib, task_kind='delayed_verification')
+        print('PAIR_DELAY', {'hours_after_b':(task.not_before-t_b).total_seconds()/3600, 'anchor':task.delay_anchor_at.isoformat()})
+>       assert task.not_before >= t_b+timedelta(hours=24)
+E       assert datetime.datetime(2026, 9, 27, 6, 12, 46, 966673, tzinfo=datetime.timezone.utc) >= (datetime.datetime(2026, 9, 27, 7, 12, 46, 966673, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1))
+E        +  where datetime.datetime(2026, 9, 27, 6, 12, 46, 966673, tzinfo=datetime.timezone.utc) = <StudyTask: delayed_verification:pending>.not_before
+E        +  and   datetime.timedelta(days=1) = timedelta(hours=24)
+
+docs/review/2026-09-27/test_p0_regressions.py:86: AssertionError
+___________ test_parallel_practice_cannot_reveal_active_verification ___________
+
+caller = <tests.conftest.ApiCaller object at 0x10ec5a480>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_parallel_practice_cannot_reveal_active_verification(caller, project_a, subject_a1):
+        v = published(subject_a1, 'true_false')
+        verify = start_session(caller, project_a, subject_a1, v.question, mode='verification', key='active-verify')
+        present(caller, project_a, verify['items'][0]['session_item_id'])
+        practice = start_session(caller, project_a, subject_a1, v.question, mode='practice', key='parallel-practice')
+        item_id = practice['items'][0]['session_item_id']
+        result = caller.post(f'/api/v1/projects/{project_a.id}/session-items/{item_id}/reveal')
+        print('PARALLEL_REVEAL', {'http_status':result.status_code, 'answer_payload':result.json().get('answer_payload')})
+>       assert result.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:96: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[4ea60e58-96e8-4df0-a0a9-946be081d641] succeeded in 0.0010704169999371516s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[c590182d-ad7a-4e1a-ac65-c7545dcc85e4] succeeded in 0.0007061670003167819s: 'ok'
+________________ test_task_session_creation_cannot_bypass_delay ________________
+
+caller = <tests.conftest.ApiCaller object at 0x10effec90>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_task_session_creation_cannot_bypass_delay(caller, project_a, subject_a1):
+        pair, a, b, c = make_pairing(subject_a1)
+        sess = start_session(caller, project_a, subject_a1, b.question)
+        item_id = sess['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        submitted = submit(caller, project_a, item_id, answer_for(b), key='b-now')
+        assert submitted.status_code == 200
+        task = StudyTask.objects.get(pairing=pair, origin_session_item_id=item_id, task_kind='delayed_verification')
+        assert task.not_before > timezone.now()+timedelta(hours=23)
+        response = caller.post(f'/api/v1/projects/{project_a.id}/practice-sessions', {'mode':'verification', 'subject_id':str(subject_a1.id), 'task_id':str(task.id)}, key='bypass-delay')
+        task.refresh_from_db()
+        print('DIRECT_TASK_DELAY_BYPASS', {'status':response.status_code,'task_status':task.status,'due_future':task.not_before.isoformat()})
+>       assert response.status_code in (400, 403, 409)
+E       assert 201 in (400, 403, 409)
+E        +  where 201 = <HttpResponse status_code=201, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:124: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[40be3d5e-d085-4986-807c-773fdefe6cbe] succeeded in 0.001036084000588744s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[53bcf55d-ae2f-429e-8ad7-1e06bb8998d8] succeeded in 0.0009247910002159188s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[eaa4d4a5-c086-484c-81c3-a0b763b5ef9a] succeeded in 0.017203208000864834s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[56e08282-fdc4-4328-b546-7bb4e73af113] succeeded in 0.03410670800076332s: 'paired_tasks=1'
+_________________ test_image_import_accepts_browser_multipart __________________
+
+caller = <tests.conftest.ApiCaller object at 0x10ed55760>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10e80f7a0>
+
+    def test_image_import_accepts_browser_multipart(caller, project_a, subject_a1, monkeypatch):
+        from io import BytesIO
+        from PIL import Image
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from ai.providers import base as providers
+        from apps.audit.models import LLMRun
+        seen = []
+        provider = providers.StubProvider()
+        original_call = provider.call
+        def record(request):
+            seen.append(request.capability)
+            return original_call(request)
+        monkeypatch.setattr(provider, 'call', record)
+        providers.set_provider_override(provider)
+        image = BytesIO()
+        Image.new('RGB', (16, 16), 'white').save(image, format='PNG')
+        response = caller.client.post(
+            f'/api/v1/projects/{project_a.id}/imports/images',
+            data={'subject_id':str(subject_a1.id), 'files':[SimpleUploadedFile('review.png', image.getvalue(), content_type='image/png')]},
+            HTTP_X_CSRFTOKEN=caller.client.cookies['csrftoken'].value,
+            HTTP_IDEMPOTENCY_KEY='review-vision-import',
+        )
+>       assert response.status_code == 201, response.content
+E       AssertionError: b'{"error": {"code": "invalid_input", "message": "\\u8bf7\\u6c42\\u53c2\\u6570\\u6821\\u9a8c\\u5931\\u8d25", "details": {"errors": [{"type": "missing", "loc": ["body", "files"], "msg": "Field required"}]}}}'
+E       assert 400 == 201
+E        +  where 400 = <HttpResponse status_code=400, "application/json; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:148: AssertionError
+__________ test_personalized_prompt_contains_actual_answer_and_steps ___________
+
+caller = <tests.conftest.ApiCaller object at 0x1094e28a0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_personalized_prompt_contains_actual_answer_and_steps(caller, project_a, subject_a1):
+        from apps.tutoring.services.core import build_prompt
+        version = published(subject_a1, 'constructed_response')
+        session = start_session(caller, project_a, subject_a1, version.question)
+        item_id = session['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        raw_marker = 'REVIEW_ORIGINAL_ANSWER_5_times_4_equals_20'
+        step_marker = 'REVIEW_STUDENT_STEP_counted_order_twice'
+        response = caller.post(
+            f'/api/v1/projects/{project_a.id}/session-items/{item_id}/submit',
+            {'answer':{'type':'constructed_response','text':raw_marker}, 'steps':[{'text':step_marker}], 'confidence':'unsure'},
+            key='review-real-answer-context',
+        )
+        assert response.status_code == 200, response.content
+        prompt = build_prompt(item=SessionItem.objects.get(id=item_id))
+        print('TUTOR_CONTEXT', {'raw_answer_in_prompt':raw_marker in prompt, 'steps_in_prompt':step_marker in prompt})
+>       assert raw_marker in prompt and step_marker in prompt, 'Only grading statuses are passed; actual student work is absent'
+E       AssertionError: Only grading statuses are passed; actual student work is absent
+E       assert ('REVIEW_ORIGINAL_ANSWER_5_times_4_equals_20' in '你是考试学习辅导助手。你面对的是固定版本的题目与已核对答案。\n严格规则：\n1. 只输出 JSON，不要输出解释文字或 Markdown 代码块。\n2. 不得修改、重新判定或猜测正式分数；不得声称学生“已掌握”。\n3. 不得引用...exam_spec_version:64ffa807-557b-4159-bd99-f0a3bb0c00f9, knowledge_node:789118dd-f20e-4bb2-8fec-ce002ffc91d5\n请输出 JSON。')
+
+docs/review/2026-09-27/test_p0_regressions.py:168: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[7b0d0849-dcad-4e22-9f86-b9b0ff37a250] succeeded in 0.0015137499995034887s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[1b208624-df6d-4e03-8a9e-6f187e619864] succeeded in 0.000985791999482899s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[81e74bad-167f-44c9-9ec8-c9830a7d41ad] succeeded in 0.0181486670007871s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[de0c675d-409e-4d57-9931-ef3f7746d96d] succeeded in 0.026466249999430147s: 'paired_tasks=0'
+_________ test_project_learning_routes_match_frontend[learning-states] _________
+
+caller = <tests.conftest.ApiCaller object at 0x109775520>
+project_a = <ExamProject: 演示项目A·综合能力>, endpoint = 'learning-states'
+
+    @pytest.mark.parametrize('endpoint',['learning-states','evidence','review-tasks'])
+    def test_project_learning_routes_match_frontend(caller, project_a, endpoint):
+        response = caller.get(f'/api/v1/projects/{project_a.id}/{endpoint}')
+        print('LEARNING_ROUTE', endpoint, response.status_code)
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <HttpResponseNotFound status_code=404, "text/html; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:174: AssertionError
+____________ test_project_learning_routes_match_frontend[evidence] _____________
+
+caller = <tests.conftest.ApiCaller object at 0x10966bc20>
+project_a = <ExamProject: 演示项目A·综合能力>, endpoint = 'evidence'
+
+    @pytest.mark.parametrize('endpoint',['learning-states','evidence','review-tasks'])
+    def test_project_learning_routes_match_frontend(caller, project_a, endpoint):
+        response = caller.get(f'/api/v1/projects/{project_a.id}/{endpoint}')
+        print('LEARNING_ROUTE', endpoint, response.status_code)
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <HttpResponseNotFound status_code=404, "text/html; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:174: AssertionError
+__________ test_project_learning_routes_match_frontend[review-tasks] ___________
+
+caller = <tests.conftest.ApiCaller object at 0x1096aabd0>
+project_a = <ExamProject: 演示项目A·综合能力>, endpoint = 'review-tasks'
+
+    @pytest.mark.parametrize('endpoint',['learning-states','evidence','review-tasks'])
+    def test_project_learning_routes_match_frontend(caller, project_a, endpoint):
+        response = caller.get(f'/api/v1/projects/{project_a.id}/{endpoint}')
+        print('LEARNING_ROUTE', endpoint, response.status_code)
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <HttpResponseNotFound status_code=404, "text/html; charset=utf-8">.status_code
+
+docs/review/2026-09-27/test_p0_regressions.py:174: AssertionError
+____________ test_image_service_invokes_configured_vision_provider _____________
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eb231d0>
+
+    def test_image_service_invokes_configured_vision_provider(project_a, subject_a1, monkeypatch):
+        from io import BytesIO
+        from PIL import Image
+        from ai.providers import base as providers
+        from apps.ingestion.services.core import create_image_document
+        from apps.ingestion.services.imports import start_image_import
+        from apps.audit.models import LLMRun
+        seen=[]
+        provider=providers.StubProvider()
+        original=provider.call
+        def record(request):
+            seen.append(request.capability)
+            return original(request)
+        monkeypatch.setattr(provider,'call',record)
+        providers.set_provider_override(provider)
+        picture=BytesIO()
+        Image.new('RGB',(16,16),'white').save(picture,format='PNG')
+        document=create_image_document(owner=project_a.owner, project=project_a, content=picture.getvalue(), content_type='image/png', subject=subject_a1)
+        job=start_image_import(owner=project_a.owner, project=project_a, documents=[document], subject=subject_a1)
+        print('VISION_SERVICE_NOT_WIRED', {'supports':provider.supports('extract_question'), 'calls':seen, 'input_kind':job.input_kind, 'extract_runs':LLMRun.objects.filter(capability='extract_question').count()})
+>       assert 'extract_question' in seen
+E       AssertionError: assert 'extract_question' in []
+
+docs/review/2026-09-27/test_p0_regressions.py:197: AssertionError
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_active_verification_never_serializes_score - AssertionEr...
+FAILED backend::test_all_manual_parts_confirmed_partial_score_is_final - Asse...
+FAILED backend::test_dispute_before_submit_must_not_use_disputed_key - Assert...
+FAILED backend::test_older_regrade_late_completion_cannot_override_newer - As...
+FAILED backend::test_pairing_c_waits_24h_from_b_submission - assert datetime....
+FAILED backend::test_parallel_practice_cannot_reveal_active_verification - as...
+FAILED backend::test_task_session_creation_cannot_bypass_delay - assert 201 i...
+FAILED backend::test_image_import_accepts_browser_multipart - AssertionError:...
+FAILED backend::test_personalized_prompt_contains_actual_answer_and_steps - A...
+FAILED backend::test_project_learning_routes_match_frontend[learning-states]
+FAILED backend::test_project_learning_routes_match_frontend[evidence] - asser...
+FAILED backend::test_project_learning_routes_match_frontend[review-tasks] - a...
+FAILED backend::test_image_service_invokes_configured_vision_provider - Asser...
+13 failed, 1 passed, 3 warnings in 6.36s

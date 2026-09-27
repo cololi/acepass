@@ -1,5 +1,14 @@
 # AcePass P0 验收结果
 
+> **独立验收（2026-09-27）：P0 暂不通过。** 下文为原交付验收记录；当时复跑原套件通过，
+> 新增后端回归 13 failed / 1 passed、新增浏览器回归 3 failed。见 [独立验收报告](06-independent-p0-review.md)。
+>
+> **P0.1 修复后重新验收：以下 A01—A42 结论全部重新成立，且原先不成立的项已补齐。**
+> 逐条修复证据、新的运行命令与仍属未验证的范围见
+> [P0.1 修复与重新验收报告](08-p0-1-repair-verification.md)。本轮新增：
+> 后端 164 passed（含 35 条 P0 回归 + 10 条 outbox 契约）、原浏览器套件 16 passed
+> （弱断言已加固）、新增浏览器验收 30 passed 0 skipped、真实 Worker 端到端 ok。
+
 本文件记录**实际执行过的验收**。四类证据分开标识：
 
 | 标识 | 含义 |
@@ -11,11 +20,13 @@
 
 运行环境与命令见 `README.md`；实现范围见 `docs/implementation-status.md`。
 
-- 代码版本：`5428018`（`git rev-parse --short HEAD`）
+- 代码版本：`4eb1de0`（P0.1；问题基线 `5428018`，审查 HEAD `7db03c5`）
 - 夹具：`load_demo_fixture`，两个项目、三个科目、33 个可计分叶子题（单选 9、多选 6、判断 6、填空 6、大题 6）+ 3 个共享材料父题
-- 实测命令：
-  - `cd backend && .venv/bin/python -m pytest tests -q` → **119 passed in 61.01s**
-  - `cd frontend && npx playwright test` → **desktop 8 passed / mobile 8 passed**
+- 实测命令（P0.1 重新验收）：
+  - `cd backend && .venv/bin/python -m pytest -q` → **164 passed**
+  - 原浏览器套件（强制隔离配置）→ **16 passed**
+  - 新增浏览器验收 `playwright.acceptance.config.ts` → **30 passed, 0 skipped**
+  - `scripts/verify_worker_e2e.py` → **ok: true**，outbox 全量 processed
   - `./scripts/backup.sh` + `./scripts/restore.sh var/backups/<ts> acepass_restore_check` → 计数与校验和一致
 
 ## 1. P0 用例逐条结果

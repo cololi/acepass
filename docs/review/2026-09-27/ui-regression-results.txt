@@ -1,0 +1,215 @@
+npm notice run acepass-frontend@0.1.0 npx
+npm notice run 'playwright' test -c /tmp/acepass-review.mZKwic/playwright.regressions.cjs
+[WebServer] [27/Sep/2026 07:11:59] "GET /health/live HTTP/1.1" 200 42
+[WebServer] (node:45785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:45794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 07:12:00,565 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 07:12:00,573 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 07:12:00] "POST /api/v1/auth/login HTTP/1.1" 200 302
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/me/study-settings HTTP/1.1" 200 255
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/syllabus-versions?subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 365
+[WebServer] [27/Sep/2026 07:12:00] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100&subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 4556
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100 HTTP/1.1" 200 9088
+[WebServer] [27/Sep/2026 07:12:01] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions HTTP/1.1" 201 795
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/3f5c975d-06e1-482f-9932-337d86370b92 HTTP/1.1" 200 795
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/ea3ee857-e4f8-48e9-b3ef-84c9c83d494b/presentation HTTP/1.1" 200 1271
+[WebServer] [27/Sep/2026 07:12:01] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/ea3ee857-e4f8-48e9-b3ef-84c9c83d494b/submit HTTP/1.1" 200 963
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/3f5c975d-06e1-482f-9932-337d86370b92 HTTP/1.1" 200 1753
+[WebServer] [27/Sep/2026 07:12:01] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/ea3ee857-e4f8-48e9-b3ef-84c9c83d494b/presentation HTTP/1.1" 200 1272
+  ✘  1 [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:12:5 › submitted practice still exposes tutoring entry (4.2s)
+(node:45834) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 07:12:04] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 07:12:04,947 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:04] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 07:12:04,955 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:04] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 07:12:05] "POST /api/v1/auth/login HTTP/1.1" 200 302
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/me/study-settings HTTP/1.1" 200 255
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/syllabus-versions?subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 365
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100&subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 4556
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100 HTTP/1.1" 200 9088
+[WebServer] [27/Sep/2026 07:12:05] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions HTTP/1.1" 201 795
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/fffe0f7f-3b5d-4651-ae85-6ddaafe9603d HTTP/1.1" 200 795
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/fc0bfaaf-eac9-4e2e-b719-0491c9e02bad/presentation HTTP/1.1" 200 1271
+[WebServer] [27/Sep/2026 07:12:05] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/fc0bfaaf-eac9-4e2e-b719-0491c9e02bad/submit HTTP/1.1" 200 963
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/fffe0f7f-3b5d-4651-ae85-6ddaafe9603d HTTP/1.1" 200 1753
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/fc0bfaaf-eac9-4e2e-b719-0491c9e02bad/presentation HTTP/1.1" 200 1272
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/fffe0f7f-3b5d-4651-ae85-6ddaafe9603d HTTP/1.1" 200 1753
+[WebServer] [27/Sep/2026 07:12:05] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] 2026-09-27 07:12:05,964 WARNING django.request Unprocessable Entity: /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/undefined/reveal
+[WebServer] [27/Sep/2026 07:12:05] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/undefined/reveal HTTP/1.1" 422 187
+REVEAL_AFTER_RELOAD http://127.0.0.1:5174/api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/undefined/reveal 422
+  ✘  2 [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:20:5 › answer reveal survives reloading a submitted item (1.3s)
+(node:45875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 07:12:06,509 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 07:12:06,517 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 07:12:06] "POST /api/v1/auth/login HTTP/1.1" 200 302
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/me/study-settings HTTP/1.1" 200 255
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/auth/me HTTP/1.1" 200 292
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/subjects HTTP/1.1" 200 500
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects HTTP/1.1" 200 949
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/syllabus-versions?subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 365
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100&subject_id=650dda8d-8a54-48a1-b162-859e96157c84 HTTP/1.1" 200 4556
+[WebServer] [27/Sep/2026 07:12:06] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/questions?limit=100 HTTP/1.1" 200 9088
+[WebServer] [27/Sep/2026 07:12:07] "POST /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions HTTP/1.1" 201 802
+[WebServer] [27/Sep/2026 07:12:07] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/practice-sessions/3d15f8da-cc0b-4e14-8116-1c0c16cd87e4 HTTP/1.1" 200 802
+[WebServer] [27/Sep/2026 07:12:07] "GET /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/0066241b-ca49-41a8-8273-125537d92a3b/presentation HTTP/1.1" 200 1110
+[WebServer] [27/Sep/2026 07:12:07] "PUT /api/v1/projects/bf53bb04-671e-407a-92f3-439e7220d823/session-items/0066241b-ca49-41a8-8273-125537d92a3b/draft HTTP/1.1" 200 151
+  ✘  3 [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:34:5 › constructed response provides photo attachment input (3.8s)
+
+
+  1) [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:12:5 › submitted practice still exposes tutoring entry 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '完整讲解', exact: true })
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '完整讲解', exact: true }) with timeout 3000ms
+      - waiting for getByRole('button', { name: '完整讲解', exact: true })
+
+
+      15 |   await page.getByRole('button',{name:'提交作答'}).click()
+      16 |   await expect(page.getByText('提交时间',{exact:false}).first()).toBeVisible()
+    > 17 |   await expect(page.getByRole('button',{name:'完整讲解',exact:true})).toBeVisible()
+         |                                                                   ^
+      18 | })
+      19 |
+      20 | test('answer reveal survives reloading a submitted item', async ({page}) => {
+        at /Users/cololi/Documents/AcePass/docs/review/2026-09-27/ui-regressions.spec.ts:17:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-submitted-p-e51fe-till-exposes-tutoring-entry-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-submitted-p-e51fe-till-exposes-tutoring-entry-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-submitted-p-e51fe-till-exposes-tutoring-entry-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-submitted-p-e51fe-till-exposes-tutoring-entry-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:20:5 › answer reveal survives reloading a submitted item 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 422
+
+      29 |   const response=await responsePromise
+      30 |   console.log('REVEAL_AFTER_RELOAD',response.url(),response.status())
+    > 31 |   expect(response.status()).toBe(200)
+         |                             ^
+      32 | })
+      33 |
+      34 | test('constructed response provides photo attachment input', async ({page}) => {
+        at /Users/cololi/Documents/AcePass/docs/review/2026-09-27/ui-regressions.spec.ts:31:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-answer-reve-014b7--reloading-a-submitted-item-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-answer-reve-014b7--reloading-a-submitted-item-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-answer-reve-014b7--reloading-a-submitted-item-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-answer-reve-014b7--reloading-a-submitted-item-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:34:5 › constructed response provides photo attachment input 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.workbench input[type="file"]')
+    Expected: 1
+    Received: 0
+    Timeout:  3000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('.workbench input[type="file"]') with timeout 3000ms
+      - waiting for locator('.workbench input[type="file"]')
+        10 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      34 | test('constructed response provides photo attachment input', async ({page}) => {
+      35 |   await start(page,'大题')
+    > 36 |   await expect(page.locator('.workbench input[type="file"]')).toHaveCount(1)
+         |                                                               ^
+      37 | })
+      38 |
+        at /Users/cololi/Documents/AcePass/docs/review/2026-09-27/ui-regressions.spec.ts:36:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-constructed-adcb6-ides-photo-attachment-input-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-constructed-adcb6-ides-photo-attachment-input-desktop/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-constructed-adcb6-ides-photo-attachment-input-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace ../../../../tmp/acepass-review.mZKwic/browser-regressions/ui-regressions-constructed-adcb6-ides-photo-attachment-input-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:12:5 › submitted practice still exposes tutoring entry 
+    [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:20:5 › answer reveal survives reloading a submitted item 
+    [desktop] › docs/review/2026-09-27/ui-regressions.spec.ts:34:5 › constructed response provides photo attachment input 

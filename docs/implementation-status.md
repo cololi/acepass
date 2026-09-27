@@ -1,11 +1,26 @@
 # AcePass 实施状态
 
+> **独立验收（2026-09-27）：P0 暂不通过。** 已复现的缺口见
+> [独立验收报告](06-independent-p0-review.md)，修复顺序见 [P0 修复计划](07-p0-repair-plan.md)。
+> 原套件通过不能视为全部业务闭环通过。
+>
+> **P0.1 修复完成（同一日）：业务阻断已修复并重新验收通过。**
+> 逐条修复证据见 [P0.1 修复与重新验收报告](08-p0-1-repair-verification.md)。
+> 真实 provider 与真实隔天体验仍为未验证。
+
 按里程碑记录**实际实现范围、验证方式与未完成项**。未运行的测试不写“通过”，
 未经过真实时间的不写“已验证”。逐条验收结果见 [`acceptance-results.md`](acceptance-results.md)。
 
-- 代码版本：`5428018`
-- 最近一次全量校验：`cd backend && .venv/bin/python -m pytest tests -q` → **119 passed in 61.01s**；
-  `cd frontend && npx playwright test` → **desktop 8 passed / mobile 8 passed**
+- 代码版本：`4eb1de0`（P0.1 前端/浏览器验收/运维）、`a794b1a`（P0.1 后端）；
+  问题基线为 `5428018`
+- 最近一次全量校验：
+  - 后端 `cd backend && .venv/bin/python -m pytest -q` → **164 passed**
+    （原 119 + P0 回归 35 + outbox 契约 10）
+  - 原浏览器套件（已加固且强制隔离）→ **16 passed**（desktop 8 + mobile 8）
+  - 新增浏览器验收（独立库/Redis/端口/媒体 + 真实 Worker）→ **30 passed, 0 skipped**
+    （desktop 15 + mobile 15）
+  - 真实 Worker 端到端 `scripts/verify_worker_e2e.py` → **ok: true**，
+    outbox 全量 processed、`unresolved={}`
 
 ## 0. 环境（实测）
 
@@ -18,8 +33,8 @@
 | Node / npm / Vite / React | v24.18.0 / 12.1.0 / 6.4.3 / 19 |
 | PostgreSQL | 16.15（Homebrew）。架构文档写「17 系列」，本机为 16.15：**这是实现与文档的差异，已按实际记录**；P0 未使用 17 专属特性，迁移与约束在 16 上全部通过 |
 | Redis | 8.10.2（Homebrew） |
-| Docker | 客户端 29.8.1 已装，**守护进程（OrbStack）未运行** → Compose 只做 `config` 语法校验 |
-| AI provider | `none`（无凭据）→ 真实模型验证未做 |
+| Docker | 客户端 29.8.1 + OrbStack。P0.1 已实际 `build` + `up -d`，8 服务 healthy，`curl -k https://127.0.0.1:8443/health/ready` → 200；验证后已 `down -v` 并停止 OrbStack |
+| AI provider | `none`（无凭据）→ **真实视觉/文本模型仍未验证**；业务链已用可注入 provider 验证接通 |
 
 ## 1. M0 工程、环境与真实状态
 
@@ -43,7 +58,8 @@
 
 **未完成**
 
-- Compose 未实际启动（守护进程未运行）；未做 TLS/生产反向代理实机验证。
+- 已在本机实机启动 Compose 全栈并验证 TLS/健康检查/依赖顺序；**未向任何远程环境部署**。
+- 真实 provider 凭据未配置；真实隔天体验未经过。
 
 ## 2. M1 多项目与领域数据
 

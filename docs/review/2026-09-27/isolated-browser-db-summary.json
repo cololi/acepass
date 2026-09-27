@@ -1,0 +1,14 @@
+{
+  "database": "acepass_browser_audit_20260927",
+  "attempts": 14,
+  "evidence_rows": 96,
+  "knowledge_states": 3,
+  "review_tasks": 0,
+  "outbox_status": {
+    "processed": 34,
+    "dispatched": 1
+  },
+  "unprocessed_topics": {
+    "learning.reconcile_plan": 1
+  }
+}
