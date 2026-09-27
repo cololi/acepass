@@ -210,7 +210,15 @@ def finish_session(request, project_id: str, session_id: str):
     scope = f"sessions.finish:{session_id}"
     replay = idempotency.claim(request.user, scope, key, {})
     if replay is not None:
-        return replay.status_code, replay.body
+        # A replayed finish returns the *current* projection of the same session,
+        # re-serialised under the gate that applies now — the same rule the detail
+        # read and every other replay path already follow (C01). Returning the
+        # stored body would hand back the score of a session whose content an
+        # active verification covers right now, and would never restore it once
+        # that verification closed. Finishing again stays idempotent: a finished
+        # session is returned unchanged, so no second finish event is enqueued.
+        session = session_services.finish_session(session=session, user=request.user)
+        return replay.status_code, session_services.session_state(session, user=request.user)
     session = session_services.finish_session(session=session, user=request.user)
     result = session_services.session_state(session, user=request.user)
     idempotency.record_result(

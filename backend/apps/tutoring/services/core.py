@@ -15,6 +15,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import time
 from typing import Any
 
 from django.conf import settings
@@ -40,6 +41,12 @@ from apps.practice.services import exposure
 from apps.tutoring.models import TutorJob, TutorSession, TutorTurn
 
 logger = logging.getLogger("apps.tutoring")
+
+#: How long the synchronous HTTP caller waits for *another* lease owner to settle
+#: the job before answering with the honest "still running" state. The wait is a
+#: plain sleep between short reads: no transaction and no row lock is held.
+SETTLE_WAIT_SECONDS = 10.0
+SETTLE_POLL_SECONDS = 0.2
 
 
 def _blocks_text(blocks: Any) -> str:
@@ -391,6 +398,12 @@ def _write_job_result(*, job: TutorJob, claim, fields: dict[str, Any]) -> bool:
     this consumer still owns the claim and no newer consumer has already finished
     the job. The model call is deliberately *not* inside this block: the lock is
     held for a few statements, never for a network request.
+
+    A consumer with **no** claim (``claim is None``: a manual invocation with no
+    outbox row to serialise on) has no authority over an outcome another consumer
+    already settled. It may start work on a queued job, but it must not replace a
+    succeeded/failed/unavailable row — that is the C04 "success overwrites a
+    success it does not own" write.
     """
     with transaction.atomic():
         if not _claim_still_owned(claim):
@@ -402,12 +415,41 @@ def _write_job_result(*, job: TutorJob, claim, fields: dict[str, Any]) -> bool:
             # A newer consumer already delivered a validated result; a stale one
             # must not overwrite it with a failure.
             return False
+        if claim is None and locked.status in {
+            TutorRequestStatus.SUCCEEDED,
+            TutorRequestStatus.FAILED,
+            TutorRequestStatus.UNAVAILABLE,
+        }:
+            logger.info("tutor job %s: unleased consumer refused to overwrite a settled job", job.id)
+            return False
         for name, value in fields.items():
             setattr(locked, name, value)
         locked.save(update_fields=[*fields, "updated_at"])
     for name, value in fields.items():
         setattr(job, name, value)
     return True
+
+
+def wait_for_settlement(job: TutorJob, *, timeout_seconds: float | None = None) -> TutorJob:
+    """Wait briefly for the consumer that owns this job's lease to settle it.
+
+    When the inline HTTP caller cannot acquire the lease, a worker already owns the
+    job and will commit both the result and the business facts. The response must
+    describe the *same* committed outcome the poll endpoint will show, so this
+    waits for the job to reach a finalized state and otherwise returns the current
+    one (the client keeps polling). Each iteration is one plain read: no
+    transaction is open and no lock is held between iterations.
+    """
+    deadline = time.monotonic() + (SETTLE_WAIT_SECONDS if timeout_seconds is None else timeout_seconds)
+    while True:
+        job.refresh_from_db()
+        settled = job.status in {
+            TutorRequestStatus.FAILED,
+            TutorRequestStatus.UNAVAILABLE,
+        } or (job.status == TutorRequestStatus.SUCCEEDED and job.finalized_at is not None)
+        if settled or time.monotonic() >= deadline:
+            return job
+        time.sleep(SETTLE_POLL_SECONDS)
 
 
 def _finalize_success(*, job: TutorJob, purpose: str, claim) -> TutorJob:

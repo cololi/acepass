@@ -1,6 +1,12 @@
-# Secrets and local configuration
+# Secrets and local configuration.
+# Real configuration stays untracked; the templates that carry *no* secret are
+# tracked, because CI and the release-gate scripts must work from the commit
+# alone (`infra/docker/.env.example` was previously swallowed by `.env.*`, so a
+# clean checkout could not even validate the compose file — C05).
 .env
 .env.*
+!.env.example
+!**/.env.example
 backend/.env
 *.pem
 *.key

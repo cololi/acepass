@@ -39,7 +39,7 @@ from apps.common.errors import (
     StructureInvalid,
     VersionConflict,
 )
-from apps.practice.models import Attempt, GradeEvent, SessionItem
+from apps.practice.models import Attempt, GradeEvent, LearningEvidence, SessionItem
 from domain.grading import adapters
 
 logger = logging.getLogger("apps.practice.attempts")
@@ -617,6 +617,58 @@ def _confirm_pending_parts(
 # --------------------------------------------------------------------------
 # Regrade and dispute handling
 # --------------------------------------------------------------------------
+def lock_attempt_for_regrade(*, attempt_id, regrade_generation: int | None):
+    """Lock one attempt, refresh it, and decide whether this run may write.
+
+    Returns ``(locked_attempt, stale)``. The lock is a row lock on the attempt
+    only, held for the short write that follows — never across a model call.
+
+    **Every** regrade branch that would modify a grade or invalidate evidence goes
+    through this: a run issued earlier must not touch an attempt that a newer
+    generation has already settled, whichever branch it takes. The high-water mark
+    ``applied_regrade_generation`` is re-read under the lock, so an in-memory list
+    loaded when the run started cannot make a stale run look current (C02).
+    """
+    locked = _locked_attempt(attempt_id)
+    if locked is None:
+        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    if regrade_generation is not None and int(regrade_generation) <= int(locked.applied_regrade_generation):
+        logger.info(
+            "stale regrade skipped attempt=%s generation=%s already_applied=%s",
+            locked.id,
+            regrade_generation,
+            locked.applied_regrade_generation,
+        )
+        return locked, True
+    return locked, False
+
+
+@transaction.atomic
+def invalidate_evidence_for_content_change(*, attempt, regrade_generation: int | None, reason: str) -> tuple[int, bool]:
+    """Content-version branch of a regrade: check the generation *before* writing.
+
+    The target answer key belongs to another content version, so the attempt
+    cannot be mechanically re-graded. The evidence is invalidated — but only if
+    this run is still the newest authority for the attempt. Without the guard this
+    branch erased evidence produced by a *newer* generation while leaving that
+    newer grade and watermark in place, which is a plain ordering bug: the review
+    found 6 active evidence rows destroyed by an old queued run.
+
+    Returns ``(invalidated_evidence, stale_skipped)``. A stale run writes nothing.
+    """
+    locked, stale = lock_attempt_for_regrade(attempt_id=attempt.id, regrade_generation=regrade_generation)
+    if stale:
+        return 0, True
+    return (
+        LearningEvidence.objects.filter(attempt=locked, is_active=True).update(
+            is_active=False,
+            invalidated_at=timezone.now(),
+            invalidated_reason=reason,
+        ),
+        False,
+    )
+
+
 @transaction.atomic
 def regrade_attempt(
     *,
@@ -637,23 +689,18 @@ def regrade_attempt(
 
     Returns ``None`` when the request is stale and nothing was written.
     """
-    locked = _locked_attempt(attempt.id)
-    if locked is None:  # pragma: no cover - the attempt existed a moment ago
-        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    # The generation verdict comes first, on the freshly locked row: a run issued
+    # earlier than the attempt's applied watermark must not write anything at all,
+    # not even after a target validation error (C02).
+    locked, stale = lock_attempt_for_regrade(attempt_id=attempt.id, regrade_generation=regrade_generation)
+    if stale:
+        return None
     item = locked.session_item
     if str(target_answer_key_version.question_version_id) != str(item.question_version_id):
         raise InvalidInput(message="目标答案版本不属于该题项固定的题目版本，不能机械重判")
     target_answer_key_version, target_rubric_version = recheck_regrade_target(
         target_answer_key_version, target_rubric_version
     )
-    if regrade_generation is not None and int(regrade_generation) <= int(locked.applied_regrade_generation):
-        logger.info(
-            "stale regrade skipped attempt=%s generation=%s already_applied=%s",
-            locked.id,
-            regrade_generation,
-            locked.applied_regrade_generation,
-        )
-        return None
     rule: dict[str, Any] = dict(
         item.spec_version.rule_for(item.question_version.question_type) if item.spec_version_id else {}
     )

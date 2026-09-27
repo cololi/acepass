@@ -148,11 +148,19 @@ def post_message(request, project_id: str, tutor_session_id: str, payload: Tutor
         purpose=payload.purpose,
     )
     # P0 runs the call inline and returns the validated result; the job row and
-    # outbox event still exist so a worker retry is idempotent.
+    # outbox event still exist so a worker retry is idempotent. The inline call
+    # takes the *same* outbox lease a worker would, so the request and the worker
+    # are two consumers of one job rather than two writers (C04).
     from apps.tutoring.tasks import run_tutor_job_now
 
-    run_tutor_job_now(job)
-    job.refresh_from_db()
+    verdict = run_tutor_job_now(job)
+    if verdict == "lease_not_acquired":
+        # A worker already owns this job's event. This caller owns nothing, so it
+        # must neither call the model nor write a result: it waits (no lock held)
+        # for the owner to commit, then describes that committed outcome.
+        job = tutor_services.wait_for_settlement(job)
+    else:
+        job.refresh_from_db()
     result = tutor_services.job_payload(job)
     idempotency.record_result(
         request.user, scope, key, status_code=201, response_body=result, resource_type="tutor_job", resource_id=job.id

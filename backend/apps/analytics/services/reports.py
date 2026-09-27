@@ -439,12 +439,19 @@ def execute_regrade_run(regrade_run_id: str) -> str:
                         target_answer_key_version.question_version_id
                     ):
                         # A different content version: the old answer cannot
-                        # mechanically re-grade it, so the evidence is invalidated.
-                        invalidated += LearningEvidence.objects.filter(attempt=attempt, is_active=True).update(
-                            is_active=False,
-                            invalidated_at=timezone.now(),
-                            invalidated_reason="题干版本不同，无法用新答案重判；证据失效",
+                        # mechanically re-grade it, so the evidence is invalidated —
+                        # but only by the run that still owns this attempt. The
+                        # attempt is locked, refreshed and checked against the run's
+                        # generation *inside* the service (C02), so an old queued
+                        # run can no longer delete evidence a newer generation just
+                        # produced. Old runs are reported as skipped, never written.
+                        rows, was_stale = attempt_services.invalidate_evidence_for_content_change(
+                            attempt=attempt,
+                            regrade_generation=run.generation,
+                            reason="题干版本不同，无法用新答案重判；证据失效",
                         )
+                        invalidated += rows
+                        stale += 1 if was_stale else 0
                         continue
                     grade = attempt_services.regrade_attempt(
                         attempt=attempt,

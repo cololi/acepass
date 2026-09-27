@@ -104,12 +104,21 @@ jobs:
         with:
           name: acepass-frontend-dist
           path: frontend/dist
-      - name: Compose config validation
+      - name: The committed tree carries a template, never a real configuration
+        # 干净 checkout 必须自带模板：脚本与 CI 都不再依赖未提交的本地文件（C05）。
         run: |
-          cp infra/docker/.env.example infra/docker/.env
-          docker compose -f infra/docker/docker-compose.yml config --quiet
+          test -f infra/docker/.env.example || { echo "缺少已提交的 infra/docker/.env.example"; exit 1; }
+          if git ls-files --error-unmatch infra/docker/.env >/dev/null 2>&1; then
+            echo "infra/docker/.env 是本地配置，不得进入版本库"; exit 1
+          fi
+          grep -q 'change-me' infra/docker/.env.example || { echo "模板必须是不含真实密钥的示例"; exit 1; }
+      - name: Compose config validation
+        # 直接以模板作为 env file 校验，不写出 infra/docker/.env：验证步骤也不该
+        # 覆盖或创建本地配置。
+        run: docker compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.example config --quiet
       - name: Generate throwaway TLS certs
-        run: bash scripts/gen-dev-certs.sh infra/docker/certs localhost
+        # 证书只生成到 runner 的临时目录；仓库树内不留任何私钥（infra/docker/certs 已忽略）。
+        run: bash scripts/gen-dev-certs.sh "${RUNNER_TEMP}/acepass-ci-certs" localhost
       - name: Render and validate the nginx template
         # 与生产完全相同的路径：nginx 镜像的入口脚本用 envsubst 渲染
         # /etc/nginx/templates/default.conf.template，再执行 nginx -t。
@@ -117,20 +126,25 @@ jobs:
           docker run --rm --add-host api:127.0.0.1 \
             -e ACEPASS_HTTPS_PORT=8443 \
             -v "$PWD/infra/proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
-            -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
+            -v "${RUNNER_TEMP}/acepass-ci-certs:/etc/nginx/certs:ro" \
             -v "$PWD/frontend/dist:/usr/share/nginx/html:ro" \
             nginx:1.27-alpine nginx -t
       - name: Proxy component check (redirect target, TLS, real SPA bundle, upstream)
         # 实际启动容器并发出真实请求：跳转必须落到公开的 HTTPS 端口，`api` 上游必须
         # 真的解析，/login 必须由挂载的 AcePass 产物提供且脚本资源可加载。范围仅限
         # 代理组件，API 与数据库不在本步骤内。
+        # 脚本自带隔离：每次运行生成唯一项目/资源名、端口、临时 env 与证书目录，
+        # 不读写 infra/docker/.env，也不删除不属于本次运行的容器或卷。
         run: bash scripts/verify_proxy.sh component
       - name: Full-stack login check (real compose stack through the proxy)
         # 与上一步分开：这里才是"全栈登录通过"。需要构建应用镜像并跑真实迁移。
         run: bash scripts/verify_proxy.sh full-stack
       - name: Compose logs on failure
+        # 脚本用唯一项目名并在 EXIT 中清理自己的资源，所以这里不会留下可读的失败
+        # 容器；失败诊断由脚本自身的 docker logs 输出负责。这条只列出全局状态，
+        # 不做任何清理。
         if: failure()
-        run: docker compose -f infra/docker/docker-compose.yml logs --tail=100 || true
+        run: docker ps -a --format '{{.Names}}\t{{.Status}}' || true
       - name: Shell script syntax
         run: for f in scripts/*.sh; do echo "bash -n $f"; bash -n "$f"; done
       - name: Restore refuses an unreachable database (dry-run)

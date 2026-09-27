@@ -5,6 +5,10 @@ version executed the provider call first and only then told the outbox, so a rea
 worker ignored an existing live lease and two consumers could run the same job.
 Completion and failure carry the claim token, so a stale consumer cannot confirm
 or reopen a row another consumer owns.
+
+The inline HTTP path (``run_tutor_job_now``) goes through the very same claim, so
+"worker" and "synchronous request" are two consumers of one lease rather than two
+independent writers (C04).
 """
 
 from __future__ import annotations
@@ -50,20 +54,58 @@ def run_tutor_job(
     return job.status
 
 
-def run_tutor_job_now(job) -> None:
-    """P0 executes the call inline; the outbox event remains for retry and audit.
+def run_tutor_job_now(job) -> str:
+    """P0 executes the call inline — under the *same* outbox lease a worker uses.
+
+    The job's outbox row is committed before this runs and is therefore claimable
+    by a real worker. Production HTTP used to call the provider with ``claim=None``
+    anyway: two consumers ran the same job concurrently, the late writer won the
+    job row and the HTTP response, while the assistant message kept the worker's
+    text (C04). Ownership is now a single decision on that one row, so exactly one
+    consumer may call the model and commit the result; a worker that arrives during
+    the inline call sees a live lease and skips.
 
     Rebuilding the prompt from frozen inputs is deterministic, so a worker retry
-    sends exactly the same request instead of a re-invented one. The outbox row is
-    confirmed by whichever consumer claims it, never here: the inline call does
-    not hold the lease.
+    sends exactly the same request instead of a re-invented one. The model call
+    still happens outside every transaction, and the lease is never held across a
+    database lock.
+
+    Returns the stored job status, or ``"lease_not_acquired"`` when another
+    consumer already owns the event: the caller then owns nothing and must deliver
+    whatever that consumer commits rather than run its own call.
     """
+    from apps.audit.models import OutboxEvent
+    from apps.audit.services import outbox
     from apps.tutoring.services import core as tutor_service
 
     if job.status != "queued":
-        return
+        return job.status
     prompt = tutor_service.build_prompt(
         item=job.tutor_session.session_item, user_question=job.request_text
     )
     citations, _context = tutor_service._allowed_citation_ids(job.tutor_session.session_item)
-    tutor_service.run_job(job=job, prompt=prompt, citations=citations, purpose=job.purpose)
+    event = OutboxEvent.objects.filter(dedupe_key=f"tutor-job:{job.id}").first()
+    if event is None:
+        # Defensive: with no row there is nothing to serialise on. ``create_job``
+        # always enqueues one, so this is only reachable for a hand-built fixture.
+        tutor_service.run_job(job=job, prompt=prompt, citations=citations, purpose=job.purpose)
+        return job.status
+    claim = outbox.claim_event(str(event.id))
+    if claim is None:
+        return "lease_not_acquired"
+    try:
+        tutor_service.run_job(
+            job=job,
+            prompt=prompt,
+            citations=citations,
+            purpose=job.purpose,
+            claim=claim,
+        )
+    except Exception as exc:
+        outbox.fail_claim(claim, str(exc))
+        raise
+    # A successful business commit confirms the claim inside ``_finalize_success``.
+    # This token-checked call only covers the terminal paths that produce no
+    # business facts (a model failure) and is a no-op when already confirmed.
+    outbox.confirm_claim(claim)
+    return job.status
