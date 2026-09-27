@@ -9,7 +9,7 @@
   本报告的运行输出见下文各节。
 
 结论：**R01—R11 的 P0 业务阻断已消除并有可重复的运行证据；R12 的部署与恢复路径已实测。**
-真实模型 provider、真实隔天体验仍为**未验证**（见第 4 节），本轮不声称通过。
+真实模型 provider、真实隔天体验仍为**未验证**（见第 5 节），本轮不声称通过。
 
 ---
 
@@ -35,7 +35,23 @@
 
 ---
 
-## 2. R01—R11 逐条修复验证
+## 2. F01—F11 任务对照
+
+| 任务 | 内容 | 对应问题 | 交付位置 | 结果 |
+|---|---|---|---|---|
+| F01 | 修正评分语义、人工部分分和待评分值 | R02 | `domain/grading/adapters.py`、`practice/services/attempts.py`、`learning/services/evidence.py`、`analytics/services/reports.py`、`practice/services/mistakes.py` | 完成，见 §3 R02 |
+| F02 | 争议答案提交保护、重判 generation 与历史不变性 | R04/R05 | `practice/services/attempts.py`（`_content_trust_blocker`、`regrade_attempt`）、`analytics/models.py` | 完成，见 §3 R04/R05 |
+| F03 | 验证模式统一用途隔离 | R03 | `practice/services/verification_gate.py`、`sessions.py`、`practice/api.py`、`analytics/services/reports.py`、`learning/services/evidence.py` | 完成，见 §3 R03 |
+| F04 | 修复 learning 路由及页面错误状态 | R01 | `apps/learning/api.py`、`ReviewPage.tsx`、`KnowledgePage.tsx` | 完成，见 §3 R01 |
+| F05 | 修复延迟锚点、任务用途、跨项目启动 | R06/R10 | `learning/services/pairing.py`、`practice/services/sessions.py`、`TodayPage.tsx`、`ReviewPage.tsx`、`context.tsx` | 完成，见 §3 R06/R10 |
+| F06 | 修复 Worker 注册和 outbox 完整状态机 | R11 | `config/celery.py`、`apps/audit/{models,services/outbox,tasks}.py`、`config/settings/base.py` | 完成，见 §3 R11 与 §3 |
+| F07 | 完成图片上传、人工校对、视觉提取业务接线 | R07 | `ingestion/api.py`、`ingestion/services/{imports,extraction}.py`、`CandidateReviewPage.tsx` | 完成，见 §3 R07 |
+| F08 | 完成提交后辅导、完整上下文和刷新恢复 | R08/R09 | `tutoring/services/core.py`、`ai/prompts/registry.py`、`PracticePage.tsx` | 完成，见 §3 R08/R09 |
+| F09 | 大题照片与可核对的人工评分；多科目体验 | R10 | `PracticePage.tsx`、`GradingPage.tsx`、`ReviewPage.tsx`、`SettingsPage.tsx`、`practice/api.py` | 完成，见 §3 R10 |
+| F10 | Compose、备份恢复和 CI 门槛 | R12 | `infra/docker/**`、`infra/proxy/nginx.conf`、`config/settings/prod.py`、`scripts/{backup,restore,gen-dev-certs}.sh`、`.github/workflows/ci.yml`、`.dockerignore` | 完成，见 §3 R12 |
+| F11 | 补全端到端验收、真实 provider、更新交付记录 | 全部 | `frontend/tests/acceptance/**`、`backend/tests/integration/test_{p0_regressions,outbox_contract}.py`、`scripts/verify_worker_e2e.py`、`bootstrap_acceptance` 命令、本报告 | 工程与人工路径完成；**真实 provider 与真实隔天仍为未验证**（§4） |
+
+## 3. R01—R11 逐条修复验证
 
 ### R01 · 复习和证据接口实际为 404 → 已修复
 
@@ -224,14 +240,14 @@
 - `learning.*` 加入队列路由；`learning.refresh_delayed_tasks` 进入 beat（此前无生产者也无调度）。
 - `docker-compose.yml` 恢复 Redis 持久化。
 
-**验证**：真实 Worker 端到端脚本 `scripts/verify_worker_e2e.py`（输出见第 3 节）与
+**验证**：真实 Worker 端到端脚本 `scripts/verify_worker_e2e.py`（输出见第 4 节）与
 `backend/tests/integration/test_outbox_contract.py` 的 10 条契约测试（生产主题 vs 注册表
 一致性、无重名任务、beat/imports 覆盖、内联确认不被降级、Redis 清空恢复、租约回收、
 尝试上限与退避、未知主题不被静默标成功、重投不重复生效、消费者报告失败不被强制确认）。
 
 ---
 
-## 3. 真实 Worker 端到端证据
+## 4. 真实 Worker 端到端证据
 
 命令（独立库、独立 Redis 6391、真实 Celery worker，`ACEPASS_INLINE_TASKS=false`）：
 
@@ -284,7 +300,7 @@ Task learning.reconcile_plan[777dd0a2-…] succeeded in 0.098s:
 
 ---
 
-## 4. 仍然未验证的部分（不声称通过）
+## 5. 仍然未验证的部分（不声称通过）
 
 | 项目 | 状态 | 原因 |
 |---|---|---|
@@ -299,7 +315,7 @@ Task learning.reconcile_plan[777dd0a2-…] succeeded in 0.098s:
 
 ---
 
-## 5. 对原验收结论的逐条回应
+## 6. 对原验收结论的逐条回应
 
 | 原报告结论 | 本轮结果 |
 |---|---|
@@ -322,7 +338,7 @@ Task learning.reconcile_plan[777dd0a2-…] succeeded in 0.098s:
 
 ---
 
-## 6. 迁移与投影处理
+## 7. 迁移与投影处理
 
 ### 6.1 迁移（全部为追加字段，无破坏性操作）
 
@@ -373,7 +389,7 @@ Task learning.reconcile_plan[777dd0a2-…] succeeded in 0.098s:
 未对真实业务库做任何清空或重建；所有新回归在独立测试库运行。重判与争议只新增
 superseding 事件，不覆盖历史。
 
-## 7. 是否申请进入 P1
+## 8. 是否申请进入 P1
 
 原测试（164 后端 / 16 浏览器）与新回归（35 后端 / 30 浏览器）全部通过；空账户路径
 （`bootstrap_acceptance` 从零建项目/科目/规范/题目，再完成全流程）与真实异步闭环
