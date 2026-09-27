@@ -1,0 +1,669 @@
+"""Attempt submission and grade events.
+
+Submission is idempotent and single-shot per session item:
+
+1. lock the session item
+2. check the session is still submittable and the idempotency key
+3. store the attempt (raw answer only, never overwriting an earlier one)
+4. produce the initial grade event (deterministic, or pending review)
+5. point the attempt at the effective grade event and enqueue evidence rebuild
+
+A retry with the same key and payload returns the same result; a different
+payload on the same key, or a second submission for the same item, is a 409.
+"""
+
+from __future__ import annotations
+
+from decimal import Decimal
+from typing import Any
+
+from django.db import transaction
+from django.utils import timezone
+
+from apps.analytics.models import RegradeRun
+from apps.audit.models import ContentRevision
+from apps.audit.services.outbox import enqueue
+from apps.common.enums import (
+    GradeEventKind,
+    GradeMethod,
+    GradeStatus,
+    QuestionType,
+    SessionStatus,
+)
+from apps.common.errors import (
+    AlreadySubmitted,
+    InvalidInput,
+    ScopeViolation,
+    StructureInvalid,
+    VersionConflict,
+)
+from apps.practice.models import Attempt, GradeEvent, SessionItem
+from domain.grading import adapters
+
+
+def rule_snapshot_for(item: SessionItem) -> dict[str, Any]:
+    """Freeze the awarding rule at submission time."""
+    spec_rule: dict[str, Any] = {}
+    if item.spec_version_id:
+        spec_rule = item.spec_version.rule_for(item.question_version.question_type)
+    answer_payload = item.answer_key_version.answer_payload if item.answer_key_version_id else {}
+    return {
+        "spec_version_id": str(item.spec_version_id) if item.spec_version_id else None,
+        "question_type": item.question_version.question_type,
+        "spec_rule": spec_rule,
+        "answer_rule": {
+            key: answer_payload.get(key)
+            for key in ("policy", "partial_score", "wrong_score", "blank_score", "mismatch_policy")
+            if answer_payload.get(key) is not None
+        },
+        "max_score": str(item.max_score),
+    }
+
+
+def merged_rule(item: SessionItem) -> dict[str, Any]:
+    """Spec defaults, overridden by explicit answer-level rules."""
+    rule: dict[str, Any] = dict(rule_snapshot_for(item).get("spec_rule") or {})
+    answer_payload = item.answer_key_version.answer_payload if item.answer_key_version_id else {}
+    for key in ("policy", "partial_score", "wrong_score", "blank_score", "mismatch_policy"):
+        if answer_payload.get(key) is not None:
+            rule[key] = answer_payload.get(key)
+    return rule
+
+
+def validate_answer_shape(item: SessionItem, raw_answer: dict) -> None:
+    """The submitted answer must match the question actually presented."""
+    if not isinstance(raw_answer, dict):
+        raise StructureInvalid(message="作答必须是对象")
+    declared = raw_answer.get("type")
+    expected = item.question_version.question_type
+    if declared != expected:
+        raise StructureInvalid(
+            message="作答类型与题目类型不一致",
+            details={"expected": expected, "received": declared},
+        )
+    content = item.question_version.content or {}
+    if expected in {QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE}:
+        allowed = {str(option.get("id")) for option in content.get("options") or [] if isinstance(option, dict)}
+        selected = raw_answer.get("selected_option_ids")
+        if selected is None and raw_answer.get("selected_option_id") is not None:
+            selected = [raw_answer.get("selected_option_id")]
+        if selected is None:
+            selected = []
+        if not isinstance(selected, list):
+            raise StructureInvalid(message="选项作答必须是数组")
+        unknown = [str(value) for value in selected if str(value) not in allowed]
+        if unknown:
+            raise StructureInvalid(message="提交了不属于该题的选项 ID", details={"unknown_option_ids": unknown})
+        if len({str(value) for value in selected}) != len(selected):
+            raise StructureInvalid(message="同一选项被重复提交")
+        if expected == QuestionType.SINGLE_CHOICE and len(selected) > 1:
+            raise StructureInvalid(message="单选题只能选择一个选项")
+    elif expected == QuestionType.TRUE_FALSE:
+        value = raw_answer.get("value", None)
+        if value is not None and not isinstance(value, bool):
+            raise StructureInvalid(message="判断题作答必须是 true/false，或留空表示未答")
+    elif expected == QuestionType.FILL_BLANK:
+        blanks = raw_answer.get("blanks")
+        if blanks is not None and not isinstance(blanks, dict):
+            raise StructureInvalid(message="填空作答必须按空位 ID 给出对象")
+        allowed_blank_ids = {
+            str(blank.get("blank_id")) for blank in content.get("blanks") or [] if isinstance(blank, dict)
+        }
+        for blank_id, value in (blanks or {}).items():
+            if allowed_blank_ids and str(blank_id) not in allowed_blank_ids:
+                raise StructureInvalid(message=f"提交了不属于该题的空位：{blank_id}")
+            if value is not None and not isinstance(value, str):
+                raise StructureInvalid(message="空位作答必须是字符串原文")
+    elif expected == QuestionType.CONSTRUCTED_RESPONSE:
+        text = raw_answer.get("text", "")
+        if text is None or not isinstance(text, str):
+            raise StructureInvalid(message="大题作答文本必须是字符串")
+
+
+def _locked_session_item(session_item_id: str) -> SessionItem | None:
+    """Lock a session item row, then load related objects without the lock.
+
+    PostgreSQL refuses ``FOR UPDATE`` on the nullable side of an outer join, so
+    locking and joining are always two separate statements in this module.
+    """
+    row = SessionItem.objects.select_for_update().filter(id=session_item_id).first()
+    if row is None:
+        return None
+    return (
+        SessionItem.objects.select_related(
+            "session", "question_version__question", "answer_key_version", "rubric_version", "spec_version"
+        )
+        .filter(id=row.id)
+        .first()
+    )
+
+
+def _locked_attempt(attempt_id: str) -> Attempt | None:
+    """Lock an attempt row, then load its related objects without the lock.
+
+    Splitting the two steps avoids "FOR UPDATE cannot be applied to the nullable
+    side of an outer join" when a related FK is nullable.
+    """
+    row = Attempt.objects.select_for_update().filter(id=attempt_id).first()
+    if row is None:
+        return None
+    return (
+        Attempt.objects.select_related(
+            "session_item__session",
+            "session_item__question_version__question",
+            "session_item__answer_key_version",
+            "session_item__rubric_version",
+            "current_grade_event",
+        )
+        .filter(id=row.id)
+        .first()
+    )
+
+
+def _validate_attachments(project, user, asset_ids: list[str]) -> list[str]:
+    from django.conf import settings
+
+    from apps.ingestion.models import Asset
+
+    if not asset_ids:
+        return []
+    max_count = getattr(settings, "ATTEMPT_MAX_ATTACHMENTS", 6)
+    if len(asset_ids) > max_count:
+        raise InvalidInput(message=f"每道作答最多上传 {max_count} 张图片")
+    assets = list(Asset.objects.filter(id__in=asset_ids, project=project, owner=user))
+    if len(assets) != len(set(map(str, asset_ids))):
+        raise ScopeViolation(message="附件不存在或不属于当前项目")
+    total = sum(asset.size_bytes for asset in assets)
+    max_bytes = getattr(settings, "ATTEMPT_MAX_ATTACHMENT_BYTES", 30 * 1024 * 1024)
+    if total > max_bytes:
+        raise InvalidInput(message="附件总大小超过上限")
+    return [str(asset.id) for asset in assets]
+
+
+@transaction.atomic
+def submit_attempt(
+    *,
+    session_item_id: str,
+    user,
+    raw_answer: dict,
+    steps: list | None = None,
+    asset_ids: list | None = None,
+    confidence: str = "",
+    client_active_ms: int | None = None,
+    now=None,
+) -> tuple[Attempt, GradeEvent]:
+    """Store the attempt and its initial grade event."""
+    item = _locked_session_item(session_item_id)
+    if item is None:
+        raise ScopeViolation(message="题项不存在或不在当前权限范围")
+    session = item.session
+    if str(session.user_id) != str(user.id):
+        raise ScopeViolation(message="题项不存在或不在当前权限范围")
+    if session.status != SessionStatus.ACTIVE:
+        raise InvalidInput(message="会话已结束，不能继续提交")
+    existing = Attempt.objects.filter(session_item=item).first()
+    if existing is not None:
+        raise AlreadySubmitted(details={"attempt_id": str(existing.id)})
+
+    validate_answer_shape(item, raw_answer)
+    attachment_ids = _validate_attachments(session.project, user, list(asset_ids or []))
+    moment = now or timezone.now()
+    elapsed_ms = 0
+    if item.first_delivered_at:
+        elapsed_ms = max(0, int((moment - item.first_delivered_at).total_seconds() * 1000))
+    attempt = Attempt.objects.create(
+        session_item=item,
+        user=user,
+        project=session.project,
+        raw_answer=raw_answer,
+        steps=steps or [],
+        attachments=attachment_ids,
+        confidence=confidence[:16],
+        submitted_at=moment,
+        elapsed_ms=elapsed_ms,
+        client_active_ms=client_active_ms,
+    )
+    grade = create_initial_grade(attempt, item=item, now=moment)
+    return attempt, grade
+
+
+def create_initial_grade(attempt: Attempt, *, item: SessionItem, now=None) -> GradeEvent:
+    """Deterministic grade, or pending_review where the rules cannot decide."""
+    answer_payload = item.answer_key_version.answer_payload if item.answer_key_version_id else {}
+    rubric_payload = None
+    if item.rubric_version_id:
+        rubric_payload = {
+            "criteria": item.rubric_version.criteria,
+            "total_score": str(item.rubric_version.total_score),
+        }
+    result = adapters.grade(
+        question_type=item.question_version.question_type,
+        raw_answer=attempt.raw_answer,
+        answer_payload=answer_payload,
+        max_score=item.max_score,
+        rule=merged_rule(item),
+        rubric=rubric_payload,
+    )
+    grade = GradeEvent.objects.create(
+        attempt=attempt,
+        kind=GradeEventKind.INITIAL,
+        status=result.status,
+        method=result.method,
+        grading_revision=1,
+        confirmed_score=result.confirmed_score,
+        max_score=item.max_score,
+        pending_max_score=result.pending_max_score,
+        is_fully_confirmed=result.is_fully_confirmed,
+        parts=result.as_dict()["parts"],
+        answer_key_version_id=item.answer_key_version_id,
+        rubric_version_id=item.rubric_version_id,
+        spec_version_id=item.spec_version_id,
+        rule_snapshot=rule_snapshot_for(item),
+        rule_version=item.session.policy_version,
+        comment="; ".join(result.notes)[:1000],
+    )
+    attempt.current_grade_event = grade
+    attempt.grading_revision = grade.grading_revision
+    attempt.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+    if item.first_delivered_at is None:
+        # Submitting without an explicit presentation still counts as delivered.
+        item.first_delivered_at = now or timezone.now()
+        item.save(update_fields=["first_delivered_at", "updated_at"])
+    enqueue(
+        "projection.rebuild_attempt_evidence",
+        {"attempt_id": str(attempt.id)},
+        dedupe_key=f"evidence:{attempt.id}:{grade.grading_revision}",
+    )
+    enqueue(
+        "learning.on_attempt_graded",
+        {"attempt_id": str(attempt.id), "grade_event_id": str(grade.id)},
+        dedupe_key=f"graded:{attempt.id}:{grade.grading_revision}",
+    )
+    return grade
+
+
+# --------------------------------------------------------------------------
+# Manual confirmation (constructed responses and review fallbacks)
+# --------------------------------------------------------------------------
+@transaction.atomic
+def confirm_grade(
+    *,
+    attempt_id: str,
+    user,
+    parts: list[dict],
+    expected_grading_revision: int,
+    answer_key_version_id: str | None = None,
+    rubric_version_id: str | None = None,
+    comment: str = "",
+) -> GradeEvent:
+    """Human confirmation of a manual rubric or of a pending blank review."""
+    attempt = _locked_attempt(attempt_id)
+    if attempt is None:
+        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    item = attempt.session_item
+    session = item.session
+    if str(attempt.user_id) != str(user.id) and not user.is_staff:
+        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    if expected_grading_revision is None:
+        raise VersionConflict(message="缺少 expected_grading_revision，请重新加载评分页")
+    if int(expected_grading_revision) != int(attempt.grading_revision):
+        raise VersionConflict(details={"expected": expected_grading_revision, "actual": attempt.grading_revision})
+    if answer_key_version_id and str(answer_key_version_id) != str(item.answer_key_version_id or ""):
+        raise VersionConflict(message="评分依据的答案版本已变化，请重新加载")
+    if rubric_version_id and str(rubric_version_id) != str(item.rubric_version_id or ""):
+        raise VersionConflict(message="评分依据的 rubric 版本已变化，请重新加载")
+
+    is_self = str(user.id) == str(attempt.user_id)
+    method = GradeMethod.SELF_CONFIRMED if is_self else GradeMethod.REVIEWER_CONFIRMED
+    previous = attempt.current_grade_event
+    max_score = item.max_score
+
+    if item.question_version.question_type == QuestionType.CONSTRUCTED_RESPONSE:
+        confirmed_parts, total = _confirm_rubric_parts(item, parts)
+    else:
+        confirmed_parts, total = _confirm_pending_parts(item, parts, previous)
+    for part in confirmed_parts:
+        if part.get("status") == GradeStatus.CONFIRMED:
+            part["method"] = method
+
+    fully_confirmed = total == max_score and all(
+        part.get("status") == GradeStatus.CONFIRMED for part in confirmed_parts
+    )
+    grade = GradeEvent.objects.create(
+        attempt=attempt,
+        kind=GradeEventKind.MANUAL_CONFIRMATION,
+        status=GradeStatus.CONFIRMED if fully_confirmed else GradeStatus.PENDING_REVIEW,
+        method=method,
+        grading_revision=attempt.grading_revision + 1,
+        confirmed_score=total,
+        max_score=max_score,
+        pending_max_score=max_score - total,
+        is_fully_confirmed=fully_confirmed,
+        parts=confirmed_parts,
+        answer_key_version_id=item.answer_key_version_id,
+        rubric_version_id=item.rubric_version_id,
+        spec_version_id=item.spec_version_id,
+        rule_snapshot=rule_snapshot_for(item),
+        rule_version=session.policy_version,
+        grader=user,
+        grader_is_self=is_self,
+        comment=comment[:1000],
+        supersedes=previous,
+    )
+    if previous is not None:
+        previous.is_superseded = True
+        previous.save(update_fields=["is_superseded", "updated_at"])
+    attempt.current_grade_event = grade
+    attempt.grading_revision = grade.grading_revision
+    attempt.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+    ContentRevision.objects.create(
+        actor=user,
+        entity_type="grade_event",
+        entity_id=str(grade.id),
+        action="manual_confirmation",
+        project_id=attempt.project_id,
+        detail={"method": method, "is_self": is_self, "score": str(total)},
+    )
+    enqueue(
+        "projection.rebuild_attempt_evidence",
+        {"attempt_id": str(attempt.id)},
+        dedupe_key=f"evidence:{attempt.id}:{grade.grading_revision}",
+    )
+    enqueue(
+        "learning.on_attempt_graded",
+        {"attempt_id": str(attempt.id), "grade_event_id": str(grade.id)},
+        dedupe_key=f"graded:{attempt.id}:{grade.grading_revision}",
+    )
+    return grade
+
+
+def _confirm_rubric_parts(item: SessionItem, parts: list[dict]) -> tuple[list[dict], Decimal]:
+    rubric = item.rubric_version
+    if rubric is None:
+        raise InvalidInput(message="该题缺少 rubric，无法逐评分点确认")
+    criteria = {str(c.get("criterion_id")): c for c in rubric.criteria if isinstance(c, dict)}
+    submitted = {str(part.get("part_id")): part for part in parts if isinstance(part, dict)}
+    missing_required = [
+        criterion_id
+        for criterion_id, criterion in criteria.items()
+        if criterion.get("required") and criterion_id not in submitted
+    ]
+    if missing_required:
+        raise InvalidInput(message="存在未确认的必填评分点", details={"missing_criteria": missing_required})
+    unknown = [part_id for part_id in submitted if part_id not in criteria]
+    if unknown:
+        raise InvalidInput(message="提交了不属于该 rubric 的评分点", details={"unknown_criteria": unknown})
+
+    confirmed_parts: list[dict] = []
+    total = Decimal("0")
+    for criterion_id, criterion in criteria.items():
+        criterion_max = Decimal(str(criterion.get("max_score", "0")))
+        part = submitted.get(criterion_id)
+        if part is None:
+            confirmed_parts.append(
+                {
+                    "part_id": criterion_id,
+                    "score": None,
+                    "max_score": str(criterion_max),
+                    "status": GradeStatus.PENDING_REVIEW,
+                    "method": None,
+                    "detail": {"text": criterion.get("text", "")},
+                }
+            )
+            continue
+        raw_score = part.get("score")
+        if raw_score in (None, ""):
+            raise InvalidInput(message=f"评分点 {criterion_id} 缺少分值")
+        try:
+            score = Decimal(str(raw_score))
+        except Exception as exc:
+            raise InvalidInput(message=f"评分点 {criterion_id} 的分值必须是十进制数") from exc
+        if score < 0 or score > criterion_max:
+            raise InvalidInput(
+                message=f"评分点 {criterion_id} 的分值必须在 0 到 {criterion_max} 之间",
+                details={"criterion_id": criterion_id, "max_score": str(criterion_max)},
+            )
+        scale = criterion.get("scale")
+        if scale:
+            step = Decimal(str(scale))
+            if step > 0 and (score % step) != 0:
+                raise InvalidInput(
+                    message=f"评分点 {criterion_id} 必须按 {step} 的刻度给分",
+                    details={"criterion_id": criterion_id, "scale": str(step)},
+                )
+        confirmed_parts.append(
+            {
+                "part_id": criterion_id,
+                "score": str(score),
+                "max_score": str(criterion_max),
+                "status": GradeStatus.CONFIRMED,
+                "method": None,  # set by the caller to the event-level method
+                "detail": {
+                    "text": criterion.get("text", ""),
+                    "comment": str(part.get("comment", ""))[:300],
+                },
+            }
+        )
+        total += score
+    return confirmed_parts, total
+
+
+def _confirm_pending_parts(
+    item: SessionItem, parts: list[dict], previous: GradeEvent | None
+) -> tuple[list[dict], Decimal]:
+    """Confirm previously pending blanks, keeping already-confirmed parts."""
+    prior_parts = {
+        str(part.get("part_id")): part for part in (previous.parts if previous else []) if isinstance(part, dict)
+    }
+    submitted = {str(part.get("part_id")): part for part in parts if isinstance(part, dict)}
+    if not submitted:
+        raise InvalidInput(message="请给出至少一个评分点的确认结果")
+    confirmed_parts: list[dict] = []
+    total = Decimal("0")
+    for part_id, prior in prior_parts.items():
+        part_max = Decimal(str(prior.get("max_score", "0")))
+        override = submitted.get(part_id)
+        if override is None:
+            if prior.get("status") == GradeStatus.CONFIRMED and prior.get("score") is not None:
+                total += Decimal(str(prior["score"]))
+            confirmed_parts.append(prior)
+            continue
+        decision = str(override.get("decision") or "award")
+        if decision == "keep_pending":
+            confirmed_parts.append({**prior, "status": GradeStatus.PENDING_REVIEW, "score": None, "method": None})
+            continue
+        raw_score = override.get("score")
+        if raw_score in (None, ""):
+            raise InvalidInput(message=f"评分点 {part_id} 缺少分值")
+        score = Decimal(str(raw_score))
+        if score < 0 or score > part_max:
+            raise InvalidInput(message=f"评分点 {part_id} 的分值必须在 0 到 {part_max} 之间")
+        confirmed_parts.append(
+            {
+                **prior,
+                "score": str(score),
+                "status": GradeStatus.CONFIRMED,
+                "detail": {**(prior.get("detail") or {}), "comment": str(override.get("comment", ""))[:300]},
+            }
+        )
+        total += score
+    for part_id in submitted:
+        if part_id not in prior_parts:
+            raise InvalidInput(message=f"评分点 {part_id} 不属于该题", details={"part_id": part_id})
+    return confirmed_parts, total
+
+
+# --------------------------------------------------------------------------
+# Regrade and dispute handling
+# --------------------------------------------------------------------------
+@transaction.atomic
+def regrade_attempt(
+    *,
+    attempt: Attempt,
+    target_answer_key_version,
+    target_rubric_version=None,
+    actor=None,
+    reason: str = "",
+) -> GradeEvent:
+    """Re-grade one attempt against a reviewed new answer version.
+
+    The original attempt and its initial grade event are preserved. The new event
+    supersedes the old one only if it is still the newest revision, so a late
+    task cannot overwrite a newer result.
+    """
+    locked = _locked_attempt(attempt.id)
+    if locked is None:  # pragma: no cover - the attempt existed a moment ago
+        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    item = locked.session_item
+    if str(target_answer_key_version.question_version_id) != str(item.question_version_id):
+        raise InvalidInput(message="目标答案版本不属于该题项固定的题目版本，不能机械重判")
+    rule: dict[str, Any] = dict(
+        item.spec_version.rule_for(item.question_version.question_type) if item.spec_version_id else {}
+    )
+    for key in ("policy", "partial_score", "wrong_score", "blank_score", "mismatch_policy"):
+        if target_answer_key_version.answer_payload.get(key) is not None:
+            rule[key] = target_answer_key_version.answer_payload.get(key)
+    result = adapters.grade(
+        question_type=item.question_version.question_type,
+        raw_answer=locked.raw_answer,
+        answer_payload=target_answer_key_version.answer_payload,
+        max_score=item.max_score,
+        rule=rule,
+        rubric={"criteria": target_rubric_version.criteria, "total_score": str(target_rubric_version.total_score)}
+        if target_rubric_version is not None
+        else None,
+    )
+    previous = locked.current_grade_event
+    if previous is not None and previous.grading_revision > locked.grading_revision:
+        raise VersionConflict(message="该作答已有更新的评分修订，旧任务不再写入")
+    grade = GradeEvent.objects.create(
+        attempt=locked,
+        kind=GradeEventKind.REGRADE,
+        status=result.status,
+        method=result.method,
+        grading_revision=locked.grading_revision + 1,
+        confirmed_score=result.confirmed_score,
+        max_score=item.max_score,
+        pending_max_score=result.pending_max_score,
+        is_fully_confirmed=result.is_fully_confirmed,
+        parts=result.as_dict()["parts"],
+        answer_key_version=target_answer_key_version,
+        rubric_version=target_rubric_version,
+        spec_version_id=item.spec_version_id,
+        rule_snapshot={**rule_snapshot_for(item), "regrade_reason": reason[:500]},
+        rule_version=item.session.policy_version,
+        grader=actor,
+        comment=reason[:1000],
+        supersedes=previous,
+    )
+    if previous is not None:
+        previous.is_superseded = True
+        previous.save(update_fields=["is_superseded", "updated_at"])
+    locked.current_grade_event = grade
+    locked.grading_revision = grade.grading_revision
+    locked.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+    ContentRevision.objects.create(
+        actor=actor,
+        entity_type="grade_event",
+        entity_id=str(grade.id),
+        action="regrade",
+        project_id=locked.project_id,
+        reason=reason[:500],
+        detail={"answer_key_version_id": str(target_answer_key_version.id), "revision": grade.grading_revision},
+    )
+    enqueue(
+        "projection.rebuild_attempt_evidence",
+        {"attempt_id": str(locked.id)},
+        dedupe_key=f"evidence:{locked.id}:{grade.grading_revision}",
+    )
+    enqueue(
+        "projection.regrade_effects",
+        {"attempt_id": str(locked.id), "grade_event_id": str(grade.id)},
+        dedupe_key=f"regrade-effects:{locked.id}:{grade.grading_revision}",
+    )
+    return grade
+
+
+def handle_answer_dispute(answer_key_version, *, actor, reason: str) -> int:
+    """Move affected attempts to human review; raw answers stay untouched."""
+    attempts = Attempt.objects.filter(
+        session_item__answer_key_version=answer_key_version, current_grade_event__isnull=False
+    ).select_related("current_grade_event")
+    affected = 0
+    for attempt in attempts:
+        previous = attempt.current_grade_event
+        if previous is None:
+            continue
+        if previous.status == GradeStatus.PENDING_REVIEW:
+            affected += 1
+            continue
+        grade = GradeEvent.objects.create(
+            attempt=attempt,
+            kind=GradeEventKind.INVALIDATION,
+            status=GradeStatus.PENDING_REVIEW,
+            method=GradeMethod.MIXED,
+            grading_revision=attempt.grading_revision + 1,
+            confirmed_score=None,
+            max_score=previous.max_score,
+            pending_max_score=previous.max_score,
+            is_fully_confirmed=False,
+            parts=[
+                {
+                    "part_id": part.get("part_id"),
+                    "score": None,
+                    "max_score": part.get("max_score"),
+                    "status": GradeStatus.PENDING_REVIEW,
+                    "method": None,
+                    "detail": {"reason": "答案进入争议，原判分不再作为正式分数"},
+                }
+                for part in (previous.parts or [])
+            ],
+            answer_key_version=answer_key_version,
+            rubric_version_id=previous.rubric_version_id,
+            spec_version_id=previous.spec_version_id,
+            rule_snapshot=previous.rule_snapshot,
+            rule_version=previous.rule_version,
+            grader=actor,
+            comment=f"答案争议：{reason[:400]}",
+            supersedes=previous,
+            invalidation_reason=reason[:500],
+        )
+        previous.is_superseded = True
+        previous.save(update_fields=["is_superseded", "updated_at"])
+        attempt.current_grade_event = grade
+        attempt.grading_revision = grade.grading_revision
+        attempt.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+        affected += 1
+    return affected
+
+
+def start_regrade_run(
+    *,
+    question,
+    target_answer_key_version,
+    target_rubric_version=None,
+    actor,
+    reason: str,
+    scope: str = "all_attempts",
+) -> RegradeRun:
+    if not reason.strip():
+        raise InvalidInput(message="重判必须说明原因")
+    if str(target_answer_key_version.question_version.question_id) != str(question.id):
+        raise InvalidInput(message="目标答案版本不属于该题目")
+    run = RegradeRun.objects.create(
+        user=question.subject.project.owner,
+        project=question.subject.project,
+        subject=question.subject,
+        question=question,
+        target_answer_key_version=target_answer_key_version,
+        target_rubric_version=target_rubric_version,
+        reason=reason[:500],
+        scope=scope,
+        requested_by=actor,
+    )
+    run.affected_attempts = Attempt.objects.filter(
+        session_item__question_version__question=question, project=question.subject.project
+    ).count()
+    run.save(update_fields=["affected_attempts", "updated_at"])
+    enqueue("projection.run_regrade", {"regrade_run_id": str(run.id)}, dedupe_key=f"regrade-run:{run.id}")
+    return run

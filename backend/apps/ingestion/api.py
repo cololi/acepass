@@ -1,0 +1,545 @@
+"""Ingestion API: private assets, imports, proofreading and publication."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from django.http import Http404, StreamingHttpResponse
+from ninja import File, Form, Schema
+from ninja.files import UploadedFile
+
+from apps.audit.services import idempotency, outbox
+from apps.common.api import auth, idempotency_key, project_scoped_router
+from apps.common.enums import AssetRole
+from apps.common.errors import InvalidInput, ScopeViolation
+from apps.common.scope import require_project, require_subject
+from apps.exams.models import ExamSpecVersion
+from apps.ingestion import services as ingestion_services
+from apps.ingestion.models import ImportCandidate, ImportJob, SourceDocument
+from apps.ingestion.services import access as asset_access
+from apps.ingestion.services import imports as import_services
+from apps.ingestion.services import text_parser
+from apps.ingestion.services.core import (
+    create_image_document,
+    create_text_document,
+    store_asset,
+    validate_image,
+)
+from apps.ingestion.storage import get_storage
+
+ingestion_router = project_scoped_router(tags=["ingestion"])
+
+
+class AssetOut(Schema):
+    id: str
+    project_id: str
+    role: str
+    sensitivity: str
+    content_type: str
+    size_bytes: int
+    width: int | None
+    height: int | None
+    checksum: str
+    original_filename: str
+    download_url: str
+
+
+class TextImportIn(Schema):
+    text: str
+    subject_id: str | None = None
+    title: str = ""
+    source_note: str = ""
+    usage_scope: str = ""
+    parse: bool = True
+
+
+class ImportJobOut(Schema):
+    id: str
+    project_id: str
+    subject_id: str | None
+    status: str
+    input_kind: str
+    progress_percent: int
+    problems: list[dict[str, Any]]
+    attempts: int
+    max_attempts: int
+    last_error: str
+    extractor_version: str
+    duplicate_of_job_id: str | None
+    document_ids: list[str]
+    candidate_count: int
+    candidate_status_counts: dict[str, int]
+    created_at: str
+
+
+class CandidateRegionOut(Schema):
+    id: str
+    document_id: str
+    page_index: int
+    x: float
+    y: float
+    width: float
+    height: float
+    role: str
+    text_span: str
+    crop_asset_id: str | None
+
+
+class CandidateOut(Schema):
+    id: str
+    job_id: str
+    subject_id: str | None
+    status: str
+    revision: int
+    review_issues: list[dict[str, Any]]
+    is_stub_output: bool
+    extractor_version: str
+    draft_payload: dict[str, Any]
+    machine_payload: dict[str, Any]
+    source_regions: list[CandidateRegionOut]
+    publication_question_id: str | None
+    publication_version_id: str | None
+    updated_at: str
+
+
+class CandidatePatch(Schema):
+    draft_payload: dict[str, Any] | None = None
+    subject_id: str | None = None
+    expected_revision: int | None = None
+    note: str = ""
+
+
+class CandidatePublishIn(Schema):
+    exam_spec_version_id: str | None = None
+    node_ids: list[str] = []
+    origin_type: str = "user_authored"
+    display_label: str = ""
+
+
+class SourceDocumentOut(Schema):
+    id: str
+    project_id: str
+    subject_id: str | None
+    title: str
+    document_type: str
+    role: str
+    sensitivity: str
+    source_type: str
+    source_note: str
+    usage_scope: str
+    checksum: str
+    asset_id: str | None
+    raw_text_preview: str
+
+
+class TextParseIn(Schema):
+    text: str
+
+
+def _asset_out(asset) -> dict:
+    return {
+        "id": str(asset.id),
+        "project_id": str(asset.project_id),
+        "role": asset.role,
+        "sensitivity": asset.sensitivity,
+        "content_type": asset.content_type,
+        "size_bytes": asset.size_bytes,
+        "width": asset.width,
+        "height": asset.height,
+        "checksum": asset.checksum,
+        "original_filename": asset.original_filename,
+        "download_url": f"/api/v1/projects/{asset.project_id}/assets/{asset.id}",
+    }
+
+
+def _document_out(document: SourceDocument) -> dict:
+    return {
+        "id": str(document.id),
+        "project_id": str(document.project_id),
+        "subject_id": str(document.subject_id) if document.subject_id else None,
+        "title": document.title,
+        "document_type": document.document_type,
+        "role": document.role,
+        "sensitivity": document.sensitivity,
+        "source_type": document.source_type,
+        "source_note": document.source_note,
+        "usage_scope": document.usage_scope,
+        "checksum": document.checksum,
+        "asset_id": str(document.asset_id) if document.asset_id else None,
+        "raw_text_preview": (document.raw_text or "")[:400],
+    }
+
+
+# --------------------------------------------------------------------------
+# Assets
+# --------------------------------------------------------------------------
+@ingestion_router.post("/projects/{project_id}/assets", auth=auth, response={201: AssetOut})
+def upload_asset(request, project_id: str, file: File[UploadedFile], role: str = Form(AssetRole.PAST_PAPER_PAGE)):
+    """Upload one private asset. The storage path is always server-generated."""
+    project = require_project(request.user, project_id)
+    content = file.read()
+    if not content:
+        raise InvalidInput(message="上传内容为空")
+    content_type = (file.content_type or "").lower()
+    asset = store_asset(
+        owner=request.user,
+        project=project,
+        content=content,
+        content_type=content_type,
+        role=role,
+        original_filename=file.name or "",
+    )
+    return 201, _asset_out(asset)
+
+
+@ingestion_router.get("/projects/{project_id}/assets/{asset_id}", auth=auth)
+def download_asset(
+    request, project_id: str, asset_id: str, purpose: str = "practice", session_item_id: str | None = None
+):
+    """Authenticated download; answer-bearing material is gated by purpose."""
+    project = require_project(request.user, project_id)
+    asset = asset_access.asset_scope(request.user, project, asset_id)
+    session_item = None
+    if session_item_id:
+        from apps.practice.models import SessionItem
+
+        session_item = (
+            SessionItem.objects.filter(id=session_item_id, session__user=request.user, session__project=project)
+            .select_related("session")
+            .first()
+        )
+        if session_item is None:
+            raise ScopeViolation(message="题项不存在或不属于该项目")
+    asset_access.assert_asset_download_allowed(
+        user=request.user,
+        project=project,
+        asset=asset,
+        purpose=purpose,
+        session=session_item.session if session_item else None,
+    )
+    storage = get_storage()
+    if not storage.exists(asset.object_key):
+        raise Http404("asset bytes are missing")
+    asset_access.record_download_exposure(
+        user=request.user, project=project, asset=asset, purpose=purpose, session_item=session_item
+    )
+    handle = storage.open(asset.object_key)
+    response = StreamingHttpResponse(handle, content_type=asset.content_type)
+    disposition = "inline" if asset.content_type.startswith("image/") else "attachment"
+    response["Content-Disposition"] = f'{disposition}; filename="{asset.id}"'
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
+@ingestion_router.get("/projects/{project_id}/source-documents", auth=auth, response=list[SourceDocumentOut])
+def list_source_documents(request, project_id: str, subject_id: str | None = None, limit: int = 50):
+    project = require_project(request.user, project_id)
+    queryset = SourceDocument.objects.filter(project=project, owner=request.user).order_by("-created_at")
+    if subject_id:
+        require_subject(request.user, project, subject_id)
+        queryset = queryset.filter(subject_id=subject_id)
+    return [_document_out(document) for document in queryset[: max(1, min(limit, 100))]]
+
+
+@ingestion_router.post("/projects/{project_id}/source-documents/text", auth=auth, response={201: SourceDocumentOut})
+def create_text_source(request, project_id: str, payload: TextImportIn):
+    """Pasted text always creates a document keeping the raw original."""
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, payload.subject_id) if payload.subject_id else None
+    document = create_text_document(
+        owner=request.user,
+        project=project,
+        text=payload.text,
+        title=payload.title,
+        subject=subject,
+        source_note=payload.source_note,
+        usage_scope=payload.usage_scope,
+    )
+    return 201, _document_out(document)
+
+
+@ingestion_router.post("/projects/{project_id}/source-documents/image", auth=auth, response={201: SourceDocumentOut})
+def create_image_source(
+    request,
+    project_id: str,
+    file: File[UploadedFile],
+    role: str = Form(AssetRole.PAST_PAPER_PAGE),
+    title: str = Form(""),
+    source_note: str = Form(""),
+    usage_scope: str = Form(""),
+    subject_id: str = Form(""),
+):
+    """Store an image source. Whole answer pages are marked as answer-bearing."""
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
+    content = file.read()
+    if not content:
+        raise InvalidInput(message="上传内容为空")
+    if role not in AssetRole.values:
+        raise InvalidInput(message="来源角色无效")
+    sensitivity = "contains_answers" if role == AssetRole.ANSWER_PAGE else "public_to_owner"
+    document = create_image_document(
+        owner=request.user,
+        project=project,
+        content=content,
+        content_type=(file.content_type or "").lower(),
+        role=role,
+        title=title,
+        subject=subject,
+        source_note=source_note,
+        usage_scope=usage_scope,
+        sensitivity=sensitivity,
+        original_filename=file.name or "",
+    )
+    return 201, _document_out(document)
+
+
+# --------------------------------------------------------------------------
+# Imports
+# --------------------------------------------------------------------------
+@ingestion_router.post("/projects/{project_id}/imports/parse-text", auth=auth)
+def parse_text_preview(request, project_id: str, payload: TextParseIn):
+    """Preview the parsed structure without creating anything."""
+    require_project(request.user, project_id)
+    segments = text_parser.parse_paste(payload.text)
+    return {"count": len(segments), "segments": segments}
+
+
+@ingestion_router.post("/projects/{project_id}/imports", auth=auth, response={201: ImportJobOut})
+def create_import(request, project_id: str, payload: TextImportIn):
+    """Text import. Image imports use ``/imports/images``."""
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, payload.subject_id) if payload.subject_id else None
+    key = idempotency_key(request)
+    scope = f"imports.create:{project_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    segments = text_parser.parse_paste(payload.text) if payload.parse else []
+    job = import_services.start_text_import(
+        owner=request.user,
+        project=project,
+        text=payload.text,
+        subject=subject,
+        title=payload.title,
+        source_note=payload.source_note,
+        usage_scope=payload.usage_scope,
+        segments=segments,
+    )
+    result = import_services.job_summary(job)
+    idempotency.record_result(
+        request.user, scope, key, status_code=201, response_body=result, resource_type="import_job", resource_id=job.id
+    )
+    return 201, result
+
+
+@ingestion_router.post("/projects/{project_id}/imports/images", auth=auth, response={201: ImportJobOut})
+def create_image_import(
+    request,
+    project_id: str,
+    files: list[File[UploadedFile]],
+    subject_id: str = Form(""),
+    title: str = Form(""),
+    role: str = Form(AssetRole.PAST_PAPER_PAGE),
+):
+    """Store image material and open manual proofreading candidates."""
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
+    if not files:
+        raise InvalidInput(message="请至少上传一张图片")
+    contents = []
+    for upload in files:
+        content = upload.read()
+        validate_image(content=content, content_type=(upload.content_type or "").lower())
+        contents.append(content)
+    checksums = [ingestion_services.file_checksum(content) for content in contents]
+    key = idempotency_key(request)
+    scope = f"imports.create_images:{project_id}"
+    replay = idempotency.claim(
+        request.user, scope, key, {"checksums": checksums, "subject_id": subject_id, "role": role}
+    )
+    if replay is not None:
+        return replay.status_code, replay.body
+    documents = []
+    duplicates = []
+    for upload, content, checksum in zip(files, contents, checksums, strict=True):
+        existing = ingestion_services.find_duplicate_document(project=project, checksum=checksum)
+        if existing is not None:
+            duplicates.append(existing)
+            continue
+        documents.append(
+            create_image_document(
+                owner=request.user,
+                project=project,
+                content=content,
+                content_type=(upload.content_type or "").lower(),
+                role=role,
+                title=title,
+                subject=subject,
+                sensitivity="contains_answers" if role == AssetRole.ANSWER_PAGE else "public_to_owner",
+                original_filename=upload.name or "",
+            )
+        )
+    job = import_services.start_image_import(
+        owner=request.user, project=project, documents=documents or duplicates, subject=subject, title=title
+    )
+    if duplicates:
+        ingestion_services.add_job_problem(
+            job,
+            "duplicate_source_file",
+            f"其中 {len(duplicates)} 张图片与已有来源文件完全相同，已复用原来源而未新增（避免同一试卷重复统计）。",
+            severity="warning",
+        )
+    result = import_services.job_summary(job)
+    idempotency.record_result(
+        request.user, scope, key, status_code=201, response_body=result, resource_type="import_job", resource_id=job.id
+    )
+    return 201, result
+
+
+@ingestion_router.get("/projects/{project_id}/imports", auth=auth, response=list[ImportJobOut])
+def list_imports(request, project_id: str, status: str | None = None, limit: int = 20):
+    project = require_project(request.user, project_id)
+    queryset = ImportJob.objects.filter(project=project, created_by=request.user).order_by("-created_at")
+    if status:
+        queryset = queryset.filter(status=status)
+    return [import_services.job_summary(job) for job in queryset[: max(1, min(limit, 100))]]
+
+
+@ingestion_router.get("/projects/{project_id}/imports/{job_id}", auth=auth, response=ImportJobOut)
+def get_import(request, project_id: str, job_id: str):
+    project = require_project(request.user, project_id)
+    job = ImportJob.objects.filter(id=job_id, project=project, created_by=request.user).first()
+    if job is None:
+        raise ScopeViolation(message="导入任务不存在或不属于该项目")
+    return import_services.job_summary(job)
+
+
+@ingestion_router.post("/projects/{project_id}/imports/{job_id}/retry", auth=auth, response=ImportJobOut)
+def retry_import(request, project_id: str, job_id: str):
+    project = require_project(request.user, project_id)
+    job = ImportJob.objects.filter(id=job_id, project=project, created_by=request.user).first()
+    if job is None:
+        raise ScopeViolation(message="导入任务不存在或不属于该项目")
+    key = idempotency_key(request)
+    scope = f"imports.retry:{job_id}"
+    replay = idempotency.claim(request.user, scope, key, {})
+    if replay is not None:
+        return replay.status_code, replay.body
+    job = import_services.retry_job(job, actor=request.user)
+    result = import_services.job_summary(job)
+    idempotency.record_result(
+        request.user, scope, key, status_code=200, response_body=result, resource_type="import_job", resource_id=job.id
+    )
+    return result
+
+
+@ingestion_router.get("/projects/{project_id}/import-candidates", auth=auth, response=list[CandidateOut])
+def list_candidates(request, project_id: str, job_id: str | None = None, status: str | None = None, limit: int = 50):
+    project = require_project(request.user, project_id)
+    queryset = ImportCandidate.objects.filter(project=project, job__created_by=request.user).order_by("created_at")
+    if job_id:
+        queryset = queryset.filter(job_id=job_id)
+    if status:
+        queryset = queryset.filter(status=status)
+    return [
+        import_services.candidate_summary(candidate)
+        for candidate in queryset.select_related("job")[: max(1, min(limit, 100))]
+    ]
+
+
+@ingestion_router.get("/projects/{project_id}/import-candidates/{candidate_id}", auth=auth, response=CandidateOut)
+def get_candidate(request, project_id: str, candidate_id: str):
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
+    if candidate is None:
+        raise ScopeViolation(message="候选不存在或不属于该项目")
+    return import_services.candidate_summary(candidate)
+
+
+@ingestion_router.patch("/projects/{project_id}/import-candidates/{candidate_id}", auth=auth, response=CandidateOut)
+def patch_candidate(request, project_id: str, candidate_id: str, payload: CandidatePatch):
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
+    if candidate is None:
+        raise ScopeViolation(message="候选不存在或不属于该项目")
+    subject = require_subject(request.user, project, payload.subject_id) if payload.subject_id else None
+    candidate = ingestion_services.update_candidate(
+        candidate,
+        payload=payload.draft_payload,
+        subject=subject,
+        expected_revision=payload.expected_revision,
+        actor=request.user,
+        note=payload.note,
+    )
+    return import_services.candidate_summary(candidate)
+
+
+@ingestion_router.post("/projects/{project_id}/import-candidates/{candidate_id}/ignore", auth=auth, response=CandidateOut)
+def ignore_candidate(request, project_id: str, candidate_id: str, reason: str = ""):
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
+    if candidate is None:
+        raise ScopeViolation(message="候选不存在或不属于该项目")
+    key = idempotency_key(request)
+    scope = f"candidates.ignore:{candidate_id}"
+    replay = idempotency.claim(request.user, scope, key, {"reason": reason})
+    if replay is not None:
+        return replay.status_code, replay.body
+    candidate = ingestion_services.ignore_candidate(candidate, actor=request.user, reason=reason)
+    result = import_services.candidate_summary(candidate)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=200,
+        response_body=result,
+        resource_type="import_candidate",
+        resource_id=candidate.id,
+    )
+    return result
+
+
+@ingestion_router.post("/projects/{project_id}/import-candidates/{candidate_id}/publish", auth=auth, response=CandidateOut)
+def publish_candidate(request, project_id: str, candidate_id: str, payload: CandidatePublishIn):
+    """Publish a proofread candidate into an immutable question version."""
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
+    if candidate is None:
+        raise ScopeViolation(message="候选不存在或不属于该项目")
+    spec = None
+    if payload.exam_spec_version_id:
+        spec = ExamSpecVersion.objects.filter(id=payload.exam_spec_version_id, subject__project=project).first()
+        if spec is None:
+            raise ScopeViolation(message="考试规范版本不存在或不属于该项目")
+        if spec.status != "published":
+            raise InvalidInput(message="只能使用已发布的考试规范版本")
+    key = idempotency_key(request)
+    scope = f"candidates.publish:{candidate_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    candidate, question = ingestion_services.publish_candidate(
+        candidate,
+        actor=request.user,
+        exam_spec_version=spec,
+        node_ids=payload.node_ids,
+        origin_type=payload.origin_type,
+        display_label=payload.display_label,
+    )
+    result = import_services.candidate_summary(candidate)
+    result["question_id"] = str(question.id)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=200,
+        response_body=result,
+        resource_type="import_candidate",
+        resource_id=candidate.id,
+    )
+    outbox.after_commit_dispatch()
+    return result

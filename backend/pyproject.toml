@@ -1,0 +1,14 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "DJ"]
+ignore = ["B008", "E501", "DJ001"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402", "F401"]
+"config/settings/*" = ["F403", "F405", "E402", "F401"]
+"apps/*/services/__init__.py" = ["F403", "F401"]
+"conftest.py" = ["F811"]

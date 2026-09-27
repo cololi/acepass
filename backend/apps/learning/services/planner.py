@@ -1,0 +1,625 @@
+"""Daily planning under one global budget.
+
+Order of work (docs/03 §6): due delayed verification/review -> confirmed weak
+points -> undiagnosed knowledge points -> other practice. The global budget is
+split across active projects with the largest-remainder method, and the split
+snapshot (project set + rotation offset) is stored on the plan so a same-day
+retry is deterministic.
+"""
+
+from __future__ import annotations
+
+from datetime import date, timedelta
+from decimal import Decimal
+
+from django.conf import settings
+from django.db import transaction
+from django.db.models import Sum
+from django.utils import timezone
+
+from apps.common.enums import (
+    AnswerSourceType,
+    EvidenceDimension,
+    KnowledgeStateSummary,
+    QuestionVersionStatus,
+    SessionStatus,
+    TaskKind,
+    TaskStatus,
+)
+from apps.common.errors import InvalidInput, ScopeViolation
+from apps.exams.models import ExamProject
+from apps.knowledge.models import QuestionKnowledge, VerificationPairing
+from apps.learning.models import LearnerKnowledgeState, StudyPlan, StudyTask
+from apps.learning.services import pairing as pairing_service
+from apps.practice.models import LearningEvidence, PracticeSession
+from apps.question_bank.models import Question
+
+RULE_VERSION = "p0-1"
+DEFAULT_MINUTES_BY_TYPE = {"constructed_response": 15, "fill_blank": 3}
+
+
+def active_projects(user):
+    return list(ExamProject.objects.filter(owner=user, is_archived=False).order_by("display_order", "created_at"))
+
+
+def allocate_budget(user, projects: list[ExamProject], budget_minutes: int, on_date: date) -> dict:
+    """Split the integer budget across projects.
+
+    Base order: target date, then creation time. The daily rotation shift is
+    ``days_since_epoch % active_project_count`` so the same project is not always
+    first. Remainders go out by largest fractional part, then by rotated order,
+    which keeps a same-day retry identical.
+    """
+    if not projects:
+        return {"projects": [], "notes": ["没有进行中的项目"], "rotation_offset": 0, "project_order": []}
+    settings_obj = getattr(user, "settings", None)
+    percentages = dict(getattr(settings_obj, "project_budget_percent", {}) or {})
+    ordered = sorted(projects, key=lambda project: (project.target_date or date.max, project.created_at))
+    offset = (on_date - date(1970, 1, 1)).days % len(ordered)
+    rotated = ordered[offset:] + ordered[:offset]
+
+    notes: list[str] = []
+    if percentages:
+        raw = [(project, float(percentages.get(str(project.id), 0.0))) for project in ordered]
+        assigned_percent = sum(percent for _project, percent in raw)
+        if assigned_percent < 100:
+            notes.append(f"用户指定比例合计 {assigned_percent:g}%，其余 {100 - assigned_percent:g}% 不分配")
+        if assigned_percent <= 0:
+            notes.append("用户指定比例均为 0：本日不分配任何项目时间")
+    else:
+        raw = [(project, 100.0 / len(ordered)) for project in ordered]
+        notes.append("未指定项目比例：按进行中项目等分")
+
+    base: dict[str, int] = {}
+    fractions: dict[str, tuple[float, int]] = {}
+    for project, percent in raw:
+        value = budget_minutes * percent / 100.0
+        floor = int(value)
+        base[str(project.id)] = floor
+        fractions[str(project.id)] = (value - floor, _rotation_rank(rotated, project))
+    remainder = budget_minutes - sum(base.values())
+    for project_id, (_fraction, _rank) in sorted(fractions.items(), key=lambda pair: (-pair[1][0], pair[1][1])):
+        if remainder <= 0:
+            break
+        base[project_id] += 1
+        remainder -= 1
+
+    allocations = [
+        {
+            "project_id": str(project.id),
+            "project_name": project.name,
+            "percent": round(percent, 4),
+            "minutes": base[str(project.id)],
+        }
+        for project, percent in raw
+    ]
+    allocations.sort(key=lambda row: _rotation_rank(rotated, next(p for p in ordered if str(p.id) == row["project_id"])))
+    return {
+        "projects": allocations,
+        "notes": notes,
+        "rotation_offset": offset,
+        "project_order": [str(project.id) for project in ordered],
+    }
+
+
+def _rotation_rank(rotated: list[ExamProject], project: ExamProject) -> int:
+    for index, item in enumerate(rotated):
+        if item.id == project.id:
+            return index
+    return len(rotated)
+
+
+# --------------------------------------------------------------------------
+# Candidate selection
+# --------------------------------------------------------------------------
+def _question_minutes(question: Question) -> int:
+    version = question.current_published_version or question.versions.order_by("-version").first()
+    if version is None:
+        return 2
+    if version.estimated_seconds:
+        return max(1, round(version.estimated_seconds / 60))
+    return DEFAULT_MINUTES_BY_TYPE.get(version.question_type, 2)
+
+
+def _eligible_question(question: Question | None) -> tuple[bool, str]:
+    if question is None:
+        return False, "没有关联题目"
+    version = question.current_published_version
+    if version is None or version.status != QuestionVersionStatus.PUBLISHED:
+        return False, "题目没有已发布版本"
+    answer = version.answer_keys.filter(verification_status="checked", is_disputed=False).first()
+    if answer is None:
+        return False, "题目缺少已核对且无争议的答案"
+    if answer.source_type == AnswerSourceType.AI_DERIVED:
+        return False, "AI 推导答案尚未通过独立验证"
+    return True, ""
+
+
+def delayed_task_candidates(*, user, project, now=None, limit: int = 20) -> list[dict]:
+    """Due delayed verification tasks, earliest deadline first."""
+    moment = now or timezone.now()
+    queryset = (
+        StudyTask.objects.filter(
+            user=user,
+            project=project,
+            task_kind=TaskKind.DELAYED_VERIFICATION,
+            status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED],
+        )
+        .filter(not_before__lte=moment)
+        .select_related("question", "knowledge_node")
+        .order_by("not_before")
+    )
+    rows = []
+    for task in queryset[: max(1, min(limit, 100))]:
+        ok, _reason = _eligible_question(task.question)
+        if not ok:
+            continue
+        status = pairing_service.delayed_interval_status(task=task, now=moment)
+        if not status["satisfied"]:
+            continue
+        rows.append(_task_candidate(task, reason_codes=["due_delayed_verification"], status=status))
+    return rows
+
+
+def _task_candidate(task: StudyTask, *, reason_codes: list[str], status: dict | None = None) -> dict:
+    return {
+        "task_id": str(task.id),
+        "task_kind": task.task_kind,
+        "question_id": str(task.question_id) if task.question_id else None,
+        "question_label": task.question.display_label if task.question_id else "",
+        "knowledge_node_id": str(task.knowledge_node_id) if task.knowledge_node_id else None,
+        "knowledge_node_name": task.knowledge_node.canonical_name if task.knowledge_node_id else "",
+        "project_id": str(task.project_id),
+        "subject_id": str(task.subject_id),
+        "estimated_minutes": task.estimated_minutes,
+        "reason_codes": reason_codes + list(task.reason_codes or []),
+        "evidence_ids": list(task.evidence_ids or []),
+        "pairing_version": task.pairing_version,
+        "not_before": status.get("not_before") if status else None,
+        "deficit_notice": task.deficit_notice,
+    }
+
+
+def weakly_known_candidates(*, user, project, limit: int = 20) -> list[dict]:
+    """Confirmed weak points with an eligible paired or mapped question."""
+    rows: list[dict] = []
+    states = (
+        LearnerKnowledgeState.objects.filter(user=user, project=project, needs_review=True)
+        .select_related("node", "syllabus_version")
+        .order_by("-needs_review", "as_of")[: max(1, min(limit, 50))]
+    )
+    for state in states:
+        chosen = None
+        for pairing in VerificationPairing.objects.filter(
+            project=project, node=state.node, is_active=True
+        ).select_related("immediate_question"):
+            ok, _reason = _eligible_question(pairing.immediate_question)
+            if ok:
+                chosen = pairing.immediate_question
+                break
+        if chosen is None:
+            mapping = (
+                QuestionKnowledge.objects.filter(node=state.node, is_primary=True, question_version__status="published")
+                .select_related("question_version__question")
+                .first()
+            )
+            if mapping is None:
+                continue
+            ok, _reason = _eligible_question(mapping.question_version.question)
+            if not ok:
+                continue
+            chosen = mapping.question_version.question
+        rows.append(
+            {
+                "task_id": None,
+                "task_kind": TaskKind.WEAKNESS_REPAIR,
+                "question_id": str(chosen.id),
+                "question_label": chosen.display_label,
+                "knowledge_node_id": str(state.node_id),
+                "knowledge_node_name": state.node.canonical_name,
+                "project_id": str(project.id),
+                "subject_id": str(state.syllabus_version.subject_id),
+                "estimated_minutes": _question_minutes(chosen),
+                "reason_codes": ["weakness_repair", f"state_{state.summary}"],
+                "evidence_ids": list(state.source_evidence_ids or [])[:10],
+                "pairing_version": None,
+                "not_before": None,
+                "deficit_notice": "",
+            }
+        )
+    return rows
+
+
+def undiagnosed_candidates(*, user, project, limit: int = 20) -> list[dict]:
+    """Nodes with no state yet, paired with an eligible question."""
+    rows: list[dict] = []
+    diagnosed = set(
+        LearnerKnowledgeState.objects.filter(user=user, project=project).values_list("node_id", flat=True)
+    )
+    mappings = (
+        QuestionKnowledge.objects.filter(
+            question_version__status="published",
+            question_version__question__subject__project=project,
+            is_primary=True,
+        )
+        .select_related("question_version__question", "node")
+        .order_by("node__canonical_name")
+    )
+    seen_nodes: set[str] = set()
+    for mapping in mappings:
+        node_id = str(mapping.node_id)
+        if node_id in diagnosed or node_id in seen_nodes:
+            continue
+        question = mapping.question_version.question
+        ok, _reason = _eligible_question(question)
+        if not ok:
+            continue
+        seen_nodes.add(node_id)
+        rows.append(
+            {
+                "task_id": None,
+                "task_kind": TaskKind.UNDIAGNOSED_PROBE,
+                "question_id": str(question.id),
+                "question_label": question.display_label,
+                "knowledge_node_id": node_id,
+                "knowledge_node_name": mapping.node.canonical_name,
+                "project_id": str(project.id),
+                "subject_id": str(question.subject_id),
+                "estimated_minutes": _question_minutes(question),
+                "reason_codes": ["undiagnosed_node"],
+                "evidence_ids": [],
+                "pairing_version": None,
+                "not_before": None,
+                "deficit_notice": "",
+            }
+        )
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def general_candidates(*, user, project, limit: int = 20) -> list[dict]:
+    """Other eligible published questions, for filling remaining time."""
+    rows: list[dict] = []
+    questions = (
+        Question.objects.filter(subject__project=project, current_published_version__status="published")
+        .select_related("current_published_version")
+        .order_by("display_label")[: max(1, min(limit, 50))]
+    )
+    for question in questions:
+        ok, _reason = _eligible_question(question)
+        if not ok:
+            continue
+        rows.append(
+            {
+                "task_id": None,
+                "task_kind": TaskKind.GENERAL_PRACTICE,
+                "question_id": str(question.id),
+                "question_label": question.display_label,
+                "knowledge_node_id": None,
+                "knowledge_node_name": "",
+                "project_id": str(project.id),
+                "subject_id": str(question.subject_id),
+                "estimated_minutes": _question_minutes(question),
+                "reason_codes": ["general_practice"],
+                "evidence_ids": [],
+                "pairing_version": None,
+                "not_before": None,
+                "deficit_notice": "",
+            }
+        )
+    return rows
+
+
+# --------------------------------------------------------------------------
+# Plan generation
+# --------------------------------------------------------------------------
+def current_plan(user, on_date: date | None = None, revision: int | None = None) -> StudyPlan | None:
+    settings_obj = getattr(user, "settings", None)
+    local_date = on_date or (settings_obj.local_date() if settings_obj else timezone.now().date())
+    queryset = StudyPlan.objects.filter(user=user, plan_date=local_date).order_by("-revision")
+    if revision is not None:
+        queryset = queryset.filter(revision=revision)
+    return queryset.first()
+
+
+@transaction.atomic
+def generate_plan(*, user, on_date: date | None = None, refresh: bool = False, now=None) -> StudyPlan:
+    """Build (or refresh) today's plan.
+
+    A refresh creates a new revision and only replaces tasks that have not
+    started; completed or in-progress work is kept.
+    """
+    moment = now or timezone.now()
+    settings_obj = getattr(user, "settings", None)
+    local_date = on_date or (settings_obj.local_date(moment) if settings_obj else moment.date())
+    budget = int(getattr(settings_obj, "daily_budget_minutes", settings.DEFAULT_DAILY_BUDGET_MINUTES))
+    undiagnosed_share = int(
+        getattr(settings_obj, "undiagnosed_time_share_percent", settings.UNDIAGNOSED_TIME_SHARE_PERCENT)
+    )
+    projects = active_projects(user)
+    existing = current_plan(user, local_date)
+    if existing is not None and not refresh:
+        return existing
+
+    allocation = allocate_budget(user, projects, budget, local_date)
+    revision = (existing.revision + 1) if existing is not None else 1
+    plan = StudyPlan.objects.create(
+        user=user,
+        plan_date=local_date,
+        timezone=getattr(settings_obj, "timezone", "UTC"),
+        revision=revision,
+        daily_budget_minutes=budget,
+        allocated_minutes=0,
+        allocation=allocation["projects"],
+        project_order=allocation.get("project_order", []),
+        rotation_offset=allocation.get("rotation_offset", 0),
+        rule_version=RULE_VERSION,
+        notes=list(allocation.get("notes", [])),
+        generated_at=moment,
+    )
+    if existing is not None:
+        existing.tasks.filter(status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED]).update(
+            status=TaskStatus.SKIPPED,
+            invalidated_reason="计划刷新后被新修订替换",
+            updated_at=moment,
+        )
+
+    planned_minutes = 0
+    notes: list[str] = []
+    for project_allocation in allocation["projects"]:
+        project = ExamProject.objects.get(id=project_allocation["project_id"])
+        project_minutes = project_allocation["minutes"]
+        if project_minutes <= 0:
+            notes.append(f"{project.name}：本日分配 0 分钟，未安排任务（预算不足以容纳任何题目）")
+            continue
+        result = _plan_project(
+            user=user,
+            project=project,
+            plan=plan,
+            minutes=project_minutes,
+            undiagnosed_share=undiagnosed_share,
+            now=moment,
+        )
+        planned_minutes += result["planned_minutes"]
+        notes.extend(result["notes"])
+
+    plan.allocated_minutes = planned_minutes
+    plan.notes = list(plan.notes) + notes
+    plan.save(update_fields=["allocated_minutes", "notes", "updated_at"])
+    enqueue_plan_event(plan)
+    return plan
+
+
+def _plan_project(*, user, project, plan, minutes: int, undiagnosed_share: int, now) -> dict:
+    """Fill one project's share using the fixed category order."""
+    remaining = minutes
+    planned = 0
+    notes: list[str] = []
+    reserve = int(minutes * undiagnosed_share / 100)
+    categories = [
+        ("due_delayed_verification", delayed_task_candidates(user=user, project=project, now=now)),
+        ("weakness_repair", weakly_known_candidates(user=user, project=project)),
+        ("undiagnosed_probe", undiagnosed_candidates(user=user, project=project)),
+        ("general_practice", general_candidates(user=user, project=project)),
+    ]
+    reserve_used = 0
+    for category, candidates in categories:
+        for candidate in candidates:
+            cost = max(1, int(candidate["estimated_minutes"]))
+            if cost > remaining:
+                continue
+            task = _materialise_task(user=user, project=project, plan=plan, candidate=candidate)
+            if task is None:
+                continue
+            remaining -= cost
+            planned += cost
+            if category == "undiagnosed_probe":
+                reserve_used += cost
+        if remaining <= 0:
+            break
+    if reserve > 0 and reserve_used < reserve:
+        notes.append(
+            f"{project.name}：未诊断内容预留 {reserve} 分钟，本日实际安排 {reserve_used} 分钟（无更多合格未诊断题）"
+        )
+    if remaining > 0:
+        notes.append(f"{project.name}：仍有 {remaining} 分钟未分配（没有能完整容纳的合格题目）")
+    return {"planned_minutes": planned, "notes": notes, "remaining": remaining}
+
+
+def _materialise_task(*, user, project, plan, candidate: dict) -> StudyTask | None:
+    if candidate.get("task_id"):
+        task = StudyTask.objects.filter(
+            id=candidate["task_id"], user=user, status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED]
+        ).first()
+        if task is None:
+            return None
+        task.plan = plan
+        task.reason_codes = list(candidate["reason_codes"])
+        task.save(update_fields=["plan", "reason_codes", "updated_at"])
+        return task
+    question = Question.objects.filter(id=candidate["question_id"]).first()
+    if question is None:
+        return None
+    return StudyTask.objects.create(
+        plan=plan,
+        user=user,
+        project=project,
+        subject_id=candidate["subject_id"],
+        task_kind=candidate["task_kind"],
+        status=TaskStatus.PENDING,
+        question=question,
+        knowledge_node_id=candidate.get("knowledge_node_id"),
+        estimated_minutes=max(1, int(candidate["estimated_minutes"])),
+        reason_codes=list(candidate["reason_codes"]),
+        evidence_ids=list(candidate.get("evidence_ids") or [])[:20],
+        rule_version=RULE_VERSION,
+    )
+
+
+def enqueue_plan_event(plan: StudyPlan) -> None:
+    from apps.audit.services.outbox import enqueue
+
+    enqueue("learning.reconcile_plan", {"plan_id": str(plan.id)}, dedupe_key=f"plan:{plan.id}")
+
+
+def plan_payload(plan: StudyPlan | None, *, now=None) -> dict:
+    if plan is None:
+        return {"plan": None, "tasks": [], "notes": ["今日还没有计划：可点击“生成今日计划”"]}
+    moment = now or timezone.now()
+    tasks = []
+    for task in plan.tasks.select_related("question", "knowledge_node", "subject").order_by("created_at"):
+        review = getattr(task, "review_task", None)
+        tasks.append(
+            {
+                "task_id": str(task.id),
+                "task_kind": task.task_kind,
+                "status": task.status,
+                "project_id": str(task.project_id),
+                "subject_id": str(task.subject_id),
+                "question_id": str(task.question_id) if task.question_id else None,
+                "question_label": task.question.display_label if task.question_id else "",
+                "knowledge_node_id": str(task.knowledge_node_id) if task.knowledge_node_id else None,
+                "knowledge_node_name": task.knowledge_node.canonical_name if task.knowledge_node_id else "",
+                "estimated_minutes": task.estimated_minutes,
+                "reason_codes": task.reason_codes,
+                "evidence_ids": task.evidence_ids,
+                "not_before": task.not_before.isoformat() if task.not_before else None,
+                "due_at": task.due_at.isoformat() if task.due_at else None,
+                "delay_anchor_at": task.delay_anchor_at.isoformat() if task.delay_anchor_at else None,
+                "delay_hours": review.delay_hours if review else None,
+                "available_now": (task.not_before is None or task.not_before <= moment),
+                "deficit_notice": task.deficit_notice,
+                "pairing_version": task.pairing_version,
+            }
+        )
+    return {
+        "plan": {
+            "plan_id": str(plan.id),
+            "plan_date": plan.plan_date.isoformat(),
+            "revision": plan.revision,
+            "timezone": plan.timezone,
+            "daily_budget_minutes": plan.daily_budget_minutes,
+            "allocated_minutes": plan.allocated_minutes,
+            "allocation": plan.allocation,
+            "rotation_offset": plan.rotation_offset,
+            "rule_version": plan.rule_version,
+            "generated_at": plan.generated_at.isoformat(),
+        },
+        "tasks": tasks,
+        "notes": plan.notes,
+    }
+
+
+def start_task(*, user, task_id: str, now=None) -> tuple[StudyTask, dict]:
+    """Start a task after re-validating that the question is still usable."""
+    task = (
+        StudyTask.objects.filter(id=task_id, user=user).select_related("question", "subject", "project").first()
+    )
+    if task is None:
+        raise ScopeViolation(message="任务不存在或不在当前权限范围")
+    if task.project.is_archived:
+        raise InvalidInput(message="项目已归档，任务不可开始")
+    if task.status in {TaskStatus.COMPLETED, TaskStatus.SKIPPED, TaskStatus.INVALIDATED}:
+        raise InvalidInput(message=f"任务状态为 {task.status}，不能开始", details={"status": task.status})
+    ok, reason = _eligible_question(task.question)
+    if not ok:
+        task.status = TaskStatus.INVALIDATED
+        task.invalidated_reason = reason
+        task.save(update_fields=["status", "invalidated_reason", "updated_at"])
+        raise InvalidInput(message=f"题目当前不可用：{reason}")
+    status = pairing_service.delayed_interval_status(task=task, now=now)
+    if not status["satisfied"]:
+        raise InvalidInput(message=status["reason"], details={"not_before": status.get("not_before")})
+    review = getattr(task, "review_task", None)
+    if review is not None and not review.was_started:
+        review.was_started = True
+        review.save(update_fields=["was_started", "updated_at"])
+    task.status = TaskStatus.IN_PROGRESS
+    task.started_at = task.started_at or (now or timezone.now())
+    task.save(update_fields=["status", "started_at", "updated_at"])
+    return task, status
+
+
+def defer_task(*, user, task_id: str, reason: str = "") -> StudyTask:
+    task = StudyTask.objects.filter(id=task_id, user=user).first()
+    if task is None:
+        raise ScopeViolation(message="任务不存在或不在当前权限范围")
+    if task.status == TaskStatus.COMPLETED:
+        raise InvalidInput(message="已完成任务不能顺延")
+    task.status = TaskStatus.DEFERRED
+    task.reason_codes = list(task.reason_codes or []) + [f"deferred:{reason[:60] or 'user'}"]
+    task.save(update_fields=["status", "reason_codes", "updated_at"])
+    return task
+
+
+def skip_task(*, user, task_id: str, reason: str = "") -> StudyTask:
+    task = StudyTask.objects.filter(id=task_id, user=user).first()
+    if task is None:
+        raise ScopeViolation(message="任务不存在或不在当前权限范围")
+    task.status = TaskStatus.SKIPPED
+    task.invalidated_reason = reason[:300]
+    task.save(update_fields=["status", "invalidated_reason", "updated_at"])
+    return task
+
+
+def backlog_summary(*, user, now=None) -> list[dict]:
+    """Overdue tasks carried forward, reported as a backlog count."""
+    moment = now or timezone.now()
+    rows: list[dict] = []
+    for project in active_projects(user):
+        overdue = StudyTask.objects.filter(
+            user=user,
+            project=project,
+            status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED],
+            due_at__lt=moment,
+        ).count()
+        if overdue:
+            rows.append({"project_id": str(project.id), "project_name": project.name, "overdue_tasks": overdue})
+    return rows
+
+
+def progress_notes(*, user, now=None) -> list[str]:
+    """Explain the current state with real counts only."""
+    notes: list[str] = []
+    unresolved = PracticeSession.objects.filter(
+        user=user, status=SessionStatus.ACTIVE, mode="verification"
+    ).count()
+    if unresolved:
+        notes.append(f"有 {unresolved} 个验证会话尚未结束：结束前不显示分数，也不提供答案。")
+    excluded = (
+        LearningEvidence.objects.filter(user=user, is_active=True)
+        .filter(dimension=EvidenceDimension.INDEPENDENT_CORRECT, qualifies=False)
+        .count()
+    )
+    if excluded:
+        notes.append(f"有 {excluded} 条作答未计入严格独立证据（可在证据列表查看排除原因）。")
+    undiagnosed = LearnerKnowledgeState.objects.filter(
+        user=user, summary=KnowledgeStateSummary.UNDIAGNOSED
+    ).count()
+    if undiagnosed:
+        notes.append(f"仍有 {undiagnosed} 个考点未诊断。")
+    return notes
+
+
+def unclassified_weight_warning(*, project) -> list[str]:
+    """Node weights must account for the whole score; unclassified is explicit."""
+    total = (
+        QuestionKnowledge.objects.filter(
+            question_version__status="published",
+            question_version__question__subject__project=project,
+            is_primary=True,
+        ).aggregate(value=Sum("score_weight"))["value"]
+        or Decimal("0")
+    )
+    if total == 0:
+        return ["该项目尚无已发布题目的考点权重，考点地图与报告暂无可归属分值。"]
+    return []
+
+
+def plan_delta_minutes(plan: StudyPlan) -> int:
+    return plan.daily_budget_minutes - plan.allocated_minutes
+
+
+def next_day(on_date: date) -> date:
+    return on_date + timedelta(days=1)
