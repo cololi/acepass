@@ -6,15 +6,26 @@ from typing import Any
 
 from ninja import Schema
 
+from ai.providers import base as providers
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
 from apps.common.enums import SessionMode
-from apps.common.errors import AlreadySubmitted, InvalidInput, PurposeNotAllowed, ScopeViolation
+from apps.common.errors import (
+    AiNotConfigured,
+    AlreadySubmitted,
+    DependencyUnavailable,
+    InvalidInput,
+    PurposeNotAllowed,
+    ScopeViolation,
+)
 from apps.common.scope import require_project, require_subject
-from apps.practice.models import Attempt, PracticeSession, SessionItem
+from apps.practice.models import AnswerTranscription, Attempt, DiagnosisFollowUp, PracticeSession, SessionItem
 from apps.practice.services import attempts as attempt_services
+from apps.practice.services import diagnosis as diagnosis_services
+from apps.practice.services import estimation as estimation_services
 from apps.practice.services import exposure, verification_gate
 from apps.practice.services import sessions as session_services
+from apps.practice.services import transcription as transcription_services
 
 practice_router = project_scoped_router(tags=["practice"])
 
@@ -648,3 +659,290 @@ def _rubric_payload(item: SessionItem) -> dict | None:
         "criteria": rubric.criteria,
         "total_score": str(rubric.total_score),
     }
+
+
+# --------------------------------------------------------------------------
+# P1 batch 3 (B07): transcription confirmation, AI estimation, AI diagnosis
+# --------------------------------------------------------------------------
+class TranscriptionRequestIn(Schema):
+    asset_id: str
+    #: The learner's own transcription text. When present, no model is called and
+    #: the row is recorded as ``origin="manual"`` and already confirmed.
+    text: str | None = None
+
+
+class TranscriptionOut(Schema):
+    transcription_id: str
+    attempt_id: str
+    asset_id: str
+    origin: str
+    status: str
+    raw_text: str
+    confirmed_text: str
+    confidence: float | None
+    doubts: list[Any]
+    is_stub: bool
+    note: str
+    is_confirmed: bool
+    decided_at: str | None
+    llm_run_id: str | None
+    prompt_version: str
+
+
+class TranscriptionConfirmIn(Schema):
+    #: ``None`` accepts the model text as-is; a string is the learner's own text.
+    text: str | None = None
+    note: str = ""
+
+
+class TranscriptionRejectIn(Schema):
+    note: str = ""
+
+
+class DiagnosisRequestIn(Schema):
+    learner_note: str = ""
+
+
+class FollowUpAnswerIn(Schema):
+    text: str
+
+
+def _attempt_scope(user, project, attempt_id: str) -> Attempt:
+    """Owner-scoped attempt. A foreign attempt is a 404, never a hint that it exists."""
+    attempt = (
+        Attempt.objects.filter(id=attempt_id, project=project, user=user)
+        .select_related(
+            "session_item__session",
+            "session_item__question_version__question",
+            "session_item__rubric_version",
+            "current_grade_event",
+        )
+        .first()
+    )
+    if attempt is None:
+        raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    return attempt
+
+
+def _transcription_scope(user, project, transcription_id: str) -> AnswerTranscription:
+    transcription = (
+        AnswerTranscription.objects.filter(
+            id=transcription_id, attempt__project=project, attempt__user=user
+        )
+        .select_related("attempt")
+        .first()
+    )
+    if transcription is None:
+        raise ScopeViolation(message="转写不存在或不在当前权限范围")
+    return transcription
+
+
+def _follow_up_scope(user, project, follow_up_id: str) -> DiagnosisFollowUp:
+    follow_up = DiagnosisFollowUp.objects.filter(
+        id=follow_up_id, attempt__project=project, attempt__user=user
+    ).first()
+    if follow_up is None:
+        raise ScopeViolation(message="追问不存在或不在当前权限范围")
+    return follow_up
+
+
+def _raise_ai_error(exc: providers.AiError, *, action: str) -> None:
+    """Map provider failures the way the rest of the product does.
+
+    A missing capability is "AI not configured" (503), anything else the provider
+    raised is a dependency failure (503) — never a fabricated result.
+    """
+    if isinstance(exc, providers.AiUnavailable):
+        raise AiNotConfigured(
+            message=f"{action}需要配置 AI 能力：{exc}", details={"error_code": exc.code}
+        ) from exc
+    raise DependencyUnavailable(
+        message=f"{action}失败：{exc}", details={"error_code": exc.code}
+    ) from exc
+
+
+def _assert_delivery_visible(*, attempt: Attempt, action: str) -> None:
+    """The shared content gate: no score-shaped delivery while grading is hidden."""
+    if session_services.delivery_hidden_for_item(item=attempt.session_item, user=attempt.user):
+        raise PurposeNotAllowed(
+            message=f"验证/考试进行中：为避免泄露答案，验证结束前不能{action}。",
+            details={"reason": "grading_hidden", "attempt_id": str(attempt.id)},
+        )
+
+
+@practice_router.get("/projects/{project_id}/attempts/{attempt_id}/transcriptions", auth=auth)
+def list_transcriptions(request, project_id: str, attempt_id: str):
+    """Transcriptions of one attempt, including which photos still block grading."""
+    project = require_project(request.user, project_id)
+    attempt = _attempt_scope(request.user, project, attempt_id)
+    pending = transcription_services.handwriting_assets(attempt)
+    rows = AnswerTranscription.objects.filter(attempt=attempt).order_by("created_at")
+    return {
+        "attempt_id": str(attempt.id),
+        "attachment_asset_ids": [str(asset_id) for asset_id in (attempt.attachments or [])],
+        "pending_asset_ids": pending,
+        "transcription_required": bool(pending),
+        "gate_open": not pending,
+        "transcriptions": [transcription_services.transcription_payload(row) for row in rows],
+    }
+
+
+@practice_router.post(
+    "/projects/{project_id}/attempts/{attempt_id}/transcriptions", auth=auth, response={201: TranscriptionOut}
+)
+def create_transcription(request, project_id: str, attempt_id: str, payload: TranscriptionRequestIn):
+    """Request one handwriting transcription, or record the learner's own text.
+
+    With ``text`` the learner is telling the system what they wrote (the only path
+    when no vision model is configured, and always available as a correction);
+    without it a vision provider reads the photo and the result stays a proposal.
+    """
+    project = require_project(request.user, project_id)
+    attempt = _attempt_scope(request.user, project, attempt_id)
+    key = idempotency_key(request)
+    scope = f"attempts.transcribe:{attempt_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    if payload.text is not None:
+        # An explicit (even blank) ``text`` means "this is what I wrote": a blank
+        # one is a client mistake the learner must see, not a silent fallback into
+        # a model call.
+        transcription = transcription_services.record_manual_transcription(
+            attempt=attempt, asset_id=payload.asset_id, text=payload.text, actor=request.user
+        )
+    else:
+        try:
+            transcription = transcription_services.request_transcription(
+                attempt=attempt, asset_id=payload.asset_id, actor=request.user
+            )
+        except providers.AiError as exc:
+            _raise_ai_error(exc, action="手写转写")
+    result = transcription_services.transcription_payload(transcription)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="answer_transcription",
+        resource_id=transcription.id,
+    )
+    return 201, result
+
+
+@practice_router.post(
+    "/projects/{project_id}/transcriptions/{transcription_id}/confirm", auth=auth, response=TranscriptionOut
+)
+def confirm_transcription(request, project_id: str, transcription_id: str, payload: TranscriptionConfirmIn):
+    """Confirm (or correct) what the learner actually wrote. This opens the gate."""
+    project = require_project(request.user, project_id)
+    transcription = _transcription_scope(request.user, project, transcription_id)
+    transcription = transcription_services.confirm_transcription(
+        transcription=transcription, actor=request.user, text=payload.text
+    )
+    if payload.note:
+        transcription.note = payload.note[:500]
+        transcription.save(update_fields=["note", "updated_at"])
+    return transcription_services.transcription_payload(transcription)
+
+
+@practice_router.post(
+    "/projects/{project_id}/transcriptions/{transcription_id}/reject", auth=auth, response=TranscriptionOut
+)
+def reject_transcription(request, project_id: str, transcription_id: str, payload: TranscriptionRejectIn):
+    """Reject the proposal: the photo stays unconfirmed and grading stays blocked."""
+    project = require_project(request.user, project_id)
+    transcription = _transcription_scope(request.user, project, transcription_id)
+    transcription = transcription_services.reject_transcription(
+        transcription=transcription, actor=request.user, note=payload.note
+    )
+    return transcription_services.transcription_payload(transcription)
+
+
+@practice_router.post("/projects/{project_id}/attempts/{attempt_id}/ai-estimate", auth=auth)
+def create_ai_estimate(request, project_id: str, attempt_id: str):
+    """Per-criterion reference estimate. Never a confirmed score."""
+    project = require_project(request.user, project_id)
+    attempt = _attempt_scope(request.user, project, attempt_id)
+    key = idempotency_key(request)
+    scope = f"attempts.ai-estimate:{attempt_id}"
+    replay = idempotency.claim(request.user, scope, key, {})
+    if replay is not None:
+        # A stored estimate is still a score-shaped disclosure: re-check the gate
+        # instead of handing back a body that may now be hidden (C01).
+        _assert_delivery_visible(attempt=attempt, action="读取 AI 估分")
+        return replay.status_code, replay.body
+    try:
+        event = estimation_services.estimate_grade(attempt=attempt, actor=request.user)
+    except providers.AiError as exc:
+        _raise_ai_error(exc, action="AI 估分")
+    result = estimation_services.estimate_payload(event)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=200,
+        response_body=result,
+        resource_type="grade_event",
+        resource_id=event.id,
+    )
+    return result
+
+
+@practice_router.get("/projects/{project_id}/attempts/{attempt_id}/ai-estimate", auth=auth)
+def get_ai_estimate(request, project_id: str, attempt_id: str):
+    """The latest estimate, or an explicit "no estimate yet" state."""
+    project = require_project(request.user, project_id)
+    attempt = _attempt_scope(request.user, project, attempt_id)
+    _assert_delivery_visible(attempt=attempt, action="读取 AI 估分")
+    return estimation_services.estimate_state(attempt)
+
+
+@practice_router.post("/projects/{project_id}/attempts/{attempt_id}/ai-diagnosis", auth=auth)
+def create_ai_diagnosis(request, project_id: str, attempt_id: str, payload: DiagnosisRequestIn):
+    """Candidate error causes plus the follow-up questions that would settle them."""
+    project = require_project(request.user, project_id)
+    attempt = _attempt_scope(request.user, project, attempt_id)
+    key = idempotency_key(request)
+    scope = f"attempts.ai-diagnosis:{attempt_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        _assert_delivery_visible(attempt=attempt, action="读取 AI 诊断")
+        return replay.status_code, replay.body
+    try:
+        result = diagnosis_services.propose_diagnosis(
+            attempt=attempt, actor=request.user, learner_note=payload.learner_note
+        )
+    except providers.AiError as exc:
+        _raise_ai_error(exc, action="AI 诊断")
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=200,
+        response_body=result,
+        resource_type="error_diagnosis",
+        resource_id=result["llm_run_id"],
+    )
+    return result
+
+
+@practice_router.post("/projects/{project_id}/diagnosis-follow-ups/{follow_up_id}/answer", auth=auth)
+def answer_diagnosis_follow_up(request, project_id: str, follow_up_id: str, payload: FollowUpAnswerIn):
+    project = require_project(request.user, project_id)
+    follow_up = _follow_up_scope(request.user, project, follow_up_id)
+    follow_up = diagnosis_services.answer_follow_up(
+        follow_up=follow_up, actor=request.user, text=payload.text
+    )
+    return diagnosis_services.follow_up_payload(follow_up)
+
+
+@practice_router.post("/projects/{project_id}/diagnosis-follow-ups/{follow_up_id}/skip", auth=auth)
+def skip_diagnosis_follow_up(request, project_id: str, follow_up_id: str):
+    project = require_project(request.user, project_id)
+    follow_up = _follow_up_scope(request.user, project, follow_up_id)
+    follow_up = diagnosis_services.skip_follow_up(follow_up=follow_up, actor=request.user)
+    return diagnosis_services.follow_up_payload(follow_up)

@@ -340,3 +340,24 @@ class SearchChannel(models.TextChoices):
     KEYWORD = "keyword", "关键词"
     VECTOR = "vector", "向量"
     HYBRID = "hybrid", "混合"
+
+
+class TranscriptionStatus(models.TextChoices):
+    """Review state of a handwriting transcription proposal.
+
+    A model transcription is inert until a human confirms or edits it: grading,
+    estimation and diagnosis may only use ``confirmed_text``.
+    """
+
+    PROPOSED = "proposed", "待确认"
+    CONFIRMED = "confirmed", "已确认"
+    EDITED = "edited", "已修改确认"
+    REJECTED = "rejected", "已否决"
+
+
+class FollowUpStatus(models.TextChoices):
+    """State of one diagnostic follow-up question asked of the learner."""
+
+    PENDING = "pending", "待回答"
+    ANSWERED = "answered", "已回答"
+    SKIPPED = "skipped", "已跳过"

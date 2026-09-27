@@ -11,11 +11,13 @@ from apps.common.enums import (
     EvidenceDimension,
     ExposureKind,
     ExposurePurpose,
+    FollowUpStatus,
     GradeEventKind,
     GradeMethod,
     GradeStatus,
     SessionMode,
     SessionStatus,
+    TranscriptionStatus,
 )
 from apps.common.models import BaseModel
 
@@ -292,6 +294,87 @@ class ErrorDiagnosis(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.error_type}:{self.status}"
+
+
+class AnswerTranscription(BaseModel):
+    """One handwriting-transcription record for one answer photo.
+
+    A vision model may read the image, and the learner then confirms or edits what
+    the system thinks they wrote. Without a vision model the learner types the
+    text themselves (``origin="manual"``), which is the honest fallback the P0
+    import path already uses. Only :attr:`confirmed_text` may feed grading,
+    estimation or diagnosis — :attr:`raw_text` is a *proposal* and is never a
+    source of truth. ``is_stub`` marks a test/demo transcription, which is never a
+    real recognition result.
+    """
+
+    attempt = models.ForeignKey(Attempt, on_delete=models.CASCADE, related_name="transcriptions")
+    #: The id inside ``Attempt.attachments`` (append-only asset list).
+    asset_id = models.CharField(max_length=64)
+    #: ``model`` when a vision provider read the photo, ``manual`` when the learner
+    #: typed their own work. A manual row is never labelled as a recognition result.
+    origin = models.CharField(max_length=16, default="model")
+    run = models.ForeignKey(
+        "audit.LLMRun", null=True, blank=True, on_delete=models.SET_NULL, related_name="transcriptions"
+    )
+    status = models.CharField(
+        max_length=16, choices=TranscriptionStatus.choices, default=TranscriptionStatus.PROPOSED, db_index=True
+    )
+    raw_text = models.TextField(blank=True)
+    confirmed_text = models.TextField(blank=True)
+    confidence = models.FloatField(null=True, blank=True)
+    doubts = models.JSONField(default=list, blank=True)
+    is_stub = models.BooleanField(default=False, help_text="由测试/演示 stub 产生的转写，不是真实识别结果")
+    decided_by = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="decided_transcriptions"
+    )
+    decided_at = models.DateTimeField(null=True, blank=True)
+    note = models.CharField(max_length=500, blank=True)
+
+    class Meta:
+        db_table = "practice_answer_transcription"
+        constraints = [
+            models.UniqueConstraint(fields=["attempt", "asset_id"], name="uniq_transcription_per_asset"),
+        ]
+        indexes = [models.Index(fields=["attempt", "status"])]
+        ordering = ["attempt", "created_at"]
+        verbose_name = "手写转写"
+        verbose_name_plural = "手写转写"
+
+    def __str__(self) -> str:
+        return f"transcription {self.status} asset={self.asset_id[:8]}"
+
+
+class DiagnosisFollowUp(BaseModel):
+    """One question the diagnosis asked the learner, and the answer if given.
+
+    Follow-up answers are the process evidence a model cannot read from a photo;
+    storing them as ``pending`` rows (instead of showing and dropping them) is what
+    makes "证据不足就问" auditable.
+    """
+
+    attempt = models.ForeignKey(Attempt, on_delete=models.CASCADE, related_name="diagnosis_follow_ups")
+    question = models.CharField(max_length=500)
+    why = models.CharField(max_length=300, blank=True)
+    evidence_kind = models.CharField(max_length=60, blank=True)
+    status = models.CharField(
+        max_length=16, choices=FollowUpStatus.choices, default=FollowUpStatus.PENDING, db_index=True
+    )
+    answer_text = models.TextField(blank=True)
+    run = models.ForeignKey(
+        "audit.LLMRun", null=True, blank=True, on_delete=models.SET_NULL, related_name="diagnosis_follow_ups"
+    )
+    answered_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "practice_diagnosis_follow_up"
+        indexes = [models.Index(fields=["attempt", "status"])]
+        ordering = ["attempt", "created_at"]
+        verbose_name = "诊断追问"
+        verbose_name_plural = "诊断追问"
+
+    def __str__(self) -> str:
+        return f"follow-up {self.status}"
 
 
 class LearningEvidence(BaseModel):

@@ -95,6 +95,46 @@ class TutorJob(BaseModel):
         return f"tutor job {self.status}"
 
 
+class TutorSegment(BaseModel):
+    """One append-only, *validated* content block of a tutor job (B08).
+
+    Only content that already passed the existing structured-output validation
+    (``ai.prompts.registry.validate_explain_payload``) is ever stored here, and a
+    stale segment is never delivered: the row mirrors ``TutorJob.result_blocks``
+    block by block after the job reached ``succeeded``, so a partial model
+    stream, a rejected payload or an invented citation has nothing to mirror.
+
+    ``index`` is both the block position and the SSE event id, which makes the
+    reconnect cursor a plain "send everything after this index" question instead
+    of a second, lossy notion of position.
+    """
+
+    job = models.ForeignKey(TutorJob, on_delete=models.CASCADE, related_name="segments")
+    index = models.PositiveIntegerField()
+    #: text / math / list — the validated block kinds, nothing else.
+    kind = models.CharField(max_length=16)
+    text = models.TextField(blank=True)
+    #: list blocks only; empty for text and math.
+    items = models.JSONField(default=list, blank=True)
+    #: sha256 of the canonical block, so tampering with a row is detectable.
+    digest = models.CharField(max_length=64)
+    #: Set when the frozen source this content was built from no longer holds.
+    is_stale = models.BooleanField(default=False, db_index=True)
+    stale_reason = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        db_table = "tutoring_segment"
+        constraints = [
+            models.UniqueConstraint(fields=["job", "index"], name="uniq_tutor_segment_index"),
+        ]
+        ordering = ["job", "index"]
+        verbose_name = "辅导内容片段"
+        verbose_name_plural = "辅导内容片段"
+
+    def __str__(self) -> str:
+        return f"{self.job_id}#{self.index} ({self.kind})"
+
+
 class TutorTurn(BaseModel):
     """Conversation log. Kept separate from the validated job output."""
 

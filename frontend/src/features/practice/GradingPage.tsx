@@ -10,6 +10,7 @@ import {
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
 import { GradePanel, OriginalWork } from './PracticePage'
+import { AiEstimatePanel, TranscriptionPanel } from './AiAssistPanels'
 
 const TYPE_LABELS: Record<string, string> = {
   single_choice: '单选题',
@@ -211,6 +212,39 @@ export function GradingPage() {
 
                 <h3>学生的原始作答</h3>
                 <OriginalWork detail={toOriginalWork(active)} projectId={projectId} />
+
+                {/* Transcriptions, estimates and diagnosis are owner-scoped on the
+                    server: for someone else's attempt they would answer with a scope
+                    error three times over, so the reviewer gets one plain note. */}
+                {!active.is_own_attempt ? (
+                  <div className="notice info" data-testid="reviewer-scope-note">
+                    这是他人的作答：AI 转写确认与 AI 估分按作答归属校验，只能由作答者本人操作。
+                    请直接使用下方的评分标准与逐评分点人工打分；你的确认会记录为复核确认。
+                  </div>
+                ) : (
+                  <>
+                    <TranscriptionPanel
+                      projectId={projectId}
+                      attemptId={active.attempt_id}
+                      assetIds={active.attachments}
+                    />
+
+                    <AiEstimatePanel
+                      projectId={projectId}
+                      attemptId={active.attempt_id}
+                      partIds={active.parts.map((part) => part.part_id)}
+                      criterionDescriptions={Object.fromEntries(
+                        (active.rubric?.criteria ?? [])
+                          .filter((criterion) => criterion.criterion_id)
+                          .map((criterion) => [
+                            String(criterion.criterion_id),
+                            String(criterion.text ?? criterion.description ?? ''),
+                          ]),
+                      )}
+                      onPrefill={(values) => setScores((current) => ({ ...current, ...values }))}
+                    />
+                  </>
+                )}
 
                 {active.rubric ? (
                   <div className="card" style={{ background: '#f9fafc' }} data-testid="grading-rubric">

@@ -93,6 +93,19 @@ class DependencyUnavailable(AcePassError):
     message = "依赖服务不可用"
 
 
+class TranscriptionRequired(AcePassError):
+    """Handwritten work must be transcribed and confirmed by the learner first.
+
+    Raised before any AI estimation or diagnosis touches a photo answer: a model
+    must never grade or diagnose text it read only approximately, and the learner
+    has to confirm what the system thinks they wrote.
+    """
+
+    code = "transcription_required"
+    status_code = 409
+    message = "该作答含手写照片且尚未确认转写，请先确认或修改转写文本"
+
+
 class AiNotConfigured(AcePassError):
     code = "ai_not_configured"
     status_code = 503

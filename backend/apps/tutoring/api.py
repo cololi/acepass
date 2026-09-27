@@ -1,9 +1,10 @@
-"""Tutoring API: gated explanations, validated results and AI status."""
+"""Tutoring API: gated explanations, validated results, SSE and AI status."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from django.http import StreamingHttpResponse
 from ninja import Schema
 
 from apps.audit.services import idempotency, outbox
@@ -13,6 +14,7 @@ from apps.common.scope import require_project
 from apps.practice.models import SessionItem
 from apps.tutoring.models import TutorJob, TutorSession
 from apps.tutoring.services import core as tutor_services
+from apps.tutoring.services import streaming as tutor_streaming
 
 tutor_router = project_scoped_router(tags=["tutoring"])
 
@@ -53,6 +55,8 @@ class TutorJobOut(Schema):
     error_code: str
     error_message: str
     delivered_at: str | None
+    #: B08: validated segments available for replay (SSE or ``/segments``).
+    segment_count: int
     result_blocks: list[Any]
     citations: list[str]
     missing_information: list[str]
@@ -167,6 +171,94 @@ def post_message(request, project_id: str, tutor_session_id: str, payload: Tutor
     )
     outbox.after_commit_dispatch()
     return 201, result
+
+
+def _job_in_scope(request, project, job_id: str) -> TutorJob:
+    """Owner- and project-scoped job lookup; an outsider gets a 404, not a 403."""
+    job = (
+        TutorJob.objects.filter(id=job_id, project=project, user=request.user)
+        .select_related(
+            "llm_run",
+            "tutor_session__session_item__question_version",
+            "tutor_session__answer_key_version",
+        )
+        .first()
+    )
+    if job is None:
+        raise ScopeViolation(message="辅导任务不存在或不在当前权限范围")
+    return job
+
+
+def _last_event_id(request, after: int | None) -> int | None:
+    """The reconnect cursor: ``Last-Event-ID`` header, else explicit ``?after=``.
+
+    Event ids are segment indices, so the cursor is simply "I already have
+    everything up to n". An unreadable cursor is ignored rather than guessed at:
+    the client then receives the full validated transcript, which is honest and
+    lossless (never a re-generation).
+    """
+    raw = request.headers.get("Last-Event-ID") or request.META.get("HTTP_LAST_EVENT_ID")
+    if raw is not None and str(raw).strip():
+        try:
+            value: int | None = int(str(raw).strip())
+        except (TypeError, ValueError):
+            value = None
+        if value is not None and value >= 0:
+            return value
+    if after is not None and after >= 0:
+        return after
+    return None
+
+
+@tutor_router.get("/projects/{project_id}/tutor-jobs/{job_id}/stream", auth=auth)
+def stream_job(
+    request,
+    project_id: str,
+    job_id: str,
+    after: int | None = None,
+    poll_seconds: float = tutor_streaming.DEFAULT_POLL_SECONDS,
+    max_seconds: float = tutor_streaming.DEFAULT_STREAM_SECONDS,
+):
+    """Stream only the validated segments of a job, and never call a provider.
+
+    The job is generated once, by the POST that created it. This endpoint is a
+    read of the stored rows: reconnecting with ``Last-Event-ID`` (or ``?after=``)
+    resumes strictly after that segment index, so a dropped connection is free —
+    it cannot re-run the model, create an ``LLMRun`` or enqueue an outbox event.
+    A job whose frozen source no longer matches the live content yields one
+    ``event: error`` (``stale_source``) and no content at all.
+    """
+    project = require_project(request.user, project_id)
+    job = _job_in_scope(request, project, job_id)
+    # B02: stored content still holds the answer, so the stream obeys the same
+    # gate as the JSON read. It must run *before* the response starts: an
+    # exception raised inside a generator can no longer become a JSON error.
+    tutor_services.assert_job_deliverable(job)
+    response = StreamingHttpResponse(
+        tutor_streaming.stream_events(
+            job=job,
+            last_event_id=_last_event_id(request, after),
+            poll_seconds=poll_seconds,
+            max_seconds=max_seconds,
+        ),
+        content_type="text/event-stream",
+    )
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response
+
+
+@tutor_router.get("/projects/{project_id}/tutor-jobs/{job_id}/segments", auth=auth)
+def list_job_segments(request, project_id: str, job_id: str):
+    """The stored validated transcript, for a UI that does not hold an SSE stream.
+
+    Same rows, same staleness rule as the stream, so both surfaces agree on what
+    is deliverable.
+    """
+    project = require_project(request.user, project_id)
+    job = _job_in_scope(request, project, job_id)
+    tutor_services.assert_job_deliverable(job)
+    return tutor_streaming.segments_payload(job)
 
 
 @tutor_router.get("/projects/{project_id}/tutor-jobs/{job_id}", auth=auth, response=TutorJobOut)

@@ -16,6 +16,7 @@ import {
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
 import { Blocks } from '../../components/Content'
+import { DiagnosisPanel, TranscriptionPanel, TutorStreamPanel } from './AiAssistPanels'
 
 type AnswerState = Record<string, unknown>
 
@@ -635,7 +636,7 @@ export function PracticePage() {
                 当前会话不提供辅导：验证/考试模式下需要独立完成；如需讲解请结束验证后新建练习会话。
               </div>
             )}
-            {tutorJob ? <TutorPanel job={tutorJob} /> : null}
+            {tutorJob ? <TutorStreamPanel projectId={projectId} job={tutorJob} /> : null}
           </div>
         </div>
       ) : (
@@ -788,6 +789,19 @@ function SubmittedView({
           </div>
         ) : null}
 
+        {/* The photos the learner uploaded are right above this panel: a
+            transcription proposal is confirmed where the work is visible. Only a
+            constructed response carries handwritten work the gate cares about. */}
+        {questionType === 'constructed_response' ? (
+          <div style={{ marginTop: 12 }}>
+            <TranscriptionPanel
+              projectId={projectId}
+              attemptId={attempt.attempt_id}
+              assetIds={detail?.attachments ?? []}
+            />
+          </div>
+        ) : null}
+
         <div className="row" style={{ marginTop: 10 }}>
           {canReveal ? (
             <button
@@ -830,9 +844,10 @@ function SubmittedView({
       {tutorJob ? (
         <div className="card">
           <h2>按需辅导</h2>
-          <TutorPanel job={tutorJob} />
+          <TutorStreamPanel projectId={projectId} job={tutorJob} />
         </div>
       ) : null}
+      <DiagnosisPanel projectId={projectId} attemptId={attempt.attempt_id} />
       {session ? null : null}
     </>
   )
@@ -989,46 +1004,4 @@ function RevealPanel({ reveal }: { reveal: RevealOut }) {
   )
 }
 
-function TutorPanel({ job }: { job: TutorJobOut }) {
-  return (
-    <div className="card" style={{ background: '#fbfcfe' }}>
-      <div className="row between">
-        <h3 style={{ margin: 0 }}>辅导结果</h3>
-        <span className={`pill ${job.is_stub ? 'warn' : job.status === 'succeeded' ? 'ok' : 'danger'}`}>
-          {job.is_stub ? '测试/演示 stub（非真实模型）' : job.status}
-        </span>
-      </div>
-      {job.is_stub ? (
-        <div className="notice warn">
-          当前运行在测试/演示模式，讲解内容来自 stub provider，不代表真实模型输出，也不会用于任何正式内容。
-        </div>
-      ) : null}
-      {job.status !== 'succeeded' ? (
-        <div className="notice danger">
-          {job.error_message || '辅导未成功'}
-          {job.error_code === 'ai_not_configured' ? '（AI 未配置：手动录题、作答、判分与复习仍可正常使用）' : ''}
-        </div>
-      ) : (
-        <>
-          <p className="tiny muted">
-            提供商 {job.provider || '—'} · 模型 {job.model || '—'} · 提示词版本 {job.prompt_version}
-            {job.reveals_answer ? ' · 本次包含答案性内容，已记录答案暴露' : ' · 仅提示，已记录辅助暴露'}
-          </p>
-          <Blocks blocks={job.result_blocks} />
-          {job.missing_information.length ? (
-            <p className="small">
-              <strong>缺失信息：</strong>
-              {job.missing_information.join('；')}
-            </p>
-          ) : null}
-          {job.suggested_next.length ? (
-            <p className="small">
-              <strong>建议下一步：</strong>
-              {job.suggested_next.join('；')}
-            </p>
-          ) : null}
-        </>
-      )}
-    </div>
-  )
-}
+/* 辅导结果由 TutorStreamPanel 渲染：SSE 分段 + 存储分段回退（B08）。 */

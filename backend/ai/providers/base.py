@@ -26,6 +26,7 @@ logger = logging.getLogger("apps.ai")
 
 CAPABILITIES = (
     "extract_question",
+    "transcribe_handwriting",
     "suggest_tags",
     "explain",
     "diagnose",
@@ -36,6 +37,21 @@ CAPABILITIES = (
 
 #: P0 only implements these two; the rest stay registered but disabled.
 P0_CAPABILITIES = ("extract_question", "explain")
+
+#: Capabilities the offline stub can answer. Every stub result carries
+#: ``is_stub=True`` and the UI labels it, so a demo can never pass for a real
+#: model result.
+#:
+#: ``suggest_tags`` is deliberately absent: the knowledge tag queue is only ever
+#: filled by a real text model, so "no provider" stays an explicit
+#: ``ai_not_configured`` instead of an empty stub proposal.
+STUB_CAPABILITIES = (
+    "extract_question",
+    "transcribe_handwriting",
+    "explain",
+    "diagnose",
+    "estimate_grade",
+)
 
 
 class AiError(RuntimeError):
@@ -143,7 +159,9 @@ class OpenAICompatibleProvider(BaseProvider):
         if text_model:
             capabilities.extend(["explain", "diagnose", "suggest_tags", "estimate_grade"])
         if vision_model:
-            capabilities.append("extract_question")
+            # Handwriting transcription is a vision job: a text-only provider must
+            # never be asked to read a photo.
+            capabilities.extend(["extract_question", "transcribe_handwriting"])
         self.capabilities = tuple(capabilities)
 
     def _endpoint(self) -> str:
@@ -152,9 +170,9 @@ class OpenAICompatibleProvider(BaseProvider):
         return f"{self.base_url}/chat/completions"
 
     def _model_for(self, capability: str) -> str:
-        if capability == "extract_question":
+        if capability in {"extract_question", "transcribe_handwriting"}:
             if not self.vision_model:
-                raise AiUnavailable("该 provider 未配置视觉模型，不能执行图片识别")
+                raise AiUnavailable("该 provider 未配置视觉模型，不能执行图片识别或手写转写")
             return self.vision_model
         if not self.text_model:
             raise AiUnavailable("该 provider 未配置文本模型")
@@ -259,7 +277,7 @@ class StubProvider(BaseProvider):
 
     name = "stub"
     is_stub = True
-    capabilities = P0_CAPABILITIES
+    capabilities = STUB_CAPABILITIES
 
     def __init__(self, *, behaviour: str = "ok"):
         self.behaviour = behaviour
@@ -308,6 +326,42 @@ class StubProvider(BaseProvider):
                     "doubts": ["stub 输出仅供联调，不能作为正式内容"],
                 },
             )
+        if request.capability == "transcribe_handwriting":
+            return self._result(
+                request,
+                {
+                    "text": "【stub 转写】这是测试/演示模式的占位转写，不是真实识别结果。",
+                    "confidence": 0.0,
+                    "doubts": ["stub 输出：请人工核对原图并修改后再确认"],
+                    "illegible": False,
+                },
+            )
+        if request.capability == "estimate_grade":
+            return self._result(
+                request,
+                {
+                    "criteria": [],
+                    "overall_note": "【stub 估分】stub 不产生任何评分点分数：请人工逐点确认。",
+                    "confidence": 0.0,
+                },
+            )
+        if request.capability == "diagnose":
+            return self._result(
+                request,
+                {
+                    "causes": [{"error_type": "unknown", "confidence": 0.0, "evidence": []}],
+                    "follow_up_questions": [
+                        {
+                            "question": "【stub 追问】请写下你当时的完整推导步骤。",
+                            "why": "stub 没有过程证据，只能请你补充",
+                            "evidence_kind": "过程步骤",
+                        }
+                    ],
+                    "missing_information": ["stub 输出没有诊断依据"],
+                },
+            )
+        if request.capability == "suggest_tags":
+            return self._result(request, {"tags": []})
         raise AiUnavailable(f"stub 未实现能力：{request.capability}")
 
     def _result(self, request: AiRequest, payload: dict[str, Any]) -> AiCallResult:

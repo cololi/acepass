@@ -39,6 +39,7 @@ from apps.common.errors import InvalidInput, PurposeNotAllowed, ScopeViolation
 from apps.practice.models import Attempt, ExposureEvent, SessionItem
 from apps.practice.services import exposure
 from apps.tutoring.models import TutorJob, TutorSession, TutorTurn
+from apps.tutoring.services import streaming as tutor_streaming
 
 logger = logging.getLogger("apps.tutoring")
 
@@ -473,6 +474,12 @@ def _finalize_success(*, job: TutorJob, purpose: str, claim) -> TutorJob:
         if locked is None or locked.status != TutorRequestStatus.SUCCEEDED:
             job.refresh_from_db()
             return job
+        # B08: mirror the validated blocks into append-only segment rows *in the
+        # same commit* as the assistant turn, so "the explanation was delivered"
+        # and "the segments a reconnect can replay exist" are one fact. This is
+        # idempotent (``(job, index)`` is unique), so the recovery re-delivery
+        # below completes a missing mirror instead of duplicating it.
+        tutor_streaming.append_segments(locked)
         if locked.finalized_at is None:
             item = locked.tutor_session.session_item
             if not TutorTurn.objects.filter(job=locked, role="assistant").exists():
@@ -735,6 +742,8 @@ def job_payload(job: TutorJob, *, include_content: bool = True) -> dict[str, Any
         "error_code": job.error_code,
         "error_message": job.error_message,
         "delivered_at": job.delivered_at.isoformat() if job.delivered_at else None,
+        # B08: how many validated segments the SSE transcript / stream can offer.
+        "segment_count": job.segments.count(),
     }
     if include_content and job.status == TutorRequestStatus.SUCCEEDED:
         payload["result_blocks"] = job.result_blocks
