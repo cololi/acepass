@@ -1,0 +1,147 @@
+ 
+ -------------- celery@Cololis-Mac-mini.local v5.5.3 (immunity)
+--- ***** ----- 
+-- ******* ---- macOS-27.0-arm64-arm-64bit 2026-09-27 08:21:49
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         acepass:0x107280aa0
+- ** ---------- .> transport:   redis://127.0.0.1:6391/0
+- ** ---------- .> results:     redis://127.0.0.1:6391/0
+- *** --- * --- .> concurrency: 1 (solo)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> ingestion        exchange=ingestion(direct) key=ingestion
+                .> projection       exchange=projection(direct) key=projection
+                .> tutoring         exchange=tutoring(direct) key=tutoring
+
+[tasks]
+  . audit.scan_outbox
+  . ingestion.extract_candidate
+  . learning.on_attempt_graded
+  . learning.on_session_finished
+  . learning.reconcile_plan
+  . learning.refresh_delayed_tasks
+  . projection.rebuild_after_answer_change
+  . projection.rebuild_attempt_evidence
+  . projection.refresh_paper_stats
+  . projection.regrade_effects
+  . projection.run_regrade
+  . tutoring.run_job
+
+[2026-09-27 08:21:49,510: INFO/MainProcess] Connected to redis://127.0.0.1:6391/0
+[2026-09-27 08:21:49,512: INFO/MainProcess] mingle: searching for neighbors
+[2026-09-27 08:21:50,519: INFO/MainProcess] mingle: all alone
+[2026-09-27 08:21:50,556: INFO/MainProcess] celery@Cololis-Mac-mini.local ready.
+[2026-09-27 08:22:06,792: INFO/MainProcess] Task projection.rebuild_attempt_evidence[23168ea8-a32c-4076-97d7-d6028a742ae5] received
+[2026-09-27 08:22:06,844: INFO/MainProcess] Task projection.rebuild_attempt_evidence[23168ea8-a32c-4076-97d7-d6028a742ae5] succeeded in 0.052765042000828544s: 'evidence_rows=6'
+[2026-09-27 08:22:06,845: INFO/MainProcess] Task learning.on_attempt_graded[f67a93c0-a2fb-4637-b1b1-4180fc419f95] received
+[2026-09-27 08:22:06,887: INFO/MainProcess] Task learning.on_attempt_graded[f67a93c0-a2fb-4637-b1b1-4180fc419f95] succeeded in 0.04177175000040734s: 'paired_tasks=0'
+[2026-09-27 08:22:06,888: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d26a7217-393f-4af2-b78d-9c9877140ecf] received
+[2026-09-27 08:22:06,906: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d26a7217-393f-4af2-b78d-9c9877140ecf] succeeded in 0.01828650000061316s: 'evidence_rows=6'
+[2026-09-27 08:22:06,907: INFO/MainProcess] Task learning.on_attempt_graded[c0071b46-20fd-405a-af2d-8aa55f2e0e06] received
+[2026-09-27 08:22:06,944: INFO/MainProcess] Task learning.on_attempt_graded[c0071b46-20fd-405a-af2d-8aa55f2e0e06] succeeded in 0.03670333400077652s: 'paired_tasks=0'
+[2026-09-27 08:22:07,046: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9dbafb19-8667-46d0-96cf-cf4a6a85d06d] received
+[2026-09-27 08:22:07,065: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9dbafb19-8667-46d0-96cf-cf4a6a85d06d] succeeded in 0.019004959000085364s: 'evidence_rows=6'
+[2026-09-27 08:22:07,066: INFO/MainProcess] Task learning.on_attempt_graded[40321807-d1b5-4b0f-a6db-ac0b32320ceb] received
+[2026-09-27 08:22:07,107: INFO/MainProcess] Task learning.on_attempt_graded[40321807-d1b5-4b0f-a6db-ac0b32320ceb] succeeded in 0.04114375000062864s: 'paired_tasks=1'
+[2026-09-27 08:22:07,600: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c7cc19ea-74a4-4d2b-af7a-a38328b73bb8] received
+[2026-09-27 08:22:07,624: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c7cc19ea-74a4-4d2b-af7a-a38328b73bb8] succeeded in 0.023373374999209773s: 'evidence_rows=6'
+[2026-09-27 08:22:07,625: INFO/MainProcess] Task learning.on_attempt_graded[b52e5800-9d3e-48fc-9202-dc38601b3c74] received
+[2026-09-27 08:22:07,673: INFO/MainProcess] Task learning.on_attempt_graded[b52e5800-9d3e-48fc-9202-dc38601b3c74] succeeded in 0.048093167000843096s: 'paired_tasks=0'
+[2026-09-27 08:22:08,118: INFO/MainProcess] Task projection.rebuild_attempt_evidence[248704a7-cca8-4a8a-b214-c6f46fbcee97] received
+[2026-09-27 08:22:08,143: INFO/MainProcess] Task projection.rebuild_attempt_evidence[248704a7-cca8-4a8a-b214-c6f46fbcee97] succeeded in 0.025302209000074072s: 'evidence_rows=6'
+[2026-09-27 08:22:08,144: INFO/MainProcess] Task learning.on_attempt_graded[9f202c06-3892-4854-ab63-68a5a82b2a30] received
+[2026-09-27 08:22:08,186: INFO/MainProcess] Task learning.on_attempt_graded[9f202c06-3892-4854-ab63-68a5a82b2a30] succeeded in 0.04144441700009338s: 'paired_tasks=0'
+[2026-09-27 08:22:08,595: INFO/MainProcess] Task projection.rebuild_attempt_evidence[61771385-a72e-4468-82b2-1167f8216ec0] received
+[2026-09-27 08:22:08,616: INFO/MainProcess] Task projection.rebuild_attempt_evidence[61771385-a72e-4468-82b2-1167f8216ec0] succeeded in 0.020234875000824104s: 'evidence_rows=6'
+[2026-09-27 08:22:08,617: INFO/MainProcess] Task learning.on_attempt_graded[61afb1b8-fb3d-4e3f-b87a-0f87de8b5dfe] received
+[2026-09-27 08:22:08,656: INFO/MainProcess] Task learning.on_attempt_graded[61afb1b8-fb3d-4e3f-b87a-0f87de8b5dfe] succeeded in 0.03931700000066485s: 'paired_tasks=0'
+[2026-09-27 08:22:09,112: INFO/MainProcess] Task projection.rebuild_attempt_evidence[026ec2d5-6ba3-4d08-98c9-0485e45fa728] received
+[2026-09-27 08:22:09,134: INFO/MainProcess] Task projection.rebuild_attempt_evidence[026ec2d5-6ba3-4d08-98c9-0485e45fa728] succeeded in 0.021722375000535976s: 'evidence_rows=6'
+[2026-09-27 08:22:09,135: INFO/MainProcess] Task learning.on_attempt_graded[119c947f-18c4-4141-a827-d9d7db8ed304] received
+[2026-09-27 08:22:09,173: INFO/MainProcess] Task learning.on_attempt_graded[119c947f-18c4-4141-a827-d9d7db8ed304] succeeded in 0.038016624999727355s: 'paired_tasks=0'
+[2026-09-27 08:22:10,009: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1ff9ef46-30d2-41b1-b5fb-0482732df37f] received
+[2026-09-27 08:22:10,028: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1ff9ef46-30d2-41b1-b5fb-0482732df37f] succeeded in 0.01936066700000083s: 'evidence_rows=6'
+[2026-09-27 08:22:10,029: INFO/MainProcess] Task learning.on_attempt_graded[423ec5ff-76d5-4d83-9b06-7e9363724920] received
+[2026-09-27 08:22:10,065: INFO/MainProcess] Task learning.on_attempt_graded[423ec5ff-76d5-4d83-9b06-7e9363724920] succeeded in 0.03599575000043842s: 'paired_tasks=1'
+[2026-09-27 08:22:10,856: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5df2d242-3820-4ca9-a939-81a9a1dafeba] received
+[2026-09-27 08:22:10,874: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5df2d242-3820-4ca9-a939-81a9a1dafeba] succeeded in 0.0177148330003547s: 'evidence_rows=6'
+[2026-09-27 08:22:10,875: INFO/MainProcess] Task learning.on_attempt_graded[ee2ef9f3-de59-4850-b7ef-811a9e1a33cd] received
+[2026-09-27 08:22:10,911: INFO/MainProcess] Task learning.on_attempt_graded[ee2ef9f3-de59-4850-b7ef-811a9e1a33cd] succeeded in 0.036329083999589784s: 'paired_tasks=0'
+[2026-09-27 08:22:11,160: INFO/MainProcess] Task projection.rebuild_attempt_evidence[12475264-c5b4-47c4-aae2-5c63403977d2] received
+[2026-09-27 08:22:11,179: INFO/MainProcess] Task projection.rebuild_attempt_evidence[12475264-c5b4-47c4-aae2-5c63403977d2] succeeded in 0.01934383299885667s: 'evidence_rows=6'
+[2026-09-27 08:22:11,180: INFO/MainProcess] Task learning.on_attempt_graded[df0ca4a3-aa03-41d1-8724-d046e090a0c9] received
+[2026-09-27 08:22:11,210: INFO/MainProcess] Task learning.on_attempt_graded[df0ca4a3-aa03-41d1-8724-d046e090a0c9] succeeded in 0.029267916999742738s: 'paired_tasks=0'
+[2026-09-27 08:22:13,045: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c326ee3c-c41d-495f-8d90-dbf2f44afbd5] received
+[2026-09-27 08:22:13,070: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c326ee3c-c41d-495f-8d90-dbf2f44afbd5] succeeded in 0.025027749999935622s: 'evidence_rows=6'
+[2026-09-27 08:22:13,071: INFO/MainProcess] Task learning.on_attempt_graded[dddc4ab3-a3a7-422f-9030-2a0d1d85549b] received
+[2026-09-27 08:22:13,116: INFO/MainProcess] Task learning.on_attempt_graded[dddc4ab3-a3a7-422f-9030-2a0d1d85549b] succeeded in 0.04517441600000893s: 'paired_tasks=1'
+[2026-09-27 08:22:14,164: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7582267e-c4c2-4756-b623-ec32ec9d9a32] received
+[2026-09-27 08:22:14,183: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7582267e-c4c2-4756-b623-ec32ec9d9a32] succeeded in 0.01942629100085469s: 'evidence_rows=6'
+[2026-09-27 08:22:14,184: INFO/MainProcess] Task learning.on_attempt_graded[be172f4f-652e-4b21-af15-8260caa4d592] received
+[2026-09-27 08:22:14,222: INFO/MainProcess] Task learning.on_attempt_graded[be172f4f-652e-4b21-af15-8260caa4d592] succeeded in 0.038006332999430015s: 'paired_tasks=0'
+[2026-09-27 08:22:14,502: INFO/MainProcess] Task tutoring.run_job[8138722c-3709-4c90-af05-3de332577dcc] received
+[2026-09-27 08:22:14,505: INFO/MainProcess] Task tutoring.run_job[8138722c-3709-4c90-af05-3de332577dcc] succeeded in 0.0021395829990069615s: 'unavailable'
+[2026-09-27 08:22:15,461: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1249ca7c-54b6-4183-8d55-24f1efb4f4e8] received
+[2026-09-27 08:22:15,487: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1249ca7c-54b6-4183-8d55-24f1efb4f4e8] succeeded in 0.025191624999933993s: 'evidence_rows=6'
+[2026-09-27 08:22:15,488: INFO/MainProcess] Task learning.on_attempt_graded[e4afe84b-babf-432b-93d6-a52b7fac9fbe] received
+[2026-09-27 08:22:15,519: INFO/MainProcess] Task learning.on_attempt_graded[e4afe84b-babf-432b-93d6-a52b7fac9fbe] succeeded in 0.03179354200074158s: 'paired_tasks=0'
+[2026-09-27 08:22:22,468: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b12548b8-f8fa-4049-a5a0-89d3af9d039c] received
+[2026-09-27 08:22:22,488: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b12548b8-f8fa-4049-a5a0-89d3af9d039c] succeeded in 0.020397207999849343s: 'evidence_rows=6'
+[2026-09-27 08:22:22,490: INFO/MainProcess] Task learning.on_attempt_graded[3075ac2c-65e0-4c16-a4e1-f612ac26c2a5] received
+[2026-09-27 08:22:22,529: INFO/MainProcess] Task learning.on_attempt_graded[3075ac2c-65e0-4c16-a4e1-f612ac26c2a5] succeeded in 0.039724500000374974s: 'paired_tasks=1'
+[2026-09-27 08:22:23,008: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a2163352-fb33-4dba-b57e-5d19c84b8fd7] received
+[2026-09-27 08:22:23,030: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a2163352-fb33-4dba-b57e-5d19c84b8fd7] succeeded in 0.021907999998802552s: 'evidence_rows=6'
+[2026-09-27 08:22:23,031: INFO/MainProcess] Task learning.on_attempt_graded[8c139607-ff65-4cc9-a657-1443aa8d3bfc] received
+[2026-09-27 08:22:23,074: INFO/MainProcess] Task learning.on_attempt_graded[8c139607-ff65-4cc9-a657-1443aa8d3bfc] succeeded in 0.043101374998514075s: 'paired_tasks=0'
+[2026-09-27 08:22:23,574: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1eb533de-cf0d-4658-b3d5-017947115192] received
+[2026-09-27 08:22:23,598: INFO/MainProcess] Task projection.rebuild_attempt_evidence[1eb533de-cf0d-4658-b3d5-017947115192] succeeded in 0.023949125001308857s: 'evidence_rows=6'
+[2026-09-27 08:22:23,599: INFO/MainProcess] Task learning.on_attempt_graded[55acddca-9953-4aaa-94ff-1b82808649d4] received
+[2026-09-27 08:22:23,639: INFO/MainProcess] Task learning.on_attempt_graded[55acddca-9953-4aaa-94ff-1b82808649d4] succeeded in 0.04009116599991103s: 'paired_tasks=0'
+[2026-09-27 08:22:24,051: INFO/MainProcess] Task projection.rebuild_attempt_evidence[486ca434-0f27-4b0d-9300-806ff354161a] received
+[2026-09-27 08:22:24,070: INFO/MainProcess] Task projection.rebuild_attempt_evidence[486ca434-0f27-4b0d-9300-806ff354161a] succeeded in 0.019875250000040978s: 'evidence_rows=6'
+[2026-09-27 08:22:24,071: INFO/MainProcess] Task learning.on_attempt_graded[00baeb6c-b1be-4faf-a810-3beabfeec432] received
+[2026-09-27 08:22:24,107: INFO/MainProcess] Task learning.on_attempt_graded[00baeb6c-b1be-4faf-a810-3beabfeec432] succeeded in 0.0358725410005718s: 'paired_tasks=0'
+[2026-09-27 08:22:24,617: INFO/MainProcess] Task projection.rebuild_attempt_evidence[8fec5d34-f731-4119-b253-40d43c0eb919] received
+[2026-09-27 08:22:24,640: INFO/MainProcess] Task projection.rebuild_attempt_evidence[8fec5d34-f731-4119-b253-40d43c0eb919] succeeded in 0.023644457998670987s: 'evidence_rows=6'
+[2026-09-27 08:22:24,641: INFO/MainProcess] Task learning.on_attempt_graded[567529c9-7176-40d2-9ccd-e412bc327b13] received
+[2026-09-27 08:22:24,685: INFO/MainProcess] Task learning.on_attempt_graded[567529c9-7176-40d2-9ccd-e412bc327b13] succeeded in 0.04370891700091306s: 'paired_tasks=0'
+[2026-09-27 08:22:25,536: INFO/MainProcess] Task projection.rebuild_attempt_evidence[f9c73d18-d2dc-430d-a596-936e4486eb8f] received
+[2026-09-27 08:22:25,557: INFO/MainProcess] Task projection.rebuild_attempt_evidence[f9c73d18-d2dc-430d-a596-936e4486eb8f] succeeded in 0.020126375000472763s: 'evidence_rows=6'
+[2026-09-27 08:22:25,558: INFO/MainProcess] Task learning.on_attempt_graded[7ad91406-c8a1-44d4-8756-1fb768bfdfa9] received
+[2026-09-27 08:22:25,601: INFO/MainProcess] Task learning.on_attempt_graded[7ad91406-c8a1-44d4-8756-1fb768bfdfa9] succeeded in 0.042758625000715256s: 'paired_tasks=1'
+[2026-09-27 08:22:26,419: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c4b31639-7235-4c82-973b-9206b3c526d8] received
+[2026-09-27 08:22:26,438: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c4b31639-7235-4c82-973b-9206b3c526d8] succeeded in 0.018722583999988274s: 'evidence_rows=6'
+[2026-09-27 08:22:26,439: INFO/MainProcess] Task learning.on_attempt_graded[475430e1-e092-483d-848f-a9ff04bd44ee] received
+[2026-09-27 08:22:26,476: INFO/MainProcess] Task learning.on_attempt_graded[475430e1-e092-483d-848f-a9ff04bd44ee] succeeded in 0.03734370799975295s: 'paired_tasks=0'
+[2026-09-27 08:22:26,758: INFO/MainProcess] Task projection.rebuild_attempt_evidence[34a190ea-c4a7-462f-bf6d-51db70b9d9ae] received
+[2026-09-27 08:22:26,777: INFO/MainProcess] Task projection.rebuild_attempt_evidence[34a190ea-c4a7-462f-bf6d-51db70b9d9ae] succeeded in 0.01862191699910909s: 'evidence_rows=6'
+[2026-09-27 08:22:26,778: INFO/MainProcess] Task learning.on_attempt_graded[6a194bad-a007-4fb1-902a-411c8cf86e65] received
+[2026-09-27 08:22:26,810: INFO/MainProcess] Task learning.on_attempt_graded[6a194bad-a007-4fb1-902a-411c8cf86e65] succeeded in 0.032331708000128856s: 'paired_tasks=0'
+[2026-09-27 08:22:28,509: INFO/MainProcess] Task projection.rebuild_attempt_evidence[4204606e-79a2-409a-b3a2-1d45e2e371e1] received
+[2026-09-27 08:22:28,529: INFO/MainProcess] Task projection.rebuild_attempt_evidence[4204606e-79a2-409a-b3a2-1d45e2e371e1] succeeded in 0.020303290999436285s: 'evidence_rows=6'
+[2026-09-27 08:22:28,530: INFO/MainProcess] Task learning.on_attempt_graded[5139511e-64de-4e73-b992-4fd904f03c30] received
+[2026-09-27 08:22:28,573: INFO/MainProcess] Task learning.on_attempt_graded[5139511e-64de-4e73-b992-4fd904f03c30] succeeded in 0.04240533300071547s: 'paired_tasks=1'
+[2026-09-27 08:22:29,788: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9cac9a32-4d23-4296-9b6f-412fdbe0385e] received
+[2026-09-27 08:22:29,811: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9cac9a32-4d23-4296-9b6f-412fdbe0385e] succeeded in 0.0226159590001771s: 'evidence_rows=6'
+[2026-09-27 08:22:29,812: INFO/MainProcess] Task learning.on_attempt_graded[53f13e9b-4b44-4b66-b98b-c5867cf359a4] received
+[2026-09-27 08:22:29,857: INFO/MainProcess] Task learning.on_attempt_graded[53f13e9b-4b44-4b66-b98b-c5867cf359a4] succeeded in 0.04504987499967683s: 'paired_tasks=0'
+[2026-09-27 08:22:30,127: INFO/MainProcess] Task tutoring.run_job[4341cb0b-2f47-484e-87ea-60aa50c954a6] received
+[2026-09-27 08:22:30,129: INFO/MainProcess] Task tutoring.run_job[4341cb0b-2f47-484e-87ea-60aa50c954a6] succeeded in 0.0016760409998823889s: 'unavailable'
+[2026-09-27 08:22:30,992: INFO/MainProcess] Task projection.rebuild_attempt_evidence[409493b9-18c3-469e-b9c4-20beae5f0caf] received
+[2026-09-27 08:22:31,016: INFO/MainProcess] Task projection.rebuild_attempt_evidence[409493b9-18c3-469e-b9c4-20beae5f0caf] succeeded in 0.02353462500104797s: 'evidence_rows=6'
+[2026-09-27 08:22:31,017: INFO/MainProcess] Task learning.on_attempt_graded[36b0485f-7146-4028-a101-466c23437cd0] received
+[2026-09-27 08:22:31,047: INFO/MainProcess] Task learning.on_attempt_graded[36b0485f-7146-4028-a101-466c23437cd0] succeeded in 0.029996959001437062s: 'paired_tasks=0'
+[2026-09-27 08:28:57,757: INFO/MainProcess] Task projection.rebuild_attempt_evidence[0a6de23f-cda4-47a5-ad75-a8107f53debf] received
+[2026-09-27 08:28:57,810: INFO/MainProcess] Task projection.rebuild_attempt_evidence[0a6de23f-cda4-47a5-ad75-a8107f53debf] succeeded in 0.05197204199794214s: 'evidence_rows=6'
+[2026-09-27 08:28:57,811: INFO/MainProcess] Task learning.on_attempt_graded[bf9e0aa0-df9d-45fc-9e54-2147c9213dcb] received
+[2026-09-27 08:28:57,857: INFO/MainProcess] Task learning.on_attempt_graded[bf9e0aa0-df9d-45fc-9e54-2147c9213dcb] succeeded in 0.04667200000039884s: 'paired_tasks=1'
+[2026-09-27 08:28:58,554: INFO/MainProcess] Task learning.reconcile_plan[777dd0a2-38ad-4a97-baee-be1416990e6c] received
+[2026-09-27 08:28:58,652: INFO/MainProcess] Task learning.reconcile_plan[777dd0a2-38ad-4a97-baee-be1416990e6c] succeeded in 0.09840908299884177s: 'pending=30 delayed_updated=6 superseded=False'
+[2026-09-27 08:28:59,125: INFO/MainProcess] Task projection.rebuild_attempt_evidence[57ff1877-1fa6-413b-8c5e-66a0476e74ed] received
+[2026-09-27 08:28:59,198: INFO/MainProcess] Task projection.rebuild_attempt_evidence[57ff1877-1fa6-413b-8c5e-66a0476e74ed] succeeded in 0.07303316699835705s: 'evidence_rows=6'
+[2026-09-27 08:28:59,203: INFO/MainProcess] Task learning.on_attempt_graded[d09f4b6e-ff80-433a-ac1a-6ce81b5a5f1e] received
+[2026-09-27 08:28:59,313: INFO/MainProcess] Task learning.on_attempt_graded[d09f4b6e-ff80-433a-ac1a-6ce81b5a5f1e] succeeded in 0.11030924999795388s: 'paired_tasks=1'
+[2026-09-27 08:28:59,661: INFO/MainProcess] Task learning.refresh_delayed_tasks[cfe7a0f6-98d2-4c4b-ae5c-673a6b0eedd0] received
+[2026-09-27 08:28:59,720: INFO/MainProcess] Task learning.refresh_delayed_tasks[cfe7a0f6-98d2-4c4b-ae5c-673a6b0eedd0] succeeded in 0.058528625002509216s: 'updated=6'

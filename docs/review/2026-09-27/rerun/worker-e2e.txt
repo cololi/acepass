@@ -1,0 +1,12 @@
+{"step": "environment", "database": "acepass_acceptance_20260927_012133", "redis_url": "redis://127.0.0.1:6391/0", "inline": false}
+{"step": "scope", "project": "验收项目A·基础能力", "subject": "验收科目一·数量关系"}
+{"step": "baseline", "attempts": 22, "evidence": 144, "states": 3, "study_tasks": 8, "outbox": 50}
+{"step": "attempt_submitted", "attempt_id": "bfe2ac6b-927d-4a13-8893-1844b9df4c4f", "grade_status": "confirmed"}
+{"step": "worker_consumes_attempt_events", "ok": true, "evidence_rows": 6, "paired_tasks": 1, "grade_event": "e8592606-008c-45f1-a3a5-7c02265284b8"}
+{"step": "worker_consumes_reconcile_plan", "ok": true, "status": "processed", "processed_at": "2026-09-27 08:28:58.650485+00:00", "attempts": 1}
+{"step": "flush_prepared", "attempt_id": "267453a9-4d04-4b40-9e3f-73426f139927", "rows": ["8424e6c7-ce62-4e09-aa4b-61a114245cb9", "7c936358-2213-4e43-9ca9-5d7c09164bd0"]}
+{"step": "flush_recovery_dispatched", "delivered": 2}
+{"step": "redis_flush_recovery", "ok": true, "evidence_before": 0, "evidence_after": 6, "reconciled": false}
+{"step": "killed_worker_recovery", "ok": true, "released": 1}
+{"step": "final_state", "unresolved": {}, "attempts": 24, "evidence": 156, "states": 3, "study_tasks": 40, "review_tasks": 7, "outbox": 56, "processed": 56}
+{"ok": true}
