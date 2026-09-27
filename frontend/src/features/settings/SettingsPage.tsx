@@ -26,7 +26,8 @@ const DEFAULT_RULES = {
 }
 
 export function SettingsPage() {
-  const { currentProject, currentSubject, projects, subjects, reload, selectProject } = useScope()
+  const { currentProject, currentSubject, projects, subjects, reload, reloadSubjects, selectProject, selectSubject } =
+    useScope()
   const toast = useToast()
   const queryClient = useQueryClient()
   const [budget, setBudget] = useState('60')
@@ -104,10 +105,13 @@ export function SettingsPage() {
         idempotencyKey: newIdempotencyKey('subject-create'),
         body: { name: subjectName },
       }),
-    onSuccess: async () => {
-      toast.push('科目已创建', 'ok')
+    onSuccess: async (created) => {
+      toast.push('科目已创建，已可直接在下拉中选择', 'ok')
       setSubjectName('')
-      await reload()
+      // Reload the subject list immediately so the new subject is selectable
+      // without a manual page refresh (R10).
+      const list = await reloadSubjects()
+      if (created?.id && list.some((subject) => subject.id === created.id)) selectSubject(created.id)
       await queryClient.invalidateQueries()
     },
     onError: (err) => setError(describeError(err)),

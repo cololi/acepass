@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiRequest, newIdempotencyKey, type GradeOut, type GradingQueueRow } from '../../api/client'
+import {
+  apiRequest,
+  newIdempotencyKey,
+  type AttemptDetail,
+  type GradeOut,
+  type GradingQueueRow,
+} from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
-import { GradePanel } from './PracticePage'
+import { GradePanel, OriginalWork } from './PracticePage'
 
 const TYPE_LABELS: Record<string, string> = {
   single_choice: '单选题',
@@ -11,6 +17,41 @@ const TYPE_LABELS: Record<string, string> = {
   true_false: '判断题',
   fill_blank: '填空题',
   constructed_response: '大题',
+}
+
+/** A queue row already carries everything a reviewer needs; reuse the renderer. */
+function toOriginalWork(row: GradingQueueRow): AttemptDetail {
+  return {
+    attempt_id: row.attempt_id,
+    session_item_id: row.session_item_id,
+    submitted_at: row.submitted_at,
+    elapsed_ms: row.elapsed_ms,
+    raw_answer: row.raw_answer,
+    steps: row.steps,
+    attachments: row.attachments,
+    confidence: row.confidence,
+    grading_revision: row.grading_revision,
+    receipt_only: false,
+    grade: null,
+  }
+}
+
+/** A short excerpt of the submitted work, so a reviewer can pick a row by content. */
+function answerPreview(row: GradingQueueRow): string {
+  const raw = row.raw_answer ?? {}
+  const type = String(raw.type ?? '')
+  let text = ''
+  if (type === 'constructed_response') text = String(raw.text ?? '')
+  else if (type === 'fill_blank') {
+    text = Object.entries((raw.blanks as Record<string, string>) ?? {})
+      .map(([id, value]) => `${id}=${value || '（空）'}`)
+      .join('，')
+  } else if (type === 'true_false') text = raw.value ? '正确' : '错误'
+  else text = JSON.stringify(raw.selected_option_ids ?? raw.selected_option_id ?? [])
+  if (row.attachments?.length) text += ` · ${row.attachments.length} 张照片`
+  const trimmed = text.replace(/\s+/g, ' ').trim()
+  if (!trimmed) return '（无文本作答）'
+  return trimmed.length > 60 ? `${trimmed.slice(0, 60)}…` : trimmed
 }
 
 /**
@@ -136,7 +177,12 @@ export function GradingPage() {
                       }}
                       style={{ cursor: 'pointer', background: active?.attempt_id === row.attempt_id ? '#f5f8ff' : undefined }}
                     >
-                      <td className="small">{row.display_label || row.question_id.slice(0, 8)}</td>
+                      <td className="small">
+                        {row.display_label || row.question_id.slice(0, 8)}
+                        <div className="tiny muted" data-testid="queue-answer-preview">
+                          {answerPreview(row)}
+                        </div>
+                      </td>
                       <td className="small">{TYPE_LABELS[row.question_type] ?? row.question_type}</td>
                       <td className="small">{new Date(row.submitted_at).toLocaleString()}</td>
                       <td className="small">{row.pending_max_score}</td>
@@ -159,12 +205,30 @@ export function GradingPage() {
               <>
                 <p className="small muted">
                   {active.display_label || active.question_id.slice(0, 8)} · {TYPE_LABELS[active.question_type] ?? active.question_type} ·
-                  版本 r{active.grading_revision}
+                  版本 r{active.grading_revision} · 本项满分 {active.parts.reduce((sum, part) => sum + Number(part.max_score), 0)}
                   {active.is_own_attempt ? '（本人作答：将记录为自评确认）' : '（他人作答：可记录复核确认）'}
                 </p>
+
+                <h3>学生的原始作答</h3>
+                <OriginalWork detail={toOriginalWork(active)} projectId={projectId} />
+
+                {active.rubric ? (
+                  <div className="card" style={{ background: '#f9fafc' }} data-testid="grading-rubric">
+                    <h4 style={{ marginTop: 0 }}>评分标准（评分点与满分）</h4>
+                    <ul className="small">
+                      {active.rubric.criteria.map((criterion, index) => (
+                        <li key={index}>
+                          {String(criterion.criterion_id ?? index)} · {String(criterion.text ?? '')}（
+                          {String(criterion.max_score ?? '')} 分）
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
                 <div className="row">
                   <button className="btn small" disabled={revealAttempt.isPending} onClick={() => revealAttempt.mutate()}>
-                    查看标准答案与评分标准
+                    查看标准答案（已记录暴露）
                   </button>
                 </div>
                 {revealAttempt.data ? (
@@ -172,15 +236,6 @@ export function GradingPage() {
                     <pre className="small" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
                       {JSON.stringify(revealAttempt.data.answer_payload, null, 2)}
                     </pre>
-                    {revealAttempt.data.rubric ? (
-                      <ul className="small">
-                        {revealAttempt.data.rubric.criteria.map((criterion, index) => (
-                          <li key={index}>
-                            {String(criterion.text ?? '')}（{String(criterion.max_score ?? '')} 分）
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
                   </div>
                 ) : null}
 

@@ -253,7 +253,10 @@ export interface GradeOut {
   max_score: string
   pending_max_score: string
   estimated_score: string | null
+  /** Every scoring part has been decided. A wrong answer is fully confirmed. */
   is_fully_confirmed: boolean
+  /** Fully confirmed *and* at full marks: the only reading of "完全正确". */
+  is_correct: boolean
   parts: GradePart[]
   rule_version: string
   rule_snapshot: Record<string, unknown>
@@ -271,6 +274,51 @@ export interface AttemptState {
   receipt_only: boolean
 }
 
+export interface AttemptDetail {
+  attempt_id: string
+  session_item_id: string
+  submitted_at: string
+  elapsed_ms: number
+  raw_answer: Record<string, unknown>
+  steps: unknown[]
+  attachments: string[]
+  confidence: string
+  grading_revision: number
+  receipt_only: boolean
+  grade: GradeOut | null
+}
+
+export interface MistakeRow {
+  attempt_id: string
+  session_item_id: string
+  session_id: string
+  question_id: string
+  question_version_id: string
+  display_label: string
+  question_type: string
+  subject_id: string
+  submitted_at: string
+  grading_revision: number
+  confirmed_score: string
+  max_score: string
+  lost_score: string
+  method: string
+  grader_is_self: boolean
+  parts: GradePart[]
+  raw_answer: Record<string, unknown>
+  steps: unknown[]
+  attachments: string[]
+  can_tutor: boolean
+}
+
+export interface UploadedAsset {
+  id: string
+  role: string
+  content_type: string
+  size_bytes: number
+  original_filename: string
+}
+
 export interface SessionItemState {
   session_item_id: string
   ordinal: number
@@ -283,6 +331,9 @@ export interface SessionItemState {
   draft_revision: number
   has_draft: boolean
   tutoring_allowed: boolean
+  /** Stable ids for reveal / tutoring after a reload or deep link. */
+  attempt_id: string | null
+  can_reveal: boolean
   attempt: AttemptState | null
 }
 
@@ -298,9 +349,10 @@ export interface SessionOut {
   created_at: string
   finished_at: string | null
   items: SessionItemState[]
-  confirmed_score: string
-  pending_max_score: string
+  confirmed_score: string | null
+  pending_max_score: string | null
   score_visible: boolean
+  score_hidden_reason?: string | null
 }
 
 export interface RevealOut {
@@ -478,6 +530,9 @@ export interface CandidateOut {
     role: string
     text_span: string
     crop_asset_id: string | null
+    document_asset_id: string | null
+    document_title: string
+    document_type: string
   }>
   publication_question_id: string | null
   publication_version_id: string | null
@@ -490,6 +545,7 @@ export interface GradingQueueRow {
   question_id: string
   display_label: string
   question_type: string
+  subject_id: string
   submitted_at: string
   grading_revision: number
   pending_max_score: string
@@ -497,6 +553,13 @@ export interface GradingQueueRow {
   is_own_attempt: boolean
   can_review_as_other: boolean
   parts: GradePart[]
+  /** The reviewer must be able to read the original work, not recall it. */
+  raw_answer: Record<string, unknown>
+  steps: unknown[]
+  attachments: string[]
+  confidence: string
+  elapsed_ms: number
+  rubric: { rubric_version_id: string; criteria: Array<Record<string, unknown>>; total_score: string } | null
 }
 
 export interface KnowledgeNode {
@@ -532,6 +595,8 @@ export interface VerificationPairingOut {
 export interface ReviewTaskRow {
   task_id: string
   status: string
+  project_id: string
+  subject_id: string
   question_id: string | null
   question_label: string
   knowledge_node_name: string

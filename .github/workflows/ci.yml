@@ -57,14 +57,39 @@ jobs:
         working-directory: backend
         env:
           DJANGO_SECRET_KEY: ci-only-long-random-secret-key-value-0123456789abcdef
-          DJANGO_ALLOWED_HOSTS: localhost
-          DJANGO_CSRF_TRUSTED_ORIGINS: http://localhost
+          DJANGO_ALLOWED_HOSTS: acepass.example.com,localhost
+          DJANGO_CSRF_TRUSTED_ORIGINS: https://acepass.example.com
         run: |
           DJANGO_SETTINGS_MODULE=config.settings.dev .venv/bin/python manage.py check
-          DJANGO_SETTINGS_MODULE=config.settings.prod .venv/bin/python manage.py check --deploy || true
+          # 生产设置以 production 模式运行（没有默认密钥、默认主机与默认调试模式）。
+          # 不加 `|| true`：配置错误必须让这一步失败，发布门槛不能被吞掉。
+          # --fail-level WARNING 让任何未经审阅的部署告警也失败；已知且明确接受的
+          # security.W021（HSTS preload，需域名所有者决定）在 prod.py 中显式静音。
+          ACEPASS_RUNTIME_MODE=production DJANGO_SETTINGS_MODULE=config.settings.prod \
+            .venv/bin/python manage.py check --deploy --fail-level WARNING
       - name: Tests (real PostgreSQL)
         working-directory: backend
         run: .venv/bin/python -m pytest tests -q
+
+  infra:
+    # 发布门槛的部署侧校验：Compose 变量/YAML 合并、nginx 配置语法与 shell 语法。
+    # 都不需要 Docker 守护进程之外的部署目标，也不会碰任何真实环境。
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose config validation
+        run: |
+          cp infra/docker/.env.example infra/docker/.env
+          docker compose -f infra/docker/docker-compose.yml config --quiet
+      - name: Generate throwaway TLS certs and validate nginx config
+        run: |
+          bash scripts/gen-dev-certs.sh infra/docker/certs localhost
+          docker run --rm --add-host api:127.0.0.1 \
+            -v "$PWD/infra/proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro" \
+            -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
+            nginx:1.27-alpine nginx -t
+      - name: Shell script syntax
+        run: for f in scripts/*.sh; do echo "bash -n $f"; bash -n "$f"; done
 
   frontend:
     runs-on: ubuntu-latest

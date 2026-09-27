@@ -14,7 +14,9 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY backend/requirements/base.txt backend/requirements/lock.txt ./requirements/
-RUN pip install --no-cache-dir -r requirements/lock.txt gunicorn
+# Gunicorn 与其他运行依赖一样来自锁定文件（requirements/lock.txt，见 base.txt 声明），
+# 不再单独安装未锁定版本。
+RUN pip install --no-cache-dir -r requirements/lock.txt
 
 COPY backend/ ./
 # The built SPA is served by the nginx service; the API only needs the files if

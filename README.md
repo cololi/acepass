@@ -1,5 +1,9 @@
 # AcePass
 
+> **2026-09-27 独立验收：P0 暂不通过。** 下文为原交付记录，完成状态以
+> [独立验收报告](docs/06-independent-p0-review.md) 为准。原测试可通过，但新增回归发现业务阻断；
+> 下一步执行 [P0 修复计划](docs/07-p0-repair-plan.md)，交接入口见 [DeepSeek 修复任务](DEEPSEEK_P0_FIX_HANDOFF.md)。
+
 以考试得分为目标的个性化刷题、补弱与学习验证系统。**本仓库已包含可运行的 P0 实现**，
 不只是规格文档：多项目/多科目、五种题型、导入校对、确定性判分与人工评分、暴露台账、
 配对验证与延迟复习、考点证据、今日计划与练习报告，前后端都可实际运行。
@@ -92,23 +96,48 @@ npx tsc -b && npx vite build                   # 类型检查与生产构建
 npx playwright test                            # 真实浏览器：desktop + mobile 各 8 项
 ```
 
-`djANGO_SETTINGS_MODULE=config.settings.prod manage.py check --deploy` 只剩
-`security.W021`（未开启 HSTS preload，属于有意选择：preload 不可轻易回退，需要域名所有者自行决定）。
+`DJANGO_SETTINGS_MODULE=config.settings.prod`（并以 `ACEPASS_RUNTIME_MODE=production` 运行，否则
+没有默认密钥）下 `manage.py check --deploy` 无遗留问题：唯一有意接受的是 HSTS preload 未开启
+（`security.W021`，preload 不可轻易回退，需要域名所有者自行决定），已在 `prod.py` 里显式
+`SILENCED_SYSTEM_CHECKS`；CI 用 `--fail-level WARNING` 运行，任何**新的**部署告警都会让发布门槛失败：
 
-## 5. 备份与恢复（已实测空目录恢复）
+```bash
+cd backend
+ACEPASS_RUNTIME_MODE=production \
+DJANGO_SECRET_KEY='<≥50 字符的占位密钥>' \
+DJANGO_ALLOWED_HOSTS='acepass.example.com,localhost' \
+DJANGO_CSRF_TRUSTED_ORIGINS='https://acepass.example.com' \
+DJANGO_SETTINGS_MODULE=config.settings.prod \
+.venv/bin/python manage.py check --deploy --fail-level WARNING
+# → System check identified no issues (1 silenced).
+```
+
+## 5. 备份与恢复（已实测空目录恢复与拒绝覆盖）
 
 ```bash
 # 备份：数据库 dump + 私有文件 tar + 校验清单 + 版本信息（默认保留 7 天）
 ./scripts/backup.sh                       # 输出到 var/backups/<UTC 时间戳>/
 
-# 恢复：必须恢复到空位置（目标库不存在），随后校验文件清单
+# 恢复前先 dry-run：只做前置检查并打印目标目录与清单差异，不写任何东西
+./scripts/restore.sh --dry-run var/backups/<时间戳> acepass_restore_check
+# 真实恢复：目标数据库必须不存在，目标媒体目录必须不存在或为空
 ./scripts/restore.sh var/backups/<时间戳> acepass_restore_check
 ```
+
+恢复脚本在写入任何东西之前就会拒绝：目标媒体目录非空、目标数据库已存在、备份缺少
+`database.dump`/`media.tar.gz`/`media-manifest.sha256`。恢复后按 `media-manifest.sha256`
+（`backup.sh` 写入的 `shasum -a 256` 清单）逐个校验 SHA-256，并报告 missing（清单有、
+恢复后没有）与 extra（恢复后多出、清单没有）；任一非空即失败退出。
 
 实测结果（2026-09-27，源库 → 空库 + 空媒体目录）：attempts 30/30、grade_events 35/35、
 session_items 41/41、exposures 46/46、versions 324/324、answers 297/297、assets 2/2、
 tasks 19/19；两件私有图片的 SHA-256 与备份清单一致；原始作答与冻结版本引用可读。
-**Redis 不在备份范围内**（它只承载触发器，业务事实在 PostgreSQL）。
+
+2026-09-27 的运维演练（临时库 `acepass_ops_drill_*`，用完即删）另测：dry-run 通过；空目录恢复
+exit 0 且清单逐字节一致；非空媒体目录的第二次恢复被拒绝（exit 1，且未创建目标库、未改动文件）；
+目标库已存在时被拒绝；备份被篡改（多一个文件 / 少一个文件 / 内容被改）分别被 extra、missing、
+SHA-256 校验拦住。**Redis 不在 backup.sh 的备份范围内**（业务事实在 PostgreSQL），但 Compose 中
+Redis 已开启 AOF+RDB 持久化，重启不丢队列（见 `infra/docker/README.md`）。
 
 ## 6. 目录结构
 
@@ -123,8 +152,8 @@ backend/
 frontend/
   src/{app,components,features,api}/
   tests/e2e/                         # Playwright 真实浏览器验收
-infra/{docker,proxy}/                # Compose 编排与同源反向代理
-scripts/{backup.sh,restore.sh,demo_live_flow.py}
+infra/{docker,proxy}/                # Compose 编排与同源反向代理（TLS 终止点，见 infra/docker/README.md）
+scripts/{backup.sh,restore.sh,gen-dev-certs.sh,demo_live_flow.py}
 docs/{01..05} 与 implementation-status.md / acceptance-results.md
 ```
 
@@ -132,7 +161,9 @@ docs/{01..05} 与 implementation-status.md / acceptance-results.md
 
 - **真实 AI provider 未验证**（没有 API Key）：A36 未运行；配置方式见下。
 - **真实隔天学习效果未验证**：延迟验证只有可注入时钟的逻辑证据，没有真实等待 24 小时。
-- **Docker Compose 未在本机启动验证**（守护进程未运行），只做了 `docker compose config` 语法校验。
+- **Docker Compose 已在本机（OrbStack）实际构建并启动验证**（8 个服务全部起来、api/web healthy、
+  TLS 与探针闭合，见 `infra/docker/README.md` 第 6 节）；**未**在真实目标服务器、真实域名或
+  受信任证书上验证。
 - **未向任何远程服务器部署**：仓库内没有授权的部署目标。
 - P1/P2（PDF 批量导入、向量检索、FSRS、生成题、限时模拟考试、效果校准）未开始。
 

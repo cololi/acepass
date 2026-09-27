@@ -63,6 +63,10 @@ def producer_topics() -> set[str]:
     assert that no producer outruns its consumer — the class of bug that let
     ``learning.reconcile_plan`` be discarded by a real worker while every inline
     test stayed green.
+
+    A beat-scheduled topic is not a producer topic: nothing calls ``enqueue()``
+    for ``learning.refresh_delayed_tasks``, so it lives in ``beat_schedule``
+    (pinned there, together with its consumer registration) instead of here.
     """
     return {
         "projection.rebuild_attempt_evidence",
@@ -72,7 +76,6 @@ def producer_topics() -> set[str]:
         "projection.refresh_paper_stats",
         "learning.on_attempt_graded",
         "learning.on_session_finished",
-        "learning.refresh_delayed_tasks",
         "learning.reconcile_plan",
         "tutoring.run_job",
         "ingestion.extract_candidate",

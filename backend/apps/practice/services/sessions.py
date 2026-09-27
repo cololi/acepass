@@ -421,6 +421,11 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
             "draft_revision": item.draft_revision,
             "has_draft": bool(item.draft),
             "tutoring_allowed": bool(item.tutoring_allowed and session.mode == SessionMode.PRACTICE),
+            # Stable ids the UI must use after a reload or a deep link: the
+            # reveal and tutoring endpoints take the attempt / item id, so
+            # neither may depend on a one-shot presentation response (R09).
+            "attempt_id": str(attempt.id) if attempt is not None else None,
+            "can_reveal": not session.hides_grading,
             "attempt": attempt_state(attempt, session=session),
         }
         if include_stems:

@@ -246,8 +246,13 @@ def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = Tru
                 "role": region.role,
                 "text_span": region.text_span,
                 "crop_asset_id": str(region.crop_asset_id) if region.crop_asset_id else None,
+                # The whole page the crop came from, so a proofreader can always
+                # compare against the original image even when no crop exists.
+                "document_asset_id": str(region.document.asset_id) if region.document.asset_id else None,
+                "document_title": region.document.title,
+                "document_type": region.document.document_type,
             }
-            for region in candidate.source_regions.all()
+            for region in candidate.source_regions.select_related("document")
         ],
         "publication_question_id": str(candidate.publication_question_id) if candidate.publication_question_id else None,
         "publication_version_id": str(candidate.publication_version_id) if candidate.publication_version_id else None,

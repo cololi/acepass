@@ -1,0 +1,47 @@
+# AcePass 镜像构建上下文（backend.Dockerfile 的 context 是仓库根目录）。
+# 目标：本地虚拟环境、前端依赖、密钥与运行期数据都不进入构建上下文。
+# 注意：frontend/dist 必须保留（Dockerfile 会 COPY 它）；其余按需增删。
+
+# --- Python 虚拟环境与缓存 ---
+**/.venv/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.coverage
+**/htmlcov/
+**/*.egg-info/
+
+# --- 前端依赖与测试产物 ---
+**/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+frontend/.vite/
+
+# --- 本地环境变量与证书私钥（绝不进镜像）---
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+*.crt
+infra/docker/certs/
+
+# --- 运行期数据（学习者数据与上传材料）---
+var/
+backend/var/
+*.log
+
+# --- 版本控制、交付工件与文档 ---
+.git/
+.gitignore
+.github/
+docs/
+*.zip
+DEEPSEEK_*.md
+
+# --- 其他 ---
+.DS_Store
+**/.DS_Store

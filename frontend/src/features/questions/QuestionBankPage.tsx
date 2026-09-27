@@ -108,7 +108,15 @@ export function QuestionBankPage() {
           purpose: 'practice',
         },
       }),
-    onSuccess: (data) => navigate(`/practice?session=${data.session_id}`),
+    onSuccess: (data) => {
+      // Carry the project and subject in the URL: the workbench is also reachable
+      // from a task in another project, and it must not create the next session
+      // with whatever happens to be selected globally.
+      const params = new URLSearchParams({ session: data.session_id })
+      if (projectId) params.set('project', projectId)
+      if (currentSubject?.id) params.set('subject', currentSubject.id)
+      navigate(`/practice?${params.toString()}`)
+    },
     onError: (err) => toast.push(describeError(err), 'error'),
   })
 

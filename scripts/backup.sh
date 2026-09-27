@@ -30,13 +30,16 @@ pg_dump \
   --file="$OUT/database.dump" "$POSTGRES_DB"
 
 echo "==> 2/3 private media at ${MEDIA}"
-if [ -d "$MEDIA" ]; then
+if [ -d "$MEDIA" ] && [ -n "$(find "$MEDIA" -type f -print -quit)" ]; then
   # A manifest makes it possible to prove which objects a restore recovered.
+  # Format is exactly `shasum -a 256` output with relative `./` paths, so
+  # restore.sh can both re-check the hashes and diff the recovered file set.
   (cd "$MEDIA" && find . -type f -print0 | sort -z | xargs -0 shasum -a 256) > "$OUT/media-manifest.sha256"
   echo "    文件数：$(wc -l < "$OUT/media-manifest.sha256" | tr -d " ")"
   tar -czf "$OUT/media.tar.gz" -C "$MEDIA" .
 else
-  echo "    （媒体目录不存在，记录为空清单）"
+  # 目录不存在或为空：写空清单（不要调用 xargs，避免不同平台在空输入上行为不一致）。
+  echo "    （媒体目录不存在或为空，记录为空清单）"
   : > "$OUT/media-manifest.sha256"
   tar -czf "$OUT/media.tar.gz" --files-from /dev/null
 fi

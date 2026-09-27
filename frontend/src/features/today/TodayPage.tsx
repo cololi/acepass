@@ -54,13 +54,19 @@ export function TodayPage() {
 
   const startTask = useMutation({
     mutationFn: (task: PlanTaskOut) =>
-      apiRequest<{ create_session_hint: { subject_id: string; question_ids: string[]; task_id: string; purpose: string } }>(
-        `/study-tasks/${task.task_id}/start`,
-        { method: 'POST', idempotencyKey: newIdempotencyKey('task-start') },
-      ),
+      apiRequest<{
+        create_session_hint: { subject_id: string; question_ids: string[]; task_id: string; purpose: string }
+      }>(`/study-tasks/${task.task_id}/start`, {
+        method: 'POST',
+        idempotencyKey: newIdempotencyKey('task-start'),
+      }).then((data) => ({ ...data, projectId: task.project_id })),
     onSuccess: (data) => {
       const hint = data.create_session_hint
+      // The task may belong to a different project than the one currently
+      // selected; the workbench adopts `project`/`subject` from the URL so the
+      // session is created in the right project (R10).
       const params = new URLSearchParams({
+        project: data.projectId,
         subject: hint.subject_id,
         task: hint.task_id,
         purpose: hint.purpose,

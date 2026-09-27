@@ -514,7 +514,9 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
             & Q(session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
         )
         .select_related("session_item__question_version__question", "current_grade_event", "user")
-        .order_by("submitted_at")
+        # Newest first: a reviewer who has just graded a submission expects it at
+        # the top, not buried under older pending work.
+        .order_by("-submitted_at")
     )
     if not request.user.is_staff:
         queryset = queryset.filter(user=request.user)

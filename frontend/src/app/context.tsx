@@ -122,7 +122,10 @@ interface ScopeContextValue {
   currentSubject: SubjectOut | null
   selectProject: (projectId: string) => void
   selectSubject: (subjectId: string) => void
+  /** Re-read projects *and* the current project's subjects. */
   reload: () => Promise<void>
+  /** Re-read only the current project's subjects. */
+  reloadSubjects: () => Promise<SubjectOut[]>
   loading: boolean
 }
 
@@ -134,6 +137,7 @@ const ScopeContext = createContext<ScopeContextValue>({
   selectProject: () => undefined,
   selectSubject: () => undefined,
   reload: async () => undefined,
+  reloadSubjects: async () => [],
   loading: false,
 })
 
@@ -180,27 +184,64 @@ export function ScopeProvider({ children }: { children: React.ReactNode }) {
     else window.localStorage.removeItem(SUBJECT_STORAGE)
   }, [subjectId])
 
-  useEffect(() => {
-    let cancelled = false
-    async function loadSubjects() {
-      if (!projectId) {
+  /** Fetch the current project's subjects and adopt a valid selection. */
+  const fetchSubjects = useCallback(
+    async (forProjectId: string | null, options: { keepCurrent?: boolean } = {}): Promise<SubjectOut[]> => {
+      const keepCurrent = options.keepCurrent ?? true
+      if (!forProjectId) {
         setSubjects([])
         setSubjectId(null)
-        return
+        return []
       }
-      const list = await apiRequest<SubjectOut[]>(`/projects/${projectId}/subjects`)
-      if (cancelled) return
+      const list = await apiRequest<SubjectOut[]>(`/projects/${forProjectId}/subjects`)
       setSubjects(list)
-      setSubjectId((current) => {
-        if (current && list.some((subject) => subject.id === current)) return current
-        return list[0]?.id ?? null
-      })
-    }
-    void loadSubjects()
+      setSubjectId((current) =>
+        keepCurrent && current && list.some((subject) => subject.id === current)
+          ? current
+          : (list[0]?.id ?? null),
+      )
+      return list
+    },
+    [],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    void fetchSubjects(projectId).catch(() => {
+      if (!cancelled) {
+        setSubjects([])
+        setSubjectId(null)
+      }
+    })
     return () => {
       cancelled = true
     }
-  }, [projectId])
+  }, [projectId, fetchSubjects])
+
+  const reloadSubjects = useCallback(async () => {
+    try {
+      return await fetchSubjects(projectId)
+    } catch {
+      return []
+    }
+  }, [fetchSubjects, projectId])
+
+  const reload = useCallback(async () => {
+    await loadProjects()
+    await reloadSubjects()
+  }, [loadProjects, reloadSubjects])
+
+  const selectProject = useCallback(
+    (next: string) => {
+      setProjectId(next)
+      // Subjects belong to a project: clear immediately, then load that
+      // project's list. A stale subject id from another project must never be
+      // used to create a session.
+      setSubjectId(null)
+      void fetchSubjects(next, { keepCurrent: false })
+    },
+    [fetchSubjects],
+  )
 
   const value = useMemo<ScopeContextValue>(
     () => ({
@@ -208,15 +249,13 @@ export function ScopeProvider({ children }: { children: React.ReactNode }) {
       currentProject: projects.find((project) => project.id === projectId) ?? null,
       subjects,
       currentSubject: subjects.find((subject) => subject.id === subjectId) ?? null,
-      selectProject: (next: string) => {
-        setProjectId(next)
-        setSubjectId(null)
-      },
+      selectProject,
       selectSubject: setSubjectId,
-      reload: loadProjects,
+      reload,
+      reloadSubjects,
       loading,
     }),
-    [projects, projectId, subjects, subjectId, loadProjects, loading],
+    [projects, projectId, subjects, subjectId, selectProject, reload, reloadSubjects, loading],
   )
   return <ScopeContext.Provider value={value}>{children}</ScopeContext.Provider>
 }

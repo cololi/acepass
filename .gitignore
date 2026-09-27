@@ -28,3 +28,6 @@ var/
 
 # OS
 .DS_Store
+
+# Local TLS material for the compose stack (never commit private keys)
+infra/docker/certs/
