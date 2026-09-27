@@ -34,6 +34,13 @@ from apps.exams.models import Paper
 #: The analysis horizon: "近五年" means five *complete* cycles, never five rows.
 DEFAULT_CYCLE_COUNT = 5
 UNCLASSIFIED_LABEL = "未分类"
+#: Internal key for scored marks whose question has no knowledge mapping at all.
+UNCLASSIFIED_KEY = "__unclassified__"
+#: Why a paper cannot be counted, in a machine-readable form the UI maps to text.
+REASON_DEMO = "demo_or_mock"
+REASON_NO_REVISION = "no_effective_revision"
+REASON_NOT_CONFIRMED = "revision_not_confirmed"
+REASON_NO_ITEMS = "no_scored_items"
 
 
 def _cycle_sort_key(cycle_key: str) -> tuple[int, str]:
@@ -48,20 +55,28 @@ def _cycle_sort_key(cycle_key: str) -> tuple[int, str]:
 
 
 def paper_is_countable(paper: Paper) -> tuple[bool, str]:
+    """May this occurrence record enter the numbers, and if not, why not.
+
+    The order matters for the message a user reads: "it is a demo paper" is a
+    more useful explanation than "the revision is not confirmed", even though
+    both may be true.
+    """
     if paper.is_demo:
-        return False, "demo_or_mock"
+        return False, REASON_DEMO
     if paper.source_kind != SourceKind.OFFICIAL_PAST:
+        # Mock papers and practice sets are registered on purpose; they simply
+        # never describe an official distribution.
         return False, f"source_kind={paper.source_kind}"
     revision = paper.effective_revision
     if revision is None:
-        return False, "no_effective_revision"
+        return False, REASON_NO_REVISION
     if revision.status != PaperRevisionStatus.CONFIRMED:
-        return False, "revision_not_confirmed"
+        return False, REASON_NOT_CONFIRMED
     status = revision.coverage_status
     if status != "coverage_complete":
         return False, status
     if not revision.items.filter(is_scored=True).exists():
-        return False, "no_scored_items"
+        return False, REASON_NO_ITEMS
     return True, "counted"
 
 
@@ -81,7 +96,7 @@ def _node_shares(items) -> tuple[dict[str, dict], Decimal]:
         ]
         if not mappings:
             bucket = per_node.setdefault(
-                "__unclassified__",
+                UNCLASSIFIED_KEY,
                 {"node_id": None, "label": UNCLASSIFIED_LABEL, "score": Decimal("0"), "unclassified": True},
             )
             bucket["score"] += score
@@ -217,7 +232,7 @@ def cycle_analysis(*, subject, max_cycles: int = DEFAULT_CYCLE_COUNT) -> dict:
     averages: dict[str, dict] = {}
     for cycle_row in cycle_rows:
         for node in cycle_row["nodes"]:
-            key = node["node_id"] or "__unclassified__"
+            key = node["node_id"] or UNCLASSIFIED_KEY
             entry = averages.setdefault(
                 key,
                 {

@@ -817,52 +817,68 @@ def _reconcile_material_children(candidate: ImportCandidate, *, actor) -> None:
 
 
 def _write_paper_item(candidate: ImportCandidate, published_version, *, actor) -> None:
-    """Create the PaperItem for a published candidate, exactly once."""
+    """Create the PaperItem for a published candidate, exactly once.
+
+    This is the bridge between "a question was published" and "the real paper
+    occurrence now contains this question with this score", which is what the
+    cycle analysis counts. It is idempotent through
+    ``publication_paper_item_id``: a retried publication cannot create a second
+    item, and the unique (revision, position) constraint is the second guard.
+    """
+    from apps.exams.models import PaperItem
     from apps.exams.services import core as exam_services
 
-    if candidate.paper_revision_id is None:
+    if candidate.paper_revision_id is None or candidate.publication_paper_item_id is not None:
         return
-    if candidate.publication_paper_item_id is not None:
-        return
-    revision = candidate.paper_revision
-    is_material = (candidate.draft_payload or {}).get("question_type") == QuestionType.MATERIAL
-    position_key = candidate.source_position_key or (candidate.draft_payload or {}).get("display_label") or ""
-    if not position_key:
-        position_key = f"cand-{str(candidate.id)[:8]}"
-    if is_material:
-        max_score = Decimal("0")
-    else:
-        max_score = _to_decimal((candidate.draft_payload or {}).get("practice_max_score")) or Decimal("0")
-    parent_item = None
-    if candidate.parent_candidate_id and candidate.parent_candidate.publication_paper_item_id:
-        from apps.exams.models import PaperItem
-
-        parent_item = PaperItem.objects.filter(id=candidate.parent_candidate.publication_paper_item_id).first()
-    answer_key_version = published_version.answer_keys.order_by("-version").first()
+    payload = candidate.draft_payload or {}
+    is_material = payload.get("question_type") == QuestionType.MATERIAL
     item = exam_services.add_paper_item(
-        revision,
+        candidate.paper_revision,
         actor=actor,
-        position_key=position_key,
+        position_key=_paper_position_key(candidate),
         question_version=published_version,
-        answer_key_version=answer_key_version,
-        max_score=max_score,
+        answer_key_version=published_version.answer_keys.order_by("-version").first(),
+        max_score=Decimal("0") if is_material else (_to_decimal(payload.get("practice_max_score")) or Decimal("0")),
         is_scored=not is_material,
-        parent_item=parent_item,
+        parent_item=_published_parent_item(candidate),
     )
     candidate.publication_paper_item_id = item.id
     candidate.save(update_fields=["publication_paper_item_id", "updated_at"])
     if is_material:
-        # Children are usually published before their material, so their paper
-        # items are linked here rather than at their own publication time.
-        from apps.exams.models import PaperItem
+        _attach_children_to_material_item(candidate, item, PaperItem)
 
-        child_item_ids = [
-            child.publication_paper_item_id
-            for child in candidate.child_candidates.all()
-            if child.publication_paper_item_id
-        ]
-        if child_item_ids:
-            PaperItem.objects.filter(id__in=child_item_ids).update(parent_item=item, updated_at=timezone.now())
+
+def _paper_position_key(candidate: ImportCandidate) -> str:
+    """The 卷面题号 this candidate occupies; candidates always have one."""
+    payload = candidate.draft_payload or {}
+    return (
+        candidate.source_position_key
+        or str(payload.get("display_label") or "")
+        or f"cand-{str(candidate.id)[:8]}"
+    )
+
+
+def _published_parent_item(candidate: ImportCandidate):
+    """The material's paper item, when the child was published after it."""
+    from apps.exams.models import PaperItem
+
+    parent = candidate.parent_candidate
+    if parent is None or not parent.publication_paper_item_id:
+        return None
+    return PaperItem.objects.filter(id=parent.publication_paper_item_id).first()
+
+
+def _attach_children_to_material_item(candidate: ImportCandidate, item, paper_item_model) -> None:
+    """Children are usually published first, so their items are linked here."""
+    child_item_ids = [
+        child.publication_paper_item_id
+        for child in candidate.child_candidates.all()
+        if child.publication_paper_item_id
+    ]
+    if child_item_ids:
+        paper_item_model.objects.filter(id__in=child_item_ids).update(
+            parent_item=item, updated_at=timezone.now()
+        )
 
 
 def _to_decimal(value) -> Decimal | None:

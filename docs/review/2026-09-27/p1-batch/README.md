@@ -7,9 +7,9 @@
 
 | 文件 | 实际结果 |
 |---|---|
-| [backend-suite.txt](backend-suite.txt) | 正式后端全套 **226 passed / 101.10s**（203 + 本轮迁入 23 条 P1 回归），真实 PostgreSQL |
+| [backend-suite.txt](backend-suite.txt) | 正式后端全套 **226 passed / 173.57s**（203 + 本轮迁入 23 条 P1 回归），真实 PostgreSQL |
 | [p1-regressions.txt](p1-regressions.txt) | 本轮 P1 三组回归 **23 passed**（PDF 导入 9、API 契约 7、大纲/周期 7） |
-| [browser-acceptance.txt](browser-acceptance.txt) | 隔离浏览器验收 **48 passed / 1.1m**（P0 36 + P1 12；desktop+mobile，真实 Worker，`ACEPASS_INLINE_TASKS=false`） |
+| [browser-acceptance.txt](browser-acceptance.txt) | 隔离浏览器验收 **48 passed / 1.0m**（P0 36 + P1 12；desktop+mobile，真实 Worker，`ACEPASS_INLINE_TASKS=false`） |
 | [archived-browser.txt](archived-browser.txt) | 归档浏览器反例（原文件未改）**2 passed** |
 | [archived-nine.txt](archived-nine.txt) | 上轮有效后端反例（原文件未改）**9 passed, 1 deselected** |
 | [reviewer-three.txt](reviewer-three.txt) | 复验者三条反例（原文件未改）**3 passed** |

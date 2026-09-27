@@ -13,4 +13,4 @@
     class Settings(BaseModel):
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-226 passed, 3 warnings in 101.10s (0:01:41)
+226 passed, 3 warnings in 173.57s (0:02:53)

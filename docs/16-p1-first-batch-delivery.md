@@ -10,9 +10,9 @@
 
 | 检查 | 本轮实测结果 | 证据 |
 |---|---|---|
-| 正式后端全套 | **226 passed / 101.10s** | [backend-suite.txt](review/2026-09-27/p1-batch/backend-suite.txt) |
+| 正式后端全套 | **226 passed / 173.57s**（重构后复跑） | [backend-suite.txt](review/2026-09-27/p1-batch/backend-suite.txt) |
 | 本轮新增 P1 回归（正式套件） | **23 passed** | [p1-regressions.txt](review/2026-09-27/p1-batch/p1-regressions.txt) |
-| 隔离浏览器验收（P0 36 + P1 12） | **48 passed / 1.1m** | [browser-acceptance.txt](review/2026-09-27/p1-batch/browser-acceptance.txt) |
+| 隔离浏览器验收（P0 36 + P1 12） | **48 passed / 1.0m**（重构后复跑） | [browser-acceptance.txt](review/2026-09-27/p1-batch/browser-acceptance.txt) |
 | 归档浏览器反例（原文件未改） | **2 passed** | [archived-browser.txt](review/2026-09-27/p1-batch/archived-browser.txt) |
 | 上轮有效后端反例（原文件未改） | **9 passed, 1 deselected** | [archived-nine.txt](review/2026-09-27/p1-batch/archived-nine.txt) |
 | 复验者三条反例（原文件未改） | **3 passed** | [reviewer-three.txt](review/2026-09-27/p1-batch/reviewer-three.txt) |

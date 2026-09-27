@@ -66,9 +66,11 @@ def _depth_and_name(line: str) -> tuple[int, str] | None:
     if match:
         number = match.group("number")
         if re.fullmatch(r"(?:\d+\.)*\d+", number):
+            # "1" is a chapter, "1.1" a section, "1.1.2" a point.
             number_depth = number.count(".")
         else:
-            number_depth = 1 if len(number.strip("（）()")) <= 2 else 1
+            # "一、" / "（一）" style numbering carries one level of hierarchy.
+            number_depth = 1
         body = body[match.end() :].strip()
     if not body:
         return None
@@ -83,9 +85,11 @@ def import_outline(*, syllabus_version, text: str, actor=None, kind_by_depth: di
     merged = 0
     aliases_added: list[dict] = []
     skipped: list[dict] = []
-    nodes: list[dict] = []
 
-    # parents[depth] = node dict of the last node seen at that depth
+    # parents[depth] = the last node created/merged at that depth, so the next
+    # line knows what its parent is. Deeper entries are dropped as soon as a
+    # shallower line appears, which keeps a malformed word list from nesting
+    # under a node it never mentioned.
     parents: dict[int, KnowledgeNode] = {}
     for index, raw_line in enumerate((text or "").splitlines(), start=1):
         parsed = _depth_and_name(raw_line)
@@ -135,22 +139,12 @@ def import_outline(*, syllabus_version, text: str, actor=None, kind_by_depth: di
         parents[depth] = node
         for deeper in [d for d in parents if d > depth]:
             parents.pop(deeper, None)
-        nodes.append(
-            {
-                "node_id": str(node.id),
-                "depth": depth,
-                "canonical_name": node.canonical_name,
-                "parent_id": str(node.parent_id) if node.parent_id else None,
-                "created": node.canonical_name == name and node.id is not None,
-            }
-        )
     return {
         "created": created,
         "merged": merged,
         "aliases_added": aliases_added,
         "skipped": skipped,
-        "node_count": len(nodes),
-        "nodes": nodes,
+        "node_count": KnowledgeNode.objects.filter(syllabus_version=syllabus_version).count(),
     }
 
 

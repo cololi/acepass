@@ -24,6 +24,7 @@ P1-01 adds two things the PDF import needs and neither strategy may fake:
 from __future__ import annotations
 
 import re
+from itertools import count
 from typing import Any
 
 from apps.common.enums import QuestionType
@@ -148,12 +149,13 @@ def _parse_labelled(text: str) -> list[dict[str, Any]]:
     block closes at the next 材料 or at the end of the document.
     """
     blocks: list[dict[str, Any]] = []
-    counter = {"n": 0}
+    counter = count(1)
 
     def local_id(prefix: str) -> str:
-        counter["n"] += 1
-        return f"{prefix}{counter['n']}"
+        return f"{prefix}{next(counter)}"
 
+    # One mutable holder for the parse: the question being built, which section
+    # its following lines belong to, the open material block and its children.
     state: dict[str, Any] = {"current": None, "pending": None, "material": None, "children": []}
     saw_label = False
 
@@ -220,6 +222,8 @@ def _parse_labelled(text: str) -> list[dict[str, Any]]:
             begin(stem=text_line, in_material=False)
 
     for raw_line in text.splitlines():
+        # "1．【题型】…": remember the printed number for the question this line
+        # opens; `begin()` consumes it, so a continuation line cannot pick it up.
         state["line_label"] = ""
         numbered_head = LEADING_NUMBER_PATTERN.match(raw_line)
         if numbered_head is not None and SECTION_PATTERN.match(numbered_head.group(2)):

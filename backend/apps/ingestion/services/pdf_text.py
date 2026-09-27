@@ -178,14 +178,6 @@ def _normalise(text: str) -> str:
     return "\n".join(lines)
 
 
-def page_for_offset(page_map: list[tuple[int, int, int]], offset: int) -> int:
-    """Which page does a character offset of the joined text belong to?"""
-    for page_index, start, end in page_map:
-        if start <= offset <= end:
-            return page_index
-    return page_map[-1][0] if page_map else 1
-
-
 #: Headings that mark an answer section/page rather than question material.
 ANSWER_SECTION_MARKERS = (
     "参考答案",
