@@ -1,0 +1,25 @@
+{"step": "environment", "database": "acepass_acceptance_p02_independent", "redis_url": "redis://127.0.0.1:6394/0", "inline": false, "outbox_lease_seconds": 5}
+{"step": "scope", "project": "验收项目A·基础能力", "subject": "验收科目一·数量关系"}
+{"step": "baseline", "attempts": 25, "evidence": 150, "states": 5, "study_tasks": 2, "outbox": 56}
+{"step": "pre_existing_unresolved", "count": 1}
+{"step": "broker_flushed_before_drill", "queue_depth": 0, "real": true}
+{"step": "attempt_submitted", "attempt_id": "7d8c59c1-2775-43ba-a947-4a4c87cbdb13", "grade_status": "confirmed", "worker": "drill-primary"}
+{"step": "worker_consumes_attempt_events", "ok": true, "evidence_rows": 6, "paired_tasks": 0, "grade_event": "df9f6def-5a8b-417c-8c6b-a231fe82bc1d", "real": true}
+{"step": "worker_consumes_reconcile_plan", "ok": true, "status": "processed", "processed_at": "2026-09-27 11:10:04.331336+00:00", "attempts": 1, "real": true}
+{"step": "worker_stopped_for_flush", "worker": "drill-primary", "killed_with": "SIGKILL", "real": true}
+{"step": "flush_prepared", "attempt_id": "03ee46af-f811-409a-888b-af82d732ac96", "rows": ["c1ca4c88-9e67-4e0a-9acc-f1e032a19465", "446578c6-40cc-46bd-aced-da8e358ff81e"], "queue_depth_before_flush": 2, "real": true}
+{"step": "redis_flushed_for_real", "flushed": true, "queue_depth_after_flush": 0, "real": true}
+{"step": "flush_recovery_scan", "delivered": 2, "lease_seconds": 5, "real": true}
+{"step": "redis_flush_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "real": true}
+{"step": "worker_killed_mid_flight", "worker": "drill-primary", "signal": 9, "rows": 2, "caught_while_processing": true, "unconfirmed_after_kill": 2, "real": true}
+{"step": "killed_worker_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "lease_seconds": 5, "real": true}
+{"step": "second_consumer_started", "workers": 2, "real": true}
+{"step": "pair_rows_dispatched", "rows": 2, "queue_depth": 0, "real": true}
+{"step": "two_consumers_timeout_detail", "states": [{"id": "bf790576-29c1-45af-b113-a9254504cec7", "topic": "projection.rebuild_attempt_evidence", "status": "dispatched", "attempts": 1}, {"id": "961ecbc2-8f7b-4958-b02c-8343d49cb82e", "topic": "learning.on_attempt_graded", "status": "processed", "attempts": 1}], "queue_depth": 0, "primary_alive": true, "secondary_alive": true}
+{"step": "two_consumers_apply_once", "ok": false, "reason": "timed out waiting for both consumers to settle every row"}
+{"step": "two_consumers_apply_once", "ok": true, "evidence_rows": 6, "rows": 2, "real": true}
+{"step": "workers_stopped", "workers": ["drill-primary", "drill-secondary"], "real": true}
+{"step": "final_state", "unresolved": {"dispatched": 1}, "attempts": 29, "evidence": 174, "states": 5, "study_tasks": 34, "review_tasks": 1, "outbox": 65, "processed": 64}
+{"step": "all_events_resolved", "ok": false, "reason": "the drill left 1 row(s) unresolved"}
+{"note": "report written to /tmp/acepass-p02-independent.q5K01i/worker-drill.json"}
+{"ok": false}

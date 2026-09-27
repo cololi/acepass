@@ -120,7 +120,13 @@ def create_tutor_session(request, project_id: str, payload: TutorSessionIn):
 
 @tutor_router.post("/projects/{project_id}/tutor-sessions/{tutor_session_id}/messages", auth=auth, response={201: TutorJobOut})
 def post_message(request, project_id: str, tutor_session_id: str, payload: TutorMessageIn):
-    """Ask for a hint or a full explanation. Returns a job id to poll."""
+    """Ask for a hint or a full explanation. Returns a job id to poll.
+
+    A replayed message returns the same *job*, not a cached copy of its content:
+    the stored explanation is re-serialised under the content gate that applies
+    now, so a job asked before the verification started cannot be replayed to read
+    the answer out of a run that is still open (C01/B02).
+    """
     project = require_project(request.user, project_id)
     session = tutor_services.session_scope(request.user, project, tutor_session_id)
     key = idempotency_key(request)
@@ -128,7 +134,13 @@ def post_message(request, project_id: str, tutor_session_id: str, payload: Tutor
     body = payload.model_dump(mode="json")
     replay = idempotency.claim(request.user, scope, key, body)
     if replay is not None:
-        return replay.status_code, replay.body
+        job = TutorJob.objects.filter(id=replay.record.resource_id, user=request.user).first()
+        if job is None:
+            return replay.status_code, replay.body
+        # Raises 403 when the content is part of a running verification; otherwise
+        # re-serialises the job as it stands now (a retry may have changed it).
+        tutor_services.assert_job_deliverable(job)
+        return replay.status_code, tutor_services.job_payload(job)
     job = tutor_services.create_job(
         tutor_session=session,
         user=request.user,

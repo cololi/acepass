@@ -1,0 +1,362 @@
+2026-09-27 11:10:37,672 INFO celery.app.trace Task projection.refresh_paper_stats[a025e5de-df9e-43df-87c3-7969b4d7f8ff] succeeded in 0.022779082999477396s: 'ok'
+2026-09-27 11:10:37,675 INFO celery.app.trace Task projection.refresh_paper_stats[85b34898-91f2-4319-a410-dedaf30558b0] succeeded in 0.002785417000268353s: 'ok'
+2026-09-27 11:10:37,731 INFO celery.app.trace Task projection.rebuild_attempt_evidence[a38845e5-2f29-436d-8617-6dfe93870137] succeeded in 0.030333833001350285s: 'evidence_rows=6'
+2026-09-27 11:10:37,812 INFO celery.app.trace Task learning.on_attempt_graded[9b3a8f96-b3ae-4c05-9326-892ec698ef0c] succeeded in 0.08061991599970497s: 'paired_tasks=0'
+2026-09-27 11:10:37,855 WARNING django.request Forbidden: /api/v1/projects/c9b12d60-fffc-4cd7-aa31-d814a7aaae9c/attempts/9ea7affe-da0a-4231-88bd-44011aa3ba9c
+F2026-09-27 11:10:38,321 INFO celery.app.trace Task projection.refresh_paper_stats[e33a9cf8-0b16-4c02-a436-57d216523609] succeeded in 0.0031721249979455024s: 'ok'
+2026-09-27 11:10:38,324 INFO celery.app.trace Task projection.refresh_paper_stats[652cadfa-106b-455d-ba6e-fa3824dedcf3] succeeded in 0.0025034999998752028s: 'ok'
+2026-09-27 11:10:38,370 INFO celery.app.trace Task projection.rebuild_attempt_evidence[67391abb-a29f-4987-9e24-97443e40408f] succeeded in 0.023388583002088126s: 'evidence_rows=6'
+2026-09-27 11:10:38,404 INFO celery.app.trace Task learning.on_attempt_graded[6bde72c7-7ee4-4f4d-8124-d6e00dce26c6] succeeded in 0.03323708400057512s: 'paired_tasks=0'
+F2026-09-27 11:10:38,844 INFO celery.app.trace Task projection.refresh_paper_stats[53216307-8ad9-4931-9dc7-0dc3bc04be0d] succeeded in 0.0031679169987910427s: 'ok'
+2026-09-27 11:10:38,847 INFO celery.app.trace Task projection.refresh_paper_stats[705e500f-9f80-4f89-8cc8-21f8fc36a411] succeeded in 0.0023231249979289714s: 'ok'
+2026-09-27 11:10:38,890 INFO celery.app.trace Task projection.rebuild_attempt_evidence[929780f5-7a73-437e-9161-2c6a46c5b1c7] succeeded in 0.022331625001243083s: 'evidence_rows=6'
+2026-09-27 11:10:38,927 INFO celery.app.trace Task learning.on_attempt_graded[e0220af0-63ed-43db-8880-ecbd2ecddf18] succeeded in 0.03690466699845274s: 'paired_tasks=0'
+F2026-09-27 11:10:39,389 INFO celery.app.trace Task projection.refresh_paper_stats[1f866dbf-090e-4ead-a512-0b031c7f45a0] succeeded in 0.003570749999198597s: 'ok'
+2026-09-27 11:10:39,393 INFO celery.app.trace Task projection.refresh_paper_stats[cd0d2eb3-4dda-44f8-9aca-e956e2cd6fd4] succeeded in 0.003558416003215825s: 'ok'
+2026-09-27 11:10:39,436 INFO celery.app.trace Task projection.rebuild_attempt_evidence[cf925cf6-1de6-4c4c-a898-327cc1ecf403] succeeded in 0.02161679199707578s: 'evidence_rows=6'
+2026-09-27 11:10:39,468 INFO celery.app.trace Task learning.on_attempt_graded[b5bca17c-3e26-4c11-93e0-3be1c1a0dba2] succeeded in 0.031407416998263216s: 'paired_tasks=0'
+F2026-09-27 11:10:39,945 INFO celery.app.trace Task projection.refresh_paper_stats[d28cef5e-a07a-4ba2-b589-dfe31bbb5bde] succeeded in 0.003191125000739703s: 'ok'
+2026-09-27 11:10:39,948 INFO celery.app.trace Task projection.refresh_paper_stats[cd7f28f1-a9aa-4cf5-bc7d-eb4fce3abf80] succeeded in 0.00231333400006406s: 'ok'
+2026-09-27 11:10:39,988 INFO celery.app.trace Task tutoring.run_job[fc5cd2ba-afb0-44f7-87d2-2110f7afd664] succeeded in 0.00219295900024008s: 'succeeded'
+2026-09-27 11:10:40,009 WARNING django.request Forbidden: /api/v1/projects/b16d984e-d631-43ba-96e0-d872710e9300/tutor-jobs/616a46bf-05c8-48a4-b2ad-3457030e6a9c
+FEARLY_C {'B_to_C_first_present_hours': 23, 'B_to_C_submit_hours': 25, 'first_delivered_at': '2026-09-27T09:10:40.436132+00:00', 'submitted_at': '2026-09-27T11:10:40.436132+00:00', 'qualifies': True, 'detail': {'delay_anchor_at': '2026-09-26T10:10:40.436132+00:00', 'anchor_source': 'prior_attempt', 'delay_hours_required': 24, 'purpose': 'practice'}, 'reasons': []}
+F2026-09-27 11:10:40,944 WARNING apps.analytics.reports regrade run refused run=a290b254-19b4-426d-a077-33bc4e69d93c details={'reason': 'regrade_target_untrusted', 'answer_key_version_id': '35ace09e-532e-421b-ba70-6b37f04b441a', 'verification_status': 'disputed', 'is_disputed': True}
+STALE_DISPUTED {'old_generation': 1, 'new_generation': 2, 'watermark': 2, 'grade_status': 'pending_review', 'current_answer_version': 3, 'current_key_disputed': False}
+FMIGRATED_OLD_RUN {'old_generation_after_migration': 3, 'latest_generation': 2, 'watermark': 3, 'current_answer_version': 2, 'score': '0.00'}
+F2026-09-27 11:10:41,719 INFO celery.app.trace Task projection.refresh_paper_stats[ea5ea455-7035-44cc-ab92-115f6485dff5] succeeded in 0.0034900419996120036s: 'ok'
+2026-09-27 11:10:41,723 INFO celery.app.trace Task projection.refresh_paper_stats[a3876f6d-b81e-4b26-843c-0b3c6599d129] succeeded in 0.003581917000701651s: 'ok'
+{'retry_result': 'succeeded', 'outbox_status': 'processed', 'processed': True, 'job_status': 'succeeded', 'assistant_turns': 0, 'exposures': 0}
+F2026-09-27 11:10:42,140 INFO celery.app.trace Task projection.refresh_paper_stats[a82ef799-550d-49bb-ad74-a792bfe4858c] succeeded in 0.001892083997518057s: 'ok'
+2026-09-27 11:10:42,142 INFO celery.app.trace Task projection.refresh_paper_stats[c88a0de5-a14a-436d-bcc7-2f3e0c54d1eb] succeeded in 0.0017017079990182538s: 'ok'
+{'provider_calls': 2, 'final_blocks': [{'kind': 'text', 'text': 'consumer-1'}], 'outbox': 'processed', 'assistant_turns': 2, 'exposures': 2}
+F
+=================================== FAILURES ===================================
+________________ test_existing_parallel_session_must_hide_score ________________
+
+caller = <tests.conftest.ApiCaller object at 0x110e4f410>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_existing_parallel_session_must_hide_score(caller, project_a, subject_a1):
+        practice, item_id, submitted, _ = prepared(caller, project_a, subject_a1)
+        assert caller.get(f'/api/v1/projects/{project_a.id}/attempts/{submitted["attempt_id"]}').status_code == 403
+        response = caller.get(f'/api/v1/projects/{project_a.id}/practice-sessions/{practice["session_id"]}')
+        payload = response.json()
+>       assert response.status_code == 403 or (payload.get('confirmed_score') is None and payload['items'][0]['attempt']['grade'] is None), payload
+E       AssertionError: {'confirmed_score': '2.00', 'created_at': '2026-09-27T11:10:37.637682+00:00', 'finished_at': None, 'grading_hidden': False, ...}
+E       assert (200 == 403 or ('2.00' is None))
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+E        +  and   '2.00' = <built-in method get of dict object at 0x110826700>('confirmed_score')
+E        +    where <built-in method get of dict object at 0x110826700> = {'confirmed_score': '2.00', 'created_at': '2026-09-27T11:10:37.637682+00:00', 'finished_at': None, 'grading_hidden': False, ...}.get
+
+docs/review/2026-09-27/p02-independent/test_delivery_gates.py:27: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[a025e5de-df9e-43df-87c3-7969b4d7f8ff] succeeded in 0.022779082999477396s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[85b34898-91f2-4319-a410-dedaf30558b0] succeeded in 0.002785417000268353s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[a38845e5-2f29-436d-8617-6dfe93870137] succeeded in 0.030333833001350285s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[9b3a8f96-b3ae-4c05-9326-892ec698ef0c] succeeded in 0.08061991599970497s: 'paired_tasks=0'
+___________________ test_idempotent_submit_must_recheck_gate ___________________
+
+caller = <tests.conftest.ApiCaller object at 0x110fc8ce0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_idempotent_submit_must_recheck_gate(caller, project_a, subject_a1):
+        _, item_id, _, answer = prepared(caller, project_a, subject_a1)
+        result = submit(caller, project_a, item_id, answer, key='before-submit')
+>       assert result.status_code == 403 or result.json().get('grade') is None, result.json()
+E       AssertionError: {'attempt_id': '619136c1-2c7f-4868-bf46-fa1dfadee0dc', 'grade': {'comment': '', 'confirmed_score': '2.00', 'estimated_...one, 'grade_event_id': '91993cde-6560-4c29-9dd1-c9df0b4c149f', ...}, 'grading_revision': 1, 'receipt_only': False, ...}
+E       assert (200 == 403 or {'comment': '', 'confirmed_score': '2.00', 'estimated_score': None, 'grade_event_id': '91993cde-6560-4c29-9dd1-c9df0b4c149f', ...} is None)
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+E        +  and   {'comment': '', 'confirmed_score': '2.00', 'estimated_score': None, 'grade_event_id': '91993cde-6560-4c29-9dd1-c9df0b4c149f', ...} = <built-in method get of dict object at 0x11119b580>('grade')
+E        +    where <built-in method get of dict object at 0x11119b580> = {'attempt_id': '619136c1-2c7f-4868-bf46-fa1dfadee0dc', 'grade': {'comment': '', 'confirmed_score': '2.00', 'estimated_...one, 'grade_event_id': '91993cde-6560-4c29-9dd1-c9df0b4c149f', ...}, 'grading_revision': 1, 'receipt_only': False, ...}.get
+E        +      where {'attempt_id': '619136c1-2c7f-4868-bf46-fa1dfadee0dc', 'grade': {'comment': '', 'confirmed_score': '2.00', 'estimated_...one, 'grade_event_id': '91993cde-6560-4c29-9dd1-c9df0b4c149f', ...}, 'grading_revision': 1, 'receipt_only': False, ...} = functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x110da8800>>, <HttpResponse status_code=200, "application/json; charset=utf-8">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x110da8800>>, <HttpResponse status_code=200, "application/json; charset=utf-8">) = <HttpResponse status_code=200, "application/json; charset=utf-8">.json
+
+docs/review/2026-09-27/p02-independent/test_delivery_gates.py:33: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[e33a9cf8-0b16-4c02-a436-57d216523609] succeeded in 0.0031721249979455024s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[652cadfa-106b-455d-ba6e-fa3824dedcf3] succeeded in 0.0025034999998752028s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[67391abb-a29f-4987-9e24-97443e40408f] succeeded in 0.023388583002088126s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[6bde72c7-7ee4-4f4d-8124-d6e00dce26c6] succeeded in 0.03323708400057512s: 'paired_tasks=0'
+_______________ test_evidence_of_parallel_attempt_must_be_hidden _______________
+
+caller = <tests.conftest.ApiCaller object at 0x111147dd0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_evidence_of_parallel_attempt_must_be_hidden(caller, project_a, subject_a1):
+        _, _, submitted, _ = prepared(caller, project_a, subject_a1)
+        rebuild_for_attempt(submitted['attempt_id'])
+        response = caller.get(f'/api/v1/projects/{project_a.id}/evidence')
+        assert response.status_code == 200
+        leaked = [r for r in response.json()['rows'] if r['attempt_id'] == submitted['attempt_id']]
+>       assert not leaked, leaked
+E       AssertionError: [{'attempt_id': '2fbb899a-36d5-422d-90d5-8eac9d8e3e31', 'computed_at': '2026-09-27T11:10:38.964473+00:00', 'detail': {...2026-09-27T11:10:38.959297+00:00', 'detail': {'note': '原始提交存在即计入重复练习，即使看过答案也单列'}, 'dimension': 'repeat_practice', ...}]
+E       assert not [{'attempt_id': '2fbb899a-36d5-422d-90d5-8eac9d8e3e31', 'computed_at': '2026-09-27T11:10:38.964473+00:00', 'detail': {...2026-09-27T11:10:38.959297+00:00', 'detail': {'note': '原始提交存在即计入重复练习，即使看过答案也单列'}, 'dimension': 'repeat_practice', ...}]
+
+docs/review/2026-09-27/p02-independent/test_delivery_gates.py:42: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[53216307-8ad9-4931-9dc7-0dc3bc04be0d] succeeded in 0.0031679169987910427s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[705e500f-9f80-4f89-8cc8-21f8fc36a411] succeeded in 0.0023231249979289714s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[929780f5-7a73-437e-9161-2c6a46c5b1c7] succeeded in 0.022331625001243083s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[e0220af0-63ed-43db-8880-ecbd2ecddf18] succeeded in 0.03690466699845274s: 'paired_tasks=0'
+_________ test_pending_parallel_grade_queue_must_hide_score_and_rubric _________
+
+caller = <tests.conftest.ApiCaller object at 0x111189ac0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_pending_parallel_grade_queue_must_hide_score_and_rubric(caller, project_a, subject_a1):
+        _, _, submitted, _ = prepared(caller, project_a, subject_a1, qtype='constructed_response', answer={'type':'constructed_response', 'text':'my work'})
+        response = caller.get(f'/api/v1/projects/{project_a.id}/grading-queue')
+        assert response.status_code == 200
+        leaked = [r for r in response.json() if r['attempt_id'] == submitted['attempt_id']]
+>       assert not leaked, leaked
+E       AssertionError: [{'attachments': [], 'attempt_id': 'c988e9aa-1ac6-47ba-a0d9-351fc155ad27', 'can_review_as_other': False, 'confidence': 'unsure', ...}]
+E       assert not [{'attachments': [], 'attempt_id': 'c988e9aa-1ac6-47ba-a0d9-351fc155ad27', 'can_review_as_other': False, 'confidence': 'unsure', ...}]
+
+docs/review/2026-09-27/p02-independent/test_delivery_gates.py:50: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[1f866dbf-090e-4ead-a512-0b031c7f45a0] succeeded in 0.003570749999198597s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[cd0d2eb3-4dda-44f8-9aca-e956e2cd6fd4] succeeded in 0.003558416003215825s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[cf925cf6-1de6-4c4c-a898-327cc1ecf403] succeeded in 0.02161679199707578s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[b5bca17c-3e26-4c11-93e0-3be1c1a0dba2] succeeded in 0.031407416998263216s: 'paired_tasks=0'
+_______________ test_idempotent_tutor_message_must_recheck_gate ________________
+
+caller = <tests.conftest.ApiCaller object at 0x1111a3ce0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_idempotent_tutor_message_must_recheck_gate(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        practice = start_session(caller, project_a, subject_a1, version.question, key='tutor-practice')
+        item_id = practice['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        opened = caller.post(f'/api/v1/projects/{project_a.id}/tutor-sessions', {'session_item_id':item_id,'purpose':'explanation'}, key='tutor-open')
+        assert opened.status_code == 201
+        tutor_id = opened.json()['tutor_session_id']
+        url = f'/api/v1/projects/{project_a.id}/tutor-sessions/{tutor_id}/messages'
+        body = {'user_question':'请讲解此题'}
+        asked = caller.post(url, body, key='tutor-message')
+        assert asked.status_code == 201 and asked.json()['result_blocks'], asked.content
+        verification = start_session(caller, project_a, subject_a1, version.question, mode='verification', key='tutor-verification')
+        present(caller, project_a, verification['items'][0]['session_item_id'])
+        assert caller.get(f'/api/v1/projects/{project_a.id}/tutor-jobs/{asked.json()["tutor_job_id"]}').status_code == 403
+        replay = caller.post(url, body, key='tutor-message')
+>       assert replay.status_code == 403 or not replay.json().get('result_blocks'), replay.json()
+E       AssertionError: {'citations': [], 'delivered_at': '2026-09-27T11:10:39.982396+00:00', 'error_code': '', 'error_message': '', ...}
+E       assert (201 == 403 or not [{'kind': 'text', 'text': '【stub 讲解】这是测试/演示模式的占位讲解，不是真实模型输出。'}, {'kind': 'text', 'text': '请以已审核的人工解析为准；系统不会把 stub 内容当作真实结果。'}])
+E        +  where 201 = <HttpResponse status_code=201, "application/json; charset=utf-8">.status_code
+E        +  and   [{'kind': 'text', 'text': '【stub 讲解】这是测试/演示模式的占位讲解，不是真实模型输出。'}, {'kind': 'text', 'text': '请以已审核的人工解析为准；系统不会把 stub 内容当作真实结果。'}] = <built-in method get of dict object at 0x1111cf180>('result_blocks')
+E        +    where <built-in method get of dict object at 0x1111cf180> = {'citations': [], 'delivered_at': '2026-09-27T11:10:39.982396+00:00', 'error_code': '', 'error_message': '', ...}.get
+E        +      where {'citations': [], 'delivered_at': '2026-09-27T11:10:39.982396+00:00', 'error_code': '', 'error_message': '', ...} = functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x1111a1ca0>>, <HttpResponse status_code=201, "application/json; charset=utf-8">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x1111a1ca0>>, <HttpResponse status_code=201, "application/json; charset=utf-8">) = <HttpResponse status_code=201, "application/json; charset=utf-8">.json
+
+docs/review/2026-09-27/p02-independent/test_delivery_gates.py:69: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[d28cef5e-a07a-4ba2-b589-dfe31bbb5bde] succeeded in 0.003191125000739703s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[cd7f28f1-a9aa-4cf5-bc7d-eb4fce3abf80] succeeded in 0.00231333400006406s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task tutoring.run_job[fc5cd2ba-afb0-44f7-87d2-2110f7afd664] succeeded in 0.00219295900024008s: 'succeeded'
+__ test_delayed_credit_cannot_be_earned_by_opening_early_and_submitting_late ___
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_delayed_credit_cannot_be_earned_by_opening_early_and_submitting_late(project_a, subject_a1):
+        pair, _a, b, c = make_pairing(subject_a1)
+        for version in (b,c):
+            content_services.replace_knowledge_mappings(version,
+                [{'node_id': str(pair.node_id), 'is_primary': True, 'score_weight': '1'}], actor=project_a.owner)
+        now = timezone.now()
+        make_attempt(project_a, subject_a1, b, now-timedelta(hours=25, minutes=1), now-timedelta(hours=25))
+        item_c, attempt_c = make_attempt(project_a, subject_a1, c, now-timedelta(hours=2), now)
+        dimension = next(d for d in compute_dimensions(attempt_c)
+            if d['dimension']=='delayed_verification' and d['node'].id==pair.node_id)
+        print('EARLY_C', {'B_to_C_first_present_hours': 23, 'B_to_C_submit_hours':25,
+            'first_delivered_at':item_c.first_delivered_at.isoformat(), 'submitted_at':attempt_c.submitted_at.isoformat(),
+            'qualifies':dimension['qualifies'], 'detail':dimension['detail'], 'reasons':dimension['exclusion_reasons']})
+>       assert dimension['qualifies'] is False
+E       assert True is False
+
+docs/review/2026-09-27/p02-independent/test_regrade_and_delay.py:48: AssertionError
+______ test_old_disputed_regrade_cannot_invalidate_a_newer_trusted_grade _______
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_old_disputed_regrade_cannot_invalidate_a_newer_trusted_grade(project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        now = timezone.now()
+        item, attempt = make_attempt(project_a, subject_a1, version, now-timedelta(minutes=1), now)
+        original_value = item.answer_key_version.answer_payload['value']
+        v2 = new_key(version,2,not original_value,project_a.owner)
+        v3 = new_key(version,3,original_value,project_a.owner)
+        old = request_regrade(question=version.question, target_answer_key_version=v2, actor=project_a.owner,reason='older queued target')
+        new = request_regrade(question=version.question, target_answer_key_version=v3, actor=project_a.owner,reason='new valid target')
+        execute_regrade_run(str(new.id))
+        attempt.refresh_from_db()
+        prior_id = attempt.current_grade_event_id
+        assert attempt.current_grade_event.answer_key_version_id == v3.id
+        content_services.dispute_answer_key_version(v2, actor=project_a.owner, reason='only obsolete v2 wrong')
+        execute_regrade_run(str(old.id))
+        attempt.refresh_from_db()
+        print('STALE_DISPUTED', {'old_generation':old.generation, 'new_generation':new.generation,
+            'watermark':attempt.applied_regrade_generation,'grade_status':attempt.current_grade_event.status,
+            'current_answer_version':attempt.current_grade_event.answer_key_version.version,
+            'current_key_disputed':attempt.current_grade_event.answer_key_version.is_disputed})
+>       assert attempt.current_grade_event_id == prior_id
+E       AssertionError: assert UUID('29ebe11f-cd17-4153-a045-ea8eabfcce57') == UUID('572785ce-ba48-4324-9cd0-3a7d3517113a')
+E        +  where UUID('29ebe11f-cd17-4153-a045-ea8eabfcce57') = <Attempt: attempt#24e420e3-ade6-44d2-9e79-3e92c99e3625>.current_grade_event_id
+
+docs/review/2026-09-27/p02-independent/test_regrade_and_delay.py:71: AssertionError
+_ test_generation_migration_cannot_promote_old_queued_run_above_applied_newer_run _
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_generation_migration_cannot_promote_old_queued_run_above_applied_newer_run(project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        now = timezone.now()
+        item, attempt = make_attempt(project_a, subject_a1, version, now-timedelta(minutes=1), now)
+        original_value = item.answer_key_version.answer_payload['value']
+        v2 = new_key(version,2,not original_value,project_a.owner)
+        v3 = new_key(version,3,original_value,project_a.owner)
+        # Reproduce reachable pre-0004 state: two concurrent gen=1 requests, followed
+        # by gen=2 already applied. Drop only this constraint inside this test's
+        # transaction; pytest rolls it and all fixture data back afterwards.
+        with connection.cursor() as cursor:
+            cursor.execute('ALTER TABLE analytics_regrade_run DROP CONSTRAINT uniq_regrade_question_generation')
+        common = dict(user=project_a.owner, project=project_a, subject=subject_a1, question=version.question,requested_by=project_a.owner)
+        seed = RegradeRun.objects.create(**common,target_answer_key_version=item.answer_key_version,generation=1,status='succeeded',reason='first old run')
+        stale = RegradeRun.objects.create(**common,target_answer_key_version=v2,generation=1,reason='concurrent duplicate remains queued')
+        latest = RegradeRun.objects.create(**common,target_answer_key_version=v3,generation=2,reason='latest valid request')
+        execute_regrade_run(str(latest.id))
+        attempt.refresh_from_db()
+        assert attempt.applied_regrade_generation == 2
+        assert attempt.current_grade_event.answer_key_version_id == v3.id
+        mod = importlib.import_module('apps.analytics.migrations.0004_p0_2_regrade_generation_sequence')
+        with connection.cursor() as cursor:
+            cursor.execute('SET CONSTRAINTS ALL IMMEDIATE')
+            for sql in (mod.CREATE_SEQUENCE, mod.SETVAL_TO_MAX, mod.RENUMBER_DUPLICATES, mod.SETVAL_AFTER_BACKFILL):
+                cursor.execute(sql)
+            cursor.execute('ALTER TABLE analytics_regrade_run ADD CONSTRAINT uniq_regrade_question_generation UNIQUE (question_id, generation)')
+        stale.refresh_from_db()
+        execute_regrade_run(str(stale.id))
+        attempt.refresh_from_db()
+        print('MIGRATED_OLD_RUN', {'old_generation_after_migration':stale.generation, 'latest_generation':latest.generation,
+            'watermark':attempt.applied_regrade_generation,'current_answer_version':attempt.current_grade_event.answer_key_version.version,
+            'score':str(attempt.current_grade_event.confirmed_score)})
+>       assert attempt.current_grade_event.answer_key_version_id == v3.id
+E       AssertionError: assert UUID('b5be5b9a-dc7f-455b-a5b1-f00adc83a14a') == UUID('acee1a01-54bb-48e6-9c2d-c1d0dcade243')
+E        +  where UUID('b5be5b9a-dc7f-455b-a5b1-f00adc83a14a') = <GradeEvent: grade r3 confirmed>.answer_key_version_id
+E        +    where <GradeEvent: grade r3 confirmed> = <Attempt: attempt#c1423114-0641-47f7-82ab-7b6a0adbd62d>.current_grade_event
+E        +  and   UUID('acee1a01-54bb-48e6-9c2d-c1d0dcade243') = <AnswerKeyVersion: answer v3 (checked)>.id
+
+docs/review/2026-09-27/p02-independent/test_regrade_and_delay.py:106: AssertionError
+____________ test_tutor_retry_after_success_save_restores_exposure _____________
+
+practice_item = <SessionItem: a743d1c3-01e6-48f0-ba68-b70d4485f764#1>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11121ca10>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_tutor_retry_after_success_save_restores_exposure(practice_item, monkeypatch):
+        item=practice_item
+        tutor=TutorSession.objects.create(user=item.session.user,project=item.session.project,practice_session=item.session,session_item=item,purpose='explanation',question_version=item.question_version,answer_key_version=item.answer_key_version,rubric_version=item.rubric_version)
+        job=core.create_job(tutor_session=tutor,user=item.session.user,user_question='解释本题')
+        event=OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+        original_create=TutorTurn.objects.create
+        def crash_before_turn(**kwargs):
+            raise SystemExit('deterministic crash after job succeeded before exposure')
+        monkeypatch.setattr(TutorTurn.objects,'create',crash_before_turn)
+        with pytest.raises(SystemExit):
+            run_tutor_job(outbox_event_id=str(event.id),**event.payload)
+        event.refresh_from_db(); job.refresh_from_db()
+        assert event.status==OutboxStatus.PROCESSING
+        assert job.status=='succeeded'
+        assert not ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).exists()
+        monkeypatch.setattr(TutorTurn.objects,'create',original_create)
+        OutboxEvent.objects.filter(id=event.id).update(lease_expires_at=timezone.now()-timedelta(seconds=1))
+        result=run_tutor_job(outbox_event_id=str(event.id),**event.payload)
+        event.refresh_from_db()
+        print({'retry_result':result,'outbox_status':event.status,'processed':event.processed_at is not None,'job_status':job.status,'assistant_turns':TutorTurn.objects.filter(job=job,role='assistant').count(),'exposures':ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).count()})
+>       assert ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).count()==1, '成功且可读的讲解必须在崩溃重投后保留曝光事实'
+E       AssertionError: 成功且可读的讲解必须在崩溃重投后保留曝光事实
+E       assert 0 == 1
+E        +  where 0 = count()
+E        +    where count = <QuerySet []>.count
+E        +      where <QuerySet []> = filter(detail__tutor_job_id='98f0a2da-c701-435d-ae6b-c61d4b3ab0c5')
+E        +        where filter = <django.db.models.manager.Manager object at 0x110a4de20>.filter
+E        +          where <django.db.models.manager.Manager object at 0x110a4de20> = ExposureEvent.objects
+E        +        and   '98f0a2da-c701-435d-ae6b-c61d4b3ab0c5' = str(UUID('98f0a2da-c701-435d-ae6b-c61d4b3ab0c5'))
+E        +          where UUID('98f0a2da-c701-435d-ae6b-c61d4b3ab0c5') = <TutorJob: tutor job succeeded>.id
+
+docs/review/2026-09-27/p02-independent/test_tutor_recovery.py:33: AssertionError
+------------------------------ Captured log setup ------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[ea5ea455-7035-44cc-ab92-115f6485dff5] succeeded in 0.0034900419996120036s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[a3876f6d-b81e-4b26-843c-0b3c6599d129] succeeded in 0.003581917000701651s: 'ok'
+_______ test_stale_tutor_consumer_cannot_overwrite_after_lease_takeover ________
+
+practice_item = <SessionItem: 9c655643-82bb-4b9b-ac75-1d45759da526#1>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1111b3dd0>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_stale_tutor_consumer_cannot_overwrite_after_lease_takeover(practice_item, monkeypatch):
+        import json
+        from ai.providers import base as providers
+        item=practice_item
+        tutor=TutorSession.objects.create(user=item.session.user,project=item.session.project,practice_session=item.session,session_item=item,purpose='explanation',question_version=item.question_version,answer_key_version=item.answer_key_version,rubric_version=item.rubric_version)
+        job=core.create_job(tutor_session=tutor,user=item.session.user,user_question='解释本题')
+        event=OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+        invocations=[]
+        def call_with_takeover(provider, request, **kwargs):
+            number=len(invocations)+1
+            invocations.append(number)
+            if number==1:
+                # Deterministic lease expiry/takeover interleaving, not a real clock or process claim.
+                OutboxEvent.objects.filter(id=event.id).update(lease_expires_at=timezone.now()-timedelta(seconds=1))
+                run_tutor_job(outbox_event_id=str(event.id),**event.payload)
+            payload={'explanation_blocks':[{'kind':'text','text':f'consumer-{number}'}],'citations':[], 'missing_information':[], 'suggested_next':[]}
+            return providers.AiCallResult(payload=payload, raw_text=json.dumps(payload),is_stub=True)
+        monkeypatch.setattr(providers,'call_with_deadline',call_with_takeover)
+        run_tutor_job(outbox_event_id=str(event.id),**event.payload)
+        job.refresh_from_db(); event.refresh_from_db()
+        turns=TutorTurn.objects.filter(job=job,role='assistant').count()
+        exposures=ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).count()
+        print({'provider_calls':len(invocations),'final_blocks':job.result_blocks,'outbox':event.status,'assistant_turns':turns,'exposures':exposures})
+>       assert job.result_blocks[0]['text']=='consumer-2', '过期消费者不得覆盖接管者已确认的结果'
+E       AssertionError: 过期消费者不得覆盖接管者已确认的结果
+E       assert 'consumer-1' == 'consumer-2'
+E         
+E         - consumer-2
+E         ?          ^
+E         + consumer-1
+E         ?          ^
+
+docs/review/2026-09-27/p02-independent/test_tutor_recovery.py:59: AssertionError
+------------------------------ Captured log setup ------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[a82ef799-550d-49bb-ad74-a792bfe4858c] succeeded in 0.001892083997518057s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[c88a0de5-a14a-436d-bcc7-2f3e0c54d1eb] succeeded in 0.0017017079990182538s: 'ok'
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_existing_parallel_session_must_hide_score - AssertionErr...
+FAILED backend::test_idempotent_submit_must_recheck_gate - AssertionError: {'...
+FAILED backend::test_evidence_of_parallel_attempt_must_be_hidden - AssertionE...
+FAILED backend::test_pending_parallel_grade_queue_must_hide_score_and_rubric
+FAILED backend::test_idempotent_tutor_message_must_recheck_gate - AssertionEr...
+FAILED backend::test_delayed_credit_cannot_be_earned_by_opening_early_and_submitting_late
+FAILED backend::test_old_disputed_regrade_cannot_invalidate_a_newer_trusted_grade
+FAILED backend::test_generation_migration_cannot_promote_old_queued_run_above_applied_newer_run
+FAILED backend::test_tutor_retry_after_success_save_restores_exposure - Asser...
+FAILED backend::test_stale_tutor_consumer_cannot_overwrite_after_lease_takeover
+10 failed, 3 warnings in 7.40s

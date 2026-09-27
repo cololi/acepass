@@ -35,7 +35,7 @@ from apps.common.enums import (
     TutorRequestStatus,
 )
 from apps.common.errors import InvalidInput, PurposeNotAllowed, ScopeViolation
-from apps.practice.models import Attempt, SessionItem
+from apps.practice.models import Attempt, ExposureEvent, SessionItem
 from apps.practice.services import exposure
 from apps.tutoring.models import TutorJob, TutorSession, TutorTurn
 
@@ -370,26 +370,143 @@ def assert_job_deliverable(job: TutorJob) -> None:
     )
 
 
-def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str) -> TutorJob:
-    """Execute one provider call, validate it, and store only the validated result."""
-    if job.status in {TutorRequestStatus.SUCCEEDED, TutorRequestStatus.FAILED, TutorRequestStatus.UNAVAILABLE}:
+class LeaseLost(RuntimeError):
+    """Another consumer owns this job's outbox event; this one must not write."""
+
+
+def _claim_still_owned(claim) -> bool:
+    """Inside a transaction: does this consumer still own the outbox claim?"""
+    if claim is None:
+        # No outbox row (an inline/manual invocation with nothing to serialise on).
+        return True
+    from apps.audit.services import outbox
+
+    return outbox.hold_claim(str(claim.id), claim.claim_token) is not None
+
+
+def _write_job_result(*, job: TutorJob, claim, fields: dict[str, Any]) -> bool:
+    """Short transaction: re-check the claim, then persist a job state change.
+
+    Locks the outbox claim and the job row, re-reads both, and writes only while
+    this consumer still owns the claim and no newer consumer has already finished
+    the job. The model call is deliberately *not* inside this block: the lock is
+    held for a few statements, never for a network request.
+    """
+    with transaction.atomic():
+        if not _claim_still_owned(claim):
+            return False
+        locked = TutorJob.objects.select_for_update().filter(id=job.id).first()
+        if locked is None:
+            return False
+        if locked.status == TutorRequestStatus.SUCCEEDED and fields.get("status") != TutorRequestStatus.SUCCEEDED:
+            # A newer consumer already delivered a validated result; a stale one
+            # must not overwrite it with a failure.
+            return False
+        for name, value in fields.items():
+            setattr(locked, name, value)
+        locked.save(update_fields=[*fields, "updated_at"])
+    for name, value in fields.items():
+        setattr(job, name, value)
+    return True
+
+
+def _finalize_success(*, job: TutorJob, purpose: str, claim) -> TutorJob:
+    """Commit the business facts of a successful job exactly once (C04).
+
+    The assistant turn, the exposure fact and the outbox completion are written in
+    one short transaction that locks the job row. A re-delivery after a crash
+    between "the validated result is stored" and these facts finds them missing and
+    completes them; a re-delivery that finds them already there does nothing. A
+    consumer that has lost the claim refuses to write at all, so a stale consumer
+    returning late can never overwrite the takeover's result or duplicate the
+    message/exposure.
+    """
+    from apps.audit.services import outbox
+
+    with transaction.atomic():
+        if not _claim_still_owned(claim):
+            job.refresh_from_db()
+            return job
+        locked = TutorJob.objects.select_for_update().filter(id=job.id).first()
+        if locked is None or locked.status != TutorRequestStatus.SUCCEEDED:
+            job.refresh_from_db()
+            return job
+        if locked.finalized_at is None:
+            item = locked.tutor_session.session_item
+            if not TutorTurn.objects.filter(job=locked, role="assistant").exists():
+                TutorTurn.objects.create(
+                    tutor_session=locked.tutor_session,
+                    role="assistant",
+                    text=_blocks_text(locked.result_blocks)[:8000],
+                    job=locked,
+                )
+            if not ExposureEvent.objects.filter(detail__tutor_job_id=str(locked.id)).exists():
+                kind = ExposureKind.ANSWER_DELIVERED if locked.reveals_answer else ExposureKind.EXPLANATION_DELIVERED
+                exposure.record(
+                    user=locked.user,
+                    project=locked.project,
+                    question=item.question_version.question,
+                    question_version=item.question_version,
+                    session_item=item,
+                    kind=kind,
+                    purpose="practice",
+                    source=f"tutor_job:{purpose}",
+                    reveals_answer=locked.reveals_answer,
+                    detail={
+                        "tutor_job_id": str(locked.id),
+                        "prompt_version": prompts.EXPLAIN_PROMPT_VERSION,
+                        "is_stub": bool(locked.llm_run.is_stub) if locked.llm_run_id else False,
+                        "delivered_at": locked.delivered_at.isoformat() if locked.delivered_at else None,
+                        "recovered_after_interruption": True,
+                    },
+                )
+            locked.finalized_at = timezone.now()
+            locked.save(update_fields=["finalized_at", "updated_at"])
+        if claim is not None:
+            # Completion is part of the same commit: the event is only processed
+            # once the facts it stands for actually exist.
+            outbox.mark_processed(str(claim.id), claim_token=claim.claim_token)
+    job.refresh_from_db()
+    return job
+
+
+def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str, claim=None) -> TutorJob:
+    """Execute one provider call, validate it, and store only the validated result.
+
+    ``claim`` is the outbox claim this consumer holds (``None`` for a direct
+    invocation with no row to serialise on). Every write is guarded by it.
+    """
+    if job.status in {TutorRequestStatus.FAILED, TutorRequestStatus.UNAVAILABLE}:
         return job
+    if job.status == TutorRequestStatus.SUCCEEDED:
+        # A previous consumer stored the validated result but was interrupted
+        # before the assistant turn / exposure / completion: finish that commit
+        # instead of reporting success with the facts missing.
+        return _finalize_success(job=job, purpose=purpose, claim=claim)
     try:
         assert_job_deliverable(job)
     except PurposeNotAllowed as exc:
         # Terminal, honest refusal: nothing is stored, and the reason is on the
         # job so a later read does not look like an unexplained failure.
-        job.status = TutorRequestStatus.FAILED
-        job.error_code = "blocked_by_active_verification"
-        job.error_message = str(getattr(exc, "message", exc))[:500]
-        job.result_blocks = []
-        job.save(update_fields=["status", "error_code", "error_message", "result_blocks", "updated_at"])
+        _write_job_result(
+            job=job,
+            claim=claim,
+            fields={
+                "status": TutorRequestStatus.FAILED,
+                "error_code": "blocked_by_active_verification",
+                "error_message": str(getattr(exc, "message", exc))[:500],
+                "result_blocks": [],
+            },
+        )
         return job
     provider = providers.get_provider()
     run = job.llm_run
-    started = timezone.now()
-    job.status = TutorRequestStatus.RUNNING
-    job.save(update_fields=["status", "updated_at"])
+    if not _write_job_result(job=job, claim=claim, fields={"status": TutorRequestStatus.RUNNING}):
+        # The claim was taken over between claiming and starting: this consumer
+        # owns nothing and must not call the model or write anything.
+        logger.info("tutor job %s: claim lost before the provider call", job.id)
+        job.refresh_from_db()
+        return job
     try:
         call = providers.call_with_deadline(
             provider,
@@ -400,28 +517,50 @@ def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str) -
             ),
         )
     except providers.AiUnavailable as exc:
-        job.status = TutorRequestStatus.UNAVAILABLE
-        job.error_code = exc.code
-        job.error_message = str(exc)[:500]
-        job.save(update_fields=["status", "error_code", "error_message", "updated_at"])
-        _record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
+        _record_failure(run, LlmRunStatus.UNAVAILABLE, exc, claim=claim)
+        _write_job_result(
+            job=job,
+            claim=claim,
+            fields={
+                "status": TutorRequestStatus.UNAVAILABLE,
+                "error_code": exc.code,
+                "error_message": str(exc)[:500],
+            },
+        )
         return job
     except providers.AiError as exc:
-        job.status = TutorRequestStatus.FAILED
-        job.error_code = exc.code
-        job.error_message = str(exc)[:500]
-        job.save(update_fields=["status", "error_code", "error_message", "updated_at"])
-        _record_failure(run, LlmRunStatus.TIMEOUT if isinstance(exc, providers.AiTimeout) else LlmRunStatus.FAILED, exc)
+        _record_failure(
+            run,
+            LlmRunStatus.TIMEOUT if isinstance(exc, providers.AiTimeout) else LlmRunStatus.FAILED,
+            exc,
+            claim=claim,
+        )
+        _write_job_result(
+            job=job,
+            claim=claim,
+            fields={
+                "status": TutorRequestStatus.FAILED,
+                "error_code": exc.code,
+                "error_message": str(exc)[:500],
+            },
+        )
         return job
 
     try:
         parsed = json.loads(_strip_code_fence(call.raw_text))
     except json.JSONDecodeError:
-        job.status = TutorRequestStatus.FAILED
-        job.error_code = "ai_invalid_output"
-        job.error_message = "模型输出不是合法 JSON，未展示任何内容"
-        job.save(update_fields=["status", "error_code", "error_message", "updated_at"])
-        _record_failure(run, LlmRunStatus.REJECTED, providers.AiInvalidOutput("invalid JSON"), call=call)
+        _record_failure(
+            run, LlmRunStatus.REJECTED, providers.AiInvalidOutput("invalid JSON"), call=call, claim=claim
+        )
+        _write_job_result(
+            job=job,
+            claim=claim,
+            fields={
+                "status": TutorRequestStatus.FAILED,
+                "error_code": "ai_invalid_output",
+                "error_message": "模型输出不是合法 JSON，未展示任何内容",
+            },
+        )
         return job
 
     clean, problems = prompts.validate_explain_payload(parsed, allowed_citation_ids=set(citations))
@@ -429,11 +568,19 @@ def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str) -
     if call.is_stub:
         run.is_stub = True
     if problems:
-        job.status = TutorRequestStatus.FAILED
-        job.error_code = "ai_invalid_output"
-        job.error_message = "模型输出未通过校验，未展示：" + "; ".join(p["message"] for p in problems[:3])[:400]
-        job.save(update_fields=["status", "error_code", "error_message", "updated_at"])
-        _record_failure(run, LlmRunStatus.REJECTED, providers.AiInvalidOutput(job.error_message), call=call)
+        message = "模型输出未通过校验，未展示：" + "; ".join(p["message"] for p in problems[:3])[:400]
+        _record_failure(
+            run, LlmRunStatus.REJECTED, providers.AiInvalidOutput(message), call=call, claim=claim
+        )
+        _write_job_result(
+            job=job,
+            claim=claim,
+            fields={
+                "status": TutorRequestStatus.FAILED,
+                "error_code": "ai_invalid_output",
+                "error_message": message,
+            },
+        )
         return job
 
     item = job.tutor_session.session_item
@@ -441,81 +588,84 @@ def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str) -
         str(item.question_version_id) == str(job.tutor_session.question_version_id)
         and str(item.answer_key_version_id or "") == str(job.tutor_session.answer_key_version_id or "")
     )
-    job.result_blocks = clean["explanation_blocks"]
-    job.citations = clean["citations"]
-    job.missing_information = clean["missing_information"]
-    job.suggested_next = clean["suggested_next"]
-    job.status = TutorRequestStatus.SUCCEEDED
-    job.delivered_at = timezone.now()
-    job.is_stale = not frozen_ok
-    job.save(
-        update_fields=[
-            "result_blocks",
-            "citations",
-            "missing_information",
-            "suggested_next",
-            "status",
-            "delivered_at",
-            "is_stale",
-            "updated_at",
-        ]
-    )
-    run.status = LlmRunStatus.SUCCEEDED
-    run.prompt_tokens = call.prompt_tokens
-    run.completion_tokens = call.completion_tokens
-    run.cost_cents = call.cost_cents
-    run.cost_known = call.cost_known
-    run.attempts = call.attempts
-    run.latency_ms = call.latency_ms
-    run.is_stub = call.is_stub
-    run.model_identifier = call.model or run.model_identifier
-    run.provider = call.provider or run.provider
-    run.raw_response_excerpt = call.raw_text[:4000]
-    run.save()
-    TutorTurn.objects.create(
-        tutor_session=job.tutor_session,
-        role="assistant",
-        text=_blocks_text(clean["explanation_blocks"])[:8000],
+    # Phase 1 — commit the validated result on the job row. This is the durable
+    # record of what the model produced; it survives an interruption before the
+    # business facts below, which is what makes the retry recoverable instead of
+    # "the job says succeeded but the explanation was never delivered".
+    stored = _write_job_result(
         job=job,
-    )
-    # The delivered bundle is an exposure fact, recorded from the server side.
-    kind = ExposureKind.ANSWER_DELIVERED if job.reveals_answer else ExposureKind.EXPLANATION_DELIVERED
-    exposure.record(
-        user=job.user,
-        project=job.project,
-        question=item.question_version.question,
-        question_version=item.question_version,
-        session_item=item,
-        kind=kind,
-        purpose="practice",
-        source=f"tutor_job:{purpose}",
-        reveals_answer=job.reveals_answer,
-        detail={
-            "tutor_job_id": str(job.id),
-            "prompt_version": prompts.EXPLAIN_PROMPT_VERSION,
-            "is_stub": call.is_stub,
-            "delivered_at": job.delivered_at.isoformat() if job.delivered_at else None,
+        claim=claim,
+        fields={
+            "result_blocks": clean["explanation_blocks"],
+            "citations": clean["citations"],
+            "missing_information": clean["missing_information"],
+            "suggested_next": clean["suggested_next"],
+            "status": TutorRequestStatus.SUCCEEDED,
+            "delivered_at": timezone.now(),
+            "is_stale": not frozen_ok,
         },
     )
-    del started
-    return job
+    _record_success_run(run, call, claim=claim)
+    if not stored:
+        # A newer consumer already owns the outcome; keep its result.
+        logger.info("tutor job %s: stale consumer did not store its result", job.id)
+        job.refresh_from_db()
+        return job
+    # Phase 2 — assistant turn + exposure + outbox completion, exactly once.
+    return _finalize_success(job=job, purpose=purpose, claim=claim)
 
 
-def _record_failure(run: LLMRun | None, status: str, exc: Exception, call: providers.AiCallResult | None = None) -> None:
+def _record_success_run(run: LLMRun | None, call: providers.AiCallResult, *, claim) -> None:
+    """Persist the run telemetry for a validated call (leased like every write).
+
+    The in-memory row is saved as-is: the caller has already recorded
+    ``validation_result`` on it, and every consumer that reaches this point holds
+    the claim, so there is no concurrent writer to merge with.
+    """
     if run is None:
         return
-    run.status = status
-    run.error_code = getattr(exc, "code", "ai_error")
-    run.error_message = str(exc)[:500]
-    if call is not None:
+    with transaction.atomic():
+        if not _claim_still_owned(claim):
+            return
+        run.status = LlmRunStatus.SUCCEEDED
+        run.prompt_tokens = call.prompt_tokens
+        run.completion_tokens = call.completion_tokens
+        run.cost_cents = call.cost_cents
+        run.cost_known = call.cost_known
         run.attempts = call.attempts
         run.latency_ms = call.latency_ms
-        run.raw_response_excerpt = call.raw_text[:4000]
         run.is_stub = call.is_stub
-    else:
-        run.cost_known = False
-        run.cost_cents = None
-    run.save()
+        run.model_identifier = call.model or run.model_identifier
+        run.provider = call.provider or run.provider
+        run.raw_response_excerpt = call.raw_text[:4000]
+        run.save()
+
+
+def _record_failure(
+    run: LLMRun | None,
+    status: str,
+    exc: Exception,
+    call: providers.AiCallResult | None = None,
+    *,
+    claim=None,
+) -> None:
+    if run is None:
+        return
+    with transaction.atomic():
+        if not _claim_still_owned(claim):
+            return
+        run.status = status
+        run.error_code = getattr(exc, "code", "ai_error")
+        run.error_message = str(exc)[:500]
+        if call is not None:
+            run.attempts = call.attempts
+            run.latency_ms = call.latency_ms
+            run.raw_response_excerpt = call.raw_text[:4000]
+            run.is_stub = call.is_stub
+        else:
+            run.cost_known = False
+            run.cost_cents = None
+        run.save()
 
 
 def _strip_code_fence(text: str) -> str:

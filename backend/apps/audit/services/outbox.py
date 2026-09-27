@@ -196,6 +196,28 @@ def confirm_claim(claim: OutboxEvent) -> bool:
     return mark_processed(str(claim.id), claim_token=claim.claim_token)
 
 
+def hold_claim(event_id: str, claim_token: str) -> OutboxEvent | None:
+    """Lock and re-read a claim, returning it only while *this* consumer owns it.
+
+    The lease protects the outbox row; business writes need the same protection.
+    A consumer that already lost the row (lease expired and a takeover re-claimed
+    it, or the row was confirmed) must not go on to write job results, assistant
+    messages or exposures — otherwise the stale consumer overwrites the takeover's
+    committed outcome, which is exactly the C04 double-write.
+
+    Must be called inside a transaction: the row is locked ``FOR UPDATE`` so the
+    ownership decision and the writes that depend on it commit together, and the
+    lock is held for the short business commit only — never across a model call.
+    """
+    row = OutboxEvent.objects.select_for_update().filter(id=event_id).first()
+    if row is None or row.processed_at is not None:
+        return None
+    if not claim_token or row.claim_token != claim_token:
+        logger.info("outbox event %s is no longer owned by this consumer", event_id)
+        return None
+    return row
+
+
 def fail_claim(claim: OutboxEvent, error: str, *, recoverable: bool = True) -> bool:
     """Record a failure for the exact claim, never for a terminal row."""
     return mark_retryable_failure(claim, error, recoverable=recoverable, claim_token=claim.claim_token)

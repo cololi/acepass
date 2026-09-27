@@ -1,5 +1,7 @@
 # P0.2 收尾验证报告
 
+> **后续独立复验补充：原始11后端/2浏览器反例已独立确认通过，但不能确认全部关闭。** 交叉场景与故障演练的剩余边界见 [12独立复验](12-p0-2-independent-review.md)，下一步按其中C01—C05定向补漏。本文保留交付者原始记录。
+
 基线：`f809365`（问题基线见 [09 独立复验](09-p0-1-independent-reacceptance.md)）。本轮按
 [10 P0.2 收尾计划](10-p0-2-closeout-plan.md) 的 G01—G07 执行，目标是关闭 B01—B07 与发布门槛，
 不进入 P1、不部署到任何远程环境。
@@ -25,18 +27,21 @@
 
 | 文件 | 改动 |
 |---|---|
-| `backend/apps/analytics/migrations/0004_p0_2_regrade_generation_sequence.py` | 新建 `analytics_regrade_generation_seq` 序列 + `uniq_regrade_question_generation` 唯一约束；迁移前把序列推进到 `MAX(generation)+1`，并把历史重复的 `(question, generation)` 用序列重编号（现有业务库 0 条 regrade run，未改写任何历史行） |
+| `backend/apps/analytics/migrations/0004_p0_2_regrade_generation_sequence.py` | 新建 `analytics_regrade_generation_seq` 序列 + `uniq_regrade_question_generation` 唯一约束；迁移前把序列推进到 `MAX(generation)+1`（现有业务库 0 条 regrade run，未改写任何历史行）。**P0.2 补漏修订（C02）**：历史存在重复 `(question, generation)` 时不再用序列重编号，而是拒绝迁移并输出可操作清单（重编号会把旧 run 抬到更已生效的代次之上）；拒绝时事务整体回滚，不留部分修改 |
 | `backend/apps/analytics/models.py` | `RegradeRun.allocate_generation()`：用 `nextval` 分配代次；`Meta.constraints` 增加唯一约束 |
 | `backend/apps/practice/services/attempts.py` | `start_regrade_run` 改为一个事务内重读目标答案版本 + 序列分配代次；新增 `RegradeTargetUntrusted`、`recheck_regrade_target`（执行时加锁重查答案/rubric 可信状态）、`invalidate_for_untrusted_regrade_target`（拒绝时把覆盖的作答转入人工复核） |
 | `backend/apps/analytics/services/reports.py` | `execute_regrade_run` 整体一个事务 + `select_for_update` 锁 run 行；执行前重新校验目标；目标在中途进入争议时回滚本轮写入并记录拒绝；不再有 `running` 半成品 |
 | `backend/apps/analytics/api.py` | `ReportOut` 增加 `hidden_verification_content_attempts` |
 
-**关于"先锁稳定题目行"**：计划要求先锁 Question 行再分配 generation。实测证明在
-`test_concurrent_regrade_requests_receive_distinct_generations` 的两事务并发下，阻塞式行锁会
-造成死锁（第一个请求持有行锁直到自己提交，而该测试的同步屏障正是要求两边都到达后才提交），
-把唯一性缺陷换成活性缺陷。因此改用数据库序列：`nextval` 原子、单调、不阻塞，配合
-`(question, generation)` 唯一约束作为数据库层兜底，唯一性与"v3→v2 不倒退"的要求都成立，
-且不会死锁。这是本轮唯一偏离计划字面做法的地方，动机与实测都在 §2.1。
+**关于"先锁稳定题目行"**：计划要求先锁 Question 行再分配 generation。本轮实测是：在
+`test_concurrent_regrade_requests_receive_distinct_generations` 的两事务并发下，阻塞式行锁会让
+该测试超时——第一个请求持有行锁直到自己提交，而该测试的同步屏障要求两边都到达屏障后才提交。
+**表述修正（见 [12 独立复验](12-p0-2-independent-review.md) §2）**：这只能说明该测试的同步设计
+无法与"锁持有到提交"共存，不能推断"稳定行锁天然死锁"；正确的行锁串行化同样越不过这个屏障。
+因此改用数据库序列的真实理由是**锁的范围与耦合**：为分配一个编号而把整条重判请求串行化在一把
+与编号无关的行锁上，会把同一题目的多个独立业务动作绑在同一锁作用域内。`nextval` 原子、单调、
+不阻塞，配合 `(question, generation)` 唯一约束作为数据库层兜底，唯一性与"v3→v2 不倒退"的要求
+都成立。这是本轮唯一偏离计划字面做法的地方，动机与实测都在 §2.1。
 
 ### G02 统一内容门禁（B02）
 

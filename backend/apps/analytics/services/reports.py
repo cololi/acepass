@@ -370,12 +370,23 @@ def execute_regrade_run(regrade_run_id: str) -> str:
         )
 
         def refuse_untrusted(reason: str, exc_details: dict | None = None) -> str:
-            """Terminal refusal: no confirmed score, attempts go to human review."""
-            refused = attempt_services.invalidate_for_untrusted_regrade_target(
-                attempts=attempts, actor=run.requested_by, reason=reason
+            """Terminal refusal: no confirmed score, attempts go to human review.
+
+            Only the attempts whose effective grade is *not* newer than this run
+            are moved to review (C02). The normal regrade branch already refuses to
+            overwrite a newer generation; the refusal branch must obey the same
+            ordering, otherwise an older disputed run deletes a valid newer grade
+            on its way out.
+            """
+            refused, skipped_newer = attempt_services.invalidate_for_untrusted_regrade_target(
+                attempts=attempts,
+                actor=run.requested_by,
+                reason=reason,
+                refused_generation=run.generation,
             )
             run.regraded_attempts = 0
-            run.stale_skipped_attempts = 0
+            # Attempts a newer generation already re-graded: reported, not touched.
+            run.stale_skipped_attempts = skipped_newer
             run.invalidated_evidence = refused
             run.status = RegradeStatus.FAILED
             run.error_message = f"重判被拒绝：{reason}"[:500]
@@ -395,9 +406,14 @@ def execute_regrade_run(regrade_run_id: str) -> str:
             )
             _rebuild_after_regrade(attempts)
             logger.warning(
-                "regrade run refused run=%s details=%s", run.id, exc_details or {"reason": "target_untrusted"}
+                "regrade run refused run=%s generation=%s refused=%s newer_generation_kept=%s details=%s",
+                run.id,
+                run.generation,
+                refused,
+                skipped_newer,
+                exc_details or {"reason": "target_untrusted"},
             )
-            return f"refused_target_untrusted={refused}"
+            return f"refused_target_untrusted={refused} newer_generation_kept={skipped_newer}"
 
         try:
             target_answer_key_version, target_rubric_version = attempt_services.recheck_regrade_target(

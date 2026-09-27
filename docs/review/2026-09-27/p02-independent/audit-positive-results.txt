@@ -1,0 +1,27 @@
+2026-09-27 11:10:01,724 INFO celery.app.trace Task projection.refresh_paper_stats[cba07e85-330b-4406-a8f0-34b2cf8c9dac] succeeded in 0.02142900000035297s: 'ok'
+2026-09-27 11:10:01,728 INFO celery.app.trace Task projection.refresh_paper_stats[5ae40dd9-d8ce-4c22-b7e7-47e418fbfdf1] succeeded in 0.0030489170021610335s: 'ok'
+database=test_acepass_p02_ops_review
+grade_events_scanned=2
+grade_events_needing_rewrite=2
+evidence_active=0
+evidence_rows_with_is_correct_drift=0
+  grade_event 287395eb-884a-48b1-9b77-d74ea047a450 kind=initial: pending_max_score 9.99 → 0; is_fully_confirmed False → True
+  grade_event 47a972c8-7031-447e-a273-10f5790ad300 kind=initial: pending_max_score 9.99 → 0; is_fully_confirmed False → True
+audit_batch_id=fe5ca1d40ec3
+grade_events_rewritten=1
+grade_events_left_as_history=1
+evidence_rows_rebuilt=0
+done: raw answers, attempts and evidence source rows were not modified. 1 grade_event projection row(s) were rewritten as batch fe5ca1d40ec3 with a before/after audit in audit_content_revision; 1 superseded (historical) row(s) were left untouched.
+.
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 3 warnings in 2.68s

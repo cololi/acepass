@@ -1,0 +1,7 @@
+{
+  "docs/review/2026-09-27/p01-independent/draft-regression.spec.ts": true,
+  "docs/review/2026-09-27/p01-independent/fill-editor.spec.ts": true,
+  "docs/review/2026-09-27/p01-independent/test_data_gaps.py": true,
+  "docs/review/2026-09-27/p01-independent/test_outbox_gaps.py": true,
+  "docs/review/2026-09-27/p01-independent/test_tutor_and_import_gaps.py": true
+}

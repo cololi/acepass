@@ -402,13 +402,52 @@ def attempt_state(attempt: Attempt | None, *, session: PracticeSession, hidden: 
     }
 
 
+def delivery_hidden_for_item(*, item: SessionItem, user, content_map: dict[str, set[str]] | None = None) -> bool:
+    """Must this item's grading be withheld from *this* delivery, right now?
+
+    The single decision used by every result-delivering path (session snapshot,
+    submit replay, confirm-grade replay, attempt read, reveal). Idempotency only
+    guarantees "the same effect is not applied twice" — it never grants a
+    permanent right to read a sensitive response, so replay paths re-serialise
+    through this function instead of returning a stored body verbatim (C01).
+    """
+    from apps.practice.services import verification_gate
+
+    if item.session.hides_grading:
+        return True
+    return verification_gate.content_gate_blocks_item(item=item, content_map=content_map, user=user)
+
+
 def session_state(session: PracticeSession, *, user, include_stems: bool = False) -> dict[str, Any]:
-    """Session snapshot. Nothing here reveals answers or scores while hidden."""
+    """Session snapshot. Nothing here reveals answers or scores while hidden.
+
+    "Hidden" has two independent sources and both must be applied on *every*
+    delivery, not only on the direct attempt read:
+
+    * the session hides its own grading (a running verification / mock exam);
+    * the content is covered by *another* running verification (the parallel
+      practice session of C01 — the score of a practice attempt is as good as the
+      answer while the verification that contains the same content is open).
+
+    The second rule is content-based and shared with reports, evidence and the
+    grading queue (:mod:`apps.practice.services.verification_gate`), so hiding one
+    entry point cannot be bypassed through another.
+    """
+    from apps.practice.services import verification_gate
+
+    content_map = verification_gate.active_verification_content_map(user=user)
     items = []
+    withheld_item_ids: list[str] = []
     for item in session.items.select_related(
         "question_version__question", "answer_key_version", "rubric_version"
     ).order_by("ordinal"):
         attempt = Attempt.objects.filter(session_item=item).first()
+        # A verification item covers itself: only *another* covering item withholds
+        # this row's grading, which is what `content_gate_blocks_item` checks.
+        withheld = verification_gate.content_gate_blocks_item(item=item, content_map=content_map)
+        if withheld:
+            withheld_item_ids.append(str(item.id))
+        row_hidden = session.hides_grading or withheld
         row: dict[str, Any] = {
             "session_item_id": str(item.id),
             "ordinal": item.ordinal,
@@ -425,14 +464,28 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
             # reveal and tutoring endpoints take the attempt / item id, so
             # neither may depend on a one-shot presentation response (R09).
             "attempt_id": str(attempt.id) if attempt is not None else None,
-            "can_reveal": not session.hides_grading,
-            "attempt": attempt_state(attempt, session=session),
+            "can_reveal": not row_hidden,
+            "grading_withheld": withheld,
+            "attempt": attempt_state(attempt, session=session, hidden=row_hidden),
         }
         if include_stems:
             row["stem"] = stem_payload(item.question_version)
         items.append(row)
     hidden = session.hides_grading
+    # The session total mixes every item. While one of them is withheld the total
+    # would leak it back as a number, so the totals are omitted as a whole rather
+    # than silently summing a subset.
+    totals_hidden = hidden or bool(withheld_item_ids)
     confirmed, pending = _session_score(session)
+    if hidden:
+        hidden_reason = "验证进行中：结束本次验证后才会显示分数与正误。"
+    elif withheld_item_ids:
+        hidden_reason = (
+            "该会话包含正在验证中的同源内容：为避免泄露答案，验证结束前不显示本会话的分数。"
+            "无关会话不受影响。"
+        )
+    else:
+        hidden_reason = None
     return {
         "session_id": str(session.id),
         "project_id": str(session.project_id),
@@ -447,12 +500,11 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
         "items": items,
         # While grading is hidden the totals are omitted, not merely flagged: a
         # client must not be able to derive the score from the payload at all.
-        "confirmed_score": None if hidden else str(confirmed),
-        "pending_max_score": None if hidden else str(pending),
-        "score_visible": not hidden,
-        "score_hidden_reason": (
-            "验证进行中：结束本次验证后才会显示分数与正误。" if hidden else None
-        ),
+        "confirmed_score": None if totals_hidden else str(confirmed),
+        "pending_max_score": None if totals_hidden else str(pending),
+        "score_visible": not totals_hidden,
+        "score_hidden_reason": hidden_reason,
+        "grading_withheld_session_item_ids": withheld_item_ids,
     }
 
 

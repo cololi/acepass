@@ -9,7 +9,7 @@ from ninja import Schema
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
 from apps.common.enums import SessionMode
-from apps.common.errors import AlreadySubmitted, InvalidInput, ScopeViolation
+from apps.common.errors import AlreadySubmitted, InvalidInput, PurposeNotAllowed, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.practice.models import Attempt, PracticeSession, SessionItem
 from apps.practice.services import attempts as attempt_services
@@ -48,6 +48,9 @@ class SessionOut(Schema):
     pending_max_score: str | None
     score_visible: bool
     score_hidden_reason: str | None = None
+    #: Items whose grading is withheld because a *different* running verification
+    #: covers the same content (empty unless the content gate applies).
+    grading_withheld_session_item_ids: list[str] = []
 
 
 class DraftIn(Schema):
@@ -230,19 +233,28 @@ def list_sessions(request, project_id: str, subject_id: str | None = None, limit
     if subject_id:
         require_subject(request.user, project, subject_id)
         queryset = queryset.filter(subject_id=subject_id)
-    return [
-        {
-            "session_id": str(session.id),
-            "subject_id": str(session.subject_id),
-            "mode": session.mode,
-            "status": session.status,
-            "created_at": session.created_at.isoformat(),
-            "item_count": session.items.count(),
-            "submitted_count": Attempt.objects.filter(session_item__session=session).count(),
-            "grading_hidden": session.hides_grading,
-        }
-        for session in queryset[: max(1, min(limit, 50))]
-    ]
+    content_map = verification_gate.active_verification_content_map(user=request.user)
+    rows = []
+    for session in queryset[: max(1, min(limit, 50))]:
+        # The list view must not disagree with the detail view about whether a
+        # session's grading is currently deliverable.
+        withheld = any(
+            verification_gate.content_gate_blocks_item(item=item, content_map=content_map)
+            for item in session.items.select_related("question_version").all()
+        )
+        rows.append(
+            {
+                "session_id": str(session.id),
+                "subject_id": str(session.subject_id),
+                "mode": session.mode,
+                "status": session.status,
+                "created_at": session.created_at.isoformat(),
+                "item_count": session.items.count(),
+                "submitted_count": Attempt.objects.filter(session_item__session=session).count(),
+                "grading_hidden": session.hides_grading or withheld,
+            }
+        )
+    return rows
 
 
 # --------------------------------------------------------------------------
@@ -272,7 +284,13 @@ def put_draft(request, project_id: str, item_id: str, payload: DraftIn):
 
 @practice_router.post("/projects/{project_id}/session-items/{item_id}/submit", auth=auth, response={200: SubmitOut})
 def submit(request, project_id: str, item_id: str, payload: SubmitIn):
-    """Idempotent submission: same key + same payload returns the same attempt."""
+    """Idempotent submission: same key + same payload returns the same attempt.
+
+    The replay returns the same *resource*, never a cached copy of the sensitive
+    payload: the grade is re-serialised under the gate that applies now, so a
+    practice attempt whose content has since entered a verification returns a
+    receipt instead of the score it returned the first time (C01).
+    """
     project = require_project(request.user, project_id)
     item = _item_scope(request.user, project, item_id)
     key = idempotency_key(request)
@@ -280,7 +298,7 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
     body = payload.model_dump(mode="json")
     replay = idempotency.claim(request.user, scope, key, body)
     if replay is not None:
-        return replay.status_code, replay.body
+        return _submission_receipt(item=item, user=request.user, fallback=replay)
     try:
         attempt, grade = attempt_services.submit_attempt(
             session_item_id=str(item.id),
@@ -295,13 +313,14 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
         # A different key against an already-submitted item is still a conflict.
         raise AlreadySubmitted(details=exc.details) from exc
     session = item.session
+    hidden = session_services.delivery_hidden_for_item(item=item, user=request.user)
     result = {
         "session_item_id": str(item.id),
         "attempt_id": str(attempt.id),
         "grading_revision": attempt.grading_revision,
         "submitted_at": attempt.submitted_at.isoformat(),
-        "receipt_only": session.hides_grading,
-        "grade": session_services.grade_payload(grade, session=session),
+        "receipt_only": hidden,
+        "grade": session_services.grade_payload(grade, session=session, hidden=hidden),
     }
     idempotency.record_result(
         request.user,
@@ -314,6 +333,25 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
     )
     _dispatch()
     return 200, result
+
+
+def _submission_receipt(*, item: SessionItem, user, fallback) -> tuple[int, dict[str, Any]]:
+    """Re-serialise a replayed submission against the current visibility gate."""
+    attempt = (
+        Attempt.objects.filter(session_item=item).select_related("current_grade_event").first()
+    )
+    if attempt is None:  # the effect never landed; the stored body is all we have
+        return fallback.status_code, fallback.body
+    session = item.session
+    hidden = session_services.delivery_hidden_for_item(item=item, user=user)
+    return 200, {
+        "session_item_id": str(item.id),
+        "attempt_id": str(attempt.id),
+        "grading_revision": attempt.grading_revision,
+        "submitted_at": attempt.submitted_at.isoformat(),
+        "receipt_only": hidden,
+        "grade": session_services.grade_payload(attempt.current_grade_event, session=session, hidden=hidden),
+    }
 
 
 @practice_router.get("/projects/{project_id}/attempts/{attempt_id}", auth=auth)
@@ -350,17 +388,39 @@ def get_attempt(request, project_id: str, attempt_id: str):
 
 @practice_router.post("/projects/{project_id}/attempts/{attempt_id}/confirm-grade", auth=auth)
 def confirm_grade(request, project_id: str, attempt_id: str, payload: ConfirmGradeIn):
-    """Manual confirmation; your own attempt is always self-confirmed."""
+    """Manual confirmation; your own attempt is always self-confirmed.
+
+    Guarded like every other delivery: while the same content is inside a running
+    verification, writing a score is the same disclosure as reading one, and a
+    replayed confirmation is re-serialised under the gate that applies now.
+    """
     project = require_project(request.user, project_id)
-    attempt = Attempt.objects.filter(id=attempt_id, project=project).select_related("session_item__session").first()
+    attempt = (
+        Attempt.objects.filter(id=attempt_id, project=project)
+        .select_related("session_item__session", "session_item__question_version")
+        .first()
+    )
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    item = attempt.session_item
+    verification_gate.assert_grading_not_blocked(item=item, action="确认此题评分")
     key = idempotency_key(request)
     scope = f"attempts.confirm:{attempt_id}"
     body = payload.model_dump(mode="json")
     replay = idempotency.claim(request.user, scope, key, body)
     if replay is not None:
-        return replay.status_code, replay.body
+        session = item.session
+        hidden = session_services.delivery_hidden_for_item(item=item, user=request.user)
+        if hidden:
+            raise PurposeNotAllowed(
+                message="该内容正在验证中：为避免泄露答案，验证结束前不能读取评分。",
+                details={"reason": "active_verification_content_gate", "attempt_id": str(attempt.id)},
+            )
+        return replay.status_code, {
+            "grade": session_services.grade_payload(
+                attempt.current_grade_event, session=session, hidden=False
+            )
+        }
     grade = attempt_services.confirm_grade(
         attempt_id=str(attempt.id),
         user=request.user,
@@ -503,8 +563,10 @@ def set_diagnosis(request, project_id: str, attempt_id: str, payload: DiagnosisI
 def grading_queue(request, project_id: str, subject_id: str | None = None, limit: int = 30):
     """Attempts waiting for human confirmation (own attempts or, for staff, others').
 
-    Attempts belonging to a run whose grading is still hidden are excluded: the
-    queue must not become a back door to the score of a live verification.
+    Attempts belonging to a run whose grading is still hidden are excluded, and so
+    are attempts on content covered by *another* running verification: the queue
+    must not become a back door to the score (or the rubric, which implies the
+    answer) of a live verification. Both rules come from the shared content gate.
     """
     from django.db.models import Q
 
@@ -512,6 +574,7 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
     from apps.common.scope import is_reviewer_of
 
     project = require_project(request.user, project_id)
+    content_map = verification_gate.active_verification_content_map(user=request.user)
     queryset = (
         Attempt.objects.filter(project=project)
         .filter(current_grade_event__status=GradeStatus.PENDING_REVIEW)
@@ -524,6 +587,15 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
         # the top, not buried under older pending work.
         .order_by("-submitted_at")
     )
+    if content_map:
+        # A verification item covers itself, so `cover` must stay reviewable: keep
+        # the row when the item *is* the covering verification item, and drop it
+        # when the same content is only covered by a different running run.
+        covering_item_ids = sorted({item_id for ids in content_map.values() for item_id in ids})
+        queryset = queryset.exclude(
+            Q(session_item__question_version_id__in=list(content_map))
+            & ~Q(session_item_id__in=covering_item_ids)
+        )
     if not request.user.is_staff:
         queryset = queryset.filter(user=request.user)
     elif subject_id:

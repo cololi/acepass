@@ -76,6 +76,54 @@ def active_verification_for_content(*, user, question_version, exclude_item_id=N
     return queryset.filter(conditions).order_by("first_delivered_at").first()
 
 
+def active_verification_content_map(*, user) -> dict[str, set[str]]:
+    """``question_version_id -> ids of active verification items covering it``.
+
+    One pass over the running verification items, expanded to every version that
+    shares the question, the near-duplicate family or the content lineage. This is
+    the single source of truth for *content visibility*: every delivery path
+    (session snapshot, submit/confirm replay, tutor message replay, evidence
+    projection, grading queue, reports) filters on the same map, so a new endpoint
+    cannot accidentally reopen the leak B02/C01 described.
+
+    The values are *item* ids, not just a boolean: an item must be allowed to
+    cover itself — otherwise a verification would hide its own run — so callers
+    compare against the item they are acting on.
+    """
+    from django.db.models import Q
+
+    from apps.question_bank.models import QuestionVersion
+
+    covering: dict[str, set[str]] = {}
+    for item in _active_verification_items(user=user):
+        question = item.question_version.question
+        conditions = Q(question_id=question.id)
+        if question.family_id is not None:
+            conditions |= Q(question__family_id=question.family_id)
+        if question.content_lineage_id is not None:
+            conditions |= Q(question__content_lineage_id=question.content_lineage_id)
+        for version_id in QuestionVersion.objects.filter(conditions).values_list("id", flat=True):
+            covering.setdefault(str(version_id), set()).add(str(item.id))
+    return covering
+
+
+def content_gate_blocks_item(*, item, content_map: dict[str, set[str]] | None = None, user=None) -> bool:
+    """Is this item's grading withheld by *another* running verification?
+
+    ``content_map`` is the shared map from
+    :func:`active_verification_content_map`; pass it when gating a list so the
+    expansion runs once. ``user`` is only needed when no map is supplied.
+    """
+    if content_map is None:
+        if user is None:  # pragma: no cover - programming error
+            raise ValueError("content_gate_blocks_item needs content_map or user")
+        content_map = active_verification_content_map(user=user)
+    covering = content_map.get(str(item.question_version_id))
+    if not covering:
+        return False
+    return bool(covering - {str(item.id)})
+
+
 def blocked_question_version_ids(*, user) -> set[str]:
     """Every question version whose answers a running verification still hides.
 
@@ -84,20 +132,7 @@ def blocked_question_version_ids(*, user) -> set[str]:
     verification are excluded from report buckets exactly like the verification's
     own attempts are.
     """
-    from django.db.models import Q
-
-    from apps.question_bank.models import QuestionVersion
-
-    blocked: set[str] = set()
-    for item in _active_verification_items(user=user):
-        question = item.question_version.question
-        conditions = Q(question_id=question.id)
-        if question.family_id is not None:
-            conditions |= Q(question__family_id=question.family_id)
-        if question.content_lineage_id is not None:
-            conditions |= Q(question__content_lineage_id=question.content_lineage_id)
-        blocked |= {str(value) for value in QuestionVersion.objects.filter(conditions).values_list("id", flat=True)}
-    return blocked
+    return set(active_verification_content_map(user=user))
 
 
 def assert_content_not_in_active_verification(
@@ -145,10 +180,12 @@ def assert_grading_not_blocked(*, item: SessionItem, action: str) -> None:
 
 
 __all__ = [
+    "active_verification_content_map",
     "active_verification_for_content",
     "active_verification_for_version",
     "assert_content_not_in_active_verification",
     "assert_grading_not_blocked",
     "assert_item_not_in_active_verification",
     "blocked_question_version_ids",
+    "content_gate_blocks_item",
 ]

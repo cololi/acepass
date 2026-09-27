@@ -800,12 +800,13 @@ def start_regrade_run(
 
     The number now comes from the database sequence, which is atomic, monotonic
     and never blocks, and ``uniq_regrade_question_generation`` makes a duplicate
-    impossible even if this code regresses. The question row is deliberately
-    *not* locked: a blocking row lock cannot be held across run creation without
-    deadlocking two real concurrent requests (the first requester keeps its lock
-    until its own transaction commits, while the second waits for that lock —
-    see ``docs/11-p0-2-closeout-verification.md``), so it would trade a
-    uniqueness bug for a liveness bug.
+    impossible even if this code regresses. Locking the stable question row for the
+    whole request instead would serialise unrelated regrade requests of the same
+    question and couple two independent business actions to one lock scope; that
+    is a scope/coupling problem, not a claim that a row lock "inherently
+    deadlocks" — the earlier concurrency counter-example used a barrier a
+    correctly serialised implementation cannot cross either, so it never
+    demonstrated a liveness defect (see docs/12 §2).
     """
     if not reason.strip():
         raise InvalidInput(message="重判必须说明原因")
@@ -898,7 +899,9 @@ def recheck_regrade_target(target_answer_key_version, target_rubric_version=None
     return target, target_rubric_version
 
 
-def invalidate_for_untrusted_regrade_target(*, attempts, actor, reason: str) -> int:
+def invalidate_for_untrusted_regrade_target(
+    *, attempts, actor, reason: str, refused_generation: int | None = None
+) -> tuple[int, int]:
     """Move attempts covered by a refused regrade to human review.
 
     A queued regrade means the official score of these attempts is under review.
@@ -906,9 +909,34 @@ def invalidate_for_untrusted_regrade_target(*, attempts, actor, reason: str) -> 
     number would present a settled score for content the project has just called
     into question. The raw answers and the earlier grade events are preserved;
     only the *effective* grade becomes pending review, with the reason recorded.
+
+    **Generation guard (C02).** "This run was refused" does not mean "this
+    attempt's effective grade is wrong": the attempt may already carry the result
+    of a *newer* regrade that was requested after the refused one. An older
+    disputed run must therefore not revoke a newer valid grade — the same
+    high-water rule the normal regrade branch already applies. ``refused_generation``
+    is compared against ``applied_regrade_generation`` per attempt; attempts above
+    the watermark are skipped and counted, never rewritten.
+
+    Returns ``(invalidated, skipped_newer)``.
     """
     affected = 0
+    skipped_newer = 0
     for attempt in attempts:
+        if refused_generation is not None and int(attempt.applied_regrade_generation) > int(
+            refused_generation
+        ):
+            # A newer regrade produced this attempt's effective grade. The older
+            # refused run has no authority over it; revoking it here would delete a
+            # valid result and destroy the ordering the high-water mark provides.
+            logger.info(
+                "refused regrade generation=%s cannot revoke attempt=%s applied_generation=%s",
+                refused_generation,
+                attempt.id,
+                attempt.applied_regrade_generation,
+            )
+            skipped_newer += 1
+            continue
         previous = attempt.current_grade_event
         if previous is None or previous.status == GradeStatus.PENDING_REVIEW:
             affected += 1 if previous is not None else 0
@@ -956,8 +984,11 @@ def invalidate_for_untrusted_regrade_target(*, attempts, actor, reason: str) -> 
             action="regrade_refused_target_untrusted",
             project_id=attempt.project_id,
             reason=reason[:500],
-            detail={"superseded_grade_event_id": str(previous.id)},
+            detail={
+                "superseded_grade_event_id": str(previous.id),
+                "refused_generation": refused_generation,
+            },
         )
         affected += 1
-    return affected
+    return affected, skipped_newer
 

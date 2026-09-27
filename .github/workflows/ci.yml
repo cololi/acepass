@@ -83,12 +83,27 @@ jobs:
         run: .venv/bin/python -m pytest tests -q
 
   infra:
-    # 发布门槛的部署侧校验：Compose 变量/YAML 合并、nginx 模板渲染与语法、明文入口
-    # 301 的目标端口，以及 shell 语法。都不需要 Docker 守护进程之外的部署目标，
-    # 也不会碰任何真实环境。
+    # 发布门槛的部署侧校验：Compose 变量/YAML 合并、nginx 模板渲染、明文入口 301 的
+    # 目标端口、真实前端产物与上游解析、真实全栈登录，以及 shell 语法。
+    #
+    # 两个代理检查**分开执行、分开命名**，任何一个都不冒充另一个：
+    #   * Proxy component check —— nginx 容器 + 真实 frontend/dist + 占 8000 端口的
+    #     桩上游；证明跳转目标、TLS 终止、登录页面产物与 `upstream ... server api:8000`
+    #     能被解析。**不证明** AcePass API/数据库/会话可用。
+    #   * Full-stack login check —— docker compose 构建真实应用镜像，起真实
+    #     postgres/redis/api/web，执行真实迁移并创建一个真实账户，然后经 HTTPS 代理
+    #     完成一次带 CSRF 的真实登录。组件检查通过不等于这一步通过。
+    #
+    # 这两个步骤尚未在 GitHub Actions 上实际执行过：本轮只在本地用同样的脚本验证，
+    # CI 上的实际执行状态保持未验证，不得据此声称发布门槛已由 CI 通过。
     runs-on: ubuntu-latest
+    needs: [frontend]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: acepass-frontend-dist
+          path: frontend/dist
       - name: Compose config validation
         run: |
           cp infra/docker/.env.example infra/docker/.env
@@ -103,36 +118,19 @@ jobs:
             -e ACEPASS_HTTPS_PORT=8443 \
             -v "$PWD/infra/proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
             -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
+            -v "$PWD/frontend/dist:/usr/share/nginx/html:ro" \
             nginx:1.27-alpine nginx -t
-      - name: Plain HTTP redirects to the published HTTPS port
-        # 默认宿主端口是 8080/8443，而容器内是 80/443：跳转必须落到实际公开端口，
-        # 否则用户被送到一个没有监听的地址（这正是不做真实请求就发现不了的缺陷）。
-        run: |
-          set -euo pipefail
-          docker rm -f acepass-nginx-redirect >/dev/null 2>&1 || true
-          docker run -d --name acepass-nginx-redirect \
-            -e ACEPASS_HTTPS_PORT=18443 \
-            -v "$PWD/infra/proxy/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
-            -v "$PWD/infra/docker/certs:/etc/nginx/certs:ro" \
-            -p 18080:80 -p 18443:443 nginx:1.27-alpine >/dev/null
-          for _ in $(seq 1 30); do
-            if curl -s -o /dev/null http://127.0.0.1:18080/login; then break; fi
-            sleep 1
-          done
-          location="$(curl -s -o /dev/null -D - http://127.0.0.1:18080/login | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')"
-          echo "Location: ${location}"
-          test "${location}" = "https://127.0.0.1:18443/login" || {
-            echo "明文入口跳转目标错误：期望 https://127.0.0.1:18443/login，实际 ${location}"; exit 1; }
-          # 没有端口的 Host（真实 443 部署）必须原样保留，不能凭空加上端口。
-          vhost="$(curl -s -o /dev/null -D - -H 'Host: acepass.example.com' http://127.0.0.1:18080/login | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')"
-          echo "Location (no port): ${vhost}"
-          test "${vhost}" = "https://acepass.example.com/login" || {
-            echo "无端口 Host 跳转目标错误：实际 ${vhost}"; exit 1; }
-          # 跳转目标必须真的能完成 TLS 握手并返回页面，而不只是一个字符串。
-          code="$(curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:18443/login)"
-          echo "HTTPS entry status: ${code}"
-          test "${code}" = "200" || { echo "跳转目标不是可登录入口（HTTP ${code}）"; exit 1; }
-          docker rm -f acepass-nginx-redirect >/dev/null
+      - name: Proxy component check (redirect target, TLS, real SPA bundle, upstream)
+        # 实际启动容器并发出真实请求：跳转必须落到公开的 HTTPS 端口，`api` 上游必须
+        # 真的解析，/login 必须由挂载的 AcePass 产物提供且脚本资源可加载。范围仅限
+        # 代理组件，API 与数据库不在本步骤内。
+        run: bash scripts/verify_proxy.sh component
+      - name: Full-stack login check (real compose stack through the proxy)
+        # 与上一步分开：这里才是"全栈登录通过"。需要构建应用镜像并跑真实迁移。
+        run: bash scripts/verify_proxy.sh full-stack
+      - name: Compose logs on failure
+        if: failure()
+        run: docker compose -f infra/docker/docker-compose.yml logs --tail=100 || true
       - name: Shell script syntax
         run: for f in scripts/*.sh; do echo "bash -n $f"; bash -n "$f"; done
       - name: Restore refuses an unreachable database (dry-run)
@@ -171,6 +169,13 @@ jobs:
         run: |
           npx tsc -b
           npx vite build
+      - name: Upload the built SPA
+        # infra 的代理检查必须挂载**真实**产物，而不是空目录：它下载的就是这一份。
+        uses: actions/upload-artifact@v4
+        with:
+          name: acepass-frontend-dist
+          path: frontend/dist
+          if-no-files-found: error
 
   browser-acceptance:
     # 新版浏览器验收：空账户 + 真实结构夹具，隔离数据库/Redis/媒体/端口，并且

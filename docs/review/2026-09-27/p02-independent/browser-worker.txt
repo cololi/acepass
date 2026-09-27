@@ -1,0 +1,242 @@
+ 
+ -------------- celery@Cololis-Mac-mini.local v5.5.3 (immunity)
+--- ***** ----- 
+-- ******* ---- macOS-27.0-arm64-arm-64bit 2026-09-27 11:07:31
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         acepass:0x107628290
+- ** ---------- .> transport:   redis://127.0.0.1:6394/0
+- ** ---------- .> results:     redis://127.0.0.1:6394/0
+- *** --- * --- .> concurrency: 1 (solo)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> ingestion        exchange=ingestion(direct) key=ingestion
+                .> projection       exchange=projection(direct) key=projection
+                .> tutoring         exchange=tutoring(direct) key=tutoring
+
+[tasks]
+  . audit.scan_outbox
+  . ingestion.extract_candidate
+  . learning.on_attempt_graded
+  . learning.on_session_finished
+  . learning.reconcile_plan
+  . learning.refresh_delayed_tasks
+  . projection.rebuild_after_answer_change
+  . projection.rebuild_attempt_evidence
+  . projection.refresh_paper_stats
+  . projection.regrade_effects
+  . projection.run_regrade
+  . tutoring.run_job
+
+[2026-09-27 11:07:31,764: INFO/MainProcess] Connected to redis://127.0.0.1:6394/0
+[2026-09-27 11:07:31,765: INFO/MainProcess] mingle: searching for neighbors
+[2026-09-27 11:07:32,770: INFO/MainProcess] mingle: all alone
+[2026-09-27 11:07:32,775: INFO/MainProcess] celery@Cololis-Mac-mini.local ready.
+[2026-09-27 11:07:39,262: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9b3fe92a-e4e0-4492-92da-1cad9012f50e] received
+[2026-09-27 11:07:39,311: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9b3fe92a-e4e0-4492-92da-1cad9012f50e] succeeded in 0.048411416999442736s: 'evidence_rows=6'
+[2026-09-27 11:07:39,312: INFO/MainProcess] Task learning.on_attempt_graded[86441f89-7514-421e-bd3a-6866db53ebc5] received
+[2026-09-27 11:07:39,350: INFO/MainProcess] Task learning.on_attempt_graded[86441f89-7514-421e-bd3a-6866db53ebc5] succeeded in 0.037962999998853775s: 'paired_tasks=0'
+[2026-09-27 11:07:39,350: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9329004d-1201-447c-a4be-a4fe379de602] received
+[2026-09-27 11:07:39,365: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9329004d-1201-447c-a4be-a4fe379de602] succeeded in 0.014369583997904556s: 'evidence_rows=6'
+[2026-09-27 11:07:39,366: INFO/MainProcess] Task learning.on_attempt_graded[939e4a7a-6e39-4f93-b34d-082f450a27b2] received
+[2026-09-27 11:07:39,414: INFO/MainProcess] Task learning.on_attempt_graded[939e4a7a-6e39-4f93-b34d-082f450a27b2] succeeded in 0.0476586659970053s: 'paired_tasks=0'
+[2026-09-27 11:07:40,061: INFO/MainProcess] Task projection.rebuild_attempt_evidence[352ab150-4009-479f-9da6-6567099fe8f6] received
+[2026-09-27 11:07:40,073: INFO/MainProcess] Task projection.rebuild_attempt_evidence[352ab150-4009-479f-9da6-6567099fe8f6] succeeded in 0.012336750001850305s: 'evidence_rows=0'
+[2026-09-27 11:07:40,074: INFO/MainProcess] Task learning.on_attempt_graded[8ce39781-529f-46a1-a440-ee30b7ebb3c6] received
+[2026-09-27 11:07:40,090: INFO/MainProcess] Task learning.on_attempt_graded[8ce39781-529f-46a1-a440-ee30b7ebb3c6] succeeded in 0.016373250000469852s: 'paired_tasks=0'
+[2026-09-27 11:07:45,913: INFO/MainProcess] Task projection.rebuild_attempt_evidence[f993ae73-2735-4805-a917-4610424fc5fd] received
+[2026-09-27 11:07:45,943: INFO/MainProcess] Task projection.rebuild_attempt_evidence[f993ae73-2735-4805-a917-4610424fc5fd] succeeded in 0.029609458000777522s: 'evidence_rows=6'
+[2026-09-27 11:07:45,943: INFO/MainProcess] Task learning.on_attempt_graded[17903e82-8fa5-4648-9e20-4c9c36697adc] received
+[2026-09-27 11:07:45,990: INFO/MainProcess] Task learning.on_attempt_graded[17903e82-8fa5-4648-9e20-4c9c36697adc] succeeded in 0.0467374159998144s: 'paired_tasks=0'
+[2026-09-27 11:07:46,478: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5901eea4-5e43-4b65-8061-effc353b9c0d] received
+2026-09-27 11:07:46,479 INFO apps.audit.outbox outbox event 46e769ae-8d4a-4f06-9af2-72191698b886 is not claimable by this consumer; skipping
+[2026-09-27 11:07:46,479: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5901eea4-5e43-4b65-8061-effc353b9c0d] succeeded in 0.0012301250026212074s: 'skipped_lease_not_held'
+[2026-09-27 11:07:46,480: INFO/MainProcess] Task learning.on_attempt_graded[52996275-8110-4639-a109-363f8a6b7741] received
+[2026-09-27 11:07:46,533: INFO/MainProcess] Task learning.on_attempt_graded[52996275-8110-4639-a109-363f8a6b7741] succeeded in 0.052229875000193715s: 'paired_tasks=0'
+[2026-09-27 11:07:47,106: INFO/MainProcess] Task projection.rebuild_attempt_evidence[82958326-85d3-45b4-bcf4-a83dac15ad57] received
+2026-09-27 11:07:47,108 INFO apps.audit.outbox outbox event c7734315-a541-4a5c-9d51-dab4b2640f83 is not claimable by this consumer; skipping
+[2026-09-27 11:07:47,108: INFO/MainProcess] Task projection.rebuild_attempt_evidence[82958326-85d3-45b4-bcf4-a83dac15ad57] succeeded in 0.002102665999700548s: 'skipped_lease_not_held'
+[2026-09-27 11:07:47,109: INFO/MainProcess] Task learning.on_attempt_graded[8c3f2dae-9a05-4299-b9f6-9ccc911a123d] received
+[2026-09-27 11:07:47,161: INFO/MainProcess] Task learning.on_attempt_graded[8c3f2dae-9a05-4299-b9f6-9ccc911a123d] succeeded in 0.05226541699812515s: 'paired_tasks=0'
+[2026-09-27 11:07:47,606: INFO/MainProcess] Task projection.rebuild_attempt_evidence[0c740071-fc7b-40bd-9679-665df77ef66f] received
+2026-09-27 11:07:47,607 INFO apps.audit.outbox outbox event 2f8b32ad-cdeb-4eca-8e43-498c51af95fb is not claimable by this consumer; skipping
+[2026-09-27 11:07:47,607: INFO/MainProcess] Task projection.rebuild_attempt_evidence[0c740071-fc7b-40bd-9679-665df77ef66f] succeeded in 0.0008874999984982423s: 'skipped_lease_not_held'
+[2026-09-27 11:07:47,608: INFO/MainProcess] Task learning.on_attempt_graded[da696e8e-67dc-4b2c-9763-400559cedd8b] received
+[2026-09-27 11:07:47,651: INFO/MainProcess] Task learning.on_attempt_graded[da696e8e-67dc-4b2c-9763-400559cedd8b] succeeded in 0.04258754199690884s: 'paired_tasks=0'
+[2026-09-27 11:07:48,116: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b70fb900-ae9e-4848-a35e-5c0768ae956d] received
+2026-09-27 11:07:48,117 INFO apps.audit.outbox outbox event 4b37c5cf-142b-4277-9deb-57be7fab529e is not claimable by this consumer; skipping
+[2026-09-27 11:07:48,117: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b70fb900-ae9e-4848-a35e-5c0768ae956d] succeeded in 0.000790583999332739s: 'skipped_lease_not_held'
+[2026-09-27 11:07:48,117: INFO/MainProcess] Task learning.on_attempt_graded[64791342-7807-4a1f-b5da-fa5c29636412] received
+[2026-09-27 11:07:48,156: INFO/MainProcess] Task learning.on_attempt_graded[64791342-7807-4a1f-b5da-fa5c29636412] succeeded in 0.03851970899995649s: 'paired_tasks=0'
+[2026-09-27 11:07:49,203: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bcb3c7fb-6e31-4147-94fc-27b13f0e7ba1] received
+2026-09-27 11:07:49,204 INFO apps.audit.outbox outbox event 6cd169ce-a03f-4b16-b24b-378637af9b74 is not claimable by this consumer; skipping
+[2026-09-27 11:07:49,204: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bcb3c7fb-6e31-4147-94fc-27b13f0e7ba1] succeeded in 0.0009835839991865214s: 'skipped_lease_not_held'
+[2026-09-27 11:07:49,205: INFO/MainProcess] Task learning.on_attempt_graded[196272b5-586e-41a9-bb15-b5dc67436c92] received
+[2026-09-27 11:07:49,242: INFO/MainProcess] Task learning.on_attempt_graded[196272b5-586e-41a9-bb15-b5dc67436c92] succeeded in 0.0368397919992276s: 'paired_tasks=0'
+[2026-09-27 11:07:50,267: INFO/MainProcess] Task projection.rebuild_attempt_evidence[462655f5-f1d4-4f88-8222-0e1737095b48] received
+[2026-09-27 11:07:50,297: INFO/MainProcess] Task projection.rebuild_attempt_evidence[462655f5-f1d4-4f88-8222-0e1737095b48] succeeded in 0.029671332998987054s: 'evidence_rows=6'
+[2026-09-27 11:07:50,297: INFO/MainProcess] Task learning.on_attempt_graded[3e7c294e-0744-48e5-b8c7-c54300c8640c] received
+[2026-09-27 11:07:50,339: INFO/MainProcess] Task learning.on_attempt_graded[3e7c294e-0744-48e5-b8c7-c54300c8640c] succeeded in 0.042000874997029314s: 'paired_tasks=0'
+[2026-09-27 11:07:50,621: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9b426916-1e58-468c-acd4-1ecd54a1776c] received
+2026-09-27 11:07:50,622 INFO apps.audit.outbox outbox event 13399ec5-3ea5-4e59-805c-4c2f39cba8fa is not claimable by this consumer; skipping
+[2026-09-27 11:07:50,622: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9b426916-1e58-468c-acd4-1ecd54a1776c] succeeded in 0.0009011670008476358s: 'skipped_lease_not_held'
+[2026-09-27 11:07:50,622: INFO/MainProcess] Task learning.on_attempt_graded[2d2de791-4611-418e-b481-84e189cbb030] received
+[2026-09-27 11:07:50,661: INFO/MainProcess] Task learning.on_attempt_graded[2d2de791-4611-418e-b481-84e189cbb030] succeeded in 0.03837162499985425s: 'paired_tasks=0'
+[2026-09-27 11:07:51,545: INFO/MainProcess] Task projection.rebuild_attempt_evidence[59b9aecd-a8db-46ad-96c9-f1466387a0a2] received
+[2026-09-27 11:07:51,571: INFO/MainProcess] Task projection.rebuild_attempt_evidence[59b9aecd-a8db-46ad-96c9-f1466387a0a2] succeeded in 0.026127458000701154s: 'evidence_rows=6'
+[2026-09-27 11:07:52,573: INFO/MainProcess] Task projection.rebuild_attempt_evidence[256ff461-a63b-4bde-861a-b54ba3ba92d2] received
+[2026-09-27 11:07:52,600: INFO/MainProcess] Task projection.rebuild_attempt_evidence[256ff461-a63b-4bde-861a-b54ba3ba92d2] succeeded in 0.027101333002065076s: 'evidence_rows=6'
+[2026-09-27 11:07:52,739: INFO/MainProcess] Task projection.rebuild_attempt_evidence[42cbb19d-8b49-4d03-86a5-68dc626ef57a] received
+2026-09-27 11:07:52,740 INFO apps.audit.outbox outbox event 2f8b32ad-cdeb-4eca-8e43-498c51af95fb is not claimable by this consumer; skipping
+[2026-09-27 11:07:52,740: INFO/MainProcess] Task projection.rebuild_attempt_evidence[42cbb19d-8b49-4d03-86a5-68dc626ef57a] succeeded in 0.0009102090007218067s: 'skipped_lease_not_held'
+[2026-09-27 11:07:52,741: INFO/MainProcess] Task projection.rebuild_attempt_evidence[2eb2122c-868d-4933-ae45-8a4fa25b7adb] received
+[2026-09-27 11:07:52,768: INFO/MainProcess] Task projection.rebuild_attempt_evidence[2eb2122c-868d-4933-ae45-8a4fa25b7adb] succeeded in 0.02727824999965378s: 'evidence_rows=6'
+[2026-09-27 11:07:52,769: INFO/MainProcess] Task learning.on_attempt_graded[6aac35a7-e8e3-454c-b484-673e032df739] received
+[2026-09-27 11:07:52,822: INFO/MainProcess] Task learning.on_attempt_graded[6aac35a7-e8e3-454c-b484-673e032df739] succeeded in 0.05253820800135145s: 'paired_tasks=0'
+[2026-09-27 11:07:53,918: INFO/MainProcess] Task projection.rebuild_attempt_evidence[507cdd9f-e08d-4eac-9e65-faca63c32aba] received
+[2026-09-27 11:07:53,941: INFO/MainProcess] Task projection.rebuild_attempt_evidence[507cdd9f-e08d-4eac-9e65-faca63c32aba] succeeded in 0.02361512499919627s: 'evidence_rows=6'
+[2026-09-27 11:07:54,075: INFO/MainProcess] Task projection.rebuild_attempt_evidence[84714171-9750-401f-b792-f9db73b5a467] received
+2026-09-27 11:07:54,076 INFO apps.audit.outbox outbox event d1667585-8f71-41ab-babf-f0833aa76f89 is not claimable by this consumer; skipping
+[2026-09-27 11:07:54,076: INFO/MainProcess] Task projection.rebuild_attempt_evidence[84714171-9750-401f-b792-f9db73b5a467] succeeded in 0.0010292919978382997s: 'skipped_lease_not_held'
+[2026-09-27 11:07:54,077: INFO/MainProcess] Task learning.on_attempt_graded[5f20cc58-4768-4175-940a-2c179af70bd1] received
+[2026-09-27 11:07:54,125: INFO/MainProcess] Task learning.on_attempt_graded[5f20cc58-4768-4175-940a-2c179af70bd1] succeeded in 0.04838825000115321s: 'paired_tasks=0'
+[2026-09-27 11:07:54,427: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9ef8fe1d-e62c-4416-bece-6765d51793d8] received
+2026-09-27 11:07:54,428 INFO apps.audit.outbox outbox event 6cd169ce-a03f-4b16-b24b-378637af9b74 is not claimable by this consumer; skipping
+[2026-09-27 11:07:54,428: INFO/MainProcess] Task projection.rebuild_attempt_evidence[9ef8fe1d-e62c-4416-bece-6765d51793d8] succeeded in 0.000994916001218371s: 'skipped_lease_not_held'
+[2026-09-27 11:07:54,429: INFO/MainProcess] Task tutoring.run_job[44e40d1e-5da4-49fd-a6c1-04e40c56b139] received
+[2026-09-27 11:07:54,432: INFO/MainProcess] Task tutoring.run_job[44e40d1e-5da4-49fd-a6c1-04e40c56b139] succeeded in 0.0034297919992241077s: 'unavailable'
+[2026-09-27 11:07:55,381: INFO/MainProcess] Task projection.rebuild_attempt_evidence[67ae6cd5-25a0-4bf0-8e5e-9a2910c99ad9] received
+2026-09-27 11:07:55,382 INFO apps.audit.outbox outbox event 92bb6c44-403d-4af1-8374-a54bdd44179d is not claimable by this consumer; skipping
+[2026-09-27 11:07:55,383: INFO/MainProcess] Task projection.rebuild_attempt_evidence[67ae6cd5-25a0-4bf0-8e5e-9a2910c99ad9] succeeded in 0.001089790999685647s: 'skipped_lease_not_held'
+[2026-09-27 11:07:55,383: INFO/MainProcess] Task learning.on_attempt_graded[9554187e-66f7-4d6f-8550-f52631b70ef1] received
+[2026-09-27 11:07:55,448: INFO/MainProcess] Task learning.on_attempt_graded[9554187e-66f7-4d6f-8550-f52631b70ef1] succeeded in 0.06492370799969649s: 'paired_tasks=0'
+[2026-09-27 11:07:59,643: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a3210ead-442f-4288-99a2-92bb01bb2864] received
+2026-09-27 11:07:59,644 INFO apps.audit.outbox outbox event 2f8b32ad-cdeb-4eca-8e43-498c51af95fb is not claimable by this consumer; skipping
+[2026-09-27 11:07:59,644: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a3210ead-442f-4288-99a2-92bb01bb2864] succeeded in 0.0009464169997954741s: 'skipped_lease_not_held'
+[2026-09-27 11:07:59,644: INFO/MainProcess] Task projection.rebuild_attempt_evidence[db5687e8-6bf9-4e7f-9642-7643969b6a04] received
+2026-09-27 11:07:59,645 INFO apps.audit.outbox outbox event 6cd169ce-a03f-4b16-b24b-378637af9b74 is not claimable by this consumer; skipping
+[2026-09-27 11:07:59,645: INFO/MainProcess] Task projection.rebuild_attempt_evidence[db5687e8-6bf9-4e7f-9642-7643969b6a04] succeeded in 0.0007463750007445924s: 'skipped_lease_not_held'
+[2026-09-27 11:07:59,646: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5ca1ac3f-e983-43d0-9c7f-6b20ba95df1b] received
+[2026-09-27 11:07:59,676: INFO/MainProcess] Task projection.rebuild_attempt_evidence[5ca1ac3f-e983-43d0-9c7f-6b20ba95df1b] succeeded in 0.030323707997013116s: 'evidence_rows=6'
+[2026-09-27 11:07:59,677: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bf1653ba-6202-44c4-9830-9ff3e9ee1804] received
+[2026-09-27 11:07:59,704: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bf1653ba-6202-44c4-9830-9ff3e9ee1804] succeeded in 0.02664579100019182s: 'evidence_rows=6'
+[2026-09-27 11:08:01,969: INFO/MainProcess] Task projection.rebuild_attempt_evidence[247eb6c9-6131-433a-84e2-94ba0bba15b7] received
+[2026-09-27 11:08:01,988: INFO/MainProcess] Task projection.rebuild_attempt_evidence[247eb6c9-6131-433a-84e2-94ba0bba15b7] succeeded in 0.018694165999477264s: 'evidence_rows=6'
+[2026-09-27 11:08:02,836: INFO/MainProcess] Task projection.rebuild_attempt_evidence[806bd6e0-e1d8-4486-86b9-f271a9236b37] received
+2026-09-27 11:08:02,837 INFO apps.audit.outbox outbox event 26fa6e4b-0524-41a5-a7ad-a440bcad1f41 is not claimable by this consumer; skipping
+[2026-09-27 11:08:02,837: INFO/MainProcess] Task projection.rebuild_attempt_evidence[806bd6e0-e1d8-4486-86b9-f271a9236b37] succeeded in 0.0008637079990876373s: 'skipped_lease_not_held'
+[2026-09-27 11:08:02,838: INFO/MainProcess] Task learning.on_attempt_graded[125be6a6-3bd5-41e6-8576-5593885bfe7a] received
+[2026-09-27 11:08:02,857: INFO/MainProcess] Task learning.on_attempt_graded[125be6a6-3bd5-41e6-8576-5593885bfe7a] succeeded in 0.019028332997550024s: 'paired_tasks=0'
+[2026-09-27 11:08:05,709: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d1cce78f-259b-4079-abc6-9be19f150394] received
+2026-09-27 11:08:05,710 INFO apps.audit.outbox outbox event 2f8b32ad-cdeb-4eca-8e43-498c51af95fb is not claimable by this consumer; skipping
+[2026-09-27 11:08:05,710: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d1cce78f-259b-4079-abc6-9be19f150394] succeeded in 0.000755083001422463s: 'skipped_lease_not_held'
+[2026-09-27 11:08:05,710: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a5566291-76c1-4a92-8895-b4cb5df09824] received
+[2026-09-27 11:08:05,733: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a5566291-76c1-4a92-8895-b4cb5df09824] succeeded in 0.022118208999017952s: 'evidence_rows=6'
+[2026-09-27 11:08:08,654: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d52b1f21-f44c-4cfe-a4b8-c8d6c369be49] received
+[2026-09-27 11:08:08,673: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d52b1f21-f44c-4cfe-a4b8-c8d6c369be49] succeeded in 0.018951917001686525s: 'evidence_rows=0'
+[2026-09-27 11:08:08,887: INFO/MainProcess] Task projection.rebuild_attempt_evidence[ac072e5c-206d-416c-b1f1-85789c82b20c] received
+2026-09-27 11:08:08,887 INFO apps.audit.outbox outbox event ef30915d-1baa-470a-bfc7-064508c053d9 is not claimable by this consumer; skipping
+[2026-09-27 11:08:08,887: INFO/MainProcess] Task projection.rebuild_attempt_evidence[ac072e5c-206d-416c-b1f1-85789c82b20c] succeeded in 0.0007842499981052242s: 'skipped_lease_not_held'
+[2026-09-27 11:08:08,888: INFO/MainProcess] Task learning.on_attempt_graded[721e62f2-8132-491e-a44e-68dc4aa2e9f9] received
+[2026-09-27 11:08:08,935: INFO/MainProcess] Task learning.on_attempt_graded[721e62f2-8132-491e-a44e-68dc4aa2e9f9] succeeded in 0.047452625000005355s: 'paired_tasks=0'
+[2026-09-27 11:08:09,451: INFO/MainProcess] Task projection.rebuild_attempt_evidence[116757bc-3322-4e82-b8df-124e71a74089] received
+2026-09-27 11:08:09,451 INFO apps.audit.outbox outbox event 3c3b7019-a06f-41b2-b928-32dc6757f7c6 is not claimable by this consumer; skipping
+[2026-09-27 11:08:09,451: INFO/MainProcess] Task projection.rebuild_attempt_evidence[116757bc-3322-4e82-b8df-124e71a74089] succeeded in 0.0008640839987492654s: 'skipped_lease_not_held'
+[2026-09-27 11:08:09,452: INFO/MainProcess] Task learning.on_attempt_graded[61ad1e26-9c7a-4b6b-ab99-d754fbaf452e] received
+[2026-09-27 11:08:09,492: INFO/MainProcess] Task learning.on_attempt_graded[61ad1e26-9c7a-4b6b-ab99-d754fbaf452e] succeeded in 0.04012525000143796s: 'paired_tasks=0'
+[2026-09-27 11:08:09,951: INFO/MainProcess] Task projection.rebuild_attempt_evidence[074827be-8037-4c21-895f-3716b1f1a93f] received
+2026-09-27 11:08:09,952 INFO apps.audit.outbox outbox event 5a718062-97ac-4411-ad3f-01385c33b966 is not claimable by this consumer; skipping
+[2026-09-27 11:08:09,952: INFO/MainProcess] Task projection.rebuild_attempt_evidence[074827be-8037-4c21-895f-3716b1f1a93f] succeeded in 0.0009103750016947743s: 'skipped_lease_not_held'
+[2026-09-27 11:08:09,953: INFO/MainProcess] Task learning.on_attempt_graded[cc9c1fff-97e7-4170-85ba-9568613443d1] received
+[2026-09-27 11:08:09,998: INFO/MainProcess] Task learning.on_attempt_graded[cc9c1fff-97e7-4170-85ba-9568613443d1] succeeded in 0.04519979199903901s: 'paired_tasks=0'
+[2026-09-27 11:08:10,435: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bed73a7e-e3f9-42f1-aafe-cd057355b584] received
+2026-09-27 11:08:10,436 INFO apps.audit.outbox outbox event f47b871e-ccef-48a7-9857-1b8c82a5edd7 is not claimable by this consumer; skipping
+[2026-09-27 11:08:10,436: INFO/MainProcess] Task projection.rebuild_attempt_evidence[bed73a7e-e3f9-42f1-aafe-cd057355b584] succeeded in 0.0008330419987032656s: 'skipped_lease_not_held'
+[2026-09-27 11:08:10,437: INFO/MainProcess] Task learning.on_attempt_graded[60aca5d1-a2b4-4c43-8ac7-210255970723] received
+[2026-09-27 11:08:10,480: INFO/MainProcess] Task learning.on_attempt_graded[60aca5d1-a2b4-4c43-8ac7-210255970723] succeeded in 0.04333170799873187s: 'paired_tasks=0'
+[2026-09-27 11:08:10,766: INFO/MainProcess] Task projection.rebuild_attempt_evidence[2d03292f-6d7d-43d2-b10d-f278a6ef24f5] received
+[2026-09-27 11:08:10,788: INFO/MainProcess] Task projection.rebuild_attempt_evidence[2d03292f-6d7d-43d2-b10d-f278a6ef24f5] succeeded in 0.022076458000810817s: 'evidence_rows=6'
+[2026-09-27 11:08:10,950: INFO/MainProcess] Task projection.rebuild_attempt_evidence[405989fd-541e-4c08-b15a-6896eed359e5] received
+2026-09-27 11:08:10,951 INFO apps.audit.outbox outbox event 67105cfe-cb61-4d30-8be3-ca50501197a8 is not claimable by this consumer; skipping
+[2026-09-27 11:08:10,951: INFO/MainProcess] Task projection.rebuild_attempt_evidence[405989fd-541e-4c08-b15a-6896eed359e5] succeeded in 0.0008878330008883495s: 'skipped_lease_not_held'
+[2026-09-27 11:08:10,951: INFO/MainProcess] Task learning.on_attempt_graded[f3727756-4a98-40b0-b76b-ce51cf7ac820] received
+[2026-09-27 11:08:10,991: INFO/MainProcess] Task learning.on_attempt_graded[f3727756-4a98-40b0-b76b-ce51cf7ac820] succeeded in 0.03911854199759546s: 'paired_tasks=0'
+[2026-09-27 11:08:12,054: INFO/MainProcess] Task projection.rebuild_attempt_evidence[17e6feca-ee85-4500-9038-49bb0065656c] received
+2026-09-27 11:08:12,054 INFO apps.audit.outbox outbox event 05d17101-3c48-46f3-8655-0686f24309db is not claimable by this consumer; skipping
+[2026-09-27 11:08:12,055: INFO/MainProcess] Task projection.rebuild_attempt_evidence[17e6feca-ee85-4500-9038-49bb0065656c] succeeded in 0.0008432079994236119s: 'skipped_lease_not_held'
+[2026-09-27 11:08:12,055: INFO/MainProcess] Task learning.on_attempt_graded[54d3712e-4082-452a-a090-0e48eaba52ae] received
+[2026-09-27 11:08:12,096: INFO/MainProcess] Task learning.on_attempt_graded[54d3712e-4082-452a-a090-0e48eaba52ae] succeeded in 0.04115866699794424s: 'paired_tasks=0'
+[2026-09-27 11:08:13,170: INFO/MainProcess] Task projection.rebuild_attempt_evidence[3301ce20-3c4d-4da7-a36f-be3a1a55493c] received
+2026-09-27 11:08:13,171 INFO apps.audit.outbox outbox event ea9bb75e-8d0e-49aa-b441-553dcea8bb13 is not claimable by this consumer; skipping
+[2026-09-27 11:08:13,171: INFO/MainProcess] Task projection.rebuild_attempt_evidence[3301ce20-3c4d-4da7-a36f-be3a1a55493c] succeeded in 0.0008814170032565016s: 'skipped_lease_not_held'
+[2026-09-27 11:08:13,172: INFO/MainProcess] Task learning.on_attempt_graded[52228c5c-e3c0-4b7a-9209-61a679544636] received
+[2026-09-27 11:08:13,213: INFO/MainProcess] Task learning.on_attempt_graded[52228c5c-e3c0-4b7a-9209-61a679544636] succeeded in 0.04148387500026729s: 'paired_tasks=0'
+[2026-09-27 11:08:13,544: INFO/MainProcess] Task projection.rebuild_attempt_evidence[61c0d80e-37d2-4819-be8e-556c14484840] received
+2026-09-27 11:08:13,545 INFO apps.audit.outbox outbox event 19140ec7-cf42-46f2-98d1-2357da4d06b6 is not claimable by this consumer; skipping
+[2026-09-27 11:08:13,545: INFO/MainProcess] Task projection.rebuild_attempt_evidence[61c0d80e-37d2-4819-be8e-556c14484840] succeeded in 0.0008439999983238522s: 'skipped_lease_not_held'
+[2026-09-27 11:08:13,545: INFO/MainProcess] Task learning.on_attempt_graded[b146c698-4ee9-44b0-84c3-80ec27ac1f4b] received
+[2026-09-27 11:08:13,588: INFO/MainProcess] Task learning.on_attempt_graded[b146c698-4ee9-44b0-84c3-80ec27ac1f4b] succeeded in 0.042718749999039574s: 'paired_tasks=0'
+[2026-09-27 11:08:14,498: INFO/MainProcess] Task projection.rebuild_attempt_evidence[e5c601c6-7fa5-41b8-a35a-6b141cc1d11b] received
+2026-09-27 11:08:14,499 INFO apps.audit.outbox outbox event ef30915d-1baa-470a-bfc7-064508c053d9 is not claimable by this consumer; skipping
+[2026-09-27 11:08:14,499: INFO/MainProcess] Task projection.rebuild_attempt_evidence[e5c601c6-7fa5-41b8-a35a-6b141cc1d11b] succeeded in 0.0010343750000174623s: 'skipped_lease_not_held'
+[2026-09-27 11:08:14,500: INFO/MainProcess] Task projection.rebuild_attempt_evidence[76d8907a-014d-4c3c-af21-33d707a4a7ff] received
+[2026-09-27 11:08:14,524: INFO/MainProcess] Task projection.rebuild_attempt_evidence[76d8907a-014d-4c3c-af21-33d707a4a7ff] succeeded in 0.024406374999671243s: 'evidence_rows=6'
+[2026-09-27 11:08:15,494: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7de7e07a-6dce-4ddb-8aa6-a1263dd76147] received
+2026-09-27 11:08:15,495 INFO apps.audit.outbox outbox event 5a718062-97ac-4411-ad3f-01385c33b966 is not claimable by this consumer; skipping
+[2026-09-27 11:08:15,495: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7de7e07a-6dce-4ddb-8aa6-a1263dd76147] succeeded in 0.0009269170004699845s: 'skipped_lease_not_held'
+[2026-09-27 11:08:15,495: INFO/MainProcess] Task projection.rebuild_attempt_evidence[227ab2f9-0694-48c0-844f-97cb427bd9c9] received
+[2026-09-27 11:08:15,519: INFO/MainProcess] Task projection.rebuild_attempt_evidence[227ab2f9-0694-48c0-844f-97cb427bd9c9] succeeded in 0.02320299999701092s: 'evidence_rows=6'
+[2026-09-27 11:08:15,681: INFO/MainProcess] Task projection.rebuild_attempt_evidence[55d75de2-d87a-4bfc-b0ff-6353dc800885] received
+2026-09-27 11:08:15,682 INFO apps.audit.outbox outbox event d74e85a1-8233-4dc5-94e2-109169d35383 is not claimable by this consumer; skipping
+[2026-09-27 11:08:15,683: INFO/MainProcess] Task projection.rebuild_attempt_evidence[55d75de2-d87a-4bfc-b0ff-6353dc800885] succeeded in 0.0014739590005774517s: 'skipped_lease_not_held'
+[2026-09-27 11:08:15,683: INFO/MainProcess] Task learning.on_attempt_graded[5bf27996-9b1d-4f14-83ed-44a52e621842] received
+[2026-09-27 11:08:15,721: INFO/MainProcess] Task learning.on_attempt_graded[5bf27996-9b1d-4f14-83ed-44a52e621842] succeeded in 0.037614208999002585s: 'paired_tasks=0'
+[2026-09-27 11:08:16,872: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d05bc5c8-c913-40cb-8505-85c74ab15479] received
+[2026-09-27 11:08:16,896: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d05bc5c8-c913-40cb-8505-85c74ab15479] succeeded in 0.02374937499916996s: 'evidence_rows=6'
+[2026-09-27 11:08:17,009: INFO/MainProcess] Task projection.rebuild_attempt_evidence[66e12127-4979-4fc8-8c6f-cf50c44511ef] received
+2026-09-27 11:08:17,010 INFO apps.audit.outbox outbox event 39a72576-e882-4749-b7f8-7588b50caff3 is not claimable by this consumer; skipping
+[2026-09-27 11:08:17,010: INFO/MainProcess] Task projection.rebuild_attempt_evidence[66e12127-4979-4fc8-8c6f-cf50c44511ef] succeeded in 0.0010355839986004867s: 'skipped_lease_not_held'
+[2026-09-27 11:08:17,011: INFO/MainProcess] Task learning.on_attempt_graded[8138338a-6fa1-4d63-b5d1-9b520fdbe558] received
+[2026-09-27 11:08:17,049: INFO/MainProcess] Task learning.on_attempt_graded[8138338a-6fa1-4d63-b5d1-9b520fdbe558] succeeded in 0.03813766700113774s: 'paired_tasks=0'
+[2026-09-27 11:08:17,330: INFO/MainProcess] Task projection.rebuild_attempt_evidence[165ea228-4518-422c-8c78-a7113e949f08] received
+2026-09-27 11:08:17,332 INFO apps.audit.outbox outbox event 05d17101-3c48-46f3-8655-0686f24309db is not claimable by this consumer; skipping
+[2026-09-27 11:08:17,332: INFO/MainProcess] Task projection.rebuild_attempt_evidence[165ea228-4518-422c-8c78-a7113e949f08] succeeded in 0.0014686659997096285s: 'skipped_lease_not_held'
+[2026-09-27 11:08:17,333: INFO/MainProcess] Task tutoring.run_job[f315db9f-751c-4f21-ad07-91036c7b9e85] received
+[2026-09-27 11:08:17,336: INFO/MainProcess] Task tutoring.run_job[f315db9f-751c-4f21-ad07-91036c7b9e85] succeeded in 0.0030964590005169157s: 'unavailable'
+[2026-09-27 11:08:18,294: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d61a04d7-495d-4d52-825e-50ad962704dc] received
+[2026-09-27 11:08:18,316: INFO/MainProcess] Task projection.rebuild_attempt_evidence[d61a04d7-495d-4d52-825e-50ad962704dc] succeeded in 0.021119540997460717s: 'evidence_rows=6'
+[2026-09-27 11:08:18,466: INFO/MainProcess] Task projection.rebuild_attempt_evidence[165d020b-8a62-462f-b74d-ebbd51b0069d] received
+2026-09-27 11:08:18,467 INFO apps.audit.outbox outbox event cc4c11a2-d791-4fb2-9daf-1733b930714c is not claimable by this consumer; skipping
+[2026-09-27 11:08:18,467: INFO/MainProcess] Task projection.rebuild_attempt_evidence[165d020b-8a62-462f-b74d-ebbd51b0069d] succeeded in 0.0008328340009029489s: 'skipped_lease_not_held'
+[2026-09-27 11:08:18,468: INFO/MainProcess] Task learning.on_attempt_graded[28625cf4-48c8-40ff-b81c-b65331b48fde] received
+[2026-09-27 11:08:18,506: INFO/MainProcess] Task learning.on_attempt_graded[28625cf4-48c8-40ff-b81c-b65331b48fde] succeeded in 0.0380212499985646s: 'paired_tasks=0'
+[2026-09-27 11:08:22,879: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7cca1308-f2bb-4a1a-9e1a-7aa5395704fa] received
+2026-09-27 11:08:22,880 INFO apps.audit.outbox outbox event ef30915d-1baa-470a-bfc7-064508c053d9 is not claimable by this consumer; skipping
+[2026-09-27 11:08:22,880: INFO/MainProcess] Task projection.rebuild_attempt_evidence[7cca1308-f2bb-4a1a-9e1a-7aa5395704fa] succeeded in 0.0010948749986710027s: 'skipped_lease_not_held'
+[2026-09-27 11:08:22,881: INFO/MainProcess] Task projection.rebuild_attempt_evidence[176387ec-e9cc-4fb8-9237-e6c4f2d88bbb] received
+2026-09-27 11:08:22,882 INFO apps.audit.outbox outbox event 5a718062-97ac-4411-ad3f-01385c33b966 is not claimable by this consumer; skipping
+[2026-09-27 11:08:22,882: INFO/MainProcess] Task projection.rebuild_attempt_evidence[176387ec-e9cc-4fb8-9237-e6c4f2d88bbb] succeeded in 0.0007261669998115394s: 'skipped_lease_not_held'
+[2026-09-27 11:08:22,882: INFO/MainProcess] Task projection.rebuild_attempt_evidence[735b38a6-86fd-47a2-bc9c-f5f6935a0f88] received
+2026-09-27 11:08:22,883 INFO apps.audit.outbox outbox event 05d17101-3c48-46f3-8655-0686f24309db is not claimable by this consumer; skipping
+[2026-09-27 11:08:22,883: INFO/MainProcess] Task projection.rebuild_attempt_evidence[735b38a6-86fd-47a2-bc9c-f5f6935a0f88] succeeded in 0.0008065000001806766s: 'skipped_lease_not_held'
+[2026-09-27 11:08:22,884: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c512b134-b7e9-4db7-b8dd-eb26bccff069] received
+[2026-09-27 11:08:22,907: INFO/MainProcess] Task projection.rebuild_attempt_evidence[c512b134-b7e9-4db7-b8dd-eb26bccff069] succeeded in 0.023342958000284852s: 'evidence_rows=6'
+[2026-09-27 11:08:22,908: INFO/MainProcess] Task projection.rebuild_attempt_evidence[af8386f5-b070-4698-b3ad-675cbc15189f] received
+[2026-09-27 11:08:22,934: INFO/MainProcess] Task projection.rebuild_attempt_evidence[af8386f5-b070-4698-b3ad-675cbc15189f] succeeded in 0.026372583000920713s: 'evidence_rows=6'
+[2026-09-27 11:08:22,935: INFO/MainProcess] Task projection.rebuild_attempt_evidence[6a3321e5-4e91-4180-a5ea-3b79f1bd367e] received
+[2026-09-27 11:08:22,958: INFO/MainProcess] Task projection.rebuild_attempt_evidence[6a3321e5-4e91-4180-a5ea-3b79f1bd367e] succeeded in 0.022860625002067536s: 'evidence_rows=6'
+[2026-09-27 11:08:49,893: INFO/MainProcess] Task projection.rebuild_attempt_evidence[cfce2427-c86b-487a-979b-1978d125c0c2] received
+[2026-09-27 11:08:49,936: INFO/MainProcess] Task projection.rebuild_attempt_evidence[cfce2427-c86b-487a-979b-1978d125c0c2] succeeded in 0.04277954099961789s: 'evidence_rows=6'
+[2026-09-27 11:08:49,937: INFO/MainProcess] Task projection.rebuild_attempt_evidence[96af6002-690a-47e6-b685-4c9f33bda0d7] received
+[2026-09-27 11:08:49,959: INFO/MainProcess] Task projection.rebuild_attempt_evidence[96af6002-690a-47e6-b685-4c9f33bda0d7] succeeded in 0.022373749998223502s: 'evidence_rows=6'
+[2026-09-27 11:08:49,960: INFO/MainProcess] Task projection.rebuild_attempt_evidence[e28020df-53f5-44dc-a0fd-af7c8b1cef70] received
+[2026-09-27 11:08:49,979: INFO/MainProcess] Task projection.rebuild_attempt_evidence[e28020df-53f5-44dc-a0fd-af7c8b1cef70] succeeded in 0.018940250000014203s: 'evidence_rows=6'
+[2026-09-27 11:08:49,980: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a06dde3d-cc29-42fd-abf9-adac9878f744] received
+[2026-09-27 11:08:50,000: INFO/MainProcess] Task projection.rebuild_attempt_evidence[a06dde3d-cc29-42fd-abf9-adac9878f744] succeeded in 0.020358000001579057s: 'evidence_rows=6'
+[2026-09-27 11:09:09,644: INFO/MainProcess] sync with drill-primary@Cololis-Mac-mini.local
+[2026-09-27 11:09:10,770: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b71a50d0-eb5b-47d2-9db7-6b082b5f95b4] received
+2026-09-27 11:09:10,772 INFO apps.audit.outbox outbox event c7256dc2-7f47-4c2e-8667-da13f085ef2a is not claimable by this consumer; skipping
+[2026-09-27 11:09:10,772: INFO/MainProcess] Task projection.rebuild_attempt_evidence[b71a50d0-eb5b-47d2-9db7-6b082b5f95b4] succeeded in 0.001351167000393616s: 'skipped_lease_not_held'
+
+worker: Warm shutdown (MainProcess)

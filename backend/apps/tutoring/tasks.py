@@ -34,12 +34,18 @@ def run_tutor_job(
             outbox.fail_claim(claim, "tutor job missing")
         return "missing"
     try:
-        tutor_service.run_job(job=job, prompt=prompt, citations=list(citations), purpose=purpose)
+        tutor_service.run_job(
+            job=job, prompt=prompt, citations=list(citations), purpose=purpose, claim=claim
+        )
     except Exception as exc:
         if claim is not None:
             outbox.fail_claim(claim, str(exc))
         raise
     if claim is not None:
+        # Business writes confirm the claim inside their own transaction
+        # (``_finalize_success``). This call only covers the paths that produce no
+        # business facts — a terminal model failure — and is a token-checked no-op
+        # when the row was already confirmed or taken over.
         outbox.confirm_claim(claim)
     return job.status
 

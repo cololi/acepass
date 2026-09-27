@@ -13,6 +13,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.common.enums import (
@@ -113,7 +114,23 @@ def _question_seen_before(attempt: Attempt) -> list[str]:
     return reasons
 
 
-def _last_relevant_anchor(attempt: Attempt, node_id) -> tuple[object | None, str]:
+def _delay_evaluation_instant(attempt: Attempt) -> tuple[object, str]:
+    """``(instant, source)`` the delayed-verification interval is judged at.
+
+    A30 fixes the boundary at the moment the verification **starts**: opening C
+    after the interval has really elapsed is a delayed check, opening C at 23h and
+    submitting it at 25h is not — leaving a tab open must not earn the evidence
+    (C03). The instant is therefore the item's first presentation; the submission
+    is only a fallback for an attempt whose item was never presented (a
+    server-side submission path), where no earlier instant exists.
+    """
+    item = attempt.session_item
+    if item.first_delivered_at is not None:
+        return item.first_delivered_at, "first_presentation"
+    return attempt.submitted_at, "submission"
+
+
+def _last_relevant_anchor(attempt: Attempt, node_id, *, before=None) -> tuple[object | None, str]:
     """Anchor for the delayed dimension: the latest related *completed* event.
 
     B04: this used to read ``SessionItem.first_delivered_at``, i.e. when the
@@ -121,7 +138,7 @@ def _last_relevant_anchor(attempt: Attempt, node_id) -> tuple[object | None, str
     hours ago and submitted it 1 hour ago was credited with a 25-hour delay even
     though the training completed an hour ago. The anchor is now the shared
     definition in :mod:`apps.learning.services.anchors` — the most recent moment
-    a related learning event completed at or before this attempt was submitted.
+    a related learning event completed at or before the instant being judged.
     """
     from apps.learning.services.anchors import latest_learning_anchor
 
@@ -129,7 +146,7 @@ def _last_relevant_anchor(attempt: Attempt, node_id) -> tuple[object | None, str
         user=attempt.user,
         project=attempt.project_id,
         node_id=node_id,
-        before=attempt.submitted_at,
+        before=before if before is not None else attempt.submitted_at,
         exclude_attempt_id=attempt.id,
     )
 
@@ -298,15 +315,19 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
             }
         )
 
-        anchor, anchor_source = _last_relevant_anchor(attempt, node_id)
+        evaluated_at, evaluated_source = _delay_evaluation_instant(attempt)
+        anchor, anchor_source = _last_relevant_anchor(attempt, node_id, before=evaluated_at)
         delay_hours = getattr(settings, "DELAYED_VERIFICATION_HOURS", 24)
         delayed_reasons: list[str] = []
         if anchor is None:
             delayed_reasons.append("没有可用的延迟锚点（本题是该考点首次接触）")
         else:
-            # Measured from the completion of *this* attempt: the exposure of the
-            # question is not training, so it cannot start the clock (B04).
-            elapsed = attempt.submitted_at - anchor
+            # Measured from the completion of the most recent related training
+            # event to the moment the verification *started*: the exposure of the
+            # question is not training, so it cannot start the clock (B04), and the
+            # submission cannot extend it, so a late submit cannot earn the credit
+            # (C03).
+            elapsed = evaluated_at - anchor
             if elapsed < timedelta(hours=delay_hours):
                 delayed_reasons.append(
                     f"距最近相关训练/教学仅 {elapsed.total_seconds() / 3600:.2f} 小时，未达到 {delay_hours} 小时"
@@ -329,6 +350,10 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                     "anchor_source": anchor_source,
                     "delay_hours_required": delay_hours,
                     "purpose": item.purpose,
+                    # Auditability: which instant the interval was judged at, so a
+                    # row can be explained without re-deriving the rule.
+                    "delay_evaluated_at": evaluated_at.isoformat(),
+                    "delay_evaluated_from": evaluated_source,
                 },
             }
         )
@@ -457,6 +482,20 @@ def evidence_summary_rows(
         attempt__session_item__session__status=SessionStatus.ACTIVE,
         attempt__session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM],
     )
+    # C01: the same content may be *practised* in a plain session while a
+    # verification on it is running. Those rows carry `is_correct` and
+    # `score_fraction`, i.e. the same disclosure as the direct attempt read, so the
+    # shared content gate filters them out too — and, like every other caller, the
+    # covering verification item keeps its own rows.
+    from apps.practice.services import verification_gate
+
+    content_map = verification_gate.active_verification_content_map(user=user)
+    if content_map:
+        covering_item_ids = sorted({item_id for ids in content_map.values() for item_id in ids})
+        queryset = queryset.exclude(
+            Q(attempt__session_item__question_version_id__in=list(content_map))
+            & ~Q(attempt__session_item_id__in=covering_item_ids)
+        )
     return [
         {
             "id": str(row.id),

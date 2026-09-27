@@ -1,0 +1,145 @@
+== 范围：全栈（真实 api/postgres/redis/web + 经 HTTPS 代理的真实登录）。==
+构建真实应用镜像...
+ Image acepass-backend:p0 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 530B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from backend.Dockerfile
+#2 transferring dockerfile: 1.34kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 3.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 977B done
+#4 DONE 0.0s
+
+#5 [1/8] FROM docker.io/library/python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+#5 resolve docker.io/library/python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 17.26kB 0.0s done
+#6 DONE 0.0s
+
+#7 [2/8] RUN apt-get update  && apt-get install -y --no-install-recommends libpq5 curl  && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/8] WORKDIR /app
+#8 CACHED
+
+#9 [4/8] COPY backend/requirements/base.txt backend/requirements/lock.txt ./requirements/
+#9 CACHED
+
+#10 [5/8] RUN pip install --no-cache-dir -r requirements/lock.txt
+#10 CACHED
+
+#11 [6/8] COPY backend/ ./
+#11 CACHED
+
+#12 [7/8] COPY frontend/dist/ /app/frontend-dist/
+#12 CACHED
+
+#13 [8/8] RUN useradd --create-home --uid 10001 acepass  && mkdir -p /data/private-media /app/var/static  && chown -R acepass:acepass /data /app
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:4d94b29c20f5a19ab5b0c67b0533c3cc130a95184b981475dab16e7b5d5e9196 done
+#14 exporting config sha256:c3df925b2297d9840771cbdde7d5bc33e6612e6291d8e9934b564bc88b0640eb done
+#14 exporting attestation manifest sha256:559da002acc1812fc50bef558d676e578b00d190e41d65f352e372d4d5e38488 0.0s done
+#14 exporting manifest list sha256:875ee03d9e98b8885d7df0ebd25f1cef78e43b24e9062416bcfd3f911fb449ff 0.0s done
+#14 naming to docker.io/library/acepass-backend:p0 done
+#14 unpacking to docker.io/library/acepass-backend:p0 done
+#14 DONE 0.1s
+
+#15 resolving provenance for metadata file
+#15 DONE 0.0s
+ Image acepass-backend:p0 Built 
+ Volume acepass_private-media Creating 
+ Volume acepass_private-media Creating 
+ Network acepass_private Creating 
+ Volume acepass_certbot-webroot Creating 
+ Volume acepass_certbot-webroot Creating 
+ Volume acepass_redis-data Creating 
+ Volume acepass_redis-data Creating 
+ Network acepass_private Creating 
+ Volume acepass_postgres-data Creating 
+ Volume acepass_postgres-data Creating 
+ Volume acepass_private-media Created 
+ Volume acepass_private-media Created 
+ Volume acepass_certbot-webroot Created 
+ Volume acepass_certbot-webroot Created 
+ Volume acepass_postgres-data Created 
+ Volume acepass_postgres-data Created 
+ Volume acepass_redis-data Created 
+ Volume acepass_redis-data Created 
+ Network acepass_private Created 
+ Network acepass_private Created 
+ Container acepass-postgres-1 Creating 
+ Container acepass-redis-1 Creating 
+ Container acepass-redis-1 Created 
+ Container acepass-postgres-1 Created 
+ Container acepass-api-1 Creating 
+ Container acepass-api-1 Created 
+ Container acepass-web-1 Creating 
+ Container acepass-web-1 Created 
+ Container acepass-postgres-1 Starting 
+ Container acepass-redis-1 Starting 
+ Container acepass-postgres-1 Started 
+ Container acepass-redis-1 Started 
+ Container acepass-redis-1 Waiting 
+ Container acepass-postgres-1 Waiting 
+ Container acepass-postgres-1 Healthy 
+ Container acepass-redis-1 Healthy 
+ Container acepass-api-1 Starting 
+ Container acepass-api-1 Started 
+ Container acepass-api-1 Waiting 
+ Container acepass-api-1 Healthy 
+ Container acepass-web-1 Starting 
+ Container acepass-web-1 Started 
+Operations to perform:
+  Apply all migrations: accounts, admin, analytics, audit, auth, contenttypes, exams, ingestion, knowledge, learning, practice, question_bank, sessions, tutoring
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying exams.0001_initial... OK
+  Applying ingestion.0001_initial... OK
+  Applying question_bank.0001_initial... OK
+  Applying analytics.0001_initial... OK
+  Applying analytics.0002_initial... OK
+  Applying analytics.0003_p0_1_grading_and_regrade_semantics... OK
+  Applying analytics.0004_p0_2_regrade_generation_sequence... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_p0_1_outbox_lease_and_recovery... OK
+  Applying exams.0002_initial... OK
+  Applying knowledge.0001_initial... OK
+  Applying learning.0001_initial... OK
+  Applying practice.0001_initial... OK
+  Applying learning.0002_initial... OK
+  Applying learning.0003_alter_studytask_options_and_more... OK
+  Applying practice.0002_p0_1_grading_and_regrade_semantics... OK
+  Applying sessions.0001_initial... OK
+  Applying tutoring.0001_initial... OK
+  Applying tutoring.0002_p0_2_tutor_job_finalized_at... OK
+已创建账户：ci-login@acepass.test
+全栈登录 HTTP 200
+全栈检查通过：真实镜像、真实迁移、经 TLS 代理的真实登录与会话。

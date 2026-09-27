@@ -78,6 +78,11 @@ class TutorJob(BaseModel):
     #: True when the delivered content includes the answer itself.
     reveals_answer = models.BooleanField(default=False)
     delivered_at = models.DateTimeField(null=True, blank=True)
+    #: Set once the *business* final commit landed: the assistant turn, the
+    #: exposure fact and the outbox completion. A consumer that finds this set must
+    #: not write those facts a second time (C04). Separate from ``delivered_at``,
+    #: which only records that a validated result exists on the job row.
+    finalized_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "tutoring_job"

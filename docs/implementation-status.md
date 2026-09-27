@@ -1,5 +1,14 @@
 # AcePass 实施状态
 
+> **最新：P0.2 定向补漏已完成 C01—C05（2026-09-27，起点 c168583/bfbbfbd）。** 后端 194 passed、
+> 归档交叉反例 9/10 原样通过（第 10 条按"安全拒绝歧义历史"调整后作废，业务断言已迁入）、浏览器 36 passed、
+> 归档浏览器 2 passed、真故障演练 ok=true、代理组件与全栈登录门槛本机 Docker 通过。
+> 逐条结果见 [13 补漏报告](13-p0-2-remaining-repair.md)，证据见
+> [p02-remaining](review/2026-09-27/p02-remaining/README.md)。**真实 provider、真实隔夜与 GitHub Actions
+> 实际执行仍未验证。**
+
+> **P0.2/c168583 独立复验曾保留 C01—C05。** 完整结论见 [12复验报告](12-p0-2-independent-review.md)；下文历史状态不替代该结果。
+
 > **P0.2 收尾完成（2026-09-27，基线 f809365）：B01—B07 与三项发布门槛已修复并有本轮实测证据。**
 > 逐条改动、命令与结果见 [P0.2 收尾验证报告](11-p0-2-closeout-verification.md)；
 > 问题基线（P0.1 独立复验，仍作为历史保留）见 [09复验报告](09-p0-1-independent-reacceptance.md)。
