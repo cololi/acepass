@@ -1,0 +1,12 @@
+CommandError: gold 文件有 1 个标签无法解析：bad-label:这个考点不存在。标签必须匹配当前库中可检索内容的题目 display_label 或考点 canonical_name；请先重建索引，或用 --print-gold-template 查看可用标签。
+search_eval tokenizer=zh-char-ngram-v1 channel=hybrid project=87abfcb4-6097-4ec3-b639-200a0c9922e7 user=acceptance@acepass.local
+gold=/tmp/search-gold-bad.json queries=1 k=[5]
+documents searchable=10 question=7 node=3 with_embeddings=0 index_rows=10 excluded_rows=0 distinct_labels=10
+channel keyword available=True reason=- k1=1.2 b=0.75
+channel vector available=False model=None dimension=None provider=none reason=未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=bad-label rank=- recall@5=0.000 precision@5=0.000 channels=- expected=0 candidate_documents=10
+aggregate queries=1 scored=0 recall@5=0.000 precision@5=0.000 mrr=0.000
+threshold k=5 mean_recall=0.000 min_recall=0.000 queries_below=0 passed=False
+unresolved_label query=bad-label label=这个考点不存在
+threshold_applied=False：--min-recall 为 0，本次只报告，不判定通过
+result passed=False

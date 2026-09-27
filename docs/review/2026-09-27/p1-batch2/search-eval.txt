@@ -1,0 +1,33 @@
+search_eval tokenizer=zh-char-ngram-v1 channel=hybrid project=87abfcb4-6097-4ec3-b639-200a0c9922e7 user=acceptance@acepass.local
+gold=/Users/cololi/Documents/AcePass/docs/review/2026-09-27/p1-batch2/search-gold.json queries=8 k=[5, 10]
+documents searchable=10 question=7 node=3 with_embeddings=0 index_rows=10 excluded_rows=0 distinct_labels=10
+channel keyword available=True reason=- k1=1.2 b=0.75
+channel vector available=False model=None dimension=None provider=none reason=未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=judgement-angle-sum rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=判断题题干的关键短语
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=single-square-perimeter rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=同一科目内的近义提问，考关键词通道
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=single-half-of-12 rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=数字与中文混排
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=multiple-even-numbers rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=多选题干
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=fill-blank-sum rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=含空位占位符与符号的填空题干
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=constructed-boxes rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=大题题干
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=node-name-third rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=考点名称本身也可被检索
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+query id=node-name-second rank=1 recall@5=1.000 precision@5=0.200 recall@10=1.000 precision@10=0.100 channels=keyword expected=1 candidate_documents=10
+  note=考点名 + 噪声词，检验 BM25 的权重排序
+  channel_note=向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。
+aggregate queries=8 scored=8 recall@5=1.000 recall@10=1.000 precision@5=0.200 precision@10=0.100 mrr=1.000
+threshold k=5 mean_recall=1.000 min_recall=0.800 queries_below=0 passed=True
+threshold k=10 mean_recall=1.000 min_recall=0.800 queries_below=0 passed=True
+result passed=True

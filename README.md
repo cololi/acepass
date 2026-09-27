@@ -1,13 +1,25 @@
 # AcePass
 
+> **2026-09-27 P1 第二批交付完成。** 考点前置关系（加边成环即拒绝并给出环路径，补弱计划先排未满足的
+> 前置考点）、标签建议（只接受逐字来自大纲的考点名，采纳只写**辅助标签**修订，绝不创建/改名考点）、
+> 中文关键词 + 向量混合检索（权限/发布状态/封存先过滤，无向量时明示降级，固定金标集
+> recall@5/@10 = 1.000；含"相似度 1.0 也不返回"的权限反例）、FSRS 记忆卡（日志可重放、
+> 参数版本可追踪、复习不产生学习证据也不改变考点状态、到期卡进入当日计划且受全局预算约束）
+> 均已实现：后端 **316 passed**、隔离浏览器 **58 passed**（P0 36 + P1 第一批 12 + 本批 10，连续两次一致）、
+> 三组归档后端反例 **11/9/3 原样通过**、归档浏览器反例 **2 passed**、真故障演练 **ok=true**、
+> 干净副本发布门槛通过。**真实嵌入模型、真实模型标签建议、真实 AI 讲解/图片识别（provider 余额
+> HTTP 402、无视觉模型）、真实 ≥24 小时验证与 GitHub Actions 实际执行均未验证。** 逐条结果见
+> [18 P1 第二批交付](docs/18-p1-second-batch-delivery.md)，证据见
+> [p1-batch2](docs/review/2026-09-27/p1-batch2/README.md)，剩余批次见
+> [17 走向 100% 的计划](docs/17-remaining-plan-to-completion.md)。
+
 > **2026-09-27 P1 第一批交付完成。** 原生文字 PDF 批量导入与人工校对（来源页可追溯、五题型与材料子题
 > 关系完整、答案匹配只产生候选、重试/重复导入不重复发布、不依赖模型密钥）、大纲词表导入与人工映射
 > （同义词合并、环依赖拒绝）、真实试卷周期统计（只按真实发生记录、完整/不完整周期与分母明确、
 > 权重不重复、不足五个完整周期就显示不足）均已实现：后端 **226 passed**（含本轮迁入 23 条）、
 > 隔离浏览器 **48 passed**（P0 36 + P1 12）、归档反例 2 + 9 + 3 原样通过、真故障演练 **ok=true**、
-> 仅提交内容的干净副本下代理组件与真实全栈 HTTPS/CSRF 登录通过。**真实 AI 讲解已实际发起调用但被
-> provider 账户余额阻断（HTTP 402），真实图片识别无视觉模型凭据，真实 ≥24 小时验证与 GitHub Actions
-> 实际执行均未验证。** 逐条结果见 [16 P1 第一批交付](docs/16-p1-first-batch-delivery.md)，证据见
+> 仅提交内容的干净副本下代理组件与真实全栈 HTTPS/CSRF 登录通过。逐条结果见
+> [16 P1 第一批交付](docs/16-p1-first-batch-delivery.md)，证据见
 > [p1-batch](docs/review/2026-09-27/p1-batch/README.md)。
 
 > **2026-09-27 P0.2 最后四组遗漏修复（C01/C02/C04/C05，起点 `2c87e0c`，提交 `7285991`）。**
@@ -53,7 +65,10 @@
 | M5 图片识别与按需辅导 | 代码完成，**真实 provider 未验证** | 能力接口、`llm_run` 审计、降级路径、stub 仅在测试/演示模式；无凭据故 A36 未运行 |
 
 逐项证据见 [`docs/implementation-status.md`](docs/implementation-status.md) 与
-[`docs/acceptance-results.md`](docs/acceptance-results.md)。P1/P2 未开始，也没有被标成已完成。
+[`docs/acceptance-results.md`](docs/acceptance-results.md)。**P1 分三批推进**：第一批（原生文字 PDF 导入、
+大纲词表与人工映射、真实周期统计）已交付，见 [16](docs/16-p1-first-batch-delivery.md)；第二批（考点前置
+关系、标签候选、混合检索、FSRS 记忆卡）与第三批（诊断追问/手写转写、AI 估分、SSE）以及 P2 的批次划分、
+判据与外部阻塞见 [17 走向 100% 的计划](docs/17-remaining-plan-to-completion.md)。未完成的批次不会被标成已完成。
 
 ## 2. 本机环境（实测）
 
@@ -116,7 +131,7 @@ cd backend
 
 ```bash
 cd backend
-.venv/bin/python -m pytest tests -q            # 119 passed（单元 + PostgreSQL 集成）
+.venv/bin/python -m pytest tests -q            # 全量单元 + PostgreSQL 集成（数量以本次输出为准，当前见 docs/implementation-status.md）
 .venv/bin/python -m pytest tests/unit -q       # 只跑纯逻辑
 .venv/bin/ruff check apps ai domain config     # All checks passed
 DJANGO_SETTINGS_MODULE=config.settings.dev .venv/bin/python manage.py check
@@ -174,28 +189,31 @@ Redis 已开启 AOF+RDB 持久化，重启不丢队列（见 `infra/docker/READM
 ```text
 backend/
   config/{settings/{base,dev,test,prod},api,urls,celery}.py
-  apps/{accounts,audit,exams,ingestion,question_bank,knowledge,practice,tutoring,learning,analytics}/
+  apps/{accounts,audit,exams,ingestion,question_bank,knowledge,practice,tutoring,learning,analytics,memory,search}/
   apps/common/{enums,content,answers,scope,errors,api}.py
   ai/{providers,prompts}/            # 可替换 AI 能力接口 + 版本化提示词
   domain/grading/adapters.py         # 确定性判分适配器
+  domain/memory/fsrs.py              # 纯 Python FSRS 调度器（P1 批次 2）
   tests/{unit,integration}/          # PostgreSQL 集成测试
 frontend/
   src/{app,components,features,api}/
   tests/e2e/                         # Playwright 真实浏览器验收
 infra/{docker,proxy}/                # Compose 编排与同源反向代理（TLS 终止点，见 infra/docker/README.md）
 scripts/{backup.sh,restore.sh,gen-dev-certs.sh,demo_live_flow.py}
-docs/{01..05} 与 implementation-status.md / acceptance-results.md
+docs/{01..05} 与 06—17 各轮评审/修复/交付记录、implementation-status.md / acceptance-results.md
 ```
 
 ## 7. 明确未完成 / 未验证
 
-- **真实 AI provider 未验证**（没有 API Key）：A36 未运行；配置方式见下。
+- **真实 AI provider 未验证**（没有可用凭据：DeepSeek key 调用返回 HTTP 402 余额不足，且该端点没有视觉模型）：A36 未运行；配置方式见下。
 - **真实隔天学习效果未验证**：延迟验证只有可注入时钟的逻辑证据，没有真实等待 24 小时。
 - **Docker Compose 已在本机（OrbStack）实际构建并启动验证**（8 个服务全部起来、api/web healthy、
   TLS 与探针闭合，见 `infra/docker/README.md` 第 6 节）；**未**在真实目标服务器、真实域名或
   受信任证书上验证。
 - **未向任何远程服务器部署**：仓库内没有授权的部署目标。
-- P1/P2（PDF 批量导入、向量检索、FSRS、生成题、限时模拟考试、效果校准）未开始。
+- **GitHub Actions 未实际触发**：发布门槛用同一脚本在本机执行。
+- **P1/P2 未交付部分**：批次划分与进度以 [17 计划](docs/17-remaining-plan-to-completion.md) 与
+  [实现状态](docs/implementation-status.md) 为准，文档与实际不一致时以状态文件为准。
 
 配置真实模型（示例，OpenAI 兼容接口）：
 
