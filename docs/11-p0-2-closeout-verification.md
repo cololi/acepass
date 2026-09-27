@@ -212,6 +212,11 @@ POSTGRES_DB=acepass_p02_dryrun .venv/bin/python manage.py audit_projection_seman
 #   grade_events_scanned=49 / grade_events_needing_rewrite=0（现有业务库没有需要改写的历史行）
 ```
 
+> 操作说明：本轮**没有**对现有业务库执行 `migrate`。迁移与审计只在恢复副本上演练过，
+> 业务库（`acepass`）在演练前后完全一致（attempts=42、grade_events=49，演练后副本已删除）。
+> 上线时需要在维护窗口对业务库执行一次 `manage.py migrate`，它会创建序列与唯一约束；
+> 如历史 `(question, generation)` 存在重复，迁移会用序列重编号并在报告 §1 说明。
+
 为了证明审计真的保留前后值，在**副本**上人为把一条 `confirmed` 事件改成旧语义后再跑
 `--apply`：写入 `audit_content_revision`（`batch_id=56852dd11d05`，`before={pending 9.99,
 is_fully_confirmed false}`，`after={pending 0, is_fully_confirmed true}`，含前后 sha256），
