@@ -1,10 +1,19 @@
 # AcePass P0 验收结果
 
-> **最新：P0.2 定向补漏（C01—C05）已完成并有本轮实测证据。** 后端 194 passed（含迁入 17 条回归）、
+> **最新：P0.2 最后四组遗漏（C01/C02/C04/C05）已修复并有本轮实测证据（起点 `2c87e0c`，提交 `7285991`）。**
+> 后端 **203 passed**（含本轮迁入 9 条回归）、复验者三条原始反例原样 **3 passed**、上轮有效反例原样
+> **9 passed / 1 deselected**、隔离浏览器 **36 passed**、归档浏览器 **2 passed**、真故障演练 **ok=true**
+> （真 FLUSHALL / 真 SIGKILL 命中处理中任务 / 同一 event 重复投递 + 旧消费者返回后仍 1 消息 1 曝光）、
+> 仅提交内容的干净副本下代理组件与真实全栈 HTTPS/CSRF 登录通过且既有配置哨兵保持不变。
+> **真实 provider、真实隔夜、真实学习效果与 GitHub Actions 实际执行仍未验证。**
+> 见 [15 最后四组遗漏修复](15-p0-2-final-four-gaps-repair.md) 与
+> [p02-final-gaps 证据](review/2026-09-27/p02-final-gaps/README.md)。
+
+> **P0.2 定向补漏（C01—C05）已完成。** 后端 194 passed（含迁入 17 条回归）、
 > 归档交叉反例 9/10 原样通过（第 10 条按"安全拒绝歧义历史"调整后作废，业务断言已迁入）、浏览器 36 passed、
-> 归档浏览器 2 passed、真故障演练 ok=true（真 FLUSHALL / 真 SIGKILL 命中处理中任务 / 同一 event 重复投递 +
-> 旧消费者超时返回）、代理组件与全栈登录门槛本机 Docker 通过。**真实 provider、真实隔夜与 GitHub Actions
-> 实际执行仍未验证。** 见 [13 补漏报告](13-p0-2-remaining-repair.md)。
+> 归档浏览器 2 passed、真故障演练 ok=true、代理组件与全栈登录门槛本机 Docker 通过。
+> 见 [13 补漏报告](13-p0-2-remaining-repair.md)。该轮之后的独立复验（`2c87e0c`）保留的四处遗漏已在
+> [15](15-p0-2-final-four-gaps-repair.md) 关闭。
 
 > **P0.2 复验（c168583）曾保留五组补漏。** 177/11/36/2 独立通过，10 条新交叉场景失败。见 [12复验报告](12-p0-2-independent-review.md)。
 

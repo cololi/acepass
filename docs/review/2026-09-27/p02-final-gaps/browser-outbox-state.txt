@@ -1,0 +1,53 @@
+Outbox state after the isolated browser acceptance runs (real Worker, ACEPASS_INLINE_TASKS=false,
+dedicated Redis 6394, dedicated acceptance database).
+
+Run A — database acepass_acceptance_p02_final_gaps, worker started 15:45:43Z, browser suite 36 passed.
+State observed right after the run (15:47Z):
+
+    unresolved: {'dispatched': 24}
+    total: 54 processed: 30
+    active evidence: 132  attempts: 24
+
+All 24 unresolved events are `projection.rebuild_attempt_evidence`. The worker log shows, for each
+of them, the same line:
+
+    outbox event <id> is not claimable by this consumer; skipping
+    Task projection.rebuild_attempt_evidence[...] succeeded in 0.00s: 'skipped_lease_not_held'
+
+Mechanism (pre-existing, not introduced by this round): `outbox.dispatch_pending` selects the rows
+`FOR UPDATE SKIP LOCKED` and keeps those row locks while it publishes to the broker inside the same
+transaction; `outbox.claim_event` also uses `select_for_update(skip_locked=True)`. A worker that
+receives the message before the dispatcher's transaction commits therefore gets `None` and reports
+"skipped", and the row stays `dispatched` with a 300 s lease. The periodic scan (`audit.scan_outbox`,
+beat every 30 s in production; no beat runs in this local acceptance environment) re-dispatches it
+after the lease expires. The same pattern is present in the earlier independent evidence
+(docs/review/2026-09-27/p02-independent/browser-worker.txt, 2026-09-27 11:07).
+
+Recovery demonstrated on the same database by calling the production scan function directly:
+
+    before scan: {'dispatched': 24}
+    scan dispatched: 24
+    ...
+    [7] STATE {'dispatched': 6}   SCAN 6
+    [8] STATE {}
+    DRAINED
+    FINAL unresolved: {}
+    FINAL processed: 54 / 54
+    FINAL active evidence: 132 attempts: 24
+
+No event was lost, no effect was applied twice (evidence rows and attempt count unchanged), and the
+queue drained completely once the scan ran after the lease expired.
+
+Run B — database acepass_acceptance_p02_final_gaps_ui3 (POSTGRES_CONN_MAX_AGE=0), worker started
+16:01:05Z, browser suite 36 passed, archived browser counterexamples 2 passed.
+State observed right after the runs:
+
+    unresolved right after the browser run: {}
+    dispatched-but-skipped: 0
+    processed: 54 / 54
+
+i.e. in this run the worker won the race for every event and nothing needed recovery. Both outcomes
+are recorded because the race is real; neither is a business-correctness failure.
+
+This observation is OUT OF SCOPE for the C01/C02/C04/C05 repair round and was deliberately left
+unchanged. It is reported in docs/15-p0-2-final-four-gaps-repair.md §7.1 for the next batch.

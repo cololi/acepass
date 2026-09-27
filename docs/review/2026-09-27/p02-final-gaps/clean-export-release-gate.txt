@@ -1,0 +1,226 @@
+=== clean export from 7285991833bff978c08ad4a17d0777463bfd350e (git archive HEAD + built frontend/dist) ===
+--- component ---
+== 范围：代理组件（nginx + 真实 frontend/dist + 桩上游）。不证明 AcePass API 登录。==
+== 本次运行：项目/资源前缀 20260927090919-75630-23094，临时目录 /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090919-75630-23094.etbxMy ==
+Location: https://127.0.0.1:51213/login
+Location (no port): https://acepass.example.com/login
+上游解析与代理转发：ok
+登录页脚本资源 /assets/index-GequEHA5.js: HTTP 200 (application/javascript)
+组件检查通过：301 目标、TLS、真实产物与上游解析。
+component_exit=0
+--- full-stack ---
+== 范围：全栈（真实 api/postgres/redis/web + 经 HTTPS 代理的真实登录）。==
+== 本次运行：Compose 项目 acepass-verify-20260927090921-75687-747，镜像 acepass-verify-20260927090921-75687-747，临时目录 /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090921-75687-747.V75iRi ==
+构建真实应用镜像...
+ Image acepass-backend:acepass-verify-20260927090921-75687-747 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 597B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from backend.Dockerfile
+#2 transferring dockerfile: 1.34kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 2.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 977B done
+#4 DONE 0.0s
+
+#5 [1/8] FROM docker.io/library/python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
+#5 resolve docker.io/library/python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 3.01MB 0.0s done
+#6 DONE 0.1s
+
+#7 [2/8] RUN apt-get update  && apt-get install -y --no-install-recommends libpq5 curl  && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/8] WORKDIR /app
+#8 CACHED
+
+#9 [4/8] COPY backend/requirements/base.txt backend/requirements/lock.txt ./requirements/
+#9 CACHED
+
+#10 [5/8] RUN pip install --no-cache-dir -r requirements/lock.txt
+#10 CACHED
+
+#11 [6/8] COPY backend/ ./
+#11 DONE 0.0s
+
+#12 [7/8] COPY frontend/dist/ /app/frontend-dist/
+#12 DONE 0.0s
+
+#13 [8/8] RUN useradd --create-home --uid 10001 acepass  && mkdir -p /data/private-media /app/var/static  && chown -R acepass:acepass /data /app
+#13 DONE 0.1s
+
+#14 exporting to image
+#14 exporting layers 0.1s done
+#14 exporting manifest sha256:e05c25b171264e6c6278c33e4872eb3dadaaf22806941b12dda8711468247053
+#14 exporting manifest sha256:e05c25b171264e6c6278c33e4872eb3dadaaf22806941b12dda8711468247053 done
+#14 exporting config sha256:4892e9b804b3f5c4df284e1722a388439aece35e7e6262510a5be4c07dfbdecb done
+#14 exporting attestation manifest sha256:5420bfcba329ab96cc642f7633ee349b30b8dec94c14ecdecba82003d4f029e8 0.0s done
+#14 exporting manifest list sha256:1e013753ee1a9800d3edfbc5acb31d4337cf3771af3d49bde3f63651090138e6 done
+#14 naming to docker.io/library/acepass-backend:acepass-verify-20260927090921-75687-747 done
+#14 unpacking to docker.io/library/acepass-backend:acepass-verify-20260927090921-75687-747 0.1s done
+#14 DONE 0.3s
+
+#15 resolving provenance for metadata file
+#15 DONE 0.0s
+ Image acepass-backend:acepass-verify-20260927090921-75687-747 Built 
+ Image redis:7-alpine Pulling 
+ c436aca17997 Pulling fs layer 0B
+ 248d4d6535e8 Pulling fs layer 0B
+ 80825e26e4d6 Pulling fs layer 0B
+ 6c159c167f77 Pulling fs layer 0B
+ 574676109835 Pulling fs layer 0B
+ 459f390c40ba Pulling fs layer 0B
+ 4f4fb700ef54 Pulling fs layer 0B
+ 4f4fb700ef54 Already exists 0B
+ 2b4e8b5dc339 Download complete 0B
+ c436aca17997 Download complete 0B
+ 181388ee13fc Download complete 0B
+ 80825e26e4d6 Download complete 0B
+ 6c159c167f77 Download complete 0B
+ 459f390c40ba Download complete 0B
+ 248d4d6535e8 Downloading 1.049MB
+ 574676109835 Downloading 1.049MB
+ 248d4d6535e8 Downloading 1.049MB
+ 574676109835 Downloading 1.049MB
+ 248d4d6535e8 Downloading 2.097MB
+ 574676109835 Downloading 2.097MB
+ 248d4d6535e8 Downloading 2.097MB
+ 574676109835 Downloading 2.097MB
+ 248d4d6535e8 Downloading 2.097MB
+ 574676109835 Downloading 2.097MB
+ 248d4d6535e8 Downloading 3.146MB
+ 574676109835 Downloading 5.243MB
+ 248d4d6535e8 Downloading 3.975MB
+ 574676109835 Downloading 6.291MB
+ 574676109835 Downloading 6.291MB
+ 248d4d6535e8 Download complete 0B
+ 80825e26e4d6 Pull complete 0B
+ 6c159c167f77 Pull complete 0B
+ 248d4d6535e8 Pull complete 0B
+ 574676109835 Downloading 8.389MB
+ 574676109835 Downloading 9.437MB
+ 574676109835 Downloading 10.49MB
+ 574676109835 Downloading 11.53MB
+ 574676109835 Downloading 11.53MB
+ 574676109835 Download complete 0B
+ 574676109835 Extracting 1B
+ 4f4fb700ef54 Pull complete 0B
+ c436aca17997 Pull complete 0B
+ 459f390c40ba Pull complete 0B
+ 574676109835 Pull complete 0B
+ Image redis:7-alpine Pulled 
+ Volume acepass-verify-20260927090921-75687-747_postgres-data Creating 
+ Volume acepass-verify-20260927090921-75687-747_redis-data Creating 
+ Network acepass-verify-20260927090921-75687-747_private Creating 
+ Volume acepass-verify-20260927090921-75687-747_redis-data Creating 
+ Network acepass-verify-20260927090921-75687-747_private Creating 
+ Volume acepass-verify-20260927090921-75687-747_postgres-data Creating 
+ Volume acepass-verify-20260927090921-75687-747_certbot-webroot Creating 
+ Volume acepass-verify-20260927090921-75687-747_certbot-webroot Creating 
+ Volume acepass-verify-20260927090921-75687-747_private-media Creating 
+ Volume acepass-verify-20260927090921-75687-747_private-media Creating 
+ Volume acepass-verify-20260927090921-75687-747_redis-data Created 
+ Volume acepass-verify-20260927090921-75687-747_redis-data Created 
+ Volume acepass-verify-20260927090921-75687-747_postgres-data Created 
+ Volume acepass-verify-20260927090921-75687-747_postgres-data Created 
+ Volume acepass-verify-20260927090921-75687-747_private-media Created 
+ Volume acepass-verify-20260927090921-75687-747_private-media Created 
+ Volume acepass-verify-20260927090921-75687-747_certbot-webroot Created 
+ Volume acepass-verify-20260927090921-75687-747_certbot-webroot Created 
+ Network acepass-verify-20260927090921-75687-747_private Created 
+ Network acepass-verify-20260927090921-75687-747_private Created 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Creating 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Creating 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Created 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Created 
+ Container acepass-verify-20260927090921-75687-747-api-1 Creating 
+ Container acepass-verify-20260927090921-75687-747-api-1 Created 
+ Container acepass-verify-20260927090921-75687-747-web-1 Creating 
+ Container acepass-verify-20260927090921-75687-747-web-1 Created 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Starting 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Starting 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Started 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Started 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Waiting 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Waiting 
+ Container acepass-verify-20260927090921-75687-747-postgres-1 Healthy 
+ Container acepass-verify-20260927090921-75687-747-redis-1 Healthy 
+ Container acepass-verify-20260927090921-75687-747-api-1 Starting 
+ Container acepass-verify-20260927090921-75687-747-api-1 Started 
+ Container acepass-verify-20260927090921-75687-747-api-1 Waiting 
+ Container acepass-verify-20260927090921-75687-747-api-1 Healthy 
+ Container acepass-verify-20260927090921-75687-747-web-1 Starting 
+ Container acepass-verify-20260927090921-75687-747-web-1 Started 
+Operations to perform:
+  Apply all migrations: accounts, admin, analytics, audit, auth, contenttypes, exams, ingestion, knowledge, learning, practice, question_bank, sessions, tutoring
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying exams.0001_initial... OK
+  Applying ingestion.0001_initial... OK
+  Applying question_bank.0001_initial... OK
+  Applying analytics.0001_initial... OK
+  Applying analytics.0002_initial... OK
+  Applying analytics.0003_p0_1_grading_and_regrade_semantics... OK
+  Applying analytics.0004_p0_2_regrade_generation_sequence... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_p0_1_outbox_lease_and_recovery... OK
+  Applying exams.0002_initial... OK
+  Applying knowledge.0001_initial... OK
+  Applying learning.0001_initial... OK
+  Applying practice.0001_initial... OK
+  Applying learning.0002_initial... OK
+  Applying learning.0003_alter_studytask_options_and_more... OK
+  Applying practice.0002_p0_1_grading_and_regrade_semantics... OK
+  Applying sessions.0001_initial... OK
+  Applying tutoring.0001_initial... OK
+  Applying tutoring.0002_p0_2_tutor_job_finalized_at... OK
+已创建账户：verify-20260927090921-75687-747@acepass.test
+全栈登录 HTTP 200
+全栈检查通过：真实镜像、真实迁移、经 TLS 代理的真实登录与会话。
+full_stack_exit=0
+=== post-run isolation checks (16:09:57Z) ===
+sentinel: TEST_EXISTING_CONFIGURATION=preserve-this-existing-deployment
+certs dir: ls: infra/docker/certs: No such file or directory
+-- containers --
+-- volumes --
+-- networks --
+bridge
+host
+none
+-- images --
+acepass-backend:p0
+mikefarah/yq:4
+nginx:1.27-alpine
+postgres:16-alpine
+redis:7-alpine
+-- leftover run temp dirs: 0 --
+-- dev services --
+dev API 8000 alive
+dev Vite 5173 alive
+-- dev redis --
+PONG

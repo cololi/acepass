@@ -1,0 +1,94 @@
+2026-09-27 15:12:25,728 INFO celery.app.trace Task projection.refresh_paper_stats[710ca371-58f1-4ed9-bff1-756f724944b7] succeeded in 0.029836333000275772s: 'ok'
+2026-09-27 15:12:25,732 INFO celery.app.trace Task projection.refresh_paper_stats[cf669921-56e6-43e5-a849-85f28e0eece6] succeeded in 0.0031543750010314398s: 'ok'
+{"before_worker": {"status": "pending", "token_present": false}, "worker_result": [{"kind": "text", "text": "leased-worker-result"}], "provider_calls": 2, "response_blocks": [{"kind": "text", "text": "late-http-result"}], "final_blocks": [{"kind": "text", "text": "late-http-result"}], "assistant_texts": ["leased-worker-result"], "exposures": 1, "outbox_status": "processed", "processed": true, "finalized": true}
+F
+=================================== FAILURES ===================================
+___________ test_http_inline_must_not_overwrite_leased_worker_result ___________
+
+caller = <tests.conftest.ApiCaller object at 0x10dda9af0>
+project_a = <ExamProject: 演示项目A·综合能力>
+practice_item = <SessionItem: 6fc0087a-a23a-4839-9010-91139c8b1ed3#1>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ddabad0>
+settings = <pytest_django.fixtures.Settings object at 0x10dda9b80>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_http_inline_must_not_overwrite_leased_worker_result(caller, project_a, practice_item, monkeypatch, settings):
+        settings.ACEPASS_INLINE_TASKS = False
+        # Broker transport is irrelevant to this deterministic interleaving. The
+        # actual task below still claims and confirms the persisted outbox row.
+        monkeypatch.setattr(outbox, 'after_commit_dispatch', lambda **kwargs: None)
+        opened = caller.post(
+            f'/api/v1/projects/{project_a.id}/tutor-sessions',
+            {'session_item_id': str(practice_item.id), 'purpose': 'explanation'},
+            key='review-inline-tutor-session',
+        )
+        assert opened.status_code == 201, opened.content
+        tutor_id = opened.json()['tutor_session_id']
+        calls = []
+        seen = {}
+    
+        def interleaved_provider(provider, request, **kwargs):
+            assert connection.get_autocommit() is True
+            index = len(calls) + 1
+            calls.append(index)
+            if index == 1:
+                job = TutorJob.objects.get(tutor_session_id=tutor_id)
+                event = OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+                seen['before_worker'] = {'status': event.status, 'token_present': bool(event.claim_token)}
+                assert event.status == 'pending' and not event.claim_token
+                assert run_tutor_job(outbox_event_id=str(event.id), **event.payload) == 'succeeded'
+                job.refresh_from_db()
+                event.refresh_from_db()
+                seen['worker_result'] = job.result_blocks
+                assert job.result_blocks[0]['text'] == 'leased-worker-result'
+                assert event.status == 'processed' and event.processed_at is not None
+            text = 'late-http-result' if index == 1 else 'leased-worker-result'
+            body = {'explanation_blocks': [{'kind': 'text', 'text': text}],
+                    'citations': [], 'missing_information': [], 'suggested_next': []}
+            return providers.AiCallResult(payload=body, raw_text=json.dumps(body), is_stub=True)
+    
+        monkeypatch.setattr(providers, 'call_with_deadline', interleaved_provider)
+        response = caller.post(
+            f'/api/v1/projects/{project_a.id}/tutor-sessions/{tutor_id}/messages',
+            {'user_question': 'Explain this question'}, key='review-http-tutor-message',
+        )
+        assert response.status_code == 201, response.content
+        job = TutorJob.objects.get(id=response.json()['tutor_job_id'])
+        event = OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+        assistant_texts = list(TutorTurn.objects.filter(job=job, role='assistant').values_list('text', flat=True))
+        exposures = ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).count()
+        seen.update({'provider_calls': len(calls), 'response_blocks': response.json()['result_blocks'],
+                     'final_blocks': job.result_blocks, 'assistant_texts': assistant_texts,
+                     'exposures': exposures, 'outbox_status': event.status,
+                     'processed': event.processed_at is not None, 'finalized': job.finalized_at is not None})
+        print(json.dumps(seen, ensure_ascii=False))
+        assert len(calls) == 2 and len(assistant_texts) == 1 and exposures == 1
+        assert event.status == 'processed' and event.processed_at is not None
+        assert job.finalized_at is not None
+>       assert job.result_blocks[0]['text'] == assistant_texts[0] == 'leased-worker-result', (
+            'The late unleased HTTP caller must not overwrite the already finalized leased Worker result'
+        )
+E       AssertionError: The late unleased HTTP caller must not overwrite the already finalized leased Worker result
+E       assert 'late-http-result' == 'leased-worker-result'
+E         
+E         - leased-worker-result
+E         + late-http-result
+
+/tmp/acepass-c04-review.C1mbAm/test_http_tutor_lease.py:74: AssertionError
+------------------------------ Captured log setup ------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[710ca371-58f1-4ed9-bff1-756f724944b7] succeeded in 0.029836333000275772s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[cf669921-56e6-43e5-a849-85f28e0eece6] succeeded in 0.0031543750010314398s: 'ok'
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../../../../../tmp/acepass-c04-review.C1mbAm/test_http_tutor_lease.py::test_http_inline_must_not_overwrite_leased_worker_result
+1 failed, 3 warnings in 3.03s

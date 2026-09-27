@@ -1,0 +1,226 @@
+2026-09-27 15:15:20,810 INFO celery.app.trace Task projection.refresh_paper_stats[0a6035da-b83c-4629-8894-224ea19c56ea] succeeded in 0.029239249997772276s: 'ok'
+2026-09-27 15:15:20,814 INFO celery.app.trace Task projection.refresh_paper_stats[b622975b-b9ff-4195-8c49-eb0d48c5c746] succeeded in 0.0027610000033746473s: 'ok'
+2026-09-27 15:15:20,868 INFO celery.app.trace Task projection.rebuild_attempt_evidence[84c34c20-608a-41af-bfb0-3187fdaab68c] succeeded in 0.028586749998794403s: 'evidence_rows=6'
+2026-09-27 15:15:20,909 INFO celery.app.trace Task learning.on_attempt_graded[1ead60b7-77f9-4182-84e6-14e4a5edcfcd] succeeded in 0.039933583000674844s: 'paired_tasks=0'
+2026-09-27 15:15:20,951 INFO celery.app.trace Task learning.on_session_finished[8e95962a-5bb0-42ce-a7fd-801033d66c5f] succeeded in 0.028376207999826875s: 'ok'
+FINISH_INITIAL_STATUS 200 FINISH_INITIAL_BODY {'session_id': '737fc882-171f-448a-83fd-1417c660c053', 'project_id': 'f998aea1-ebec-425a-a668-8a535b765a40', 'subject_id': '009a788a-4561-484c-9a6e-3100b75cf483', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'items': [{'session_item_id': '89f3bcb1-4def-4405-901f-186c9795c85c', 'ordinal': 1, 'question_id': '2c381abe-261c-4903-bb9e-be1f2aa2c30f', 'question_type': 'true_false', 'display_label': 'A1-判断-1', 'max_score': '2.00', 'purpose': 'practice', 'first_delivered_at': '2026-09-27T15:15:20.819299+00:00', 'draft_revision': 0, 'has_draft': False, 'tutoring_allowed': True, 'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'can_reveal': True, 'grading_withheld': False, 'attempt': {'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'submitted_at': '2026-09-27T15:15:20.833790+00:00', 'elapsed_ms': 14, 'grading_revision': 1, 'grade': {'grade_event_id': '20551f26-6d88-4341-a0f7-b6574c3eac48', 'status': 'confirmed', 'method': 'deterministic', 'grading_revision': 1, 'confirmed_score': '2.00', 'max_score': '2.00', 'pending_max_score': '0.00', 'estimated_score': None, 'is_fully_confirmed': True, 'is_correct': True, 'parts': [{'score': '2.00', 'detail': {'outcome': 'correct'}, 'method': 'deterministic', 'status': 'confirmed', 'part_id': 'statement', 'max_score': '2.00'}], 'rule_version': 'p0-1', 'rule_snapshot': {'max_score': '2.00', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'question_type': 'true_false', 'spec_version_id': '530a4efd-ed45-4cc4-9836-52b06c2a8da0'}, 'grader_is_self': False, 'comment': '', 'superseded': False}, 'receipt_only': False}}], 'confirmed_score': '2.00', 'pending_max_score': '0.00', 'score_visible': True, 'score_hidden_reason': None, 'grading_withheld_session_item_ids': []}
+CURRENT_GET_STATUS 200 CURRENT_GET_BODY {'session_id': '737fc882-171f-448a-83fd-1417c660c053', 'project_id': 'f998aea1-ebec-425a-a668-8a535b765a40', 'subject_id': '009a788a-4561-484c-9a6e-3100b75cf483', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'items': [{'session_item_id': '89f3bcb1-4def-4405-901f-186c9795c85c', 'ordinal': 1, 'question_id': '2c381abe-261c-4903-bb9e-be1f2aa2c30f', 'question_type': 'true_false', 'display_label': 'A1-判断-1', 'max_score': '2.00', 'purpose': 'practice', 'first_delivered_at': '2026-09-27T15:15:20.819299+00:00', 'draft_revision': 0, 'has_draft': False, 'tutoring_allowed': True, 'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'can_reveal': False, 'grading_withheld': True, 'attempt': {'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'submitted_at': '2026-09-27T15:15:20.833790+00:00', 'elapsed_ms': 14, 'grading_revision': 1, 'grade': None, 'receipt_only': True}}], 'confirmed_score': None, 'pending_max_score': None, 'score_visible': False, 'score_hidden_reason': '该会话包含正在验证中的同源内容：为避免泄露答案，验证结束前不显示本会话的分数。无关会话不受影响。', 'grading_withheld_session_item_ids': ['89f3bcb1-4def-4405-901f-186c9795c85c']}
+FINISH_REPLAY_STATUS 200 FINISH_REPLAY_BODY {'session_id': '737fc882-171f-448a-83fd-1417c660c053', 'project_id': 'f998aea1-ebec-425a-a668-8a535b765a40', 'subject_id': '009a788a-4561-484c-9a6e-3100b75cf483', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'items': [{'attempt': {'grade': {'parts': [{'score': '2.00', 'detail': {'outcome': 'correct'}, 'method': 'deterministic', 'status': 'confirmed', 'part_id': 'statement', 'max_score': '2.00'}], 'method': 'deterministic', 'status': 'confirmed', 'comment': '', 'max_score': '2.00', 'is_correct': True, 'superseded': False, 'rule_version': 'p0-1', 'rule_snapshot': {'max_score': '2.00', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'question_type': 'true_false', 'spec_version_id': '530a4efd-ed45-4cc4-9836-52b06c2a8da0'}, 'grade_event_id': '20551f26-6d88-4341-a0f7-b6574c3eac48', 'grader_is_self': False, 'confirmed_score': '2.00', 'estimated_score': None, 'grading_revision': 1, 'pending_max_score': '0.00', 'is_fully_confirmed': True}, 'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'elapsed_ms': 14, 'receipt_only': False, 'submitted_at': '2026-09-27T15:15:20.833790+00:00', 'grading_revision': 1}, 'ordinal': 1, 'purpose': 'practice', 'has_draft': False, 'max_score': '2.00', 'attempt_id': 'de86a783-125b-420c-841b-3dad31d20ad4', 'can_reveal': True, 'question_id': '2c381abe-261c-4903-bb9e-be1f2aa2c30f', 'display_label': 'A1-判断-1', 'question_type': 'true_false', 'draft_revision': 0, 'session_item_id': '89f3bcb1-4def-4405-901f-186c9795c85c', 'grading_withheld': False, 'tutoring_allowed': True, 'first_delivered_at': '2026-09-27T15:15:20.819299+00:00'}], 'confirmed_score': '2.00', 'pending_max_score': '0.00', 'score_visible': True, 'score_hidden_reason': None, 'grading_withheld_session_item_ids': []}
+FF2026-09-27 15:15:21,945 INFO celery.app.trace Task projection.refresh_paper_stats[04593c96-d2be-4b87-a662-56b3e46f8b53] succeeded in 0.004111040994757786s: 'ok'
+2026-09-27 15:15:21,949 INFO celery.app.trace Task projection.refresh_paper_stats[1448db7c-82a0-4846-999f-c9f8954cbe31] succeeded in 0.003211374998500105s: 'ok'
+{"before_worker": {"status": "pending", "token_present": false}, "second_consumer_verdict": "succeeded", "worker_result": [{"kind": "text", "text": "leased-worker-result"}], "expected_final_text": "leased-worker-result", "provider_calls": 2, "response_blocks": [{"kind": "text", "text": "late-http-result"}], "final_blocks": [{"kind": "text", "text": "late-http-result"}], "assistant_texts": ["leased-worker-result"], "exposures": 1, "outbox_status": "processed", "processed": true, "finalized": true}
+F
+=================================== FAILURES ===================================
+_______ test_finished_session_replay_rechecks_current_verification_gate ________
+
+caller = <tests.conftest.ApiCaller object at 0x110c254c0>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_finished_session_replay_rechecks_current_verification_gate(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        practice = start_session(caller, project_a, subject_a1, version.question, key='finished-practice')
+        item_id = practice['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        result = submit(caller, project_a, item_id, {'type': 'true_false', 'value': True}, key='answer')
+        assert result.status_code == 200
+        finish_url = f"/api/v1/projects/{project_a.id}/practice-sessions/{practice['session_id']}/finish"
+        finished = caller.post(finish_url, {}, key='finish-practice')
+        assert finished.status_code == 200
+        assert finished.json()['confirmed_score'] is not None
+        verification = start_session(caller, project_a, subject_a1, version.question, mode='verification', key='verify')
+        present(caller, project_a, verification['items'][0]['session_item_id'])
+        current = caller.get(f"/api/v1/projects/{project_a.id}/practice-sessions/{practice['session_id']}")
+        assert current.status_code == 200
+        assert current.json()['confirmed_score'] is None
+        assert current.json()['items'][0]['attempt']['grade'] is None
+        replay = caller.post(finish_url, {}, key='finish-practice')
+        print('FINISH_INITIAL_STATUS', finished.status_code, 'FINISH_INITIAL_BODY', finished.json())
+        print('CURRENT_GET_STATUS', current.status_code, 'CURRENT_GET_BODY', current.json())
+        print('FINISH_REPLAY_STATUS', replay.status_code, 'FINISH_REPLAY_BODY', replay.json())
+>       assert replay.status_code == 403 or (
+            replay.json().get('confirmed_score') is None
+            and replay.json()['items'][0]['attempt']['grade'] is None
+        ), replay.json()
+E       AssertionError: {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'grading_hidden': False, ...}
+E       assert (200 == 403 or ('2.00' is None))
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+E        +  and   '2.00' = <built-in method get of dict object at 0x11161a800>('confirmed_score')
+E        +    where <built-in method get of dict object at 0x11161a800> = {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'grading_hidden': False, ...}.get
+E        +      where {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:15:20.764626+00:00', 'finished_at': '2026-09-27T15:15:20.914212+00:00', 'grading_hidden': False, ...} = functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x110cba3c0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x110cba3c0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">) = <HttpResponse status_code=200, "application/json; charset=utf-8">.json
+
+docs/review/2026-09-27/p02-final-independent/test_finish_replay.py:28: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[0a6035da-b83c-4629-8894-224ea19c56ea] succeeded in 0.029239249997772276s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[b622975b-b9ff-4195-8c49-eb0d48c5c746] succeeded in 0.0027610000033746473s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[84c34c20-608a-41af-bfb0-3187fdaab68c] succeeded in 0.028586749998794403s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[1ead60b7-77f9-4182-84e6-14e4a5edcfcd] succeeded in 0.039933583000674844s: 'paired_tasks=0'
+INFO     celery.app.trace:trace.py:128 Task learning.on_session_finished[8e95962a-5bb0-42ce-a7fd-801033d66c5f] succeeded in 0.028376207999826875s: 'ok'
+_______ test_old_content_version_regrade_keeps_newer_generation_evidence _______
+
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_old_content_version_regrade_keeps_newer_generation_evidence(project_a, subject_a1):
+        now = timezone.now()
+        qv1 = published(subject_a1, "true_false")
+        old_item, _old_attempt = _service_attempt(project_a, subject_a1, qv1, now - timedelta(minutes=3), now - timedelta(minutes=2))
+        old = request_regrade(question=qv1.question, target_answer_key_version=old_item.answer_key_version,
+                              actor=project_a.owner, reason="Queued against the original content version")
+    
+        # A new content revision of the same stable question, through ordinary publish services.
+        content = deepcopy(qv1.content)
+        content["blocks"][0]["text"] += "（文字校订版）"
+        qv2 = content_services.create_question_version_draft(
+            qv1.question, question_type=qv1.question_type, content=content,
+            actor=project_a.owner, practice_max_score=qv1.practice_max_score,
+            revision_reason="Editorial correction while old regrade remains queued")
+        key2 = AnswerKeyVersion.objects.create(
+            question_version=qv2, version=1,
+            answer_payload=deepcopy(old_item.answer_key_version.answer_payload),
+            verification_status="checked", checked_by=project_a.owner,
+            check_basis="Independent C02 regression fixture")
+        content_services.replace_knowledge_mappings(
+            qv2, [{"node_id": str(row.node_id), "is_primary": row.is_primary,
+                   "score_weight": row.score_weight}
+                  for row in qv1.knowledge_mappings.all()], actor=project_a.owner)
+        qv2 = content_services.publish_question_version(qv2, actor=project_a.owner)
+        _item2, attempt2 = _service_attempt(project_a, subject_a1, qv2, now - timedelta(minutes=1), now)
+        assert attempt2.session_item.question_version_id == qv2.id
+    
+        new = request_regrade(question=qv2.question, target_answer_key_version=key2,
+                              actor=project_a.owner, reason="Newer regrade against corrected content")
+        assert new.generation > old.generation
+        execute_regrade_run(str(new.id))
+        rebuild_for_attempt(str(attempt2.id))  # apply the ordinary asynchronous evidence projection
+        attempt2.refresh_from_db()
+        assert attempt2.applied_regrade_generation == new.generation
+        grade_id = attempt2.current_grade_event_id
+        active_ids = set(LearningEvidence.objects.filter(attempt=attempt2, is_active=True).values_list("id", flat=True))
+        assert active_ids
+    
+        execute_regrade_run(str(old.id))
+        attempt2.refresh_from_db()
+        old.refresh_from_db()
+        assert attempt2.current_grade_event_id == grade_id
+        assert attempt2.applied_regrade_generation == new.generation
+        remaining_ids = set(LearningEvidence.objects.filter(attempt=attempt2, is_active=True).values_list("id", flat=True))
+>       assert remaining_ids == active_ids, (
+            f"Old generation {old.generation} invalidated newer generation {new.generation} evidence: "
+            f"before={len(active_ids)} after={len(remaining_ids)}, "
+            f"old.invalidated_evidence={old.invalidated_evidence}, old.stale_skipped={old.stale_skipped_attempts}"
+        )
+E       AssertionError: Old generation 1 invalidated newer generation 2 evidence: before=6 after=0, old.invalidated_evidence=6, old.stale_skipped=0
+E       assert set() == {UUID('039d46...9063dc98eef')}
+E         
+E         Extra items in the right set:
+E         UUID('4735b567-4d47-47ca-ad6f-3471afaca2d9')
+E         UUID('039d4662-6043-4e81-8688-990e3155b003')
+E         UUID('be57618c-a7f3-43b6-bdd4-e9063dc98eef')
+E         UUID('954d0a44-6d82-462d-93f2-0d1df6ca8e54')
+E         UUID('85e7dc41-eca5-4d44-9f23-99a7d08da6e0')
+E         UUID('1fd9b85a-8ef5-4aa0-b860-1079b4f6d30f')
+E         Use -v to get more diff
+
+docs/review/2026-09-27/p02-final-independent/test_c02_version_branch.py:64: AssertionError
+___________ test_http_inline_must_not_overwrite_leased_worker_result ___________
+
+caller = <tests.conftest.ApiCaller object at 0x110b887a0>
+project_a = <ExamProject: 演示项目A·综合能力>
+practice_item = <SessionItem: bd15e415-41d7-4b8d-bc07-8984be4f4c66#1>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x110ea7a10>
+settings = <pytest_django.fixtures.Settings object at 0x110ea63c0>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_http_inline_must_not_overwrite_leased_worker_result(caller, project_a, practice_item, monkeypatch, settings):
+        settings.ACEPASS_INLINE_TASKS = False
+        # Broker transport is irrelevant to this deterministic interleaving. The
+        # actual task below still claims and confirms the persisted outbox row.
+        monkeypatch.setattr(outbox, 'after_commit_dispatch', lambda **kwargs: None)
+        opened = caller.post(
+            f'/api/v1/projects/{project_a.id}/tutor-sessions',
+            {'session_item_id': str(practice_item.id), 'purpose': 'explanation'},
+            key='review-inline-tutor-session',
+        )
+        assert opened.status_code == 201, opened.content
+        tutor_id = opened.json()['tutor_session_id']
+        calls = []
+        seen = {}
+    
+        def interleaved_provider(provider, request, **kwargs):
+            assert connection.get_autocommit() is True
+            index = len(calls) + 1
+            calls.append(index)
+            if index == 1:
+                job = TutorJob.objects.get(tutor_session_id=tutor_id)
+                event = OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+                seen['before_worker'] = {'status': event.status, 'token_present': bool(event.claim_token)}
+                verdict = run_tutor_job(outbox_event_id=str(event.id), **event.payload)
+                seen['second_consumer_verdict'] = verdict
+                job.refresh_from_db()
+                event.refresh_from_db()
+                seen['worker_result'] = job.result_blocks
+                if verdict == 'succeeded':
+                    # The second consumer finished first: its finalized result wins.
+                    assert job.result_blocks[0]['text'] == 'leased-worker-result'
+                    assert event.status == 'processed' and event.processed_at is not None
+                    seen['expected_final_text'] = 'leased-worker-result'
+                else:
+                    # Correct alternative: the HTTP caller owns the same claim, so
+                    # duplicate delivery does not invoke the provider at all.
+                    assert verdict == 'skipped_lease_not_held', verdict
+                    seen['expected_final_text'] = 'late-http-result'
+            text = 'late-http-result' if index == 1 else 'leased-worker-result'
+            body = {'explanation_blocks': [{'kind': 'text', 'text': text}],
+                    'citations': [], 'missing_information': [], 'suggested_next': []}
+            return providers.AiCallResult(payload=body, raw_text=json.dumps(body), is_stub=True)
+    
+        monkeypatch.setattr(providers, 'call_with_deadline', interleaved_provider)
+        response = caller.post(
+            f'/api/v1/projects/{project_a.id}/tutor-sessions/{tutor_id}/messages',
+            {'user_question': 'Explain this question'}, key='review-http-tutor-message',
+        )
+        assert response.status_code == 201, response.content
+        job = TutorJob.objects.get(id=response.json()['tutor_job_id'])
+        event = OutboxEvent.objects.get(dedupe_key=f'tutor-job:{job.id}')
+        assistant_texts = list(TutorTurn.objects.filter(job=job, role='assistant').values_list('text', flat=True))
+        exposures = ExposureEvent.objects.filter(detail__tutor_job_id=str(job.id)).count()
+        seen.update({'provider_calls': len(calls), 'response_blocks': response.json()['result_blocks'],
+                     'final_blocks': job.result_blocks, 'assistant_texts': assistant_texts,
+                     'exposures': exposures, 'outbox_status': event.status,
+                     'processed': event.processed_at is not None, 'finalized': job.finalized_at is not None})
+        print(json.dumps(seen, ensure_ascii=False))
+        assert len(assistant_texts) == 1 and exposures == 1
+        assert event.status == 'processed' and event.processed_at is not None
+        assert job.finalized_at is not None
+>       assert job.result_blocks[0]['text'] == assistant_texts[0] == seen['expected_final_text'], (
+            'The final job, HTTP response and assistant message must preserve the result '
+            'committed by the successful lease owner, without a stale caller overwrite'
+        )
+E       AssertionError: The final job, HTTP response and assistant message must preserve the result committed by the successful lease owner, without a stale caller overwrite
+E       assert 'late-http-result' == 'leased-worker-result'
+E         
+E         - leased-worker-result
+E         + late-http-result
+
+docs/review/2026-09-27/p02-final-independent/test_http_tutor_lease.py:86: AssertionError
+------------------------------ Captured log setup ------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[04593c96-d2be-4b87-a662-56b3e46f8b53] succeeded in 0.004111040994757786s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[1448db7c-82a0-4846-999f-c9f8954cbe31] succeeded in 0.003211374998500105s: 'ok'
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_finished_session_replay_rechecks_current_verification_gate
+FAILED backend::test_old_content_version_regrade_keeps_newer_generation_evidence
+FAILED backend::test_http_inline_must_not_overwrite_leased_worker_result - As...
+3 failed, 3 warnings in 4.07s

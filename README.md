@@ -1,10 +1,19 @@
 # AcePass
 
+> **2026-09-27 P0.2 最后四组遗漏修复（C01/C02/C04/C05，起点 `2c87e0c`，提交 `7285991`）。**
+> 后端 **203 passed**（含本轮迁入 9 条回归）、复验者三条原始反例原样 **3 passed**、上轮有效反例原样
+> **9 passed / 1 deselected**、隔离浏览器 **36 passed**、归档浏览器 **2 passed**、真故障演练 **ok=true**、
+> 仅提交内容的干净副本下代理组件与真实全栈 HTTPS/CSRF 登录通过且既有配置哨兵保持不变。
+> **真实 provider、真实隔夜、真实学习效果与 GitHub Actions 实际执行仍未验证。**
+> 逐条结果见 [15 最后四组遗漏修复](docs/15-p0-2-final-four-gaps-repair.md)，证据见
+> [p02-final-gaps](docs/review/2026-09-27/p02-final-gaps/README.md)。
+
 > **2026-09-27 P0.2 定向补漏完成（C01—C05）。** 后端 **194 passed**（含本轮迁入 17 条回归）、归档交叉反例
 > **9/10 原样通过**（第 10 条按"安全拒绝歧义历史"调整后作废，业务断言已迁入正式套件）、浏览器 **36 passed**、
 > 归档浏览器 **2 passed**、真故障演练 **ok=true**（含同一 event 重复投递与旧消费者超时返回）、代理组件与全栈
-> 登录发布门槛在本机 Docker 实际执行通过。**真实 provider、真实隔夜与 GitHub Actions 实际执行仍未验证。**
-> 逐条结果见 [13 补漏报告](docs/13-p0-2-remaining-repair.md)，证据见 [p02-remaining](docs/review/2026-09-27/p02-remaining/README.md)。
+> 登录发布门槛在本机 Docker 实际执行通过。逐条结果见 [13 补漏报告](docs/13-p0-2-remaining-repair.md)，证据见
+> [p02-remaining](docs/review/2026-09-27/p02-remaining/README.md)。该轮之后的独立复验（`2c87e0c`）保留的
+> 四处遗漏已在 [15](docs/15-p0-2-final-four-gaps-repair.md) 关闭。
 
 > **P0.2 复验（c168583）曾保留五组补漏。** 177后端、11归档反例、36浏览器、2归档浏览器均通过；交叉边界仍有失败。见 [12复验报告](docs/12-p0-2-independent-review.md)。下文保留各次交付记录。
 

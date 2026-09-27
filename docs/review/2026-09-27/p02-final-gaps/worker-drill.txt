@@ -1,0 +1,24 @@
+{"step": "environment", "database": "acepass_acceptance_p02_final_gaps_drill", "redis_url": "redis://127.0.0.1:6394/0", "redis_instance": {"host": "127.0.0.1", "port": 6394, "db": 0, "redis_version": "8.10.2", "run_id": "455b49aeddb3713f2720e61941bcfda142c1e31d", "mode": "dedicated_instance", "keys_before_drill": 39}, "inline": false, "outbox_lease_seconds": 5, "ai_provider": "stub"}
+{"step": "scope", "project": "验收项目A·基础能力", "subject": "验收科目一·数量关系"}
+{"step": "baseline", "attempts": 2, "evidence": 0, "states": 0, "study_tasks": 2, "outbox": 4}
+{"step": "pre_existing_unresolved", "count": 4}
+{"step": "broker_flushed_before_drill", "queue_depth": 0, "real": true}
+{"step": "attempt_submitted", "attempt_id": "8aa4a68e-76f7-4c92-8702-083fc2706c80", "grade_status": "confirmed", "worker": "drill-primary"}
+{"step": "worker_consumes_attempt_events", "ok": true, "evidence_rows": 6, "paired_tasks": 0, "grade_event": "6da2485f-d893-4ce3-9b9b-fe8bd0faea8a", "real": true}
+{"step": "worker_consumes_reconcile_plan", "ok": true, "status": "processed", "processed_at": "2026-09-27 16:03:12.746635+00:00", "attempts": 1, "real": true}
+{"step": "worker_stopped_for_flush", "worker": "drill-primary", "killed_with": "SIGKILL", "real": true}
+{"step": "flush_prepared", "attempt_id": "3812a191-3617-459d-b64a-feb48d62f48e", "rows": ["eb6770ef-5ae7-47b8-a24e-cdfe8901ab9a", "0cafa166-9d47-4fa7-a26c-94adfcf94058"], "queue_depth_before_flush": 2, "real": true}
+{"step": "redis_flushed_for_real", "flushed": true, "queue_depth_after_flush": 0, "real": true}
+{"step": "flush_recovery_scan", "delivered": 2, "lease_seconds": 5, "real": true}
+{"step": "redis_flush_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "real": true}
+{"step": "worker_killed_mid_flight", "worker": "drill-primary", "signal": 9, "rows": 2, "caught_while_processing": true, "unconfirmed_after_kill": 2, "real": true}
+{"step": "killed_worker_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "lease_seconds": 5, "real": true}
+{"step": "second_consumer_started", "workers": 2, "real": true}
+{"step": "stale_consumer_holds_lease", "outbox_event_id": "301d9216-5987-4aa8-9105-68898c338d45", "status": "processing", "lease_seconds": 5, "real": true}
+{"step": "duplicate_delivery_sent", "outbox_event_id": "301d9216-5987-4aa8-9105-68898c338d45", "topic": "tutoring.run_job", "real": true}
+2026-09-27 16:03:43,271 INFO apps.tutoring tutor job 3b2a13dc-d8ba-4cae-ab22-9b889915e1fe: stale consumer did not store its result
+{"step": "stale_consumer_takeover", "ok": true, "duplicate_delivery": "observed_by_second_consumer", "stale_consumer_returned": true, "stale_consumer_result_blocks": [{"kind": "text", "text": "【stub 讲解】这是测试/演示模式的占位讲解，不是真实模型输出。"}, {"kind": "text", "text": "请以已审核的人工解析为准；系统不会把 stub 内容当作真实结果。"}], "assistant_turns": 1, "exposures": 1, "job_status": "succeeded", "outbox_status": "processed", "real": true}
+{"step": "final_state", "unresolved": {}, "attempts": 5, "evidence": 30, "states": 3, "study_tasks": 34, "review_tasks": 1, "outbox": 12, "processed": 12}
+{"step": "workers_stopped_in_finally", "workers": ["drill-primary", "drill-secondary"], "real": true}
+{"note": "report written to /tmp/acepass-drill-final-gaps.json"}
+{"ok": true}

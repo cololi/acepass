@@ -1,0 +1,46 @@
+2026-09-27 15:14:08,774 INFO celery.app.trace Task projection.refresh_paper_stats[4fcaf782-11fc-4ab8-a482-cb53f95f842d] succeeded in 0.03069508299813606s: 'ok'
+2026-09-27 15:14:08,778 INFO celery.app.trace Task projection.refresh_paper_stats[41bf0b4e-7ae1-47b1-9263-aa4b31757a26] succeeded in 0.002912625001044944s: 'ok'
+2026-09-27 15:14:08,834 INFO celery.app.trace Task projection.rebuild_attempt_evidence[e82c9e03-8417-4068-80f5-307f520d1086] succeeded in 0.02984983299393207s: 'evidence_rows=6'
+2026-09-27 15:14:08,876 INFO celery.app.trace Task learning.on_attempt_graded[a52fe7a5-9689-4332-898c-816889a0d46a] succeeded in 0.041848792003293056s: 'paired_tasks=0'
+2026-09-27 15:14:08,907 WARNING django.request Forbidden: /api/v1/projects/4fc9b535-a7d2-4d49-9471-325706a6e09f/attempts/1871e2d7-e74b-4864-bdb4-df6c3003d1d3
+.2026-09-27 15:14:09,362 INFO celery.app.trace Task projection.refresh_paper_stats[df762e6c-ffa0-4706-a594-f0878e697d76] succeeded in 0.0033846669975901023s: 'ok'
+2026-09-27 15:14:09,365 INFO celery.app.trace Task projection.refresh_paper_stats[1ffd47be-5da0-431d-afe3-c33457d58ffd] succeeded in 0.002165541998692788s: 'ok'
+2026-09-27 15:14:09,411 INFO celery.app.trace Task projection.rebuild_attempt_evidence[e034872d-0333-4ee4-a51c-4d0f06bc402c] succeeded in 0.024595915994723327s: 'evidence_rows=6'
+2026-09-27 15:14:09,445 INFO celery.app.trace Task learning.on_attempt_graded[2de5d97f-7ccd-40c0-b66a-66ea01c5f61f] succeeded in 0.03386154100007843s: 'paired_tasks=0'
+.2026-09-27 15:14:09,936 INFO celery.app.trace Task projection.refresh_paper_stats[502fa54a-54c3-4a0b-8c0b-c9b8c049b27b] succeeded in 0.0028046250008628704s: 'ok'
+2026-09-27 15:14:09,939 INFO celery.app.trace Task projection.refresh_paper_stats[9c6e579c-d5f8-41f0-bb8c-8524c17b99af] succeeded in 0.002420666001853533s: 'ok'
+2026-09-27 15:14:09,984 INFO celery.app.trace Task projection.rebuild_attempt_evidence[9eeb2541-2602-4f49-85df-b0041f90e3d4] succeeded in 0.022400665999157354s: 'evidence_rows=6'
+2026-09-27 15:14:10,019 INFO celery.app.trace Task learning.on_attempt_graded[16397ccf-06ea-4d49-961b-ffb6cf71488c] succeeded in 0.03526554199925158s: 'paired_tasks=0'
+.2026-09-27 15:14:10,491 INFO celery.app.trace Task projection.refresh_paper_stats[9329ebb8-49df-4e49-8428-9974a658a20a] succeeded in 0.002774790998955723s: 'ok'
+2026-09-27 15:14:10,494 INFO celery.app.trace Task projection.refresh_paper_stats[abd15940-9152-468d-84cb-e98abea5a479] succeeded in 0.002183042000979185s: 'ok'
+2026-09-27 15:14:10,539 INFO celery.app.trace Task projection.rebuild_attempt_evidence[4f1fed18-4e09-4927-856c-21547ae723b2] succeeded in 0.02312858300138032s: 'evidence_rows=6'
+2026-09-27 15:14:10,572 INFO celery.app.trace Task learning.on_attempt_graded[03c2c473-cc5b-4157-a7a3-f6bd9edb7957] succeeded in 0.03279287499753991s: 'paired_tasks=0'
+.2026-09-27 15:14:11,079 INFO celery.app.trace Task projection.refresh_paper_stats[737f22bc-a6b0-4b74-bce4-97bd9ddf6827] succeeded in 0.0033732910014805384s: 'ok'
+2026-09-27 15:14:11,082 INFO celery.app.trace Task projection.refresh_paper_stats[721a5389-d4c0-40e5-b8f5-2b5fe1950de8] succeeded in 0.002298958002938889s: 'ok'
+2026-09-27 15:14:11,132 INFO celery.app.trace Task tutoring.run_job[c5f57e59-f8dd-40a2-a1dc-7aff9b8efcfd] succeeded in 0.004076000004715752s: 'succeeded'
+2026-09-27 15:14:11,157 WARNING django.request Forbidden: /api/v1/projects/50f73dda-be47-4cb6-91e0-bfee3d3567ff/tutor-jobs/99cee958-ab34-4780-aeec-43e8d0e6a9fb
+2026-09-27 15:14:11,164 WARNING django.request Forbidden: /api/v1/projects/50f73dda-be47-4cb6-91e0-bfee3d3567ff/tutor-sessions/b1ed656f-54ce-4a8e-8039-32c9f7516c52/messages
+.EARLY_C {'B_to_C_first_present_hours': 23, 'B_to_C_submit_hours': 25, 'first_delivered_at': '2026-09-27T13:14:11.618817+00:00', 'submitted_at': '2026-09-27T15:14:11.618817+00:00', 'qualifies': False, 'detail': {'delay_anchor_at': '2026-09-26T14:14:11.618817+00:00', 'anchor_source': 'prior_attempt', 'delay_hours_required': 24, 'purpose': 'practice', 'delay_evaluated_at': '2026-09-27T13:14:11.618817+00:00', 'delay_evaluated_from': 'first_presentation'}, 'reasons': ['距最近相关训练/教学仅 23.00 小时，未达到 24 小时']}
+.2026-09-27 15:14:12,064 INFO apps.practice.attempts refused regrade generation=1 cannot revoke attempt=db4f0f9a-42eb-47fd-aa09-8ce9c3f24d5d applied_generation=2
+2026-09-27 15:14:12,067 WARNING apps.analytics.reports regrade run refused run=2c1a3051-3244-41dd-8a0e-ea594ce48229 generation=1 refused=0 newer_generation_kept=1 details={'reason': 'regrade_target_untrusted', 'answer_key_version_id': 'b0fe9883-bf4e-4ca4-ac62-208102b2a589', 'verification_status': 'disputed', 'is_disputed': True}
+STALE_DISPUTED {'old_generation': 1, 'new_generation': 2, 'watermark': 2, 'grade_status': 'confirmed', 'current_answer_version': 3, 'current_key_disputed': False}
+.2026-09-27 15:14:12,390 INFO celery.app.trace Task projection.refresh_paper_stats[2acc6e77-90d7-4137-b0bd-f6590df5794c] succeeded in 0.0033617500012042s: 'ok'
+2026-09-27 15:14:12,393 INFO celery.app.trace Task projection.refresh_paper_stats[b0f74d97-0871-4957-8792-36ddc6d04369] succeeded in 0.0033580829986021854s: 'ok'
+{'retry_result': 'succeeded', 'outbox_status': 'processed', 'processed': True, 'job_status': 'succeeded', 'assistant_turns': 1, 'exposures': 1}
+.2026-09-27 15:14:12,831 INFO celery.app.trace Task projection.refresh_paper_stats[cd960b1b-7616-4ac7-8b24-c919151c1a10] succeeded in 0.002310249998117797s: 'ok'
+2026-09-27 15:14:12,833 INFO celery.app.trace Task projection.refresh_paper_stats[df68528d-03b3-4080-a64d-1912d95a3994] succeeded in 0.0015428339975187555s: 'ok'
+2026-09-27 15:14:12,861 INFO apps.tutoring tutor job 76e0144c-bb11-4dde-8922-8c9b4d549f44: stale consumer did not store its result
+{'provider_calls': 2, 'final_blocks': [{'kind': 'text', 'text': 'consumer-2'}], 'outbox': 'processed', 'assistant_turns': 1, 'exposures': 1}
+.
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 1 deselected, 3 warnings in 7.02s

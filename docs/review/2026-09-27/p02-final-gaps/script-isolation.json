@@ -1,0 +1,63 @@
+{
+  "source_paths": [
+    "scripts/verify_proxy.sh",
+    "infra/docker/.env.example",
+    ".github/workflows/ci.yml"
+  ],
+  "runs": [
+    {
+      "mode": "full-stack",
+      "safe_shell_shim": true,
+      "shim_fail_pattern": "build api",
+      "script_exit_code": 42,
+      "stdout_tail": [
+        "== 范围：全栈（真实 api/postgres/redis/web + 经 HTTPS 代理的真实登录）。==",
+        "== 本次运行：Compose 项目 acepass-verify-20260927090904-75461-5038，镜像 acepass-verify-20260927090904-75461-5038，临时目录 /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090904-75461-5038.jidTg7 ==",
+        "构建真实应用镜像..."
+      ],
+      "docker_calls": [
+        "compose --project-name acepass-verify-20260927090904-75461-5038 --env-file /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090904-75461-5038.jidTg7/verify.env -f infra/docker/docker-compose.yml build api",
+        "compose --project-name acepass-verify-20260927090904-75461-5038 --env-file /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090904-75461-5038.jidTg7/verify.env -f infra/docker/docker-compose.yml config --format json",
+        "compose --project-name acepass-verify-20260927090904-75461-5038 --env-file /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090904-75461-5038.jidTg7/verify.env -f infra/docker/docker-compose.yml down --remove-orphans --volumes",
+        "image rm acepass-backend:acepass-verify-20260927090904-75461-5038"
+      ],
+      "default_project_acepass_used": false,
+      "down_targets_only_own_project": true,
+      "existing_env_preserved": true,
+      "template_overwrote_existing_env": false,
+      "project_env_file_used": false,
+      "temp_workdir_removed": true,
+      "image_removals": [
+        "image rm acepass-backend:acepass-verify-20260927090904-75461-5038"
+      ],
+      "removals_are_own_tag_only": true,
+      "fixture": "/var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T/acepass-c05-full-stack-5hvlykj8/repo"
+    },
+    {
+      "mode": "component",
+      "safe_shell_shim": true,
+      "shim_fail_pattern": "network create",
+      "script_exit_code": 42,
+      "stdout_tail": [
+        "== 范围：代理组件（nginx + 真实 frontend/dist + 桩上游）。不证明 AcePass API 登录。==",
+        "== 本次运行：项目/资源前缀 20260927090904-75496-4555，临时目录 /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927090904-75496-4555.pLVr7A =="
+      ],
+      "docker_calls": [
+        "network create acepass-proxy-20260927090904-75496-4555",
+        "rm -f acepass-proxy-20260927090904-75496-4555-web acepass-proxy-20260927090904-75496-4555-upstream",
+        "network rm acepass-proxy-20260927090904-75496-4555"
+      ],
+      "default_project_acepass_used": false,
+      "down_targets_only_own_project": true,
+      "existing_env_preserved": true,
+      "template_overwrote_existing_env": false,
+      "project_env_file_used": false,
+      "temp_workdir_removed": true,
+      "image_removals": [],
+      "removals_are_own_tag_only": true,
+      "fixture": "/var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T/acepass-c05-component-836lbvad/repo"
+    }
+  ]
+}
+
+C05 isolation evidence: ok

@@ -1,11 +1,19 @@
 # AcePass 实施状态
 
-> **最新：P0.2 定向补漏已完成 C01—C05（2026-09-27，起点 c168583/bfbbfbd）。** 后端 194 passed、
+> **最新：P0.2 最后四组遗漏（C01/C02/C04/C05）已修复（2026-09-27，起点 `2c87e0c`，提交 `7285991`）。**
+> 正式后端 **203 passed**（194 + 本轮迁入 9 条）、复验者三条原始反例原样 **3 passed**、上轮有效反例原样
+> **9 passed / 1 deselected**、隔离浏览器 **36 passed**、归档浏览器 **2 passed**、真故障演练 **ok=true**、
+> 仅提交内容的干净副本下代理组件与真实全栈 HTTPS/CSRF 登录通过且环境哨兵保持不变。
+> 逐条结果见 [15 最后四组遗漏修复](15-p0-2-final-four-gaps-repair.md)，证据见
+> [p02-final-gaps](review/2026-09-27/p02-final-gaps/README.md)。**真实 provider、真实隔夜、
+> 真实学习效果与 GitHub Actions 实际执行仍未验证。**
+
+> **P0.2 定向补漏已完成 C01—C05（2026-09-27，起点 c168583/bfbbfbd）。** 后端 194 passed、
 > 归档交叉反例 9/10 原样通过（第 10 条按"安全拒绝歧义历史"调整后作废，业务断言已迁入）、浏览器 36 passed、
 > 归档浏览器 2 passed、真故障演练 ok=true、代理组件与全栈登录门槛本机 Docker 通过。
 > 逐条结果见 [13 补漏报告](13-p0-2-remaining-repair.md)，证据见
-> [p02-remaining](review/2026-09-27/p02-remaining/README.md)。**真实 provider、真实隔夜与 GitHub Actions
-> 实际执行仍未验证。**
+> [p02-remaining](review/2026-09-27/p02-remaining/README.md)。该轮之后的独立复验（`2c87e0c`）保留了
+> C01/C02/C04/C05 的四处遗漏，已在 [15](15-p0-2-final-four-gaps-repair.md) 关闭。
 
 > **P0.2/c168583 独立复验曾保留 C01—C05。** 完整结论见 [12复验报告](12-p0-2-independent-review.md)；下文历史状态不替代该结果。
 

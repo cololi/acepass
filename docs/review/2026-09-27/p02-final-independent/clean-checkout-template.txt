@@ -1,0 +1,5 @@
+.gitignore:3:.env.*	infra/docker/.env.example
+HEAD=2c87e0cab42652aa72e6515aa9f2aea3d2fd6a22
+tracked_template=False
+archive_template_exists=False
+clean-export full-stack exit=1 (see proxy-full-stack.txt)

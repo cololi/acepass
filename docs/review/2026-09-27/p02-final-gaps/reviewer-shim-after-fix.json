@@ -1,0 +1,13 @@
+{
+  "mode": "safe-shell-shim-no-real-docker",
+  "fixture": "/var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T/acepass-proxy-isolation-shim-evuvlouk",
+  "intentional_stop_at_build_exit_code": 127,
+  "docker_calls": [
+    "compose --project-name acepass-verify-20260927091415-77326-10569 --env-file /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927091415-77326-10569.XUFFr5/verify.env -f infra/docker/docker-compose.yml config --format json",
+    "compose --project-name acepass-verify-20260927091415-77326-10569 --env-file /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260927091415-77326-10569.XUFFr5/verify.env -f infra/docker/docker-compose.yml down --remove-orphans --volumes"
+  ],
+  "default_compose_project": "acepass (name declared in unchanged docker-compose.yml)",
+  "existing_env_preserved": true,
+  "template_overwrote_existing_env": false,
+  "cleanup_contains_volume_deletion": false
+}

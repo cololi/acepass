@@ -1,0 +1,70 @@
+2026-09-27 15:09:56,426 INFO celery.app.trace Task projection.refresh_paper_stats[74769d3c-aeda-49e8-b531-6dcff011261a] succeeded in 0.034044250001898035s: 'ok'
+2026-09-27 15:09:56,430 INFO celery.app.trace Task projection.refresh_paper_stats[63873d9f-36b3-45b5-af7b-4763fefb5c7e] succeeded in 0.0030439589972957037s: 'ok'
+2026-09-27 15:09:56,487 INFO celery.app.trace Task projection.rebuild_attempt_evidence[fc4a13d9-b46f-474b-a8e2-b5f67a211fac] succeeded in 0.02933145800489001s: 'evidence_rows=6'
+2026-09-27 15:09:56,531 INFO celery.app.trace Task learning.on_attempt_graded[4ad21286-e843-4da3-ab2d-20a17b6fe66a] succeeded in 0.043291250003676396s: 'paired_tasks=0'
+2026-09-27 15:09:56,584 INFO celery.app.trace Task learning.on_session_finished[d0e3044b-476e-4080-b182-dd52b063b432] succeeded in 0.03529800000251271s: 'ok'
+FINISH_INITIAL_STATUS 200 FINISH_INITIAL_BODY {'session_id': '7230a71b-8376-4ce6-936f-a72ab9f5aa79', 'project_id': '38317d68-1ab0-4c56-9a7d-2f156cc826e8', 'subject_id': 'd1cabd50-6a59-417b-8b4f-e709f93b9946', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'items': [{'session_item_id': '7c2b952f-44a5-4e74-84e4-4412c3399d85', 'ordinal': 1, 'question_id': '6656109d-d23f-4b4b-92df-eede6b829ee2', 'question_type': 'true_false', 'display_label': 'A1-判断-1', 'max_score': '2.00', 'purpose': 'practice', 'first_delivered_at': '2026-09-27T15:09:56.435994+00:00', 'draft_revision': 0, 'has_draft': False, 'tutoring_allowed': True, 'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'can_reveal': True, 'grading_withheld': False, 'attempt': {'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'submitted_at': '2026-09-27T15:09:56.451851+00:00', 'elapsed_ms': 15, 'grading_revision': 1, 'grade': {'grade_event_id': '07f2802d-8441-45e1-9d40-f322ae8a8979', 'status': 'confirmed', 'method': 'deterministic', 'grading_revision': 1, 'confirmed_score': '2.00', 'max_score': '2.00', 'pending_max_score': '0.00', 'estimated_score': None, 'is_fully_confirmed': True, 'is_correct': True, 'parts': [{'score': '2.00', 'detail': {'outcome': 'correct'}, 'method': 'deterministic', 'status': 'confirmed', 'part_id': 'statement', 'max_score': '2.00'}], 'rule_version': 'p0-1', 'rule_snapshot': {'max_score': '2.00', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'question_type': 'true_false', 'spec_version_id': '02607833-db99-44f2-818a-672582b0502e'}, 'grader_is_self': False, 'comment': '', 'superseded': False}, 'receipt_only': False}}], 'confirmed_score': '2.00', 'pending_max_score': '0.00', 'score_visible': True, 'score_hidden_reason': None, 'grading_withheld_session_item_ids': []}
+CURRENT_GET_STATUS 200 CURRENT_GET_BODY {'session_id': '7230a71b-8376-4ce6-936f-a72ab9f5aa79', 'project_id': '38317d68-1ab0-4c56-9a7d-2f156cc826e8', 'subject_id': 'd1cabd50-6a59-417b-8b4f-e709f93b9946', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'items': [{'session_item_id': '7c2b952f-44a5-4e74-84e4-4412c3399d85', 'ordinal': 1, 'question_id': '6656109d-d23f-4b4b-92df-eede6b829ee2', 'question_type': 'true_false', 'display_label': 'A1-判断-1', 'max_score': '2.00', 'purpose': 'practice', 'first_delivered_at': '2026-09-27T15:09:56.435994+00:00', 'draft_revision': 0, 'has_draft': False, 'tutoring_allowed': True, 'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'can_reveal': False, 'grading_withheld': True, 'attempt': {'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'submitted_at': '2026-09-27T15:09:56.451851+00:00', 'elapsed_ms': 15, 'grading_revision': 1, 'grade': None, 'receipt_only': True}}], 'confirmed_score': None, 'pending_max_score': None, 'score_visible': False, 'score_hidden_reason': '该会话包含正在验证中的同源内容：为避免泄露答案，验证结束前不显示本会话的分数。无关会话不受影响。', 'grading_withheld_session_item_ids': ['7c2b952f-44a5-4e74-84e4-4412c3399d85']}
+FINISH_REPLAY_STATUS 200 FINISH_REPLAY_BODY {'session_id': '7230a71b-8376-4ce6-936f-a72ab9f5aa79', 'project_id': '38317d68-1ab0-4c56-9a7d-2f156cc826e8', 'subject_id': 'd1cabd50-6a59-417b-8b4f-e709f93b9946', 'mode': 'practice', 'status': 'finished', 'policy_version': 'p0-1', 'grading_hidden': False, 'revealed_at': None, 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'items': [{'attempt': {'grade': {'parts': [{'score': '2.00', 'detail': {'outcome': 'correct'}, 'method': 'deterministic', 'status': 'confirmed', 'part_id': 'statement', 'max_score': '2.00'}], 'method': 'deterministic', 'status': 'confirmed', 'comment': '', 'max_score': '2.00', 'is_correct': True, 'superseded': False, 'rule_version': 'p0-1', 'rule_snapshot': {'max_score': '2.00', 'spec_rule': {'blank_score': '0.00', 'wrong_score': '0.00', 'default_max_score': '2.00'}, 'answer_rule': {}, 'question_type': 'true_false', 'spec_version_id': '02607833-db99-44f2-818a-672582b0502e'}, 'grade_event_id': '07f2802d-8441-45e1-9d40-f322ae8a8979', 'grader_is_self': False, 'confirmed_score': '2.00', 'estimated_score': None, 'grading_revision': 1, 'pending_max_score': '0.00', 'is_fully_confirmed': True}, 'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'elapsed_ms': 15, 'receipt_only': False, 'submitted_at': '2026-09-27T15:09:56.451851+00:00', 'grading_revision': 1}, 'ordinal': 1, 'purpose': 'practice', 'has_draft': False, 'max_score': '2.00', 'attempt_id': 'a3f562cc-5ec6-4b89-82d5-d5f23b86b899', 'can_reveal': True, 'question_id': '6656109d-d23f-4b4b-92df-eede6b829ee2', 'display_label': 'A1-判断-1', 'question_type': 'true_false', 'draft_revision': 0, 'session_item_id': '7c2b952f-44a5-4e74-84e4-4412c3399d85', 'grading_withheld': False, 'tutoring_allowed': True, 'first_delivered_at': '2026-09-27T15:09:56.435994+00:00'}], 'confirmed_score': '2.00', 'pending_max_score': '0.00', 'score_visible': True, 'score_hidden_reason': None, 'grading_withheld_session_item_ids': []}
+F
+=================================== FAILURES ===================================
+_______ test_finished_session_replay_rechecks_current_verification_gate ________
+
+caller = <tests.conftest.ApiCaller object at 0x10db41a90>
+project_a = <ExamProject: 演示项目A·综合能力>
+subject_a1 = <Subject: 演示项目A·综合能力/演示科目A1·数量关系>
+
+    def test_finished_session_replay_rechecks_current_verification_gate(caller, project_a, subject_a1):
+        version = published(subject_a1, 'true_false')
+        practice = start_session(caller, project_a, subject_a1, version.question, key='finished-practice')
+        item_id = practice['items'][0]['session_item_id']
+        present(caller, project_a, item_id)
+        result = submit(caller, project_a, item_id, {'type': 'true_false', 'value': True}, key='answer')
+        assert result.status_code == 200
+        finish_url = f"/api/v1/projects/{project_a.id}/practice-sessions/{practice['session_id']}/finish"
+        finished = caller.post(finish_url, {}, key='finish-practice')
+        assert finished.status_code == 200
+        assert finished.json()['confirmed_score'] is not None
+        verification = start_session(caller, project_a, subject_a1, version.question, mode='verification', key='verify')
+        present(caller, project_a, verification['items'][0]['session_item_id'])
+        current = caller.get(f"/api/v1/projects/{project_a.id}/practice-sessions/{practice['session_id']}")
+        assert current.status_code == 200
+        assert current.json()['confirmed_score'] is None
+        assert current.json()['items'][0]['attempt']['grade'] is None
+        replay = caller.post(finish_url, {}, key='finish-practice')
+        print('FINISH_INITIAL_STATUS', finished.status_code, 'FINISH_INITIAL_BODY', finished.json())
+        print('CURRENT_GET_STATUS', current.status_code, 'CURRENT_GET_BODY', current.json())
+        print('FINISH_REPLAY_STATUS', replay.status_code, 'FINISH_REPLAY_BODY', replay.json())
+>       assert replay.status_code == 403 or (
+            replay.json().get('confirmed_score') is None
+            and replay.json()['items'][0]['attempt']['grade'] is None
+        ), replay.json()
+E       AssertionError: {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'grading_hidden': False, ...}
+E       assert (200 == 403 or ('2.00' is None))
+E        +  where 200 = <HttpResponse status_code=200, "application/json; charset=utf-8">.status_code
+E        +  and   '2.00' = <built-in method get of dict object at 0x1137d04c0>('confirmed_score')
+E        +    where <built-in method get of dict object at 0x1137d04c0> = {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'grading_hidden': False, ...}.get
+E        +      where {'confirmed_score': '2.00', 'created_at': '2026-09-27T15:09:56.370822+00:00', 'finished_at': '2026-09-27T15:09:56.537875+00:00', 'grading_hidden': False, ...} = functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x10db434d0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">)()
+E        +        where functools.partial(<bound method ClientMixin._parse_json of <django.test.client.Client object at 0x10db434d0>>, <HttpResponse status_code=200, "application/json; charset=utf-8">) = <HttpResponse status_code=200, "application/json; charset=utf-8">.json
+
+/tmp/acepass-c01-c03-review-20260927/test_finish_replay.py:28: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[74769d3c-aeda-49e8-b531-6dcff011261a] succeeded in 0.034044250001898035s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.refresh_paper_stats[63873d9f-36b3-45b5-af7b-4763fefb5c7e] succeeded in 0.0030439589972957037s: 'ok'
+INFO     celery.app.trace:trace.py:128 Task projection.rebuild_attempt_evidence[fc4a13d9-b46f-474b-a8e2-b5f67a211fac] succeeded in 0.02933145800489001s: 'evidence_rows=6'
+INFO     celery.app.trace:trace.py:128 Task learning.on_attempt_graded[4ad21286-e843-4da3-ab2d-20a17b6fe66a] succeeded in 0.043291250003676396s: 'paired_tasks=0'
+INFO     celery.app.trace:trace.py:128 Task learning.on_session_finished[d0e3044b-476e-4080-b182-dd52b063b432] succeeded in 0.03529800000251271s: 'ok'
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_finished_session_replay_rechecks_current_verification_gate
+1 failed, 3 warnings in 3.36s
