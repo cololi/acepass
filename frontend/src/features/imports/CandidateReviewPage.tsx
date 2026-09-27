@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest, newIdempotencyKey, type CandidateOut, type KnowledgeNode, type SpecOut } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
@@ -38,6 +38,37 @@ const TYPE_LABELS: Record<string, string> = {
   material: '共享材料',
 }
 
+/** New P1 review codes, named in Chinese; the server message stays visible below. */
+const ISSUE_LABELS: Record<string, string> = {
+  answer_match_pending_confirmation: '答案由答案页匹配产生，需人工确认',
+  paper_item_score_missing: '真实试卷题项必须填写分值',
+  duplicate_paper_position: '该试卷题号已发布过版本，不能重复发布',
+  material_without_children: '材料题还没有子题',
+  material_children_unpublished: '仍有子题未发布',
+}
+
+const ANSWER_METHOD_LABELS: Record<string, string> = {
+  label: '题号',
+  position: '顺序',
+}
+
+function IssueItem({ issue }: { issue: { code: string; message: string } }) {
+  const label = ISSUE_LABELS[issue.code]
+  return (
+    <li>
+      {label ?? issue.message}（{issue.code}）
+      {label && label !== issue.message ? <div className="tiny muted">{issue.message}</div> : null}
+    </li>
+  )
+}
+
+function candidateLabel(row: CandidateOut | undefined, fallbackId: string): string {
+  if (!row) return `${fallbackId.slice(0, 8)}…`
+  const label = String((row.draft_payload as { display_label?: unknown } | undefined)?.display_label ?? '')
+  const position = row.source_position_key ? `卷面题号 ${row.source_position_key}` : ''
+  return [label, position].filter(Boolean).join(' · ') || `${fallbackId.slice(0, 8)}…`
+}
+
 function textOf(blocks: BlockLike[] | undefined): string {
   const first = (blocks ?? []).find((block) => (block as { kind?: string }).kind === 'text')
   return String((first as { text?: string } | undefined)?.text ?? '')
@@ -74,6 +105,20 @@ export function CandidateReviewPage() {
     queryFn: () => apiRequest<KnowledgeNode[]>(`/projects/${projectId}/knowledge-nodes?subject_id=${currentSubject?.id}`),
     enabled: Boolean(projectId && currentSubject),
   })
+
+  // Material parents and children live in the same candidate list, so the page
+  // resolves their 卷面题号 and status without a second route.
+  const jobCandidatesQuery = useQuery({
+    queryKey: ['candidates', projectId, jobId],
+    queryFn: () => apiRequest<CandidateOut[]>(`/projects/${projectId}/import-candidates?job_id=${jobId}`),
+    enabled: Boolean(projectId && jobId),
+  })
+
+  const jobCandidates = useMemo(() => {
+    const map = new Map<string, CandidateOut>()
+    for (const row of jobCandidatesQuery.data ?? []) map.set(row.id, row)
+    return map
+  }, [jobCandidatesQuery.data])
 
   const specsQuery = useQuery({
     queryKey: ['specs', projectId, currentSubject?.id],
@@ -208,6 +253,7 @@ export function CandidateReviewPage() {
     onSuccess: async (data) => {
       toast.push('已发布为不可变题目版本', 'ok')
       await queryClient.invalidateQueries({ queryKey: ['candidate', projectId, candidateId] })
+      await queryClient.invalidateQueries({ queryKey: ['candidates', projectId, jobId] })
       await queryClient.invalidateQueries({ queryKey: ['imports', projectId] })
       await queryClient.invalidateQueries({ queryKey: ['questions'] })
       if (data.publication_question_id) navigate('/questions')
@@ -225,6 +271,12 @@ export function CandidateReviewPage() {
   const options = content.options ?? []
   const blanks = content.blanks ?? []
   const machineText = String((candidate.machine_payload as { raw_excerpt?: string } | undefined)?.raw_excerpt ?? '')
+  const firstRegion = candidate.source_regions[0]
+  const answerMatch = candidate.answer_match ?? {}
+  const answerMatchMethod = answerMatch.method ? (ANSWER_METHOD_LABELS[answerMatch.method] ?? answerMatch.method) : '—'
+  const parentCandidate = candidate.parent_candidate_id ? jobCandidates.get(candidate.parent_candidate_id) : undefined
+  const childRows = candidate.child_candidate_ids.map((id) => ({ id, row: jobCandidates.get(id) }))
+  const unloadedChildren = childRows.filter((child) => !child.row).length
 
   const setOptionText = (index: number, text: string) => {
     const next = options.map((option, position) =>
@@ -302,9 +354,7 @@ export function CandidateReviewPage() {
           <strong>存在阻止发布的问题：</strong>
           <ul style={{ margin: '6px 0 0 18px' }}>
             {blocking.map((issue, index) => (
-              <li key={index}>
-                {issue.message}（{issue.code}）
-              </li>
+              <IssueItem key={index} issue={issue} />
             ))}
           </ul>
         </div>
@@ -314,11 +364,48 @@ export function CandidateReviewPage() {
           <strong>需要确认的疑点：</strong>
           <ul style={{ margin: '6px 0 0 18px' }}>
             {warnings.map((issue, index) => (
-              <li key={index}>
-                {issue.message}（{issue.code}）
-              </li>
+              <IssueItem key={index} issue={issue} />
             ))}
           </ul>
+        </div>
+      ) : null}
+
+      {answerMatch.matched ? (
+        <div className="notice warn" data-testid="candidate-answer-match">
+          <strong>本题答案由答案页匹配产生，尚未经人工确认。</strong>
+          <ul style={{ margin: '6px 0 0 18px' }}>
+            <li>匹配方式：{answerMatchMethod}</li>
+            <li>答案原文：{answerMatch.raw ? String(answerMatch.raw) : '—'}</li>
+            <li>
+              来源页：
+              {answerMatch.source_page_index ? `第 ${answerMatch.source_page_index} 页` : '—'}
+              {answerMatch.document_title ? `（${answerMatch.document_title}）` : ''}
+            </li>
+          </ul>
+          <p className="small" style={{ margin: '6px 0 0' }}>
+            机械匹配只是候选，不构成答案依据。请打开答案原件逐题核对，确认后保存，才能发布为计分题。
+          </p>
+          <label className="row" style={{ gap: 6, marginTop: 6 }}>
+            <input
+              type="checkbox"
+              checked={Boolean(draft.answer_confirmed_by_match_review)}
+              onChange={(event) =>
+                setDraft({ ...draft, answer_confirmed_by_match_review: event.target.checked })
+              }
+              data-testid="confirm-answer-match"
+            />
+            <span className="small">我已对照答案页核对本题答案（保存校对后生效）</span>
+          </label>
+        </div>
+      ) : null}
+
+      {candidate.parent_candidate_id ? (
+        <div className="notice info" data-testid="candidate-material">
+          本题是材料题的子题，父材料：
+          <Link to={`/imports/${jobId}/candidates/${candidate.parent_candidate_id}`}>
+            {candidateLabel(parentCandidate, candidate.parent_candidate_id)}
+          </Link>
+          。材料本身不计分，包含关系在发布时写入。
         </div>
       ) : null}
 
@@ -379,6 +466,16 @@ export function CandidateReviewPage() {
         <div className="card">
           <h2>结构编辑</h2>
           {saveError ? <div className="notice danger">{saveError}</div> : null}
+          {candidate.source_position_key || candidate.paper_revision_id ? (
+            <p className="small muted" data-testid="candidate-source" style={{ marginTop: 0 }}>
+              卷面题号：{candidate.source_position_key || '—'}
+              {firstRegion
+                ? ` · 来源页：第 ${firstRegion.page_index} 页${
+                    firstRegion.document_title ? `（${firstRegion.document_title}）` : ''
+                  }`
+                : ''}
+            </p>
+          ) : null}
           <label className="field">
             <span>题号/标签</span>
             <input
@@ -418,10 +515,16 @@ export function CandidateReviewPage() {
           <label className="field">
             <span>练习分值（留空则采用所选规范的题型默认分值）</span>
             <input
+              data-testid="practice-max-score"
               value={String(draft.practice_max_score ?? '')}
               onChange={(event) => setDraft({ ...draft, practice_max_score: event.target.value || null })}
             />
           </label>
+          {candidate.paper_revision_id && questionType !== 'material' ? (
+            <p className="tiny muted">
+              本题已登记为真实试卷题位：必须填写分值，否则该周期的分母不完整，周期分析不会计入这份试卷。
+            </p>
+          ) : null}
 
           {questionType === 'single_choice' || questionType === 'multiple_choice' ? (
             <div data-testid="option-editor">
@@ -576,6 +679,69 @@ export function CandidateReviewPage() {
           {blocking.length ? <span className="small muted">先解决阻止发布的问题</span> : null}
         </div>
       </div>
+
+      {questionType === 'material' || candidate.child_candidate_ids.length ? (
+        <div className="card" data-testid="candidate-material">
+          <h2>材料题子题（{candidate.child_candidate_ids.length}）</h2>
+          {candidate.child_candidate_ids.length === 0 ? (
+            <div className="empty-state">
+              解析没有识别到子题。共享材料本身不计分，必须包含子题才能发布；请按来源原图补全子题候选。
+            </div>
+          ) : (
+            <>
+              <p className="small muted">
+                子题与材料同属一个候选列表：逐个子题发布后，材料题才能发布。发布顺序不影响材料与子题的包含关系。
+              </p>
+              <div className="table-scroll">
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>卷面题号</th>
+                      <th>标签</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {childRows.map((child) => (
+                      <tr key={child.id}>
+                        <td className="small">{child.row?.source_position_key || '—'}</td>
+                        <td className="small">
+                          {String((child.row?.draft_payload as { display_label?: unknown } | undefined)?.display_label ?? '') ||
+                            '—'}
+                        </td>
+                        <td>
+                          {child.row ? (
+                            <span
+                              className={`pill ${
+                                child.row.status === 'published' ? 'ok' : child.row.status === 'ignored' ? 'neutral' : 'warn'
+                              }`}
+                            >
+                              {child.row.status}
+                            </span>
+                          ) : (
+                            <span className="pill neutral">未在当前列表</span>
+                          )}
+                        </td>
+                        <td>
+                          <Link className="btn small" to={`/imports/${jobId}/candidates/${child.id}`}>
+                            校对子题
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {unloadedChildren ? (
+                <p className="tiny muted">
+                  其中 {unloadedChildren} 个子题不在当前候选列表（可能超出列表条数上限），请回到候选列表查找。
+                </p>
+              ) : null}
+            </>
+          )}
+        </div>
+      ) : null}
 
       <div className="card">
         <h2>解析预览（发布后学员看到的题干）</h2>

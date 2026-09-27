@@ -13,6 +13,23 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: '已取消',
 }
 
+const SOURCE_KIND_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'official_past', label: '真实考试试卷' },
+  { value: 'mock', label: '模拟卷' },
+  { value: 'practice_set', label: '练习集' },
+]
+
+const EMPTY_PDF_FORM = {
+  title: '',
+  source_note: '',
+  usage_scope: '',
+  cycle_key: '',
+  session_key: '',
+  paper_code: '',
+  expected_session_count: '',
+  source_kind: 'official_past',
+}
+
 export function ImportsPage() {
   const { currentProject, currentSubject } = useScope()
   const toast = useToast()
@@ -21,6 +38,12 @@ export function ImportsPage() {
   const [params] = useSearchParams()
   const selectedJobId = params.get('job')
   const [fileError, setFileError] = useState('')
+  const [showPdfForm, setShowPdfForm] = useState(false)
+  const [pdfError, setPdfError] = useState('')
+  const [pdfForm, setPdfForm] = useState(EMPTY_PDF_FORM)
+  const [paperFiles, setPaperFiles] = useState<File[]>([])
+  const [answerFiles, setAnswerFiles] = useState<File[]>([])
+  const [fileInputKey, setFileInputKey] = useState(0)
 
   const projectId = currentProject?.id ?? null
 
@@ -28,6 +51,40 @@ export function ImportsPage() {
     queryKey: ['imports', projectId],
     queryFn: () => apiRequest<ImportJobOut[]>(`/projects/${projectId}/imports?limit=50`),
     enabled: Boolean(projectId),
+  })
+
+  const uploadPdf = useMutation({
+    mutationFn: async () => {
+      const form = new FormData()
+      paperFiles.forEach((file) => form.append('files', file))
+      answerFiles.forEach((file) => form.append('answer_files', file))
+      if (currentSubject) form.append('subject_id', currentSubject.id)
+      form.append('title', pdfForm.title)
+      form.append('source_note', pdfForm.source_note)
+      if (pdfForm.usage_scope) form.append('usage_scope', pdfForm.usage_scope)
+      form.append('cycle_key', pdfForm.cycle_key.trim())
+      form.append('session_key', pdfForm.session_key.trim())
+      form.append('paper_code', pdfForm.paper_code.trim())
+      form.append('source_kind', pdfForm.source_kind)
+      const expected = pdfForm.expected_session_count.trim()
+      if (expected) form.append('expected_session_count', expected)
+      return apiRequest<ImportJobOut>(`/projects/${projectId}/imports/pdf`, {
+        method: 'POST',
+        idempotencyKey: newIdempotencyKey('import-pdf'),
+        formData: form,
+      })
+    },
+    onSuccess: async (job) => {
+      setPdfError('')
+      setPaperFiles([])
+      setAnswerFiles([])
+      setPdfForm(EMPTY_PDF_FORM)
+      setFileInputKey((value) => value + 1)
+      toast.push('试卷已解析为待校对候选，请逐题核对卷面题号、来源页与答案匹配结果', 'ok')
+      await queryClient.invalidateQueries({ queryKey: ['imports', projectId] })
+      navigate(`/imports?job=${job.id}`)
+    },
+    onError: (err) => setPdfError(describeError(err)),
   })
 
   const uploadImage = useMutation({
@@ -99,6 +156,155 @@ export function ImportsPage() {
         </Link>
       </div>
 
+      <div className="card" data-testid="pdf-import-card">
+        <h2>原生文字 PDF 批量导入</h2>
+        <p className="small muted">
+          只解析带文字层的 PDF（扫描图片版没有文字层，必须先自行 OCR，本页不会伪造识别结果）。
+          答案单独成册时放进「答案 PDF」：匹配结果只是候选，必须由人工在校对页逐题确认后才会成为答案。
+          导入只创建待校对候选与试卷题位记录，不会自动发布任何题目。
+        </p>
+        <div className="row">
+          <button
+            className="btn"
+            data-testid="pdf-import-toggle"
+            onClick={() => setShowPdfForm((open) => !open)}
+          >
+            {showPdfForm ? '收起 PDF 导入表单' : '展开 PDF 导入表单'}
+          </button>
+          <span className="small muted">
+            表单默认收起：这一页的主要入口仍是图片导入，展开后再选择试卷与答案 PDF。
+          </span>
+        </div>
+        {showPdfForm ? (
+        <>
+        <div className="grid two">
+          <label className="field">
+            <span>试卷 PDF（可多选，必填）</span>
+            <input
+              key={`paper-${fileInputKey}`}
+              type="file"
+              accept="application/pdf"
+              multiple
+              data-testid="pdf-paper-input"
+              onChange={(event) => {
+                setPdfError('')
+                setPaperFiles(Array.from(event.target.files ?? []))
+              }}
+            />
+          </label>
+          <label className="field">
+            <span>答案 PDF（可多选，可留空）</span>
+            <input
+              key={`answer-${fileInputKey}`}
+              type="file"
+              accept="application/pdf"
+              multiple
+              data-testid="pdf-answer-input"
+              onChange={(event) => {
+                setPdfError('')
+                setAnswerFiles(Array.from(event.target.files ?? []))
+              }}
+            />
+          </label>
+        </div>
+        <div className="grid three">
+          <label className="field">
+            <span>周期/年份（真实试卷必填）</span>
+            <input
+              data-testid="pdf-cycle-key"
+              value={pdfForm.cycle_key}
+              placeholder="例如 2024"
+              onChange={(event) => setPdfForm({ ...pdfForm, cycle_key: event.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span>场次</span>
+            <input
+              data-testid="pdf-session-key"
+              value={pdfForm.session_key}
+              placeholder="例如 上半年"
+              onChange={(event) => setPdfForm({ ...pdfForm, session_key: event.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span>卷别代码</span>
+            <input
+              data-testid="pdf-paper-code"
+              value={pdfForm.paper_code}
+              placeholder="例如 卷一"
+              onChange={(event) => setPdfForm({ ...pdfForm, paper_code: event.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span>来源类型</span>
+            <select
+              data-testid="pdf-source-kind"
+              value={pdfForm.source_kind}
+              onChange={(event) => setPdfForm({ ...pdfForm, source_kind: event.target.value })}
+            >
+              {SOURCE_KIND_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>预期场次（可留空，用于完整性统计）</span>
+            <input
+              data-testid="pdf-expected-sessions"
+              value={pdfForm.expected_session_count}
+              inputMode="numeric"
+              placeholder="例如 2"
+              onChange={(event) => setPdfForm({ ...pdfForm, expected_session_count: event.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span>标题</span>
+            <input
+              data-testid="pdf-title"
+              value={pdfForm.title}
+              placeholder="例如 2024 年真题（卷一）"
+              onChange={(event) => setPdfForm({ ...pdfForm, title: event.target.value })}
+            />
+          </label>
+        </div>
+        <div className="grid two">
+          <label className="field">
+            <span>来源说明（可留空）</span>
+            <input
+              value={pdfForm.source_note}
+              placeholder="例如 官方公布的历年真题卷"
+              onChange={(event) => setPdfForm({ ...pdfForm, source_note: event.target.value })}
+            />
+          </label>
+          <label className="field">
+            <span>使用范围（可留空）</span>
+            <input
+              value={pdfForm.usage_scope}
+              placeholder="例如 仅本人复习使用"
+              onChange={(event) => setPdfForm({ ...pdfForm, usage_scope: event.target.value })}
+            />
+          </label>
+        </div>
+        {pdfError ? <div className="notice danger">{pdfError}</div> : null}
+        <div className="row">
+          <button
+            className="btn primary"
+            data-testid="pdf-import-submit"
+            disabled={paperFiles.length === 0 || uploadPdf.isPending}
+            onClick={() => uploadPdf.mutate()}
+          >
+            导入试卷 PDF
+          </button>
+          <span className="small muted">
+            真实考试试卷必须填写周期与卷别代码，否则不能进入历年统计；登记为模拟卷、练习集的内容不计入真实周期。
+          </span>
+        </div>
+        </>
+        ) : null}
+      </div>
+
       <div className="card">
         <h2>图片导入（手工结构化）</h2>
         <p className="small muted">
@@ -108,6 +314,7 @@ export function ImportsPage() {
         <input
           type="file"
           accept="image/png,image/jpeg,image/webp"
+          data-testid="image-import-input"
           multiple
           onChange={(event) => {
             setFileError('')

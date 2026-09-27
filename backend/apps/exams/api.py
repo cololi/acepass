@@ -10,6 +10,7 @@ from ninja import Router, Schema
 
 from apps.audit.services import idempotency
 from apps.common.api import auth, idempotency_key, project_scoped_router
+from apps.common.enums import PaperRevisionStatus
 from apps.common.errors import InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.exams import services
@@ -142,6 +143,8 @@ class PaperRevisionOut(Schema):
     item_count: int
     scored_item_count: int
     note: str
+    coverage_confirmed_by: str | None = None
+    coverage_confirmed_at: str | None = None
 
 
 class PaperOut(Schema):
@@ -156,6 +159,14 @@ class PaperOut(Schema):
     effective_revision_id: str | None
     revisions: list[PaperRevisionOut]
     coverage_note: str
+
+
+class CoverageIn(Schema):
+    expected_session_count: int | None = None
+    covered_session_count: int | None = None
+    note: str = ""
+    #: Explicit confirmation that this revision covers the whole cycle.
+    confirm: bool = False
 
 
 class PaperItemOut(Schema):
@@ -237,23 +248,29 @@ def _syllabus_out(syllabus: SyllabusVersion) -> dict:
     }
 
 
+def _revision_out(revision: PaperRevision) -> dict:
+    items = list(revision.items.all())
+    return {
+        "id": str(revision.id),
+        "revision": revision.revision,
+        "status": revision.status,
+        "coverage_status": revision.coverage_status,
+        "expected_session_count": revision.expected_session_count,
+        "covered_session_count": revision.covered_session_count,
+        "item_count": len(items),
+        "scored_item_count": sum(1 for item in items if item.is_scored),
+        "note": revision.note,
+        "coverage_confirmed_by": (
+            str(revision.coverage_confirmed_by_id) if revision.coverage_confirmed_by_id else None
+        ),
+        "coverage_confirmed_at": (
+            revision.coverage_confirmed_at.isoformat() if revision.coverage_confirmed_at else None
+        ),
+    }
+
+
 def _paper_out(paper: Paper) -> dict:
-    revisions = []
-    for revision in paper.revisions.all().order_by("-revision"):
-        items = revision.items.all()
-        revisions.append(
-            {
-                "id": str(revision.id),
-                "revision": revision.revision,
-                "status": revision.status,
-                "coverage_status": revision.coverage_status,
-                "expected_session_count": revision.expected_session_count,
-                "covered_session_count": revision.covered_session_count,
-                "item_count": len(items),
-                "scored_item_count": sum(1 for item in items if item.is_scored),
-                "note": revision.note,
-            }
-        )
+    revisions = [_revision_out(revision) for revision in paper.revisions.all().order_by("-revision")]
     return {
         "id": str(paper.id),
         "subject_id": str(paper.subject_id),
@@ -559,3 +576,71 @@ def list_paper_items(request, project_id: str, revision_id: str):
     if revision is None:
         raise ScopeViolation(message="试卷版本不存在或不属于该项目")
     return [_paper_item_out(item) for item in revision.items.select_related("question_version")]
+
+
+@project_router.post("/projects/{project_id}/paper-revisions/{revision_id}/coverage", auth=auth,
+                     response=PaperRevisionOut)
+def confirm_paper_coverage(request, project_id: str, revision_id: str, payload: CoverageIn):
+    """Record (or explicitly confirm) how much of one cycle a revision covers.
+
+    A single uploaded paper never proves a full cycle, so completeness is a
+    separate, human statement: the expected and covered session counts are
+    recorded here, and ``confirm`` is what marks the revision complete. The
+    cycle analysis refuses to count anything else.
+    """
+    project = require_project(request.user, project_id)
+    revision = (
+        PaperRevision.objects.filter(id=revision_id, paper__subject__project=project)
+        .select_related("paper")
+        .first()
+    )
+    if revision is None:
+        raise ScopeViolation(message="试卷版本不存在或不属于该项目")
+    if revision.status == PaperRevisionStatus.WITHDRAWN:
+        raise InvalidInput(message="已撤回的试卷版本不能登记覆盖情况")
+    if payload.expected_session_count is not None and payload.expected_session_count < 1:
+        raise InvalidInput(message="预期场次必须是正整数")
+    if payload.covered_session_count is not None and payload.covered_session_count < 0:
+        raise InvalidInput(message="已覆盖场次不能为负")
+    updated = services.record_paper_coverage(
+        revision,
+        actor=request.user,
+        expected_session_count=payload.expected_session_count,
+        covered_session_count=payload.covered_session_count,
+        confirm=payload.confirm,
+        note=payload.note,
+    )
+    return _revision_out(updated)
+
+
+@project_router.post("/projects/{project_id}/paper-revisions/{revision_id}/confirm", auth=auth,
+                     response=PaperRevisionOut)
+def confirm_paper_revision(request, project_id: str, revision_id: str):
+    """Mark a revision as human-confirmed (and therefore usable by statistics)."""
+    project = require_project(request.user, project_id)
+    revision = (
+        PaperRevision.objects.filter(id=revision_id, paper__subject__project=project)
+        .select_related("paper")
+        .first()
+    )
+    if revision is None:
+        raise ScopeViolation(message="试卷版本不存在或不属于该项目")
+    if not revision.items.filter(is_scored=True).exists():
+        raise InvalidInput(message="该版本还没有任何计分题项，确认前请先完成导入与校对")
+    updated = services.confirm_paper_revision(revision, actor=request.user)
+    return _revision_out(updated)
+
+
+@project_router.post("/projects/{project_id}/papers/{paper_id}/effective-revision", auth=auth, response=PaperOut)
+def set_effective_revision(request, project_id: str, paper_id: str, revision_id: str):
+    """Choose the one revision that counts statistically for this paper."""
+    project = require_project(request.user, project_id)
+    paper = Paper.objects.filter(id=paper_id, subject__project=project).select_related("subject").first()
+    if paper is None:
+        raise ScopeViolation(message="试卷不存在或不属于该项目")
+    revision = PaperRevision.objects.filter(id=revision_id, paper=paper).first()
+    if revision is None:
+        raise ScopeViolation(message="试卷版本不存在或不属于该试卷")
+    services.set_effective_revision(paper, revision, actor=request.user)
+    paper.refresh_from_db()
+    return _paper_out(paper)

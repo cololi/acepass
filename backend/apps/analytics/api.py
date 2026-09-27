@@ -7,6 +7,7 @@ from typing import Any
 from ninja import Router, Schema
 
 from apps.analytics.models import RegradeRun, ReportSnapshot
+from apps.analytics.services import cycles as cycle_service
 from apps.analytics.services import reports as report_service
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
@@ -92,6 +93,20 @@ def list_snapshots(request, project_id: str, limit: int = 10):
         }
         for row in rows
     ]
+
+
+@analytics_router.get("/projects/{project_id}/papers/cycle-analysis", auth=auth)
+def cycle_analysis(request, project_id: str, subject_id: str, max_cycles: int = 5):
+    """Score distribution over the most recent *complete* real cycles.
+
+    Only real occurrence records with a confirmed, coverage-complete revision are
+    counted; with fewer than ``max_cycles`` complete cycles the response says so
+    instead of averaging over whatever happens to exist.
+    """
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id)
+    horizon = max(1, min(int(max_cycles or 5), 10))
+    return cycle_service.cycle_analysis(subject=subject, max_cycles=horizon)
 
 
 @analytics_router.get("/projects/{project_id}/papers/coverage", auth=auth)

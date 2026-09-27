@@ -50,6 +50,15 @@ PROJECT_C = "验收项目C·延迟验证"
 SUBJECT_NAMES = ("验收科目一·数量关系", "验收科目二·判断推理", "验收科目三·专业实务")
 #: The delayed-verification chain has its own project: see `build` for why.
 SUBJECT_C = "验收延迟科目·数量关系"
+#: A subject whose only purpose is the P1-03 cycle analysis: five complete real
+#: occurrence records (plus one incomplete cycle and one demo paper that must be
+#: excluded). The papers and questions are clearly labelled acceptance fixtures —
+#: the point is to exercise the *counting rules*, never to claim real exam data.
+SUBJECT_CYCLES = "验收历年科目·周期统计"
+CYCLE_YEARS = ("2019", "2020", "2021", "2022", "2023")
+CYCLE_INCOMPLETE_YEAR = "2024"
+CYCLE_TOPIC = "验收周期考点"
+CYCLE_SCORE = Decimal("10")
 
 
 class Command(BaseCommand):
@@ -144,6 +153,8 @@ def build(*, email: str, password: str, display_name: str) -> dict:
     published += len(versions_c)
     delayed_tasks = _seed_delayed_verification((subject_c, nodes_c, versions_c), user)
 
+    cycle_summary = _seed_cycle_analysis_subject(project_b, user)
+
     return {
         "email": email,
         "project_a": str(project_a.id),
@@ -152,6 +163,7 @@ def build(*, email: str, password: str, display_name: str) -> dict:
         "subjects": Subject.objects.filter(project__owner=user).count(),
         "published_versions": published,
         "delayed_verification_tasks": delayed_tasks,
+        **cycle_summary,
     }
 
 
@@ -498,3 +510,133 @@ def _publish_one(
     )
     qb_services.publish_question_version(version, actor=user)
     return version
+
+
+def _seed_cycle_analysis_subject(project, user) -> dict:
+    """Build the P1-03 fixture: real cycles, one incomplete cycle, one demo paper.
+
+    Five cycles are complete (confirmed revision + manually confirmed coverage),
+    which is the horizon the report uses. ``2024`` stays incomplete on purpose so
+    the UI has a real "why is this cycle not counted" row, and a demo paper
+    carries items so the exclusion rule is observable rather than assumed.
+    """
+    subject = exams_services.create_subject(project, name=SUBJECT_CYCLES, total_score=100, pass_score=60)
+    spec = _published_spec(subject, user, partial_credit=False)
+    syllabus = _published_syllabus(subject, user)
+    nodes = _nodes(syllabus, [CYCLE_TOPIC, "验收周期考点二"])
+    node = nodes[CYCLE_TOPIC]
+
+    counted_items = 0
+    for year in CYCLE_YEARS:
+        paper, _created = exams_services.get_or_create_paper(
+            subject=subject,
+            cycle_key=year,
+            paper_code="卷一",
+            source_kind="official_past",
+            title=f"{year} 验收周期材料",
+            actor=user,
+        )
+        revision = exams_services.create_paper_revision(
+            paper,
+            actor=user,
+            expected_session_count=1,
+            covered_session_count=1,
+            note=FIXTURE_NOTE,
+        )
+        # Two scoring units per cycle: one maps to a single point, the other
+        # splits its weight across two points, so the report shows both whole and
+        # fractional shares (and proves weights are counted once).
+        for index, weights in enumerate(
+            ((Decimal("1"),), (Decimal("0.6"), Decimal("0.4")))
+        ):
+            version = _publish_one(
+                subject=subject,
+                spec=spec,
+                node=node,
+                user=user,
+                label=f"{year}-{index + 1}",
+                question_type="single_choice",
+                content={
+                    "blocks": [{"kind": "text", "text": f"{year} 年第 {index + 1} 题（验收夹具）"}],
+                    "options": [
+                        {"id": "opt_a", "label": "A", "blocks": [{"kind": "text", "text": "甲"}]},
+                        {"id": "opt_b", "label": "B", "blocks": [{"kind": "text", "text": "乙"}]},
+                    ],
+                },
+                answer_payload={"kind": "single_choice", "correct_option_id": "opt_a"},
+            )
+            qb_services.replace_knowledge_mappings(
+                version,
+                [
+                    {
+                        "node_id": str(nodes[CYCLE_TOPIC if position == 0 else "验收周期考点二"].id),
+                        "is_primary": True,
+                        "score_weight": weight,
+                    }
+                    for position, weight in enumerate(weights)
+                ],
+                actor=user,
+            )
+            exams_services.add_paper_item(
+                revision,
+                actor=user,
+                position_key=str(index + 1),
+                question_version=version,
+                max_score=CYCLE_SCORE,
+            )
+            counted_items += 1
+        exams_services.record_paper_coverage(
+            revision,
+            actor=user,
+            expected_session_count=1,
+            covered_session_count=1,
+            confirm=True,
+            note=FIXTURE_NOTE,
+        )
+        exams_services.confirm_paper_revision(revision, actor=user)
+
+    # One incomplete cycle: the revision exists but is neither confirmed nor
+    # coverage-complete, so the analysis must report why it is excluded.
+    incomplete, _created = exams_services.get_or_create_paper(
+        subject=subject,
+        cycle_key=CYCLE_INCOMPLETE_YEAR,
+        paper_code="卷一",
+        source_kind="official_past",
+        title=f"{CYCLE_INCOMPLETE_YEAR} 验收周期材料（未完成校对）",
+        actor=user,
+    )
+    exams_services.create_paper_revision(incomplete, actor=user, note=FIXTURE_NOTE + "（未完成）")
+
+    # A demo paper with items: it must never enter the numbers.
+    demo, _created = exams_services.get_or_create_paper(
+        subject=subject,
+        cycle_key="2025",
+        paper_code="演示卷",
+        source_kind="demo",
+        title="演示试卷（不计入统计）",
+        actor=user,
+    )
+    demo_revision = exams_services.create_paper_revision(
+        demo, actor=user, expected_session_count=1, covered_session_count=1, note="演示数据"
+    )
+    demo_version = _publish_one(
+        subject=subject,
+        spec=spec,
+        node=node,
+        user=user,
+        label="演示-1",
+        question_type="true_false",
+        content={"blocks": [{"kind": "text", "text": "演示试卷题目（不计入统计）"}]},
+        answer_payload={"kind": "true_false", "value": True},
+    )
+    exams_services.add_paper_item(
+        demo_revision, actor=user, position_key="1", question_version=demo_version, max_score=Decimal("99")
+    )
+
+    return {
+        "cycle_subject_id": str(subject.id),
+        "cycle_subject_name": subject.name,
+        "complete_cycles": list(CYCLE_YEARS),
+        "incomplete_cycle": CYCLE_INCOMPLETE_YEAR,
+        "cycle_scored_items": counted_items,
+    }

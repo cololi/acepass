@@ -1,0 +1,54 @@
+{
+  "steps": [
+    {
+      "step": "environment",
+      "database": "acepass_acceptance_ai_real",
+      "provider": "openai_compatible",
+      "capabilities": [
+        "diagnose",
+        "estimate_grade",
+        "explain",
+        "suggest_tags"
+      ],
+      "model_text": "deepseek-chat",
+      "model_vision": "(未配置)",
+      "prompt_version": "p0-explain-v1",
+      "is_stub_provider": false,
+      "vision_available": false,
+      "inline_tasks": false,
+      "email": "real-ai@acepass.test"
+    },
+    {
+      "step": "real_tutor_call",
+      "job_status": "failed",
+      "error_code": "ai_error",
+      "error_message": "provider HTTP 402: {\"error\":{\"message\":\"Insufficient Balance (request_id: de2d345d-0a25-4f9d-bf2c-0d17f272a443)\",\"type\":\"unknown_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "errors": [],
+      "is_stub": false,
+      "provider": "openai_compatible",
+      "model": "deepseek-chat",
+      "prompt_version": "p0-explain-v1",
+      "latency_ms": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_cents": null,
+      "cost_known": false,
+      "attempts": 1,
+      "validation_result": {},
+      "raw_response_excerpt": "",
+      "result_blocks_text": [],
+      "finalized": false,
+      "vision_available": false
+    },
+    {
+      "step": "no_score_side_effects",
+      "grade_events": 1,
+      "grade_event_unchanged": true,
+      "knowledge_states": 0,
+      "exposures": 1,
+      "ok": true
+    }
+  ],
+  "ok": false,
+  "note": "真实模型调用未成功：失败原因已记录，产品保持人工校对路径，不会伪造结果。"
+}

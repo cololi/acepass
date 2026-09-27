@@ -372,6 +372,8 @@ def coverage_note(revision: PaperRevision) -> str:
     if status == "coverage_unknown":
         return "coverage_unknown：未登记该周期预期场次/卷别，不能据单份试卷判断全年完整。"
     if status == "coverage_incomplete":
+        if revision.coverage_confirmed_at is None:
+            return "coverage_incomplete：场次已登记但尚未人工确认为完整周期，不能作为完整周期统计。"
         return "coverage_incomplete：已登记场次少于预期，不能作为完整周期统计。"
     return "coverage_complete：人工确认覆盖该周期全部已登记场次。"
 
@@ -409,3 +411,80 @@ def assert_version_current(instance, expected: int, field: str = "revision") -> 
         raise VersionConflict(message="缺少版本号，请重新加载后再提交")
     if int(expected) != int(actual):
         raise VersionConflict(details={"expected": expected, "actual": actual})
+
+
+@transaction.atomic
+def record_paper_coverage(
+    revision: PaperRevision,
+    *,
+    actor,
+    expected_session_count: int | None = None,
+    covered_session_count: int | None = None,
+    confirm: bool = False,
+    note: str = "",
+) -> PaperRevision:
+    """Record how much of one cycle a paper revision covers.
+
+    Completeness is a human statement, never inferred from "a file was
+    uploaded". ``confirm`` is what marks the coverage decision as made; the
+    cycle analysis counts nothing else.
+    """
+    locked = PaperRevision.objects.select_for_update().select_related("paper").get(id=revision.id)
+    if locked.status == PaperRevisionStatus.WITHDRAWN:
+        raise InvalidInput(message="已撤回的试卷版本不能登记覆盖情况")
+    if expected_session_count is not None:
+        locked.expected_session_count = int(expected_session_count)
+    if covered_session_count is not None:
+        locked.covered_session_count = int(covered_session_count)
+    if confirm:
+        if locked.expected_session_count is None or locked.covered_session_count is None:
+            raise InvalidInput(message="确认覆盖前必须填写“预期场次”和“已覆盖场次”")
+        if locked.covered_session_count < locked.expected_session_count:
+            raise InvalidInput(
+                message="已覆盖场次少于预期场次，不能标记为完整周期",
+                details={
+                    "expected": locked.expected_session_count,
+                    "covered": locked.covered_session_count,
+                },
+            )
+        locked.coverage_confirmed_by = actor
+        locked.coverage_confirmed_at = timezone.now()
+    if note:
+        locked.note = note[:500]
+    locked.full_clean(exclude=["paper"])
+    locked.save()
+    ContentRevision.objects.create(
+        actor=actor,
+        entity_type="paper_revision",
+        entity_id=str(locked.id),
+        action="record_coverage",
+        project_id=locked.paper.subject.project_id,
+        detail={
+            "expected_session_count": locked.expected_session_count,
+            "covered_session_count": locked.covered_session_count,
+            "coverage_status": locked.coverage_status,
+            "confirmed": bool(locked.coverage_confirmed_at),
+        },
+    )
+    return locked
+
+
+@transaction.atomic
+def confirm_paper_revision(revision: PaperRevision, *, actor) -> PaperRevision:
+    """Human confirmation that this revision's items are proofread and usable."""
+    locked = PaperRevision.objects.select_for_update().select_related("paper").get(id=revision.id)
+    if locked.status == PaperRevisionStatus.WITHDRAWN:
+        raise InvalidInput(message="已撤回的试卷版本不能确认")
+    locked.status = PaperRevisionStatus.CONFIRMED
+    locked.save(update_fields=["status", "updated_at"])
+    ContentRevision.objects.create(
+        actor=actor,
+        entity_type="paper_revision",
+        entity_id=str(locked.id),
+        action="confirm",
+        project_id=locked.paper.subject.project_id,
+        detail={"revision": locked.revision},
+    )
+    if locked.paper.effective_revision_id is None:
+        set_effective_revision(locked.paper, locked, actor=actor)
+    return locked

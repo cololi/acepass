@@ -13,6 +13,7 @@ from apps.common.scope import require_project, require_subject
 from apps.exams.models import SyllabusVersion
 from apps.knowledge import services
 from apps.knowledge.models import KnowledgeNode, QuestionTemplate, VerificationPairing
+from apps.knowledge.services import outline as outline_services
 from apps.question_bank.models import Question
 
 knowledge_router = project_scoped_router(tags=["knowledge"])
@@ -40,6 +41,28 @@ class NodeOut(Schema):
     is_unclassified: bool
     display_order: int
     question_count: int
+
+
+class OutlineIn(Schema):
+    text: str
+    #: Depth (0 = chapter) → node kind overrides; defaults: 0 chapter, 1 section.
+    kind_by_depth: dict[str, str] = {}
+
+
+class OutlineOut(Schema):
+    created: int
+    merged: int
+    aliases_added: list[dict]
+    skipped: list[dict]
+    node_count: int
+
+
+class NodePatch(Schema):
+    canonical_name: str | None = None
+    aliases: list[str] | None = None
+    parent_id: str | None = None
+    #: Setting a parent (including null for the root) is an explicit move.
+    move: bool = False
 
 
 class TemplateIn(Schema):
@@ -345,3 +368,58 @@ def knowledge_map(request, project_id: str, subject_id: str, syllabus_version_id
             }
         )
     return {"subject_id": str(subject.id), "nodes": payload}
+
+
+@knowledge_router.post("/projects/{project_id}/syllabus-versions/{syllabus_id}/nodes/import", auth=auth,
+                       response=OutlineOut)
+def import_syllabus_outline(request, project_id: str, syllabus_id: str, payload: OutlineIn):
+    """Build the node tree of one syllabus from its word list.
+
+    Same-name (or same-alias) lines merge into one node instead of duplicating a
+    point, so one knowledge point never collects two competing score rows.
+    """
+    project = require_project(request.user, project_id)
+    syllabus = SyllabusVersion.objects.filter(id=syllabus_id, subject__project=project).first()
+    if syllabus is None:
+        raise ScopeViolation(message="大纲版本不存在或不属于该项目")
+    if not (payload.text or "").strip():
+        raise InvalidInput(message="词表内容不能为空")
+    key = idempotency_key(request)
+    scope = f"nodes.import:{syllabus_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    report = outline_services.import_outline(
+        syllabus_version=syllabus, text=payload.text, actor=request.user, kind_by_depth=payload.kind_by_depth
+    )
+    result = {key: value for key, value in report.items() if key != "nodes"}
+    idempotency.record_result(
+        request.user, scope, key, status_code=200, response_body=result, resource_type="syllabus", resource_id=syllabus.id
+    )
+    return result
+
+
+@knowledge_router.patch("/projects/{project_id}/knowledge-nodes/{node_id}", auth=auth, response=NodeOut)
+def patch_node(request, project_id: str, node_id: str, payload: NodePatch):
+    """Rename, re-alias or re-parent one node (cycles are refused)."""
+    project = require_project(request.user, project_id)
+    node = KnowledgeNode.objects.filter(id=node_id, syllabus_version__subject__project=project).first()
+    if node is None:
+        raise ScopeViolation(message="考点不存在或不属于该项目")
+    parent = None
+    if payload.move and payload.parent_id:
+        parent = KnowledgeNode.objects.filter(
+            id=payload.parent_id, syllabus_version_id=node.syllabus_version_id
+        ).first()
+        if parent is None:
+            raise ScopeViolation(message="父考点不存在或不属于该大纲版本")
+    updated = outline_services.update_knowledge_node(
+        node,
+        actor=request.user,
+        canonical_name=payload.canonical_name,
+        aliases=payload.aliases,
+        parent=parent,
+        move=payload.move,
+    )
+    return _node_out(updated)

@@ -83,7 +83,7 @@ test.describe('p0.2: drafts keep every kind of user input', () => {
     await page.goto('/imports')
     await expect(page.getByRole('heading', { name: '导入与校对', exact: true })).toBeVisible()
     const uploadWait = page.waitForResponse((r) => r.url().endsWith('/imports/images') && r.request().method() === 'POST')
-    await page.locator('input[type="file"]').setInputFiles({
+    await page.getByTestId('image-import-input').setInputFiles({
       name: 'fill-source.png',
       mimeType: 'image/png',
       buffer: makePng(24, 24),

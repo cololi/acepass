@@ -109,7 +109,12 @@ def store_asset(
         if reencode:
             payload = strip_metadata(content)
     namespace = f"{owner.id}/{project.id}/{'region' if role in {AssetRole.STEM_CROP, AssetRole.MATERIAL_CROP, AssetRole.ANSWER_CROP} else 'source' if role in {AssetRole.PAST_PAPER_PAGE, AssetRole.ANSWER_PAGE} else 'uploads'}"
-    suffix = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}.get(content_type, "bin")
+    suffix = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+        "application/pdf": "pdf",
+    }.get(content_type, "bin")
     key = build_key(namespace, suffix)
     stored = get_storage().save(key, payload, content_type=content_type)
     return Asset.objects.create(
@@ -197,6 +202,58 @@ def create_image_document(
         role=role,
         sensitivity=sensitivity,
         asset=asset,
+        checksum=asset.checksum,
+        source_type="user_upload",
+        source_note=source_note[:500],
+        usage_scope=usage_scope[:200],
+    )
+
+
+@transaction.atomic
+def create_pdf_document(
+    *,
+    owner,
+    project,
+    content: bytes,
+    role: str = AssetRole.PAST_PAPER_PAGE,
+    title: str = "",
+    subject=None,
+    page_texts: list[str] | None = None,
+    source_note: str = "",
+    usage_scope: str = "",
+    sensitivity: str = AssetSensitivity.PUBLIC_TO_OWNER,
+    original_filename: str = "",
+) -> SourceDocument:
+    """Store one native-text PDF plus its per-page text layer.
+
+    The original bytes and the extracted text are kept together: the text layer
+    is what the parser reads, and the file is what a proofreader opens to check
+    it. Neither replaces the other.
+    """
+    pages = list(page_texts or [])
+    asset = store_asset(
+        owner=owner,
+        project=project,
+        content=content,
+        content_type="application/pdf",
+        role=role,
+        sensitivity=sensitivity,
+        subject=subject,
+        original_filename=original_filename,
+        reencode=False,
+    )
+    return SourceDocument.objects.create(
+        owner=owner,
+        project=project,
+        subject=subject,
+        title=title[:300],
+        document_type="pdf_answer" if role == AssetRole.ANSWER_PAGE else "pdf",
+        role=role,
+        sensitivity=sensitivity,
+        asset=asset,
+        raw_text="\n".join(pages),
+        page_texts=pages,
+        page_count=max(1, len(pages)),
         checksum=asset.checksum,
         source_type="user_upload",
         source_note=source_note[:500],
@@ -303,6 +360,10 @@ def create_candidate(
     regions: list[SourceRegion] | None = None,
     is_stub_output: bool = False,
     extractor_version: str = "",
+    parent_candidate: ImportCandidate | None = None,
+    source_position_key: str = "",
+    paper_revision=None,
+    answer_match: dict | None = None,
 ) -> ImportCandidate:
     subject = subject or job.subject
     candidate = ImportCandidate.objects.create(
@@ -314,6 +375,10 @@ def create_candidate(
         machine_payload=machine_payload or payload,
         is_stub_output=is_stub_output,
         extractor_version=extractor_version or job.extractor_version,
+        parent_candidate=parent_candidate,
+        source_position_key=source_position_key[:40],
+        paper_revision=paper_revision,
+        answer_match=answer_match or {},
     )
     if regions:
         for region in regions:
@@ -322,6 +387,23 @@ def create_candidate(
         candidate.source_regions.set(regions)
     refresh_candidate_issues(candidate)
     return candidate
+
+
+def published_paper_position(*, paper, position_key: str):
+    """The already-published question version sitting at one paper position."""
+    from apps.exams.models import PaperItem
+
+    item = (
+        PaperItem.objects.filter(
+            revision__paper=paper,
+            position_key=position_key,
+            question_version__status="published",
+        )
+        .select_related("question_version")
+        .order_by("created_at")
+        .first()
+    )
+    return item.question_version if item is not None else None
 
 
 def refresh_candidate_issues(candidate: ImportCandidate) -> list[dict]:
@@ -342,12 +424,80 @@ def refresh_candidate_issues(candidate: ImportCandidate) -> list[dict]:
             if len(options) < 2:
                 issues.append({"code": "too_few_options", "message": "选项少于两个，疑似识别缺失", "severity": "blocking"})
     answer_payload = payload.get("answer_payload") or {}
-    if not payload.get("answer_status_known", True):
+    is_material = question_type == QuestionType.MATERIAL
+    if is_material:
+        # A material is a shared stem, not a scoring unit: it has no answer of its
+        # own, and its completeness is defined by its published sub-questions.
+        children = list(candidate.child_candidates.all()) if candidate.pk else []
+        if not children:
+            issues.append(
+                {
+                    "code": "material_without_children",
+                    "message": "材料题没有任何子题；请先校对并发布子题，再发布材料题",
+                    "severity": "blocking",
+                }
+            )
+        else:
+            unpublished = [child for child in children if child.status != ImportCandidateStatus.PUBLISHED]
+            if unpublished:
+                issues.append(
+                    {
+                        "code": "material_children_unpublished",
+                        "message": f"仍有 {len(unpublished)} 个子题未发布，材料题的子题关系尚不完整",
+                        "severity": "blocking",
+                        "candidate_ids": [str(child.id) for child in unpublished],
+                    }
+                )
+    elif not payload.get("answer_status_known", True):
         issues.append({"code": "answer_unknown", "message": "答案缺失或不确定，不能发布为计分题", "severity": "blocking"})
     elif not answer_payload:
         issues.append({"code": "answer_missing", "message": "尚未填写答案", "severity": "blocking"})
+    match = candidate.answer_match or {}
+    if match.get("matched") and not payload.get("answer_confirmed_by_match_review"):
+        # Mechanical matching is a proposal. Until a human confirms it, the
+        # candidate must not be publishable (答案匹配只产生候选).
+        issues.append(
+            {
+                "code": "answer_match_pending_confirmation",
+                "message": (
+                    f"答案由答案页匹配产生（方式：{'题号' if match.get('method') == 'label' else '顺序'}，"
+                    f"原文：{str(match.get('raw', ''))[:40]}），请核对后确认"
+                ),
+                "severity": "blocking",
+                "method": match.get("method"),
+                "source_page_index": match.get("source_page_index"),
+            }
+        )
     if not candidate.subject_id:
         issues.append({"code": "subject_missing", "message": "尚未选择科目", "severity": "blocking"})
+    if candidate.paper_revision_id and not is_material:
+        raw_score = payload.get("practice_max_score")
+        if raw_score in (None, ""):
+            issues.append(
+                {
+                    "code": "paper_item_score_missing",
+                    "message": "该题属于真实试卷记录：发布前必须填写分值，否则周期分值的分母不完整",
+                    "severity": "blocking",
+                }
+            )
+    if candidate.paper_revision_id and candidate.source_position_key:
+        published = published_paper_position(
+            paper=candidate.paper_revision.paper, position_key=candidate.source_position_key
+        )
+        if published is not None and str(published.id) != str(candidate.publication_version_id or ""):
+            # Re-importing a paper must not publish the same paper position twice.
+            issues.append(
+                {
+                    "code": "duplicate_paper_position",
+                    "message": (
+                        f"该试卷的题号 {candidate.source_position_key} 已发布过版本；"
+                        "重复导入不能再次发布（如需修订请在题库中创建新版本）"
+                    ),
+                    "severity": "blocking",
+                    "question_id": str(published.question_id),
+                    "question_version_id": str(published.id),
+                }
+            )
     if not candidate.source_regions.exists():
         issues.append(
             {"code": "no_source_region", "message": "缺少来源区域；题目必须可追溯到原文或原图", "severity": "warning"}
@@ -402,6 +552,11 @@ def refresh_candidate_issues(candidate: ImportCandidate) -> list[dict]:
                         }
                     )
     candidate.review_issues = issues
+    if candidate.status in {ImportCandidateStatus.PUBLISHED, ImportCandidateStatus.IGNORED}:
+        # Recomputing issues must never un-publish or un-ignore a decided
+        # candidate; the issues are informational for those two states.
+        candidate.save(update_fields=["review_issues", "updated_at"])
+        return issues
     blocking = [issue for issue in issues if issue.get("severity") == "blocking"]
     if not blocking and candidate.status == ImportCandidateStatus.DRAFT:
         candidate.status = ImportCandidateStatus.READY
@@ -514,27 +669,42 @@ def publish_candidate(
     if blocking:
         raise StructureInvalid(message="候选仍有未解决的问题，不能发布", details={"problems": blocking})
 
-    question = qb_services.create_question(
-        subject=locked.subject,
-        origin_type=origin_type,
-        actor=actor,
-        display_label=display_label or payload.get("display_label", ""),
-        is_demo=origin_type in {OriginType.DEMO, OriginType.AI_GENERATED},
-    )
     declared_score = _to_decimal(payload.get("practice_max_score"))
     if declared_score is None and exam_spec_version is not None:
         # Publishing may explicitly adopt the selected spec's default for this
         # type; the choice is recorded on the version and shown to the reviewer.
         declared_score = exam_spec_version.default_max_score(question_type)
-    version = qb_services.create_question_version_draft(
-        question,
-        question_type=question_type,
-        content=content,
-        actor=actor,
-        practice_max_score=declared_score,
-        estimated_seconds=payload.get("estimated_seconds"),
-        revision_reason=f"由导入候选 {locked.id} 发布",
-    )
+    if question_type == QuestionType.MATERIAL:
+        # The material version is created when its first child is published (a
+        # child must point at it) and published only once its children are done,
+        # because publish validation compares the declared child list with the
+        # children that actually point at it.
+        version = _ensure_material_version(locked, actor=actor)
+        question = version.question
+        version.content = content
+        version.material_child_version_ids = published_child_version_ids(locked)
+        version.save(update_fields=["content", "material_child_version_ids", "updated_at"])
+    else:
+        question = qb_services.create_question(
+            subject=locked.subject,
+            origin_type=origin_type,
+            actor=actor,
+            display_label=display_label or payload.get("display_label", ""),
+            is_demo=origin_type in {OriginType.DEMO, OriginType.AI_GENERATED},
+        )
+        version = qb_services.create_question_version_draft(
+            question,
+            question_type=question_type,
+            content=content,
+            actor=actor,
+            practice_max_score=declared_score,
+            estimated_seconds=payload.get("estimated_seconds"),
+            revision_reason=f"由导入候选 {locked.id} 发布",
+        )
+        if locked.parent_candidate_id:
+            material_version = _ensure_material_version(locked.parent_candidate, actor=actor)
+            version.parent_material_version = material_version
+            version.save(update_fields=["parent_material_version", "updated_at"])
     if locked.source_regions.exists():
         from apps.question_bank.models import QuestionSourceLink
 
@@ -567,16 +737,132 @@ def publish_candidate(
             ],
             actor=actor,
         )
-    if question_type == QuestionType.MATERIAL and payload.get("child_version_ids"):
-        version.material_child_version_ids = list(payload["child_version_ids"])
-        version.save(update_fields=["material_child_version_ids", "updated_at"])
     published = qb_services.publish_question_version(version, actor=actor)
     locked.status = ImportCandidateStatus.PUBLISHED
     locked.publication_question_id = question.id
     locked.publication_version_id = published.id
     locked.save(update_fields=["status", "publication_question_id", "publication_version_id", "updated_at"])
+    # A candidate that belongs to a real paper occurrence writes its scored
+    # position into that paper revision. This is what makes an imported real
+    # paper countable by the cycle analysis, and `publication_paper_item_id`
+    # makes the write idempotent.
+    _write_paper_item(locked, published, actor=actor)
+    _reconcile_material_children(locked, actor=actor)
+    refresh_candidate_issues(locked)
     maybe_complete_job(locked.job)
     return locked, question
+
+
+def _ensure_material_version(candidate: ImportCandidate, *, actor):
+    """The material's own version, created as a draft on first need.
+
+    A sub-question can only point at its material through a real version row, so
+    the material version has to exist before the first child is published — but it
+    can only be *published* after its children are, which is why the two steps are
+    separate.
+    """
+    from apps.question_bank.models import QuestionVersion
+    from apps.question_bank.services import core as qb_services
+
+    if candidate.publication_version_id:
+        existing = QuestionVersion.objects.filter(id=candidate.publication_version_id).first()
+        if existing is not None:
+            return existing
+    payload = candidate.draft_payload or {}
+    question = qb_services.create_question(
+        subject=candidate.subject,
+        origin_type=OriginType.USER_AUTHORED,
+        actor=actor,
+        display_label=payload.get("display_label", ""),
+        is_demo=False,
+    )
+    version = qb_services.create_question_version_draft(
+        question,
+        question_type=QuestionType.MATERIAL,
+        content=payload.get("content") or {"blocks": []},
+        actor=actor,
+        revision_reason=f"由导入候选 {candidate.id} 的材料题版本",
+    )
+    candidate.publication_question_id = question.id
+    candidate.publication_version_id = version.id
+    candidate.save(update_fields=["publication_question_id", "publication_version_id", "updated_at"])
+    return version
+
+
+def published_child_version_ids(candidate: ImportCandidate) -> list[str]:
+    """Published versions of a material candidate's children, in source order."""
+    ids: list[str] = []
+    for child in candidate.child_candidates.order_by("created_at"):
+        if child.publication_version_id:
+            ids.append(str(child.publication_version_id))
+    return ids
+
+
+def _reconcile_material_children(candidate: ImportCandidate, *, actor) -> None:
+    """Keep a material version's child list in step with its published children."""
+    from apps.question_bank.models import QuestionVersion
+
+    if candidate.parent_candidate_id is None:
+        return
+    parent = candidate.parent_candidate
+    if not parent.publication_version_id:
+        return
+    version = QuestionVersion.objects.filter(id=parent.publication_version_id).first()
+    if version is None:  # pragma: no cover - defensive
+        return
+    derived = published_child_version_ids(parent)
+    if sorted(map(str, version.material_child_version_ids or [])) != sorted(derived):
+        version.material_child_version_ids = derived
+        version.save(update_fields=["material_child_version_ids", "updated_at"])
+
+
+def _write_paper_item(candidate: ImportCandidate, published_version, *, actor) -> None:
+    """Create the PaperItem for a published candidate, exactly once."""
+    from apps.exams.services import core as exam_services
+
+    if candidate.paper_revision_id is None:
+        return
+    if candidate.publication_paper_item_id is not None:
+        return
+    revision = candidate.paper_revision
+    is_material = (candidate.draft_payload or {}).get("question_type") == QuestionType.MATERIAL
+    position_key = candidate.source_position_key or (candidate.draft_payload or {}).get("display_label") or ""
+    if not position_key:
+        position_key = f"cand-{str(candidate.id)[:8]}"
+    if is_material:
+        max_score = Decimal("0")
+    else:
+        max_score = _to_decimal((candidate.draft_payload or {}).get("practice_max_score")) or Decimal("0")
+    parent_item = None
+    if candidate.parent_candidate_id and candidate.parent_candidate.publication_paper_item_id:
+        from apps.exams.models import PaperItem
+
+        parent_item = PaperItem.objects.filter(id=candidate.parent_candidate.publication_paper_item_id).first()
+    answer_key_version = published_version.answer_keys.order_by("-version").first()
+    item = exam_services.add_paper_item(
+        revision,
+        actor=actor,
+        position_key=position_key,
+        question_version=published_version,
+        answer_key_version=answer_key_version,
+        max_score=max_score,
+        is_scored=not is_material,
+        parent_item=parent_item,
+    )
+    candidate.publication_paper_item_id = item.id
+    candidate.save(update_fields=["publication_paper_item_id", "updated_at"])
+    if is_material:
+        # Children are usually published before their material, so their paper
+        # items are linked here rather than at their own publication time.
+        from apps.exams.models import PaperItem
+
+        child_item_ids = [
+            child.publication_paper_item_id
+            for child in candidate.child_candidates.all()
+            if child.publication_paper_item_id
+        ]
+        if child_item_ids:
+            PaperItem.objects.filter(id__in=child_item_ids).update(parent_item=item, updated_at=timezone.now())
 
 
 def _to_decimal(value) -> Decimal | None:

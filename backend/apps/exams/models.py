@@ -236,10 +236,17 @@ class PaperRevision(BaseModel):
 
     @property
     def coverage_status(self) -> str:
-        if self.expected_session_count is None:
+        """Complete only when a human confirmed the counts, not merely typed them.
+
+        Typing "expected 2 / covered 2" describes an intention; the confirmation
+        is what states that the cycle really is covered. Cycle statistics count
+        nothing but confirmed completeness, so a half-registered cycle cannot
+        silently become an official distribution.
+        """
+        if self.expected_session_count is None or self.covered_session_count is None:
             return "coverage_unknown"
-        if self.covered_session_count is None:
-            return "coverage_unknown"
+        if self.coverage_confirmed_at is None:
+            return "coverage_incomplete"
         if self.covered_session_count >= self.expected_session_count:
             return "coverage_complete"
         return "coverage_incomplete"

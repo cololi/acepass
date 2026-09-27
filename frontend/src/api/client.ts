@@ -532,11 +532,119 @@ export interface CandidateOut {
     crop_asset_id: string | null
     document_asset_id: string | null
     document_title: string
+    /** `image`, `text`, `pdf` or `pdf_answer`. */
     document_type: string
   }>
   publication_question_id: string | null
   publication_version_id: string | null
+  /** The paper item this candidate occupies once published (P1-01). */
+  publication_paper_item_id: string | null
+  /** Material hierarchy parsed from the source; null for a top-level question. */
+  parent_candidate_id: string | null
+  child_candidate_ids: string[]
+  /** 卷面题号 inside the paper revision, e.g. "12" or "三.2". */
+  source_position_key: string
+  paper_revision_id: string | null
+  /** Answer-page match: a proposal a human still has to confirm. */
+  answer_match: {
+    matched?: boolean
+    method?: string
+    label?: string
+    raw?: string
+    source_page_index?: number
+    document_id?: string
+    document_title?: string
+  }
   updated_at: string
+}
+
+export interface PaperRevisionOut {
+  id: string
+  revision: number
+  status: string
+  coverage_status: string
+  expected_session_count: number | null
+  covered_session_count: number | null
+  item_count: number
+  scored_item_count: number
+  note: string
+  coverage_confirmed_by?: string | null
+  coverage_confirmed_at?: string | null
+}
+
+export interface PaperOut {
+  id: string
+  subject_id: string
+  cycle_key: string
+  session_key: string
+  paper_code: string
+  source_kind: string
+  title: string
+  is_demo: boolean
+  effective_revision_id: string | null
+  revisions: PaperRevisionOut[]
+  coverage_note: string
+}
+
+export interface OutlineImportOut {
+  created: number
+  merged: number
+  aliases_added: Array<{ node_id: string; aliases: string[] }>
+  skipped: Array<{ line: number; text: string; reason: string; node_id?: string }>
+  node_count: number
+}
+
+export interface CycleAnalysisOut {
+  subject_id: string
+  cycle_horizon: number
+  status: 'ok' | 'insufficient_cycles'
+  complete_cycle_count: number
+  used_cycle_count: number
+  missing_complete_cycles: number
+  used_cycles: string[]
+  cycles: Array<{
+    cycle_key: string
+    paper_count: number
+    scored_item_count: number
+    denominator_total_score: string
+    share_total: string
+    nodes: Array<{
+      node_id: string | null
+      label: string
+      path: string
+      unclassified: boolean
+      score: string
+      share: string | null
+    }>
+  }>
+  incomplete_cycles: Array<{
+    cycle_key: string
+    paper_count: number
+    blocking_reasons: Array<{ paper_id: string; reason: string }>
+    papers: Array<{
+      paper_id: string
+      paper_code: string
+      session_key: string
+      /** Sent by the backend in addition to the documented shape. */
+      source_kind?: string
+      coverage_status: string
+      expected_session_count: number | null
+      covered_session_count: number | null
+      countable: boolean
+      reason: string
+    }>
+  }>
+  nodes: Array<{
+    node_id: string | null
+    label: string
+    path: string
+    unclassified: boolean
+    cycle_count: number
+    average_share: string | null
+    average_score: string | null
+  }>
+  coverage_gaps: Array<{ node_id: string; label: string; path: string; reason: string }>
+  notes: string[]
 }
 
 export interface GradingQueueRow {

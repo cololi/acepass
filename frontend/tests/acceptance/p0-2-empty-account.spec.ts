@@ -110,7 +110,7 @@ test('an empty account sets up, imports, publishes and practises through the UI'
   const uploadWait = page.waitForResponse(
     (r) => r.url().endsWith('/imports/images') && r.request().method() === 'POST',
   )
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByTestId('image-import-input').setInputFiles({
     name: 'empty-account-source.png',
     mimeType: 'image/png',
     buffer: makePng(24, 24),

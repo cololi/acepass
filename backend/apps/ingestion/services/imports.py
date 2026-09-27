@@ -1,22 +1,30 @@
-"""Text and image import entry points.
+"""Text, image and native-text PDF import entry points.
 
 P0 manual/text paths are complete here. Image *recognition* is milestone M5 and
 goes through the AI capability layer; this module only stores the material and
 creates candidate shells so a human can type the structure, and it never
 pretends a model read the image.
+
+P1-01 adds the *native-text* PDF path: the text layer of a born-digital paper is
+extracted page by page, parsed with the same labelled parser, and turned into
+candidates that each know their source page. Answers printed on their own page
+are matched onto those candidates as proposals only — nothing here reads an
+image, calls a model, or publishes an answer key.
 """
 
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass
 
 from django.db import transaction
 from django.utils import timezone
 
-from apps.common.enums import AssetRole, ImportJobStatus, QuestionType
+from apps.common.enums import AssetRole, ImportJobStatus, QuestionType, SourceKind
 from apps.common.errors import InvalidInput
 from apps.ingestion.models import ImportCandidate, ImportJob, SourceDocument
 from apps.ingestion.services import core as ingestion
+from apps.ingestion.services import pdf_text, text_parser
 
 
 @transaction.atomic
@@ -256,9 +264,407 @@ def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = Tru
         ],
         "publication_question_id": str(candidate.publication_question_id) if candidate.publication_question_id else None,
         "publication_version_id": str(candidate.publication_version_id) if candidate.publication_version_id else None,
+        "publication_paper_item_id": (
+            str(candidate.publication_paper_item_id) if candidate.publication_paper_item_id else None
+        ),
+        # Material hierarchy parsed from the source, and the paper position this
+        # candidate occupies (P1-01).
+        "parent_candidate_id": str(candidate.parent_candidate_id) if candidate.parent_candidate_id else None,
+        "child_candidate_ids": [str(child.id) for child in candidate.child_candidates.order_by("created_at")],
+        "source_position_key": candidate.source_position_key,
+        "paper_revision_id": str(candidate.paper_revision_id) if candidate.paper_revision_id else None,
+        # How an answer page was matched onto this candidate: a proposal that a
+        # human still has to confirm before an answer key can be published.
+        "answer_match": candidate.answer_match or {},
         "updated_at": candidate.updated_at.isoformat(),
     }
 
 
 def text_fingerprint(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+# --------------------------------------------------------------------------
+# P1-01: native-text PDF batch import
+# --------------------------------------------------------------------------
+@dataclass
+class PdfUpload:
+    """One uploaded PDF, already read into memory by the API layer."""
+
+    filename: str
+    content: bytes
+    content_type: str = "application/pdf"
+
+
+@dataclass
+class _SourceFile:
+    document: SourceDocument
+    extraction: pdf_text.PdfExtraction
+    reused: bool
+
+
+def _store_or_reuse_document(
+    *,
+    owner,
+    project,
+    upload: PdfUpload,
+    role: str,
+    subject,
+    title: str,
+    source_note: str,
+    usage_scope: str,
+) -> _SourceFile:
+    """Reuse an identical file instead of storing a second copy of it."""
+    content_type = (upload.content_type or "").lower()
+    if content_type and content_type not in {"application/pdf", "application/x-pdf", "application/octet-stream"}:
+        raise InvalidInput(
+            message="仅支持 PDF 文件（原生文字版）",
+            details={"content_type": content_type, "filename": upload.filename},
+        )
+    extraction = pdf_text.extract_native_text(upload.content)
+    checksum = ingestion.file_checksum(upload.content)
+    existing = ingestion.find_duplicate_document(project=project, checksum=checksum)
+    if existing is not None:
+        return _SourceFile(document=existing, extraction=extraction, reused=True)
+    document = ingestion.create_pdf_document(
+        owner=owner,
+        project=project,
+        content=upload.content,
+        role=role,
+        title=title or upload.filename,
+        subject=subject,
+        page_texts=[page.text for page in extraction.pages],
+        source_note=source_note,
+        usage_scope=usage_scope,
+        sensitivity="contains_answers" if role == AssetRole.ANSWER_PAGE else "public_to_owner",
+        original_filename=upload.filename,
+    )
+    return _SourceFile(document=document, extraction=extraction, reused=False)
+
+
+def _unique_position_key(display_label: str, used: set[str], fallback_index: int) -> str:
+    base = (display_label or "").strip() or str(fallback_index)
+    candidate = base
+    suffix = 2
+    while candidate in used:
+        candidate = f"{base}#{suffix}"
+        suffix += 1
+    used.add(candidate)
+    return candidate[:40]
+
+
+@transaction.atomic
+def start_pdf_import(
+    *,
+    owner,
+    project,
+    paper_files: list[PdfUpload],
+    answer_files: list[PdfUpload] | None = None,
+    subject=None,
+    title: str = "",
+    source_note: str = "",
+    usage_scope: str = "",
+    cycle_key: str = "",
+    session_key: str = "",
+    paper_code: str = "",
+    source_kind: str = SourceKind.OFFICIAL_PAST,
+    expected_session_count: int | None = None,
+    paper_title: str = "",
+) -> ImportJob:
+    """Import born-digital paper PDFs (plus optional answer PDFs) as candidates.
+
+    Everything mechanical happens here — extraction, page attribution, structure
+    parsing and answer matching — and every step is recorded so a proofreader can
+    check it against the original page. Publication stays a separate, explicit
+    human act.
+    """
+    from apps.exams.services import core as exam_services
+
+    answer_files = answer_files or []
+    if not paper_files:
+        raise InvalidInput(message="请至少上传一份试卷 PDF")
+    if subject is not None and str(subject.project_id) != str(project.id):
+        raise InvalidInput(message="科目不属于该项目")
+
+    sources: list[_SourceFile] = []
+    for upload in paper_files:
+        sources.append(
+            _store_or_reuse_document(
+                owner=owner,
+                project=project,
+                upload=upload,
+                role=AssetRole.PAST_PAPER_PAGE,
+                subject=subject,
+                title=title,
+                source_note=source_note,
+                usage_scope=usage_scope,
+            )
+        )
+    answer_sources: list[_SourceFile] = []
+    for upload in answer_files:
+        answer_sources.append(
+            _store_or_reuse_document(
+                owner=owner,
+                project=project,
+                upload=upload,
+                role=AssetRole.ANSWER_PAGE,
+                subject=subject,
+                title=f"{title or upload.filename}（答案）",
+                source_note=source_note,
+                usage_scope=usage_scope,
+            )
+        )
+
+    job = ingestion.create_import_job(
+        owner=owner,
+        project=project,
+        input_kind="pdf_text",
+        subject=subject,
+        documents=[source.document for source in [*sources, *answer_sources]],
+        extractor_version="pdf-text-v1",
+    )
+    job.status = ImportJobStatus.PROCESSING
+    job.started_at = timezone.now()
+    job.save(update_fields=["status", "started_at", "updated_at"])
+
+    revision = _prepare_paper_revision(
+        owner=owner,
+        job=job,
+        subject=subject,
+        cycle_key=cycle_key,
+        session_key=session_key,
+        paper_code=paper_code,
+        source_kind=source_kind,
+        expected_session_count=expected_session_count,
+        covered_session_count=len(paper_files) if expected_session_count else None,
+        title=paper_title or title,
+        actor=owner,
+        exam_services=exam_services,
+    )
+
+    empty_pages: list[dict] = []
+    reused_documents = 0
+    for source in [*sources, *answer_sources]:
+        if source.reused:
+            reused_documents += 1
+        if source.extraction.empty_pages:
+            empty_pages.append(
+                {
+                    "document_id": str(source.document.id),
+                    "title": source.document.title,
+                    "pages": source.extraction.empty_pages,
+                }
+            )
+
+    answers = _collect_answer_entries(answer_sources)
+    segments_by_source: list[tuple[_SourceFile, list[dict]]] = []
+    for source in sources:
+        text = source.extraction.text
+        segments = text_parser.parse_paste(text, structure_only=True)
+        text_parser.attach_source_pages(segments, text, source.extraction.page_map())
+        for segment in segments:
+            segment.setdefault("parse_issues", [])
+        segments_by_source.append((source, segments))
+
+    used_positions: set[str] = set()
+    running_index = 0
+    created: list[tuple[ImportCandidate, dict]] = []
+    local_ids: dict[str, ImportCandidate] = {}
+    matched_answers = 0
+    position_matched = 0
+    for source, segments in segments_by_source:
+        match_report = text_parser.apply_answer_matches(segments, answers["entries"])
+        for segment, match in zip(segments, match_report["results"], strict=True):
+            running_index += 1
+            position_key = _unique_position_key(
+                str(segment.get("display_label") or ""), used_positions, running_index
+            )
+            payload = dict(segment)
+            answer_match: dict = {}
+            if match.get("matched"):
+                matched_answers += 1
+                position_matched += 1 if match.get("method") == "position" else 0
+                payload["answer_payload"] = match["answer_payload"]
+                # A matched answer is a proposal: the proofreader must confirm it
+                # before the candidate can be published.
+                payload["answer_status_known"] = False
+                payload.setdefault("parse_issues", []).append(
+                    "答案来自答案页匹配（方式：{}，原文：{}），需人工确认".format(
+                        "题号" if match.get("method") == "label" else "顺序", str(match.get("raw"))[:40]
+                    )
+                )
+                answer_match = {
+                    "matched": True,
+                    "method": match.get("method"),
+                    "label": match.get("label"),
+                    "raw": match.get("raw"),
+                    "source_page_index": match.get("source_page_index"),
+                    "document_id": match.get("document_id"),
+                    "document_title": match.get("document_title"),
+                }
+            region = ingestion.create_source_region(
+                document=source.document,
+                page_index=int(segment.get("source_page_index") or 1),
+                x=0.0,
+                y=0.0,
+                width=1.0,
+                height=1.0,
+                role=AssetRole.PAST_PAPER_PAGE,
+                text_span=(segment.get("source_excerpt") or "")[:2000],
+            )
+            region.char_start = segment.get("source_char_start")
+            region.char_end = (segment.get("source_char_start") or 0) + len(segment.get("source_excerpt") or "")
+            region.save(update_fields=["char_start", "char_end", "updated_at"])
+            candidate = ingestion.create_candidate(
+                job=job,
+                payload=payload,
+                subject=subject,
+                machine_payload=payload,
+                regions=[region],
+                extractor_version="pdf-text-v1",
+                source_position_key=position_key,
+                paper_revision=revision,
+                answer_match=answer_match,
+            )
+            if segment.get("local_id"):
+                local_ids[str(segment["local_id"])] = candidate
+            created.append((candidate, segment))
+
+    # Material parents/children are linked from the parsed structure, not retyped.
+    for candidate, segment in created:
+        parent_local = segment.get("parent_local_id")
+        if parent_local and parent_local in local_ids:
+            candidate.parent_candidate = local_ids[parent_local]
+            candidate.save(update_fields=["parent_candidate", "updated_at"])
+            ingestion.refresh_candidate_issues(candidate)
+    if revision is not None:
+        _annotate_paper_duplicates(job, created)
+
+    if reused_documents:
+        ingestion.add_job_problem(
+            job,
+            "duplicate_source_file",
+            f"其中 {reused_documents} 份 PDF 与已有来源文件完全相同，已复用原来源而未新增副本"
+            "（避免同一试卷被重复计入）。",
+            severity="warning",
+        )
+    if empty_pages:
+        ingestion.add_job_problem(
+            job,
+            "pdf_pages_without_text",
+            "以下页面没有文字层（可能是插图页或扫描页），需要人工补齐："
+            + "; ".join(f"{item['title']} 第 {item['pages']} 页" for item in empty_pages[:5]),
+            severity="warning",
+            pages=empty_pages[:20],
+        )
+    if matched_answers:
+        ingestion.add_job_problem(
+            job,
+            "answers_matched",
+            f"已从答案页匹配 {matched_answers} 条答案（其中 {position_matched} 条按顺序匹配），"
+            "都只是候选，必须逐条人工确认后才能发布。",
+            severity="info" if not position_matched else "warning",
+            matched=matched_answers,
+            position_matched=position_matched,
+            unmatched_labels=match_report_unmatched(segments_by_source, answers),
+        )
+    if answers["entries"] and not matched_answers:
+        ingestion.add_job_problem(
+            job,
+            "answers_not_matched",
+            "答案页已解析出条目，但没有任何一条能匹配到题目；请在校对页手工填写。",
+            severity="warning",
+        )
+    if not created:
+        ingestion.add_job_problem(
+            job,
+            "no_recognised_segment",
+            "未能从 PDF 文本层识别出题目结构：请确认使用的是原生文字 PDF，"
+            "并在校对页按【题型】【题干】【选项】【答案】模板补录。",
+            severity="warning",
+        )
+    ingestion.maybe_complete_job(job)
+    return job
+
+
+def _collect_answer_entries(answer_sources: list[_SourceFile]) -> dict:
+    """Parse answer PDFs page by page so every matched answer keeps its page."""
+    entries: list[dict] = []
+    unparsed: list[str] = []
+    for source in answer_sources:
+        for page in source.extraction.pages:
+            parsed = text_parser.parse_answer_page(page.text)
+            for entry in parsed["entries"]:
+                entries.append(
+                    {
+                        **entry,
+                        "source_page_index": page.page_index,
+                        "document_id": str(source.document.id),
+                        "document_title": source.document.title,
+                    }
+                )
+            unparsed.extend(parsed["unparsed"])
+    return {"entries": entries, "unparsed": unparsed[:50]}
+
+
+def match_report_unmatched(segments_by_source, answers: dict) -> list[str]:
+    labels = {
+        str(segment.get("display_label"))
+        for _source, segments in segments_by_source
+        for segment in segments
+    }
+    return [str(entry.get("label")) for entry in answers["entries"] if str(entry.get("label")) not in labels][:50]
+
+
+def _prepare_paper_revision(
+    *,
+    owner,
+    job: ImportJob,
+    subject,
+    cycle_key: str,
+    session_key: str,
+    paper_code: str,
+    source_kind: str,
+    expected_session_count: int | None,
+    covered_session_count: int | None,
+    title: str,
+    actor,
+    exam_services,
+):
+    """Register/lookup the paper occurrence and open one draft revision."""
+    if subject is None or not cycle_key.strip() or not paper_code.strip():
+        return None
+    paper, _created = exam_services.get_or_create_paper(
+        subject=subject,
+        cycle_key=cycle_key,
+        session_key=session_key,
+        paper_code=paper_code,
+        source_kind=source_kind,
+        title=title,
+        actor=actor,
+    )
+    return exam_services.create_paper_revision(
+        paper,
+        actor=owner,
+        expected_session_count=expected_session_count,
+        covered_session_count=covered_session_count,
+        note=f"由原生文字 PDF 导入创建（导入任务 {job.id}）",
+    )
+
+
+def _annotate_paper_duplicates(job: ImportJob, created: list[tuple[ImportCandidate, dict]]) -> None:
+    """Block publishing a paper position that an earlier revision already published."""
+    duplicates = 0
+    for candidate, _segment in created:
+        issues = ingestion.refresh_candidate_issues(candidate)
+        if any(issue.get("code") == "duplicate_paper_position" for issue in issues):
+            duplicates += 1
+    if duplicates:
+        ingestion.add_job_problem(
+            job,
+            "duplicate_paper_positions",
+            f"{duplicates} 个题号在该试卷的历史版本中已经发布过，已在候选上标为阻断项；"
+            "重复导入不会再次发布（如需修订请在题库中创建新版本）。",
+            severity="warning",
+            count=duplicates,
+        )

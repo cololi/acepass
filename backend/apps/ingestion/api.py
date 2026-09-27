@@ -10,7 +10,7 @@ from ninja.files import UploadedFile
 
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
-from apps.common.enums import AssetRole
+from apps.common.enums import AssetRole, SourceKind
 from apps.common.errors import InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.exams.models import ExamSpecVersion
@@ -83,6 +83,12 @@ class CandidateRegionOut(Schema):
     role: str
     text_span: str
     crop_asset_id: str | None
+    # Declared explicitly: django-ninja serialises through the response model, so
+    # a field the schema does not list never reaches the proofreading UI — the
+    # page a candidate came from is part of "来源页可追溯", not decoration.
+    document_asset_id: str | None = None
+    document_title: str = ""
+    document_type: str = ""
 
 
 class CandidateOut(Schema):
@@ -99,6 +105,15 @@ class CandidateOut(Schema):
     source_regions: list[CandidateRegionOut]
     publication_question_id: str | None
     publication_version_id: str | None
+    publication_paper_item_id: str | None = None
+    #: Material parent/children parsed from the source (P1-01).
+    parent_candidate_id: str | None = None
+    child_candidate_ids: list[str] = []
+    #: 卷面题号 inside the paper revision, and the revision it belongs to.
+    source_position_key: str = ""
+    paper_revision_id: str | None = None
+    #: How an answer page was matched onto this candidate (proposal, not a key).
+    answer_match: dict[str, Any] = {}
     updated_at: str
 
 
@@ -408,6 +423,94 @@ def create_image_import(
     # `ingestion.extract_candidate` rows only move when the periodic scanner
     # runs, so "the vision chain is wired" was not observable from the API.
     outbox.after_commit_dispatch()
+    return 201, result
+
+
+@ingestion_router.post("/projects/{project_id}/imports/pdf", auth=auth, response={201: ImportJobOut})
+def create_pdf_import(
+    request,
+    project_id: str,
+    files: list[UploadedFile] = File(...),
+    answer_files: list[UploadedFile] = File(default=[]),
+    subject_id: str = Form(""),
+    title: str = Form(""),
+    source_note: str = Form(""),
+    cycle_key: str = Form(""),
+    session_key: str = Form(""),
+    paper_code: str = Form(""),
+    source_kind: str = Form(SourceKind.OFFICIAL_PAST),
+    expected_session_count: int | None = Form(None),
+    usage_scope: str = Form(""),
+):
+    """Batch-import born-digital paper PDFs (plus optional answer PDFs).
+
+    The text layer is extracted deterministically — no model, no credentials. Each
+    parsed question becomes a proofreading candidate that knows its source page,
+    and answers printed on a separate PDF are matched onto those candidates as
+    proposals only. ``files`` must be declared as ``list[UploadedFile]`` for the
+    same reason as the image import (see ``create_image_import``).
+    """
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
+    if not files:
+        raise InvalidInput(message="请至少上传一份试卷 PDF")
+    if source_kind not in SourceKind.values:
+        raise InvalidInput(message="试卷来源类型无效", details={"source_kind": source_kind})
+    paper_uploads = [
+        import_services.PdfUpload(
+            filename=upload.name or "paper.pdf",
+            content=upload.read(),
+            content_type=(upload.content_type or "application/pdf").lower(),
+        )
+        for upload in files
+    ]
+    answer_uploads = [
+        import_services.PdfUpload(
+            filename=upload.name or "answers.pdf",
+            content=upload.read(),
+            content_type=(upload.content_type or "application/pdf").lower(),
+        )
+        for upload in answer_files
+    ]
+    if source_kind == SourceKind.OFFICIAL_PAST and not cycle_key.strip():
+        raise InvalidInput(message="真实考试试卷必须填写年份/周期与卷别代码，否则无法进入历年统计")
+    key = idempotency_key(request)
+    scope = f"imports.create_pdf:{project_id}"
+    replay = idempotency.claim(
+        request.user,
+        scope,
+        key,
+        {
+            "checksums": [ingestion_services.file_checksum(upload.content) for upload in [*paper_uploads, *answer_uploads]],
+            "subject_id": subject_id,
+            "cycle_key": cycle_key,
+            "session_key": session_key,
+            "paper_code": paper_code,
+            "source_kind": source_kind,
+        },
+    )
+    if replay is not None:
+        return replay.status_code, replay.body
+    job = import_services.start_pdf_import(
+        owner=request.user,
+        project=project,
+        paper_files=paper_uploads,
+        answer_files=answer_uploads,
+        subject=subject,
+        title=title,
+        source_note=source_note,
+        usage_scope=usage_scope,
+        cycle_key=cycle_key,
+        session_key=session_key,
+        paper_code=paper_code,
+        source_kind=source_kind,
+        expected_session_count=expected_session_count,
+        paper_title=title,
+    )
+    result = import_services.job_summary(job)
+    idempotency.record_result(
+        request.user, scope, key, status_code=201, response_body=result, resource_type="import_job", resource_id=job.id
+    )
     return 201, result
 
 

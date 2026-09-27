@@ -77,7 +77,7 @@ class SourceDocument(BaseModel):
         "exams.Subject", null=True, blank=True, on_delete=models.SET_NULL, related_name="source_documents"
     )
     title = models.CharField(max_length=300, blank=True)
-    #: `image` or `text` in P0; PDF is a later stage.
+    #: `image`, `text`, `pdf` or `pdf_answer`; PDF is the P1 native-text import.
     document_type = models.CharField(max_length=16, default="image")
     role = models.CharField(max_length=24, choices=AssetRole.choices, default=AssetRole.PAST_PAPER_PAGE)
     sensitivity = models.CharField(
@@ -86,6 +86,10 @@ class SourceDocument(BaseModel):
     asset = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.PROTECT, related_name="documents")
     #: Full original text for pasted input; never replaced by parsed output.
     raw_text = models.TextField(blank=True)
+    #: Per-page text extracted from a native-text PDF, page order starting at 1.
+    #: Kept beside ``raw_text`` so a candidate's page number and that page's
+    #: wording both stay checkable against the original file.
+    page_texts = models.JSONField(default=list, blank=True)
     checksum = models.CharField(max_length=64, db_index=True)
     source_type = models.CharField(max_length=40, default="user_paste")
     source_note = models.CharField(max_length=500, blank=True, help_text="来源说明：出处、年份、获取方式")
@@ -197,6 +201,24 @@ class ImportCandidate(BaseModel):
     subject = models.ForeignKey(
         "exams.Subject", null=True, blank=True, on_delete=models.SET_NULL, related_name="import_candidates"
     )
+    #: Material parent of a sub-question. The relation is parsed from the source
+    #: (【材料】/子题) instead of being re-typed by the proofreader, and it survives
+    #: publication: the material question stores the published child versions.
+    parent_candidate = models.ForeignKey(
+        "ingestion.ImportCandidate", null=True, blank=True, on_delete=models.SET_NULL, related_name="child_candidates"
+    )
+    #: 卷面题号 inside the paper revision (also the position key of the PaperItem
+    #: created on publication), so re-importing the same paper can be recognised.
+    source_position_key = models.CharField(max_length=40, blank=True, db_index=True)
+    #: Draft paper revision this candidate belongs to, when it came from a paper
+    #: PDF. Publishing writes a PaperItem here, which is what makes the imported
+    #: real paper countable by the cycle analysis.
+    paper_revision = models.ForeignKey(
+        "exams.PaperRevision", null=True, blank=True, on_delete=models.SET_NULL, related_name="import_candidates"
+    )
+    #: How an answer page was matched onto this candidate (method, raw value,
+    #: source page). Recorded so the confirmation is auditable, never implicit.
+    answer_match = models.JSONField(default=dict, blank=True)
     status = models.CharField(
         max_length=16, choices=ImportCandidateStatus.choices, default=ImportCandidateStatus.DRAFT, db_index=True
     )
@@ -219,6 +241,8 @@ class ImportCandidate(BaseModel):
     reviewed_at = models.DateTimeField(null=True, blank=True)
     publication_question_id = models.UUIDField(null=True, blank=True)
     publication_version_id = models.UUIDField(null=True, blank=True)
+    #: PaperItem created when this candidate was published (idempotency marker).
+    publication_paper_item_id = models.UUIDField(null=True, blank=True)
 
     class Meta:
         db_table = "ingestion_import_candidate"
