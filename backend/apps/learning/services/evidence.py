@@ -196,7 +196,11 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
     seen_reasons = _question_seen_before(attempt) + _cross_project_lineage_seen(attempt)
 
     trusted_question = bool(item.answer_key_version and item.answer_key_version.is_usable)
-    confirmed_grade = grade is not None and grade.status == GradeStatus.CONFIRMED and grade.is_fully_confirmed
+    # `graded` = every scoring part has been decided. `correct` = it also reached
+    # full marks. A wrong answer is fully graded and still not correct, so the
+    # two facts are computed separately and never conflated.
+    graded = grade is not None and grade.status == GradeStatus.CONFIRMED and grade.is_fully_confirmed
+    correct = is_grade_correct(grade)
     self_graded = bool(grade and (grade.grader_is_self or grade.method == GradeMethod.SELF_CONFIRMED))
     estimated_only = bool(grade and grade.method == GradeMethod.AI_ESTIMATED)
     pending = grade is None or grade.status == GradeStatus.PENDING_REVIEW
@@ -214,6 +218,8 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
         base_reasons.append("本次评分为自评确认，只产生自评证据")
     if not timing_ok:
         base_reasons.append("缺少可信用时记录")
+    if graded and not correct:
+        base_reasons.append("判分已完成但未达到满分，不能作为严格独立正确证据")
 
     for mapping in nodes:
         node = mapping.node
@@ -225,7 +231,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.REPEAT_PRACTICE,
                 "node": node,
                 "qualifies": True,
-                "is_correct": bool(grade and grade.is_fully_confirmed),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": [],
                 "detail": {"note": "原始提交存在即计入重复练习，即使看过答案也单列"},
@@ -242,7 +248,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.UNASSISTED_COMPLETION,
                 "node": node,
                 "qualifies": unassisted,
-                "is_correct": bool(grade and grade.is_fully_confirmed),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": unassisted_reasons,
                 "detail": {"note": "本次作答期间无辅助，不代表此前从未见过本题"},
@@ -254,7 +260,8 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
             independent_reasons.append("本次作答不足以作为独立能力证据（会话用途）")
         independent = (
             trusted_question
-            and confirmed_grade
+            and graded
+            and correct
             and not assistance
             and not seen_reasons
             and not self_graded
@@ -267,7 +274,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.INDEPENDENT_CORRECT,
                 "node": node,
                 "qualifies": independent,
-                "is_correct": bool(confirmed_grade),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": [] if independent else independent_reasons,
                 "detail": {
@@ -302,7 +309,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.TEMPLATE_VARIANT,
                 "node": node,
                 "qualifies": template_variant,
-                "is_correct": bool(confirmed_grade),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": template_reasons,
                 "detail": {"template_id": str(template.id) if template else None},
@@ -322,7 +329,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.UNSEEN_VARIANT,
                 "node": node,
                 "qualifies": unseen,
-                "is_correct": bool(confirmed_grade),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": [] if unseen else unseen_reasons,
                 "detail": {
@@ -357,7 +364,7 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 "dimension": EvidenceDimension.DELAYED_VERIFICATION,
                 "node": node,
                 "qualifies": delayed,
-                "is_correct": bool(confirmed_grade),
+                "is_correct": correct,
                 "score_fraction": _fraction(grade),
                 "exclusion_reasons": [] if delayed else delayed_reasons,
                 "detail": {
@@ -377,6 +384,15 @@ def confirmation_ok(item) -> bool:
     if session.mode == SessionMode.VERIFICATION and session.status == SessionStatus.ACTIVE:
         return False
     return True
+
+
+def is_grade_correct(grade) -> bool:
+    """Fully confirmed *and* at full marks — the only reading of "完全正确"."""
+    if grade is None or not grade.is_fully_confirmed or grade.confirmed_score is None:
+        return False
+    if not grade.max_score or grade.max_score <= 0:
+        return False
+    return grade.confirmed_score >= grade.max_score
 
 
 def _fraction(grade) -> Decimal | None:
@@ -465,7 +481,9 @@ def invalidate_for_answer_version(answer_key_version_id: str) -> int:
     return count
 
 
-def evidence_summary_rows(*, user, project, node=None, limit: int = 100) -> list[dict]:
+def evidence_summary_rows(
+    *, user, project, node=None, limit: int = 100, subject=None, dimension: str | None = None
+) -> list[dict]:
     queryset = (
         LearningEvidence.objects.filter(user=user, project=project, is_active=True)
         .select_related("knowledge_node", "attempt")
@@ -473,6 +491,15 @@ def evidence_summary_rows(*, user, project, node=None, limit: int = 100) -> list
     )
     if node is not None:
         queryset = queryset.filter(knowledge_node=node)
+    if subject is not None:
+        queryset = queryset.filter(attempt__session_item__question_version__question__subject=subject)
+    if dimension:
+        queryset = queryset.filter(dimension=dimension)
+    # Hidden verifications must not leak through the evidence projection either.
+    queryset = queryset.exclude(
+        attempt__session_item__session__status=SessionStatus.ACTIVE,
+        attempt__session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM],
+    )
     return [
         {
             "id": str(row.id),

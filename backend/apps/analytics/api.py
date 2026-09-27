@@ -29,6 +29,8 @@ class ReportOut(Schema):
     by_knowledge_node: dict[str, Any]
     excluded_evidence: list[dict[str, Any]]
     notes: list[str]
+    #: Attempts excluded from every bucket because their run is still hidden.
+    hidden_verification_attempts: int = 0
 
 
 class RegradeIn(Schema):
@@ -47,8 +49,10 @@ class RegradeOut(Schema):
     target_rubric_version_id: str | None
     scope: str
     reason: str
+    generation: int = 0
     affected_attempts: int
     regraded_attempts: int
+    stale_skipped_attempts: int = 0
     invalidated_evidence: int
     error_message: str
     created_at: str
@@ -187,22 +191,44 @@ def run_regrade_now(request, project_id: str, regrade_id: str):
 
 @regrade_router.get("/projects/{project_id}/answer-reviews", auth=auth)
 def pending_answer_reviews(request, project_id: str):
-    """Answers that need checking or are disputed: the publication gate view."""
+    """Answers that need attention, with their regrade eligibility.
+
+    This queue deliberately includes *trusted* (``checked`` and undisputed)
+    answers as well: those are the only ones a regrade may target, so excluding
+    them made the regrade action unreachable from the UI. Disputed answers are
+    listed too, marked ineligible.
+    """
+    from django.db.models import Q as _Q
+
+    from apps.common.enums import VerificationStatus
+
     project = require_project(request.user, project_id)
-    queryset = AnswerKeyVersion.objects.filter(question_version__question__subject__project=project).exclude(
-        verification_status="checked"
+    queryset = (
+        AnswerKeyVersion.objects.filter(question_version__question__subject__project=project)
+        .filter(
+            _Q(verification_status__in=[VerificationStatus.PENDING, VerificationStatus.CHECKED])
+            | _Q(is_disputed=True)
+        )
+        .select_related("question_version__question", "rubric")
     )
-    return [
-        {
-            "answer_key_version_id": str(answer.id),
-            "question_id": str(answer.question_version.question_id),
-            "display_label": answer.question_version.question.display_label,
-            "question_version_id": str(answer.question_version_id),
-            "verification_status": answer.verification_status,
-            "source_type": answer.source_type,
-            "check_basis": answer.check_basis,
-            "is_disputed": answer.is_disputed,
-            "dispute_reason": answer.dispute_reason,
-        }
-        for answer in queryset.select_related("question_version__question").order_by("-created_at")[:200]
-    ]
+    rows = []
+    for answer in queryset.order_by("-created_at")[:200]:
+        rubric = getattr(answer, "rubric", None)
+        rows.append(
+            {
+                "answer_key_version_id": str(answer.id),
+                "question_id": str(answer.question_version.question_id),
+                "display_label": answer.question_version.question.display_label,
+                "question_version_id": str(answer.question_version_id),
+                "answer_version": answer.version,
+                "verification_status": answer.verification_status,
+                "source_type": answer.source_type,
+                "check_basis": answer.check_basis,
+                "is_disputed": answer.is_disputed,
+                "dispute_reason": answer.dispute_reason,
+                "is_usable": answer.is_usable,
+                "can_regrade": bool(answer.is_usable),
+                "rubric_version_id": str(rubric.id) if rubric is not None else None,
+            }
+        )
+    return rows

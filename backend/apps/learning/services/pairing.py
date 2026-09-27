@@ -32,8 +32,15 @@ def _published_version(question: Question):
     return question.versions.filter(status="published").order_by("-version").first()
 
 
-def _anchor_for(*, user, project, node_id, before) -> tuple[object, str]:
-    """Most recent related teaching/attempt event before ``before``."""
+def _anchor_for(*, user, project, node_id, before, include_moment=None) -> tuple[object, str]:
+    """Most recent related teaching/attempt event, at or before ``before``.
+
+    ``include_moment`` is the event that *triggered* this task. For the delayed
+    C task that is the just-graded B attempt, and it must always be able to be
+    the anchor: A's teaching event can be a day old, so anchoring on it made C
+    due immediately (the review's R06). The anchor is the latest related learning
+    event, which for "B was just completed" is B itself.
+    """
     anchor = None
     source = ""
     jobs = (
@@ -41,7 +48,7 @@ def _anchor_for(*, user, project, node_id, before) -> tuple[object, str]:
             user=user,
             project_id=project,
             reveals_answer=True,
-            server_time__lt=before,
+            server_time__lte=before,
             question_version__knowledge_mappings__node_id=node_id,
         )
         .order_by("-server_time")
@@ -54,7 +61,7 @@ def _anchor_for(*, user, project, node_id, before) -> tuple[object, str]:
         Attempt.objects.filter(
             user=user,
             project_id=project,
-            submitted_at__lt=before,
+            submitted_at__lte=before,
             session_item__question_version__knowledge_mappings__node_id=node_id,
         )
         .order_by("-submitted_at")
@@ -63,6 +70,11 @@ def _anchor_for(*, user, project, node_id, before) -> tuple[object, str]:
     )
     if attempt_time and (anchor is None or attempt_time > anchor):
         anchor, source = attempt_time, "prior_attempt"
+    trigger = None
+    if include_moment is not None:
+        trigger = include_moment
+        if anchor is None or trigger >= anchor:
+            anchor, source = trigger, "trigger_event"
     if anchor is None:
         anchor, source = before, "current_event"
     return anchor, source
@@ -165,11 +177,15 @@ def on_attempt_graded(attempt_id: str) -> int:
             _record_missing_pair_question(attempt, pairing, "delayed")
             continue
         delay_hours = pairing.delay_hours or getattr(settings, "DELAYED_VERIFICATION_HOURS", 24)
+        # The delay is measured from B's completion (or any later related
+        # learning event), never from an older exposure that would make the
+        # "delayed" check due immediately.
         anchor, source = _anchor_for(
             user=attempt.user,
             project=attempt.project,
             node_id=pairing.node_id,
             before=attempt.submitted_at,
+            include_moment=attempt.submitted_at,
         )
         not_before = anchor + timedelta(hours=delay_hours)
         task, was_created = _create_task(
@@ -311,17 +327,37 @@ def reconcile_delayed_tasks() -> int:
 
 
 def delayed_interval_status(*, task: StudyTask, now=None) -> dict:
-    """Re-check the real interval before starting a delayed task."""
+    """Re-check the real interval before starting a delayed task.
+
+    The rule is read from the ``StudyTask`` itself when the ``ReviewTask`` row is
+    missing. Returning "no delay required" in that case used to delete the gate
+    entirely after a crash between the two writes, so the task could be started
+    immediately.
+    """
     moment = now or timezone.now()
     review = getattr(task, "review_task", None)
-    if review is None:
+    if task.task_kind != TaskKind.DELAYED_VERIFICATION:
         return {"required": False, "satisfied": True, "reason": ""}
-    if task.not_before and moment < task.not_before:
+    anchor_source = review.anchor_source if review else (task.reason_codes or ["unknown"])[-1]
+    if not task.not_before:
+        # A delayed task that never got a deadline cannot be verified as delayed.
+        return {
+            "required": True,
+            "satisfied": False,
+            "reason": "延迟验证任务缺少可开始的截止时间，需重新核对锚点后再开始",
+            "not_before": None,
+        }
+    if moment < task.not_before:
         remaining = (task.not_before - moment).total_seconds() / 3600
         return {
             "required": True,
             "satisfied": False,
-            "reason": f"延迟验证需等待：还需约 {remaining:.2f} 小时（锚点 {review.anchor_source or 'unknown'}）",
+            "reason": f"延迟验证需等待：还需约 {remaining:.2f} 小时（锚点 {anchor_source or 'unknown'}）",
             "not_before": task.not_before.isoformat(),
         }
-    return {"required": True, "satisfied": True, "reason": "", "not_before": task.not_before.isoformat() if task.not_before else None}
+    return {
+        "required": True,
+        "satisfied": True,
+        "reason": "",
+        "not_before": task.not_before.isoformat(),
+    }

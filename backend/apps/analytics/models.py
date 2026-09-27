@@ -87,8 +87,15 @@ class RegradeRun(BaseModel):
     status = models.CharField(
         max_length=16, choices=RegradeStatus.choices, default=RegradeStatus.QUEUED, db_index=True
     )
+    #: Monotonic request order. Every request gets the next number, so a task
+    #: issued earlier can never overwrite a result written by a later request
+    #: even when the older task is executed last.
+    generation = models.PositiveIntegerField(default=0, db_index=True)
     affected_attempts = models.PositiveIntegerField(default=0)
     regraded_attempts = models.PositiveIntegerField(default=0)
+    stale_skipped_attempts = models.PositiveIntegerField(
+        default=0, help_text="因更新的重判/评分已生效而拒绝写入的作答数"
+    )
     invalidated_evidence = models.PositiveIntegerField(default=0)
     error_message = models.CharField(max_length=500, blank=True)
     started_at = models.DateTimeField(null=True, blank=True)

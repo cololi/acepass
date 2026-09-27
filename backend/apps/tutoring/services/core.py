@@ -43,12 +43,27 @@ logger = logging.getLogger("apps.tutoring")
 
 
 def _blocks_text(blocks: Any) -> str:
+    """Render blocks for a prompt, keeping math and never dropping content.
+
+    A math block lowers to ``$latex$`` and an image block to an explicit
+    placeholder: silently emitting an empty string for them made the prompt look
+    complete while the model was actually missing the question.
+    """
     if not isinstance(blocks, list):
         return ""
-    parts = []
+    parts: list[str] = []
     for block in blocks:
-        if isinstance(block, dict) and block.get("kind") == "text":
+        if not isinstance(block, dict):
+            continue
+        kind = block.get("kind")
+        if kind == "text":
             parts.append(str(block.get("text", "")))
+        elif kind == "math":
+            parts.append(f"${block.get('latex', '')}$")
+        elif kind == "list":
+            parts.append("\n".join(f"- {item}" for item in (block.get("items") or [])))
+        elif kind == "image":
+            parts.append(f"[图片 {block.get('asset_id') or '未标注'}]")
     return "\n".join(part for part in parts if part)
 
 
@@ -83,10 +98,15 @@ def _allowed_citation_ids(item: SessionItem) -> tuple[list[str], dict[str, Any]]
     if item.spec_version_id:
         citations.append(f"exam_spec_version:{item.spec_version_id}")
         context["exam_spec_version"] = str(item.spec_version_id)
-    mappings = version.knowledge_mappings.filter(mapping_revision=item.mapping_revision).select_related("node")
+    mappings = list(
+        version.knowledge_mappings.filter(mapping_revision=item.mapping_revision).select_related("node")
+    )
     for mapping in mappings:
         citations.append(f"knowledge_node:{mapping.node_id}")
     context["knowledge_nodes"] = [str(mapping.node_id) for mapping in mappings]
+    # Names, not just opaque ids: the model cannot explain "this knowledge point"
+    # from a UUID.
+    context["knowledge_node_names"] = [mapping.node.canonical_name for mapping in mappings]
     return citations, context
 
 
@@ -108,9 +128,18 @@ def create_tutor_session(*, item: SessionItem, user, purpose: str = TutorPurpose
 
 
 def build_prompt(*, item: SessionItem, user_question: str = "") -> str:
-    """Build the frozen prompt for one explain request."""
-    citations, _context = _allowed_citation_ids(item)
+    """Build the frozen prompt for one explain request.
+
+    The prompt is *personalised*: it carries the student's own submitted answer,
+    their steps, their confidence, their uploaded answer photos, the reviewed
+    rubric criteria and the shared material. Passing only the grading status made
+    "针对卡点讲解" impossible — the model could not see what the student wrote.
+    """
+    citations, context = _allowed_citation_ids(item)
     version = item.question_version
+    material_blocks = None
+    if version.parent_material_version_id:
+        material_blocks = (version.parent_material_version.content or {}).get("blocks") or []
     return prompts.build_explain_prompt(
         question_type=version.question_type,
         stem_text=_blocks_text((version.content or {}).get("blocks")),
@@ -120,23 +149,83 @@ def build_prompt(*, item: SessionItem, user_question: str = "") -> str:
         allowed_citation_ids=citations,
         attempt_summary=_attempt_summary(item),
         user_question=user_question,
+        knowledge_nodes=context.get("knowledge_node_names") or [],
+        rubric_criteria=(item.rubric_version.criteria if item.rubric_version_id else []) or [],
+        material_text=_blocks_text(material_blocks) if material_blocks else "",
+        blanks=(version.content or {}).get("blanks") or [],
     )
+
+
+def _render_raw_answer(raw_answer: Any) -> str:
+    """Render the student's submitted answer verbatim, for every question type."""
+    if not isinstance(raw_answer, dict) or not raw_answer:
+        return ""
+    question_type = raw_answer.get("type")
+    if question_type == "single_choice":
+        selected = raw_answer.get("selected_option_ids") or raw_answer.get("selected_option_id")
+        return f"选择：{selected if isinstance(selected, list) else [selected]}"
+    if question_type == "multiple_choice":
+        return f"选择：{raw_answer.get('selected_option_ids') or []}"
+    if question_type == "true_false":
+        value = raw_answer.get("value")
+        return "判断：" + ("未作答" if value is None else ("正确" if value else "错误"))
+    if question_type == "fill_blank":
+        blanks = raw_answer.get("blanks") or {}
+        return "各空作答：" + "; ".join(f"{key}={value!r}" for key, value in blanks.items())
+    if question_type == "constructed_response":
+        return f"作答原文：{raw_answer.get('text', '')}"
+    return f"作答原文：{json.dumps(raw_answer, ensure_ascii=False)[:2000]}"
+
+
+def _render_steps(steps: Any) -> str:
+    if not isinstance(steps, list) or not steps:
+        return ""
+    lines: list[str] = []
+    for index, step in enumerate(steps, start=1):
+        if isinstance(step, dict):
+            text = step.get("text") or _blocks_text(step.get("blocks")) or json.dumps(step, ensure_ascii=False)
+        else:
+            text = str(step)
+        if str(text).strip():
+            lines.append(f"步骤 {index}：{text}")
+    return "\n".join(lines)
 
 
 def _attempt_summary(item: SessionItem) -> str:
-    """A short, factual summary of the submitted attempt (no interpretation)."""
+    """The student's actual work plus the factual grading state.
+
+    Order matters: the work comes first because it is what the explanation must
+    address, and the score status is context rather than the subject.
+    """
     attempt = Attempt.objects.filter(session_item=item).select_related("current_grade_event").first()
     if attempt is None:
         return ""
+    lines: list[str] = []
+    rendered = _render_raw_answer(attempt.raw_answer)
+    if rendered:
+        lines.append(rendered)
+    steps = _render_steps(attempt.steps)
+    if steps:
+        lines.append("学生的解题步骤：\n" + steps)
+    if attempt.attachments:
+        lines.append(f"学生上传的作答照片数量：{len(attempt.attachments)}（内容不随本请求传输，仅用于人工评分）。")
+    if attempt.confidence:
+        lines.append(f"学生自评把握：{attempt.confidence}")
+    if attempt.elapsed_ms:
+        lines.append(f"本次用时：{attempt.elapsed_ms / 1000:.0f} 秒")
     grade = attempt.current_grade_event
     if grade is None:
-        return "已提交，判分处理中"
-    parts = ", ".join(
-        f"{part.get('part_id')}: {part.get('status')}"
-        + (f"({part.get('score')}/{part.get('max_score')})" if part.get("score") is not None else "")
-        for part in (grade.parts or [])
-    )
-    return f"判分状态 {grade.status}；分项：{parts or '无'}"
+        lines.append("判分状态：已提交，处理中（不要猜分数）")
+    else:
+        parts = ", ".join(
+            f"{part.get('part_id')}: {part.get('status')}"
+            + (f"({part.get('score')}/{part.get('max_score')})" if part.get("score") is not None else "")
+            for part in (grade.parts or [])
+        )
+        lines.append(f"判分状态 {grade.status}；分项：{parts or '无'}")
+        if grade.comment:
+            lines.append(f"评分备注：{grade.comment}")
+    return "\n".join(lines)
 
 
 def answer_summary(item: SessionItem) -> str:
@@ -160,22 +249,6 @@ def answer_summary(item: SessionItem) -> str:
     if item.question_version.question_type == "constructed_response":
         return "按评分标准逐点评分（请勿给出单一总分）"
     return ""
-
-
-def _attempt_summary(item: SessionItem) -> str:
-    """A short, factual summary of the submitted attempt (no interpretation)."""
-    attempt = Attempt.objects.filter(session_item=item).select_related("current_grade_event").first()
-    if attempt is None:
-        return ""
-    grade = attempt.current_grade_event
-    if grade is None:
-        return "已提交，判分处理中"
-    parts = ", ".join(
-        f"{part.get('part_id')}: {part.get('status')}"
-        + (f"({part.get('score')}/{part.get('max_score')})" if part.get("score") is not None else "")
-        for part in (grade.parts or [])
-    )
-    return f"判分状态 {grade.status}；分项：{parts or '无'}"
 
 
 @transaction.atomic

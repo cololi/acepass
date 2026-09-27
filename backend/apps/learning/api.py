@@ -220,15 +220,26 @@ def get_task(request, task_id: str):
     }
 
 
-@learning_router.get("/plans/{plan_id}", auth=auth)
-def get_plan(request, plan_id: str):
+@learning_router.get("/projects/{project_id}/plans/{plan_id}", auth=auth)
+def get_plan(request, project_id: str, plan_id: str):
+    """A plan is user-wide, but the route is project-scoped.
+
+    The project must therefore exist and be owned by the caller; the plan row
+    itself is resolved by user so a plan spanning two projects is still readable
+    from either project's context.
+    """
+    project = require_project(request.user, project_id)
     plan = StudyPlan.objects.filter(id=plan_id, user=request.user).first()
     if plan is None:
         raise ScopeViolation(message="计划不存在或不在当前权限范围")
-    return planner_service.plan_payload(plan)
+    payload = planner_service.plan_payload(plan)
+    plan_project_ids = {task["project_id"] for task in payload.get("tasks") or []}
+    payload["requested_project_id"] = str(project.id)
+    payload["covers_requested_project"] = str(project.id) in plan_project_ids
+    return payload
 
 
-@learning_router.get("/learning-states", auth=auth)
+@learning_router.get("/projects/{project_id}/learning-states", auth=auth)
 def list_states(request, project_id: str, subject_id: str | None = None):
     """Knowledge state with its evidence and the exact missing pieces."""
     project = require_project(request.user, project_id)
@@ -252,9 +263,17 @@ def list_states(request, project_id: str, subject_id: str | None = None):
     }
 
 
-@learning_router.get("/evidence", auth=auth)
-def list_evidence(request, project_id: str, node_id: str | None = None, limit: int = 100):
+@learning_router.get("/projects/{project_id}/evidence", auth=auth)
+def list_evidence(
+    request,
+    project_id: str,
+    node_id: str | None = None,
+    subject_id: str | None = None,
+    dimension: str | None = None,
+    limit: int = 100,
+):
     project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
     node = None
     if node_id:
         from apps.knowledge.models import KnowledgeNode
@@ -262,23 +281,48 @@ def list_evidence(request, project_id: str, node_id: str | None = None, limit: i
         node = KnowledgeNode.objects.filter(id=node_id, syllabus_version__subject__project=project).first()
         if node is None:
             raise ScopeViolation(message="考点不存在或不属于该项目")
+    rows = evidence_service.evidence_summary_rows(
+        user=request.user, project=project, node=node, limit=limit, subject=subject, dimension=dimension
+    )
     return {
         "rule_version": evidence_service.RULE_VERSION,
-        "rows": evidence_service.evidence_summary_rows(user=request.user, project=project, node=node, limit=limit),
+        "rows": rows,
+        "count": len(rows),
     }
 
 
-@learning_router.get("/review-tasks", auth=auth)
-def list_review_tasks(request, project_id: str, only_due: bool = False):
+@learning_router.get("/projects/{project_id}/mistakes", auth=auth)
+def list_mistakes(request, project_id: str, subject_id: str | None = None, limit: int = 100):
+    """Confirmed lost marks: fully graded attempts that did not reach full marks.
+
+    A mistake is only listed once every scoring part is decided (so a partly
+    human-graded answer is never shown as "wrong"), and never for a run whose
+    grading is still hidden.
+    """
+    from apps.practice.services.mistakes import mistake_rows
+
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
+    return {
+        "rows": mistake_rows(user=request.user, project=project, subject=subject, limit=limit),
+    }
+
+
+@learning_router.get("/projects/{project_id}/review-tasks", auth=auth)
+def list_review_tasks(request, project_id: str, subject_id: str | None = None, only_due: bool = False):
     """Delayed verification tasks with their real anchor and interval status."""
     from django.utils import timezone
 
     project = require_project(request.user, project_id)
+    if subject_id:
+        require_subject(request.user, project, subject_id)
     queryset = (
         StudyTask.objects.filter(user=request.user, project=project, task_kind="delayed_verification")
         .select_related("question", "knowledge_node", "review_task")
         .order_by("not_before")
     )
+    if subject_id:
+        queryset = queryset.filter(subject_id=subject_id)
     moment = timezone.now()
     rows = []
     for task in queryset:
@@ -290,6 +334,7 @@ def list_review_tasks(request, project_id: str, only_due: bool = False):
             {
                 "task_id": str(task.id),
                 "status": task.status,
+                "subject_id": str(task.subject_id),
                 "question_id": str(task.question_id) if task.question_id else None,
                 "question_label": task.question.display_label if task.question_id else "",
                 "knowledge_node_name": task.knowledge_node.canonical_name if task.knowledge_node_id else "",
@@ -307,10 +352,11 @@ def list_review_tasks(request, project_id: str, only_due: bool = False):
     return {"now": moment.isoformat(), "rows": rows}
 
 
-@learning_router.post("/study-tasks/{task_id}/reconcile-delay", auth=auth)
-def reconcile_delay(request, task_id: str):
+@learning_router.post("/projects/{project_id}/study-tasks/{task_id}/reconcile-delay", auth=auth)
+def reconcile_delay(request, project_id: str, task_id: str):
     """Push a pending delayed task's deadline when a newer anchor appeared."""
-    task = StudyTask.objects.filter(id=task_id, user=request.user).first()
+    project = require_project(request.user, project_id)
+    task = StudyTask.objects.filter(id=task_id, user=request.user, project=project).first()
     if task is None:
         raise ScopeViolation(message="任务不存在或不在当前权限范围")
     updated = pairing_service.reconcile_delayed_tasks()
@@ -318,7 +364,7 @@ def reconcile_delay(request, task_id: str):
     return {"reconciled_tasks": updated, "task_id": str(task.id), "delay_status": status}
 
 
-@learning_router.get("/knowledge-states/{node_id}/evidence", auth=auth)
+@learning_router.get("/projects/{project_id}/knowledge-states/{node_id}/evidence", auth=auth)
 def node_evidence(request, project_id: str, node_id: str):
     project = require_project(request.user, project_id)
     from apps.knowledge.models import KnowledgeNode

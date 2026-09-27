@@ -10,11 +10,19 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.analytics.models import RecomputeRun, RegradeRun, ReportSnapshot
 from apps.audit.services.outbox import enqueue
-from apps.common.enums import EvidenceDimension, GradeMethod, GradeStatus, RegradeStatus
+from apps.common.enums import (
+    EvidenceDimension,
+    GradeMethod,
+    GradeStatus,
+    RegradeStatus,
+    SessionMode,
+    SessionStatus,
+)
 from apps.common.errors import InvalidInput
 from apps.practice.models import Attempt, GradeEvent, LearningEvidence
 from apps.practice.services import attempts as attempt_services
@@ -48,9 +56,19 @@ def _fraction(bucket: dict) -> str | None:
 
 @transaction.atomic
 def build_practice_report(*, user, project, subject=None, node=None, save_snapshot: bool = True) -> dict:
-    """Practice evidence report: what is confirmed, what is not, and why."""
+    """Practice evidence report: what is confirmed, what is not, and why.
+
+    Attempts that belong to a run whose grading is still hidden (an active
+    verification or mock exam) are excluded from every bucket. Their scores are
+    not "pending": they are deliberately not disclosable yet, and an aggregate
+    would leak them just as effectively as a direct field.
+    """
     attempts = (
         Attempt.objects.filter(project=project, user=user)
+        .exclude(
+            Q(session_item__session__status=SessionStatus.ACTIVE)
+            & Q(session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
+        )
         .select_related(
             "current_grade_event", "session_item__session", "session_item__question_version__question"
         )
@@ -60,12 +78,13 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
         attempts = attempts.filter(session_item__question_version__question__subject=subject)
     attempts = list(attempts[:1000])
 
-    fully_confirmed = _bucket()
-    partial_pending = _bucket()
+    hidden_count = hidden_verification_attempt_count(user=user, project=project)
+    fully_graded = _bucket()
+    pending_review = _bucket()
     self_assessed = _bucket()
     assisted = _bucket()
     repeat_practice = _bucket()
-    pending_review = _bucket()
+    partially_graded = _bucket()
     ai_estimated = _bucket()
     first_contact = _bucket()
     by_type: dict[str, dict] = {}
@@ -99,9 +118,11 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
         elif grade.method == GradeMethod.SELF_CONFIRMED or grade.grader_is_self:
             _accumulate(self_assessed, grade, item.max_score)
         elif grade.is_fully_confirmed:
-            _accumulate(fully_confirmed, grade, item.max_score)
+            # Every scoring part is decided. This includes 0-score mistakes and
+            # partial credit on a rubric; "完全正确" is a separate fact.
+            _accumulate(fully_graded, grade, item.max_score)
         else:
-            _accumulate(partial_pending, grade, item.max_score)
+            _accumulate(partially_graded, grade, item.max_score)
 
         if attempt.id in assisted_attempt_ids:
             _accumulate(assisted, grade, item.max_score)
@@ -132,7 +153,7 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
     )
     if repeat_attempt_ids:
         notes.append(f"其中 {len(repeat_attempt_ids)} 次属于重复练习（同题多次作答单独统计）。")
-    pending_attempts = pending_review["attempts"] + partial_pending["attempts"]
+    pending_attempts = pending_review["attempts"] + partially_graded["attempts"]
     if pending_attempts:
         notes.append(
             f"有 {pending_attempts} 次作答尚未完全确认（待人工评分或缺规则）：不计入完整正确率，也不当作错题或 0 分。"
@@ -143,9 +164,14 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
         notes.append(f"有 {assisted['attempts']} 次为辅助作答：单独统计，不计入严格独立证据。")
     if ai_estimated["attempts"]:
         notes.append(f"有 {ai_estimated['attempts']} 次仅有 AI 估计分：不进入正式总分。")
+    if hidden_count:
+        notes.append(
+            f"有 {hidden_count} 次作答属于尚未结束的验证/考试：在结束前不计入任何统计，也不会通过报告泄露分数。"
+        )
     if not attempts:
         notes.append("本项目还没有作答记录：报告不显示任何推算数据。")
 
+    # Evidence rows from a hidden run are excluded for the same reason.
     excluded = [
         {
             "attempt_id": str(row.attempt_id),
@@ -153,20 +179,29 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
             "reasons": row.exclusion_reasons,
             "node_id": str(row.knowledge_node_id) if row.knowledge_node_id else None,
         }
-        for row in LearningEvidence.objects.filter(
-            user=user, project=project, is_active=True, qualifies=False
-        ).select_related("knowledge_node")[:200]
+        for row in LearningEvidence.objects.filter(user=user, project=project, is_active=True, qualifies=False)
+        .exclude(
+            Q(attempt__session_item__session__status=SessionStatus.ACTIVE)
+            & Q(attempt__session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
+        )
+        .select_related("knowledge_node")[:200]
     ]
 
     payload = {
         "report_kind": "practice",
-        "calculation_version": "p0-1",
+        "calculation_version": "p0-2",
         "as_of": timezone.now().isoformat(),
         "project_id": str(project.id),
         "subject_id": str(subject.id) if subject is not None else None,
         "totals": {
-            "fully_confirmed": _bucket_out(fully_confirmed),
-            "partially_pending": _bucket_out(partial_pending),
+            # Renamed from `fully_confirmed`: this bucket means "every scoring
+            # part decided", which includes wrong answers and partial credit.
+            "fully_graded": _bucket_out(fully_graded),
+            "partially_graded": _bucket_out(partially_graded),
+            # Kept as an alias so older clients and snapshots keep resolving;
+            # both point at the same completeness-based bucket.
+            "fully_confirmed": _bucket_out(fully_graded),
+            "partially_pending": _bucket_out(partially_graded),
             "pending_review": _bucket_out(pending_review),
             "self_assessed": _bucket_out(self_assessed),
             "assisted": _bucket_out(assisted),
@@ -174,6 +209,7 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
             "strict_independent": _bucket_out(first_contact),
             "ai_estimated": _bucket_out(ai_estimated),
         },
+        "hidden_verification_attempts": hidden_count,
         "by_question_type": {key: _bucket_out(value) for key, value in by_type.items()},
         "by_knowledge_node": {
             key: {**_bucket_out(value), "node_name": value["node_name"], "weight": value["weight"]}
@@ -188,9 +224,10 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
             project=project,
             subject=subject,
             report_kind="practice",
-            calculation_version="p0-1",
+            calculation_version="p0-2",
             input_watermark={
                 "attempt_count": len(attempts),
+                "hidden_verification_attempts": hidden_count,
                 "latest_attempt_at": attempts[0].submitted_at.isoformat() if attempts else None,
                 "evidence_count": LearningEvidence.objects.filter(user=user, project=project, is_active=True).count(),
             },
@@ -200,6 +237,15 @@ def build_practice_report(*, user, project, subject=None, node=None, save_snapsh
             notes=notes,
         )
     return payload
+
+
+def hidden_verification_attempt_count(*, user, project) -> int:
+    """Attempts excluded from reports because their grading is still hidden."""
+    return (
+        Attempt.objects.filter(project=project, user=user, session_item__session__status=SessionStatus.ACTIVE)
+        .filter(session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
+        .count()
+    )
 
 
 def _bucket_out(bucket: dict) -> dict:
@@ -268,6 +314,7 @@ def execute_regrade_run(regrade_run_id: str) -> str:
         .order_by("submitted_at")
     )
     regraded = 0
+    stale = 0
     invalidated = 0
     errors: list[str] = []
     for attempt in attempts:
@@ -281,17 +328,22 @@ def execute_regrade_run(regrade_run_id: str) -> str:
             )
             continue
         try:
-            attempt_services.regrade_attempt(
+            grade = attempt_services.regrade_attempt(
                 attempt=attempt,
                 target_answer_key_version=run.target_answer_key_version,
                 target_rubric_version=run.target_rubric_version,
                 actor=run.requested_by,
                 reason=run.reason,
+                regrade_generation=run.generation,
             )
-            regraded += 1
+            if grade is None:
+                stale += 1
+            else:
+                regraded += 1
         except Exception as exc:  # pragma: no cover - defensive
             errors.append(f"{attempt.id}: {exc}")
     run.regraded_attempts = regraded
+    run.stale_skipped_attempts = stale
     run.invalidated_evidence = invalidated
     run.status = RegradeStatus.SUCCEEDED if not errors else RegradeStatus.FAILED
     run.error_message = "; ".join(errors)[:500]
@@ -299,6 +351,7 @@ def execute_regrade_run(regrade_run_id: str) -> str:
     run.save(
         update_fields=[
             "regraded_attempts",
+            "stale_skipped_attempts",
             "invalidated_evidence",
             "status",
             "error_message",
@@ -316,7 +369,7 @@ def execute_regrade_run(regrade_run_id: str) -> str:
         {"paper_id": ""},
         dedupe_key=f"regrade-report-refresh:{run.id}",
     )
-    return f"regraded={regraded} invalidated={invalidated}"
+    return f"regraded={regraded} stale={stale} invalidated={invalidated}"
 
 
 def request_regrade(
@@ -350,9 +403,11 @@ def regrade_payload(run: RegradeRun) -> dict:
         "target_answer_key_version_id": str(run.target_answer_key_version_id),
         "target_rubric_version_id": str(run.target_rubric_version_id) if run.target_rubric_version_id else None,
         "scope": run.scope,
+        "generation": run.generation,
         "reason": run.reason,
         "affected_attempts": run.affected_attempts,
         "regraded_attempts": run.regraded_attempts,
+        "stale_skipped_attempts": run.stale_skipped_attempts,
         "invalidated_evidence": run.invalidated_evidence,
         "error_message": run.error_message,
         "created_at": run.created_at.isoformat(),

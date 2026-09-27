@@ -339,12 +339,20 @@ def create_import(request, project_id: str, payload: TextImportIn):
 def create_image_import(
     request,
     project_id: str,
-    files: list[File[UploadedFile]],
+    files: list[UploadedFile] = File(...),
     subject_id: str = Form(""),
     title: str = Form(""),
     role: str = Form(AssetRole.PAST_PAPER_PAGE),
 ):
-    """Store image material and open manual proofreading candidates."""
+    """Store image material and open proofreading candidates.
+
+    ``files`` must be declared as ``list[UploadedFile] = File(...)``. The earlier
+    ``list[File[UploadedFile]]`` expands to ``list[Annotated[UploadedFile,
+    File(...)]]``; django-ninja's automatic File detection then fails, the
+    parameter is classified as a *body* field, and a real multipart upload is
+    answered with HTTP 400 ``body.files Field required`` because the multipart
+    body model only ever reads ``request.POST``.
+    """
     project = require_project(request.user, project_id)
     subject = require_subject(request.user, project, subject_id) if subject_id else None
     if not files:
@@ -396,6 +404,10 @@ def create_image_import(
     idempotency.record_result(
         request.user, scope, key, status_code=201, response_body=result, resource_type="import_job", resource_id=job.id
     )
+    # Kick the extraction tasks this import just enqueued. Without this the
+    # `ingestion.extract_candidate` rows only move when the periodic scanner
+    # runs, so "the vision chain is wired" was not observable from the API.
+    outbox.after_commit_dispatch()
     return 201, result
 
 

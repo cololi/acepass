@@ -68,18 +68,37 @@ def build_explain_prompt(
     allowed_citation_ids: list[str],
     attempt_summary: str = "",
     user_question: str = "",
+    knowledge_nodes: list[str] | None = None,
+    rubric_criteria: list[dict[str, Any]] | None = None,
+    material_text: str = "",
+    blanks: list[dict[str, Any]] | None = None,
 ) -> str:
     option_lines = "\n".join(
         f"- {option.get('label') or option.get('id')}: {_blocks_text(option.get('blocks'))}" for option in options
     )
+    blank_lines = "\n".join(
+        f"- {blank.get('blank_id')}: {blank.get('label') or ''}"
+        for blank in (blanks or [])
+        if isinstance(blank, dict)
+    )
+    rubric_lines = "\n".join(
+        f"- {criterion.get('criterion_id')}（满分 {criterion.get('max_score')}）: {criterion.get('text', '')}"
+        for criterion in (rubric_criteria or [])
+        if isinstance(criterion, dict)
+    )
+    node_line = "、".join(knowledge_nodes or []) or "（未映射考点）"
     return (
         f"{EXPLAIN_SYSTEM}\n\n"
         f"题型：{question_type}\n题干：{stem_text}\n"
         f"选项：\n{option_lines or '（无选项）'}\n"
+        f"空位：\n{blank_lines or '（无空位）'}\n"
+        f"共享材料：{material_text or '（无共享材料）'}\n"
+        f"关联考点：{node_line}\n"
+        f"评分标准（人工已审核）：\n{rubric_lines or '（本题无逐点评分标准）'}\n"
         f"已核对答案摘要：{answer_summary or '（本题答案尚未核对，只能做条件澄清，不得给出结论性答案）'}\n"
         f"已审核人工解析：{_blocks_text(explanation_blocks) or '（无）'}\n"
-        f"学生作答情况：{attempt_summary or '（尚未提交作答）'}\n"
-        f"学生问题：{user_question or '请给出关键条件、可能卡点、方法与下一步验证。'}\n"
+        f"学生本次作答（原文，逐字保留；请针对其中具体内容讲解）：\n{attempt_summary or '（尚未提交作答）'}\n"
+        f"学生问题：{user_question or '请针对上面学生自己的作答与步骤，给出关键条件、可能卡点、方法与下一步验证。'}\n"
         f"允许引用的引用 ID（只能使用这些）：{', '.join(allowed_citation_ids) or '（无）'}\n"
         "请输出 JSON。"
     )

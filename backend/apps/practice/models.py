@@ -133,6 +133,10 @@ class Attempt(BaseModel):
         "practice.GradeEvent", null=True, blank=True, on_delete=models.SET_NULL, related_name="effective_for_attempts"
     )
     grading_revision = models.PositiveIntegerField(default=0)
+    #: Highest regrade *request generation* that has actually written a result.
+    #: Only ever moves forward, so a task issued earlier can never overwrite a
+    #: result produced by a later request.
+    applied_regrade_generation = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = "practice_attempt"

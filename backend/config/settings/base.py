@@ -217,8 +217,14 @@ CELERY_TASK_ROUTES = {
     "ingestion.*": {"queue": "ingestion"},
     "tutoring.*": {"queue": "tutoring"},
     "projection.*": {"queue": "projection"},
+    "learning.*": {"queue": "projection"},
     "audit.*": {"queue": "ingestion"},
 }
+# Outbox delivery lease and retry budget. `processed_at` is the only proof an
+# effect happened, so a row whose lease expired is re-delivered.
+OUTBOX_LEASE_SECONDS = env_int("ACEPASS_OUTBOX_LEASE_SECONDS", 300)
+OUTBOX_MAX_ATTEMPTS = env_int("ACEPASS_OUTBOX_MAX_ATTEMPTS", 8)
+OUTBOX_BACKOFF_SECONDS = env_int("ACEPASS_OUTBOX_BACKOFF_SECONDS", 30)
 
 # --------------------------------------------------------------------------
 # AI provider capability layer

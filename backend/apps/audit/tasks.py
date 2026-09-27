@@ -15,20 +15,24 @@ logger = logging.getLogger("apps.tasks")
 
 
 def _mark_outbox(event_id: str | None, *, ok: bool, error: str = "") -> None:
+    """Confirm or re-queue one outbox row from the consumer side.
+
+    Success goes through :func:`outbox.mark_processed`, which is the only thing
+    that sets ``processed_at``. Failure is scheduled with backoff and an attempt
+    cap instead of being retried forever with no bound.
+    """
     if not event_id:
         return
-    from django.utils import timezone
-
     from apps.audit.models import OutboxEvent
-    from apps.common.enums import OutboxStatus
+    from apps.audit.services import outbox
 
-    updates = {"processed_at": timezone.now(), "updated_at": timezone.now()}
     if ok:
-        updates["status"] = OutboxStatus.PROCESSED
-    else:
-        updates["status"] = OutboxStatus.FAILED
-        updates["last_error"] = error[:500]
-    OutboxEvent.objects.filter(id=event_id).update(**updates)
+        outbox.mark_processed(event_id)
+        return
+    event = OutboxEvent.objects.filter(id=event_id).first()
+    if event is None:
+        return
+    outbox.mark_retryable_failure(event, error)
 
 
 @shared_task(name="projection.rebuild_attempt_evidence", ignore_result=True)
@@ -138,7 +142,7 @@ def on_session_finished(session_id: str, outbox_event_id: str | None = None) -> 
     return "ok"
 
 
-@shared_task(name="learning.refresh_delayed_tasks", ignore_results=True)
+@shared_task(name="learning.refresh_delayed_tasks", ignore_result=True)
 def refresh_delayed_tasks(outbox_event_id: str | None = None) -> str:
     """Re-anchor pending delayed tasks whose anchor moved, and expire overdue ones."""
     from apps.learning.services import pairing as pairing_service
@@ -153,25 +157,25 @@ def refresh_delayed_tasks(outbox_event_id: str | None = None) -> str:
     return f"updated={updated}"
 
 
-@shared_task(name="tutoring.run_job", ignore_result=True)
-def run_tutor_job(
-    tutor_job_id: str, prompt: str, citations: list[str], purpose: str, outbox_event_id: str | None = None
-) -> str:
-    from apps.tutoring.models import TutorJob
-    from apps.tutoring.services import core as tutor_service
+@shared_task(name="learning.reconcile_plan", ignore_result=True)
+def reconcile_plan(plan_id: str = "", outbox_event_id: str | None = None) -> str:
+    """Re-derive a study plan from the current evidence.
 
-    job = TutorJob.objects.filter(id=tutor_job_id).first()
-    if job is None:
-        _mark_outbox(outbox_event_id, ok=False, error="tutor job missing")
-        return "missing"
+    ``learning.reconcile_plan`` used to be enqueued on every plan generation with
+    no registered consumer, so a real worker discarded the message and the outbox
+    row stayed at ``dispatched`` forever. It is registered here so the topic the
+    producers actually emit has a consumer.
+    """
+    from apps.learning.services import planner as planner_service
+
     try:
-        tutor_service.run_job(job=job, prompt=prompt, citations=list(citations), purpose=purpose)
+        result = planner_service.reconcile_plan(plan_id=plan_id)
     except Exception as exc:  # pragma: no cover - defensive
-        logger.exception("tutor job failed job=%s", tutor_job_id)
+        logger.exception("plan reconciliation failed plan=%s", plan_id)
         _mark_outbox(outbox_event_id, ok=False, error=str(exc))
         raise
     _mark_outbox(outbox_event_id, ok=True)
-    return job.status
+    return result
 
 
 @shared_task(name="ingestion.extract_candidate", ignore_result=True)
@@ -195,8 +199,6 @@ def extract_candidate(
     return result
 
 
-@shared_task(name="audit.scan_outbox", ignore_result=True)
-def scan_outbox(limit: int = 100) -> int:
-    from apps.audit.services.outbox import dispatch_pending
-
-    return dispatch_pending(limit=limit)
+# `audit.scan_outbox` is defined once, in `config/celery.py`, so the beat entry
+# and the worker resolve to the same implementation. A second `@shared_task` with
+# the same name here silently shadowed it depending on import order.

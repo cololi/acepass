@@ -221,9 +221,15 @@ class TaskStatus(models.TextChoices):
 
 class OutboxStatus(models.TextChoices):
     PENDING = "pending", "待派发"
-    DISPATCHED = "dispatched", "已派发"
+    DISPATCHED = "dispatched", "已派发（等待消费确认）"
+    PROCESSING = "processing", "消费者已领取"
     PROCESSED = "processed", "已处理"
-    FAILED = "failed", "派发失败"
+    FAILED = "failed", "派发或消费失败"
+
+    @classmethod
+    def unresolved(cls) -> tuple[str, ...]:
+        """States that still need work: nothing here has been confirmed done."""
+        return (cls.PENDING, cls.DISPATCHED, cls.PROCESSING, cls.FAILED)
 
 
 class TutorPurpose(models.TextChoices):

@@ -101,30 +101,59 @@ def start_image_import(
     documents: list[SourceDocument],
     subject=None,
     title: str = "",
+    use_vision: bool | None = None,
 ) -> ImportJob:
-    """Store image material and open a manual candidate shell per document."""
+    """Store image material and open one candidate per document.
+
+    When a provider that declares ``extract_question`` is configured, the import
+    is recorded as ``image_ai`` and a real extraction task is enqueued per
+    candidate. Without one it stays ``image_manual`` and says so, instead of
+    pretending a model read the page.
+    """
+    # Imported lazily: this module loads while the app registry is being built.
+    from apps.audit.services.outbox import enqueue
+    from apps.ingestion.services import extraction
+
+    if use_vision is None:
+        use_vision = extraction.vision_available()
+    input_kind = "image_ai" if use_vision else "image_manual"
+    extractor_version = "vision-v1" if use_vision else "manual-image-v1"
     job = ingestion.create_import_job(
         owner=owner,
         project=project,
-        input_kind="image_manual",
+        input_kind=input_kind,
         subject=subject,
         documents=documents,
-        extractor_version="manual-image-v1",
+        extractor_version=extractor_version,
     )
     job.status = ImportJobStatus.PROCESSING
     job.started_at = timezone.now()
     job.save(update_fields=["status", "started_at", "updated_at"])
-    ingestion.add_job_problem(
-        job,
-        "manual_structure_required",
-        "图片已保存为私有来源；请在校对页对照原图录入题干与答案。真实图片识别需在配置视觉模型后使用（M5）。",
-        severity="warning",
-    )
+    if use_vision:
+        stub_note = (
+            "（当前为测试/演示 stub，输出不代表真实模型识别，必须完整人工核对）"
+            if extraction.vision_is_stub()
+            else ""
+        )
+        ingestion.add_job_problem(
+            job,
+            "vision_extraction_queued",
+            "图片已保存为私有来源，已排入视觉识别任务；识别结果仍需人工对照原图校对后才能发布。" + stub_note,
+            severity="warning" if stub_note else "info",
+        )
+    else:
+        ingestion.add_job_problem(
+            job,
+            "manual_structure_required",
+            "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。"
+            "配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+            severity="warning",
+        )
     for document in documents:
         region = ingestion.create_source_region(
             document=document, page_index=1, x=0.0, y=0.0, width=1.0, height=1.0, role=AssetRole.PAST_PAPER_PAGE
         )
-        ingestion.create_candidate(
+        candidate = ingestion.create_candidate(
             job=job,
             payload={
                 "question_type": QuestionType.SINGLE_CHOICE,
@@ -136,8 +165,18 @@ def start_image_import(
             },
             subject=subject,
             regions=[region],
-            extractor_version="manual-image-v1",
+            extractor_version=extractor_version,
         )
+        if use_vision:
+            enqueue(
+                "ingestion.extract_candidate",
+                {
+                    "import_job_id": str(job.id),
+                    "document_id": str(document.id),
+                    "candidate_id": str(candidate.id),
+                },
+                dedupe_key=f"extract-candidate:{candidate.id}",
+            )
     ingestion.maybe_complete_job(job)
     return job
 

@@ -49,6 +49,28 @@ def _resolve_versions(version: QuestionVersion):
     return answer, rubric
 
 
+#: Task kinds that are checks, not practice. The server fixes their session mode.
+TASK_KIND_MODES = {
+    "delayed_verification": SessionMode.VERIFICATION,
+    "paired_immediate": SessionMode.VERIFICATION,
+    "weakness_repair": SessionMode.PRACTICE,
+    "undiagnosed_probe": SessionMode.PRACTICE,
+    "general_practice": SessionMode.PRACTICE,
+}
+
+
+def resolve_task_mode(*, mode: str, task) -> str:
+    """Decide the session mode from the *task's* purpose, not the client's wish.
+
+    A delayed-verification or paired-immediate task is a check: letting the
+    client downgrade it to ``practice`` would make the answer visible and the
+    "delayed" evidence meaningless.
+    """
+    if task is not None:
+        return TASK_KIND_MODES.get(task.task_kind, mode)
+    return mode
+
+
 @transaction.atomic
 def create_session(
     *,
@@ -85,11 +107,32 @@ def create_session(
     if task is not None:
         if str(task.project_id) != str(project.id) or str(task.subject_id) != str(subject.id):
             raise ScopeViolation(message="学习任务不属于当前项目/科目")
+        # Re-check the real interval here as well: the API may create a session
+        # straight from a task id without going through /study-tasks/{id}/start.
+        from apps.learning.services import pairing as pairing_service
+
+        interval = pairing_service.delayed_interval_status(task=task)
+        if not interval["satisfied"]:
+            raise InvalidInput(
+                message=interval["reason"] or "该验证任务尚未到期，不能开始",
+                details={"not_before": interval.get("not_before"), "task_id": str(task.id)},
+            )
+        # The task decides the mode; the client cannot downgrade a check.
+        mode = resolve_task_mode(mode=mode, task=task)
+        purpose = task.task_kind
         if task.question_id:
             question_ids = [str(task.question_id)]
         task.status = "in_progress"
         task.started_at = task.started_at or timezone.now()
         task.save(update_fields=["status", "started_at", "updated_at"])
+        pairing = pairing or task.pairing
+    elif purpose not in {"practice", "paired_immediate"}:
+        # A client must not be able to *claim* a purpose that unlocks a different
+        # flow (for example "delayed_verification" for a task that does not exist).
+        raise InvalidInput(
+            message="不能由客户端指定该会话用途；请通过对应的学习任务开始",
+            details={"purpose": purpose},
+        )
 
     session = PracticeSession.objects.create(
         user=user,
@@ -318,7 +361,10 @@ def grade_payload(grade: GradeEvent | None, *, session: PracticeSession, hidden:
         "max_score": str(grade.max_score),
         "pending_max_score": str(grade.pending_max_score),
         "estimated_score": None if grade.estimated_score is None else str(grade.estimated_score),
+        # "已全部评分" and "本题完全正确" are different facts: a wrong answer is
+        # fully graded and still incorrect.
         "is_fully_confirmed": grade.is_fully_confirmed,
+        "is_correct": is_grade_correct(grade),
         "parts": grade.parts,
         "rule_version": grade.rule_version,
         "rule_snapshot": grade.rule_snapshot,
@@ -326,6 +372,19 @@ def grade_payload(grade: GradeEvent | None, *, session: PracticeSession, hidden:
         "comment": grade.comment,
         "superseded": grade.is_superseded,
     }
+
+
+def is_grade_correct(grade: GradeEvent | None) -> bool:
+    """Fully confirmed *and* at full marks.
+
+    Only this may be presented as "本题完全正确"; ``is_fully_confirmed`` alone
+    means every scoring part has been decided.
+    """
+    if grade is None or not grade.is_fully_confirmed or grade.confirmed_score is None:
+        return False
+    if grade.max_score is None or grade.max_score <= 0:
+        return False
+    return grade.confirmed_score >= grade.max_score
 
 
 def attempt_state(attempt: Attempt | None, *, session: PracticeSession, hidden: bool | None = None) -> dict[str, Any] | None:
@@ -367,6 +426,8 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
         if include_stems:
             row["stem"] = stem_payload(item.question_version)
         items.append(row)
+    hidden = session.hides_grading
+    confirmed, pending = _session_score(session)
     return {
         "session_id": str(session.id),
         "project_id": str(session.project_id),
@@ -374,14 +435,19 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
         "mode": session.mode,
         "status": session.status,
         "policy_version": session.policy_version,
-        "grading_hidden": session.hides_grading,
+        "grading_hidden": hidden,
         "revealed_at": session.revealed_at.isoformat() if session.revealed_at else None,
         "created_at": session.created_at.isoformat(),
         "finished_at": session.finished_at.isoformat() if session.finished_at else None,
         "items": items,
-        "confirmed_score": str(_session_score(session)[0]),
-        "pending_max_score": str(_session_score(session)[1]),
-        "score_visible": not session.hides_grading,
+        # While grading is hidden the totals are omitted, not merely flagged: a
+        # client must not be able to derive the score from the payload at all.
+        "confirmed_score": None if hidden else str(confirmed),
+        "pending_max_score": None if hidden else str(pending),
+        "score_visible": not hidden,
+        "score_hidden_reason": (
+            "验证进行中：结束本次验证后才会显示分数与正误。" if hidden else None
+        ),
     }
 
 

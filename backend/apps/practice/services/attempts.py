@@ -14,6 +14,7 @@ payload on the same key, or a second submission for the same item, is a 409.
 
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 from typing import Any
 
@@ -33,12 +34,15 @@ from apps.common.enums import (
 from apps.common.errors import (
     AlreadySubmitted,
     InvalidInput,
+    PurposeNotAllowed,
     ScopeViolation,
     StructureInvalid,
     VersionConflict,
 )
 from apps.practice.models import Attempt, GradeEvent, SessionItem
 from domain.grading import adapters
+
+logger = logging.getLogger("apps.practice.attempts")
 
 
 def rule_snapshot_for(item: SessionItem) -> dict[str, Any]:
@@ -228,7 +232,24 @@ def submit_attempt(
 
 
 def create_initial_grade(attempt: Attempt, *, item: SessionItem, now=None) -> GradeEvent:
-    """Deterministic grade, or pending_review where the rules cannot decide."""
+    """Deterministic grade, or pending_review where the rules cannot decide.
+
+    The frozen answer/rubric versions on the item are re-checked against their
+    *current* trust state first: an answer disputed after this item was
+    presented must not keep grading new submissions. The raw answer is always
+    stored, and the disputed submission goes to human review instead.
+    """
+    moment = now or timezone.now()
+    distrust = _content_trust_blocker(item)
+    if distrust is not None:
+        return _create_pending_grade(
+            attempt,
+            item=item,
+            reason=distrust,
+            method=GradeMethod.MIXED,
+            kind=GradeEventKind.INITIAL,
+            now=moment,
+        )
     answer_payload = item.answer_key_version.answer_payload if item.answer_key_version_id else {}
     rubric_payload = None
     if item.rubric_version_id:
@@ -267,7 +288,7 @@ def create_initial_grade(attempt: Attempt, *, item: SessionItem, now=None) -> Gr
     attempt.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
     if item.first_delivered_at is None:
         # Submitting without an explicit presentation still counts as delivered.
-        item.first_delivered_at = now or timezone.now()
+        item.first_delivered_at = moment
         item.save(update_fields=["first_delivered_at", "updated_at"])
     enqueue(
         "projection.rebuild_attempt_evidence",
@@ -278,6 +299,82 @@ def create_initial_grade(attempt: Attempt, *, item: SessionItem, now=None) -> Gr
         "learning.on_attempt_graded",
         {"attempt_id": str(attempt.id), "grade_event_id": str(grade.id)},
         dedupe_key=f"graded:{attempt.id}:{grade.grading_revision}",
+    )
+    return grade
+
+
+def _content_trust_blocker(item: SessionItem) -> str | None:
+    """Why the frozen grading input may no longer be used for new grading."""
+    answer = item.answer_key_version
+    if answer is not None and not answer.is_usable:
+        return "本题固定答案已进入争议或失去可信状态：本次原始作答已保存，判分转人工复核"
+    rubric = item.rubric_version
+    if rubric is not None and getattr(rubric, "is_disputed", False):
+        return "本题固定评分标准已进入争议：本次原始作答已保存，判分转人工复核"
+    return None
+
+
+def _create_pending_grade(
+    attempt: Attempt,
+    *,
+    item: SessionItem,
+    reason: str,
+    method: str,
+    kind: str = GradeEventKind.INVALIDATION,
+    now=None,
+) -> GradeEvent:
+    """Persist a fully-pending grade event without inventing a score."""
+    parts = [
+        {
+            "part_id": str(criterion.get("criterion_id")) if isinstance(criterion, dict) else "part",
+            "score": None,
+            "max_score": str(criterion.get("max_score", "0")) if isinstance(criterion, dict) else str(item.max_score),
+            "status": GradeStatus.PENDING_REVIEW,
+            "method": None,
+            "detail": {"reason": reason},
+        }
+        for criterion in (item.rubric_version.criteria if item.rubric_version_id else [])
+    ] or [
+        {
+            "part_id": "item",
+            "score": None,
+            "max_score": str(item.max_score),
+            "status": GradeStatus.PENDING_REVIEW,
+            "method": None,
+            "detail": {"reason": reason},
+        }
+    ]
+    # Everything is still undecided, so the whole maximum is the pending value.
+    pending_total = sum((Decimal(str(part["max_score"])) for part in parts), Decimal("0"))
+    grade = GradeEvent.objects.create(
+        attempt=attempt,
+        kind=kind,
+        status=GradeStatus.PENDING_REVIEW,
+        method=method,
+        grading_revision=1,
+        confirmed_score=None,
+        max_score=item.max_score,
+        pending_max_score=pending_total,
+        is_fully_confirmed=False,
+        parts=parts,
+        answer_key_version_id=item.answer_key_version_id,
+        rubric_version_id=item.rubric_version_id,
+        spec_version_id=item.spec_version_id,
+        rule_snapshot=rule_snapshot_for(item),
+        rule_version=item.session.policy_version,
+        comment=reason[:1000],
+        invalidation_reason=reason[:500] if kind == GradeEventKind.INVALIDATION else "",
+    )
+    attempt.current_grade_event = grade
+    attempt.grading_revision = grade.grading_revision
+    attempt.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+    if item.first_delivered_at is None:
+        item.first_delivered_at = now or timezone.now()
+        item.save(update_fields=["first_delivered_at", "updated_at"])
+    enqueue(
+        "projection.rebuild_attempt_evidence",
+        {"attempt_id": str(attempt.id)},
+        dedupe_key=f"evidence:{attempt.id}:{grade.grading_revision}",
     )
     return grade
 
@@ -304,6 +401,11 @@ def confirm_grade(
     session = item.session
     if str(attempt.user_id) != str(user.id) and not user.is_staff:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    # The hidden-run gate applies to the *mutation*, not only to the response:
+    # re-scoring a live verification attempt would leak its result through later
+    # reads even if this call returned nothing.
+    if session.hides_grading:
+        raise PurposeNotAllowed(message="验证/考试进行中：不能对本次作答确认评分，请先结束该次验证")
     if expected_grading_revision is None:
         raise VersionConflict(message="缺少 expected_grading_revision，请重新加载评分页")
     if int(expected_grading_revision) != int(attempt.grading_revision):
@@ -312,6 +414,9 @@ def confirm_grade(
         raise VersionConflict(message="评分依据的答案版本已变化，请重新加载")
     if rubric_version_id and str(rubric_version_id) != str(item.rubric_version_id or ""):
         raise VersionConflict(message="评分依据的 rubric 版本已变化，请重新加载")
+    distrust = _content_trust_blocker(item)
+    if distrust is not None:
+        raise PurposeNotAllowed(message=f"{distrust}；请先处理答案争议")
 
     is_self = str(user.id) == str(attempt.user_id)
     method = GradeMethod.SELF_CONFIRMED if is_self else GradeMethod.REVIEWER_CONFIRMED
@@ -322,13 +427,20 @@ def confirm_grade(
         confirmed_parts, total = _confirm_rubric_parts(item, parts)
     else:
         confirmed_parts, total = _confirm_pending_parts(item, parts, previous)
-    for part in confirmed_parts:
-        if part.get("status") == GradeStatus.CONFIRMED:
-            part["method"] = method
-
-    fully_confirmed = total == max_score and all(
+    # Only the parts that are still undecided count as pending. Lost marks on a
+    # part that has been decided are a result, not unscored work.
+    pending_total = sum(
+        (Decimal(str(part.get("max_score") or "0")) for part in confirmed_parts if part.get("status") != GradeStatus.CONFIRMED),
+        Decimal("0"),
+    )
+    fully_confirmed = pending_total == 0 and all(
         part.get("status") == GradeStatus.CONFIRMED for part in confirmed_parts
     )
+    # Each decided part records *how* it was decided; the event-level method
+    # stays `mixed` when a part was scored by the model and another by a human.
+    for part in confirmed_parts:
+        if part.get("status") == GradeStatus.CONFIRMED and not part.get("method"):
+            part["method"] = method
     grade = GradeEvent.objects.create(
         attempt=attempt,
         kind=GradeEventKind.MANUAL_CONFIRMATION,
@@ -337,7 +449,7 @@ def confirm_grade(
         grading_revision=attempt.grading_revision + 1,
         confirmed_score=total,
         max_score=max_score,
-        pending_max_score=max_score - total,
+        pending_max_score=pending_total,
         is_fully_confirmed=fully_confirmed,
         parts=confirmed_parts,
         answer_key_version_id=item.answer_key_version_id,
@@ -504,12 +616,17 @@ def regrade_attempt(
     target_rubric_version=None,
     actor=None,
     reason: str = "",
-) -> GradeEvent:
+    regrade_generation: int | None = None,
+) -> GradeEvent | None:
     """Re-grade one attempt against a reviewed new answer version.
 
-    The original attempt and its initial grade event are preserved. The new event
-    supersedes the old one only if it is still the newest revision, so a late
-    task cannot overwrite a newer result.
+    The original attempt and its initial grade event are preserved. Each regrade
+    request carries a monotonic *generation* captured when the run was created.
+    The attempt stores the newest generation that actually wrote a result, so a
+    request issued earlier can never overwrite one issued later - even when the
+    older task is executed last, and even when both target the same revision.
+
+    Returns ``None`` when the request is stale and nothing was written.
     """
     locked = _locked_attempt(attempt.id)
     if locked is None:  # pragma: no cover - the attempt existed a moment ago
@@ -517,6 +634,14 @@ def regrade_attempt(
     item = locked.session_item
     if str(target_answer_key_version.question_version_id) != str(item.question_version_id):
         raise InvalidInput(message="目标答案版本不属于该题项固定的题目版本，不能机械重判")
+    if regrade_generation is not None and int(regrade_generation) <= int(locked.applied_regrade_generation):
+        logger.info(
+            "stale regrade skipped attempt=%s generation=%s already_applied=%s",
+            locked.id,
+            regrade_generation,
+            locked.applied_regrade_generation,
+        )
+        return None
     rule: dict[str, Any] = dict(
         item.spec_version.rule_for(item.question_version.question_type) if item.spec_version_id else {}
     )
@@ -534,14 +659,13 @@ def regrade_attempt(
         else None,
     )
     previous = locked.current_grade_event
-    if previous is not None and previous.grading_revision > locked.grading_revision:
-        raise VersionConflict(message="该作答已有更新的评分修订，旧任务不再写入")
+    target = int(locked.grading_revision) + 1
     grade = GradeEvent.objects.create(
         attempt=locked,
         kind=GradeEventKind.REGRADE,
         status=result.status,
         method=result.method,
-        grading_revision=locked.grading_revision + 1,
+        grading_revision=target,
         confirmed_score=result.confirmed_score,
         max_score=item.max_score,
         pending_max_score=result.pending_max_score,
@@ -550,7 +674,11 @@ def regrade_attempt(
         answer_key_version=target_answer_key_version,
         rubric_version=target_rubric_version,
         spec_version_id=item.spec_version_id,
-        rule_snapshot={**rule_snapshot_for(item), "regrade_reason": reason[:500]},
+        rule_snapshot={
+            **rule_snapshot_for(item),
+            "regrade_reason": reason[:500],
+            "regrade_generation": regrade_generation,
+        },
         rule_version=item.session.policy_version,
         grader=actor,
         comment=reason[:1000],
@@ -561,7 +689,10 @@ def regrade_attempt(
         previous.save(update_fields=["is_superseded", "updated_at"])
     locked.current_grade_event = grade
     locked.grading_revision = grade.grading_revision
-    locked.save(update_fields=["current_grade_event", "grading_revision", "updated_at"])
+    if regrade_generation is not None:
+        # High-water mark: only ever moves forward.
+        locked.applied_regrade_generation = max(int(locked.applied_regrade_generation), int(regrade_generation))
+    locked.save(update_fields=["current_grade_event", "grading_revision", "applied_regrade_generation", "updated_at"])
     ContentRevision.objects.create(
         actor=actor,
         entity_type="grade_event",
@@ -661,9 +792,20 @@ def start_regrade_run(
         scope=scope,
         requested_by=actor,
     )
-    run.affected_attempts = Attempt.objects.filter(
+    attempts = Attempt.objects.filter(
         session_item__question_version__question=question, project=question.subject.project
-    ).count()
-    run.save(update_fields=["affected_attempts", "updated_at"])
+    )
+    run.affected_attempts = attempts.count()
+    # Monotonic request order. `select_for_update` on the newest run of this
+    # question serialises concurrent requests so two runs never share a number.
+    previous = (
+        RegradeRun.objects.select_for_update()
+        .filter(project=question.subject.project, question=question)
+        .order_by("-generation")
+        .values_list("generation", flat=True)
+        .first()
+    )
+    run.generation = int(previous or 0) + 1
+    run.save(update_fields=["affected_attempts", "generation", "updated_at"])
     enqueue("projection.run_regrade", {"regrade_run_id": str(run.id)}, dedupe_key=f"regrade-run:{run.id}")
     return run

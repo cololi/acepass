@@ -57,23 +57,45 @@ class IdempotencyRecord(BaseModel):
 
 
 class OutboxEvent(BaseModel):
-    """Transactional outbox. Business state lives in PostgreSQL, not in Redis."""
+    """Transactional outbox. Business state lives in PostgreSQL, not in Redis.
+
+    ``processed_at`` is the only proof that a consumer actually finished. A row
+    is therefore never treated as done because the broker accepted it: the
+    dispatcher writes ``dispatched`` with a lease, the consumer claims
+    ``processing`` and confirms ``processed``. Anything left in ``pending``,
+    ``dispatched``, ``processing`` or ``failed`` past its lease is recoverable,
+    which is what makes a Redis flush, a killed worker or a PostgreSQL-only
+    restore survivable.
+    """
 
     topic = models.CharField(max_length=100, db_index=True)
     payload = models.JSONField(default=dict)
     status = models.CharField(max_length=16, choices=OutboxStatus.choices, default=OutboxStatus.PENDING, db_index=True)
     attempts = models.PositiveSmallIntegerField(default=0)
+    max_attempts = models.PositiveSmallIntegerField(default=8)
     available_at = models.DateTimeField(db_index=True)
     dispatched_at = models.DateTimeField(null=True, blank=True)
+    #: Set when a consumer claims the row; the lease expires if it never confirms.
+    claimed_at = models.DateTimeField(null=True, blank=True)
+    claim_token = models.CharField(max_length=64, blank=True)
+    lease_expires_at = models.DateTimeField(null=True, blank=True, db_index=True)
     processed_at = models.DateTimeField(null=True, blank=True)
     last_error = models.CharField(max_length=500, blank=True)
     dedupe_key = models.CharField(max_length=200, null=True, blank=True, unique=True)
 
     class Meta:
         db_table = "audit_outbox_event"
-        indexes = [models.Index(fields=["status", "available_at"])]
+        indexes = [
+            models.Index(fields=["status", "available_at"]),
+            models.Index(fields=["status", "lease_expires_at"]),
+        ]
         verbose_name = "任务发件箱"
         verbose_name_plural = "任务发件箱"
+
+    @property
+    def is_recoverable(self) -> bool:
+        """True while this event still needs a consumer to confirm it."""
+        return self.processed_at is None and self.status != OutboxStatus.PROCESSED
 
 
 class LLMRun(BaseModel):

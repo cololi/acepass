@@ -40,6 +40,18 @@ class GradePart:
 
 @dataclass
 class GradeResult:
+    """One grading outcome.
+
+    Two different questions must never be conflated (docs/03 §4.1):
+
+    * ``is_fully_confirmed`` — *every* scoring part has been decided. A wrong
+      answer is fully confirmed and still scores 0; a partly human-confirmed
+      constructed response is not fully confirmed and keeps a real
+      ``pending_max_score``.
+    * ``is_correct`` — the confirmed score actually reaches this item's maximum,
+      which is the only thing that may be read as "completely correct".
+    """
+
     status: str
     method: str
     max_score: Decimal
@@ -50,6 +62,16 @@ class GradeResult:
     rule_snapshot: dict[str, Any] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
 
+    @property
+    def is_correct(self) -> bool:
+        """Fully confirmed *and* at full marks: "完全正确" in the contract."""
+        return bool(
+            self.is_fully_confirmed
+            and self.confirmed_score is not None
+            and self.max_score > 0
+            and self.confirmed_score >= self.max_score
+        )
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "status": self.status,
@@ -58,6 +80,7 @@ class GradeResult:
             "max_score": str(self.max_score),
             "pending_max_score": str(self.pending_max_score),
             "is_fully_confirmed": self.is_fully_confirmed,
+            "is_correct": self.is_correct,
             "parts": [part.as_dict() for part in self.parts],
             "notes": self.notes,
         }
@@ -83,6 +106,9 @@ def _finalize(parts: list[GradePart], max_score: Decimal, rule_snapshot: dict, n
                 methods.add(part.method)
         elif part.status == GradeStatus.PENDING_REVIEW:
             has_pending = True
+            # The pending value is the maximum of the parts that are genuinely
+            # still undecided. Lost marks on a confirmed part are never turned
+            # back into "unscored" work.
             pending += part.max_score
         elif part.status == GradeStatus.VOID:
             has_pending = True
@@ -101,11 +127,10 @@ def _finalize(parts: list[GradePart], max_score: Decimal, rule_snapshot: dict, n
         status = GradeStatus.VOID
         method = GradeMethod.MIXED
 
+    # "全部评分完成" is about completeness, not about being right. A zero-score
+    # wrong answer is fully graded; a partly confirmed manual rubric is not.
     fully_confirmed = (
-        status == GradeStatus.CONFIRMED
-        and pending == ZERO
-        and confirmed == max_score
-        and all(part.status == GradeStatus.CONFIRMED for part in parts)
+        status == GradeStatus.CONFIRMED and pending == ZERO and all(part.status == GradeStatus.CONFIRMED for part in parts)
     )
     return GradeResult(
         status=status,

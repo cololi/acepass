@@ -17,7 +17,11 @@ def run_tutor_job(
     if job is None:
         _mark_outbox(outbox_event_id, ok=False, error="tutor job missing")
         return "missing"
-    tutor_service.run_job(job=job, prompt=prompt, citations=list(citations), purpose=purpose)
+    try:
+        tutor_service.run_job(job=job, prompt=prompt, citations=list(citations), purpose=purpose)
+    except Exception as exc:
+        _mark_outbox(outbox_event_id, ok=False, error=str(exc))
+        raise
     _mark_outbox(outbox_event_id, ok=True)
     return job.status
 

@@ -13,7 +13,7 @@ from apps.common.errors import AlreadySubmitted, InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.practice.models import Attempt, PracticeSession, SessionItem
 from apps.practice.services import attempts as attempt_services
-from apps.practice.services import exposure
+from apps.practice.services import exposure, verification_gate
 from apps.practice.services import sessions as session_services
 
 practice_router = project_scoped_router(tags=["practice"])
@@ -43,9 +43,11 @@ class SessionOut(Schema):
     created_at: str
     finished_at: str | None
     items: list[dict[str, Any]]
-    confirmed_score: str
-    pending_max_score: str
+    #: ``None`` while grading is hidden: the totals are omitted, not just flagged.
+    confirmed_score: str | None
+    pending_max_score: str | None
     score_visible: bool
+    score_hidden_reason: str | None = None
 
 
 class DraftIn(Schema):
@@ -387,6 +389,10 @@ def reveal_item(request, project_id: str, item_id: str):
     session = item.session
     already_submitted = Attempt.objects.filter(session_item=item).exists()
     session_services.assert_reveal_allowed(item=item, session=session, before_submit=not already_submitted)
+    # The same content may be part of a *different* running verification (another
+    # tab, another project, a second session). That run's integrity does not
+    # depend on which endpoint is used to ask.
+    verification_gate.assert_item_not_in_active_verification(item=item, action="查看答案与解析")
     payload = session_services.reveal_payload(item=item, session=session)
     exposure.record(
         user=request.user,
@@ -417,6 +423,7 @@ def reveal_attempt(request, project_id: str, attempt_id: str):
     item = attempt.session_item
     session = item.session
     session_services.assert_reveal_allowed(item=item, session=session, before_submit=False)
+    verification_gate.assert_item_not_in_active_verification(item=item, action="查看答案与解析")
     payload = session_services.reveal_payload(item=item, session=session)
     exposure.record(
         user=request.user,
@@ -488,14 +495,24 @@ def set_diagnosis(request, project_id: str, attempt_id: str, payload: DiagnosisI
 
 @practice_router.get("/projects/{project_id}/grading-queue", auth=auth)
 def grading_queue(request, project_id: str, subject_id: str | None = None, limit: int = 30):
-    """Attempts waiting for human confirmation (own attempts or, for staff, others')."""
-    from apps.common.enums import GradeStatus
+    """Attempts waiting for human confirmation (own attempts or, for staff, others').
+
+    Attempts belonging to a run whose grading is still hidden are excluded: the
+    queue must not become a back door to the score of a live verification.
+    """
+    from django.db.models import Q
+
+    from apps.common.enums import GradeStatus, SessionMode, SessionStatus
     from apps.common.scope import is_reviewer_of
 
     project = require_project(request.user, project_id)
     queryset = (
         Attempt.objects.filter(project=project)
         .filter(current_grade_event__status=GradeStatus.PENDING_REVIEW)
+        .exclude(
+            Q(session_item__session__status=SessionStatus.ACTIVE)
+            & Q(session_item__session__mode__in=[SessionMode.VERIFICATION, SessionMode.MOCK_EXAM])
+        )
         .select_related("session_item__question_version__question", "current_grade_event", "user")
         .order_by("submitted_at")
     )
@@ -513,6 +530,7 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
                 "question_id": str(attempt.session_item.question_version.question_id),
                 "display_label": attempt.session_item.question_version.question.display_label,
                 "question_type": attempt.session_item.question_version.question_type,
+                "subject_id": str(attempt.session_item.question_version.question.subject_id),
                 "submitted_at": attempt.submitted_at.isoformat(),
                 "grading_revision": attempt.grading_revision,
                 "pending_max_score": str(grade.pending_max_score) if grade else "0",
@@ -520,6 +538,25 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
                 "is_own_attempt": str(attempt.user_id) == str(request.user.id),
                 "can_review_as_other": is_reviewer_of(request.user, attempt),
                 "parts": grade.parts if grade else [],
+                # The reviewer must be able to check the original work, not
+                # remember it (R10).
+                "raw_answer": attempt.raw_answer,
+                "steps": attempt.steps,
+                "attachments": attempt.attachments,
+                "confidence": attempt.confidence,
+                "elapsed_ms": attempt.elapsed_ms,
+                "rubric": _rubric_payload(attempt.session_item),
             }
         )
     return rows
+
+
+def _rubric_payload(item: SessionItem) -> dict | None:
+    if not item.rubric_version_id:
+        return None
+    rubric = item.rubric_version
+    return {
+        "rubric_version_id": str(rubric.id),
+        "criteria": rubric.criteria,
+        "total_score": str(rubric.total_score),
+    }

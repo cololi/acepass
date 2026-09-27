@@ -463,6 +463,52 @@ def enqueue_plan_event(plan: StudyPlan) -> None:
     enqueue("learning.reconcile_plan", {"plan_id": str(plan.id)}, dedupe_key=f"plan:{plan.id}")
 
 
+@transaction.atomic
+def reconcile_plan(*, plan_id: str = "") -> str:
+    """Bring a generated plan back in line with the current evidence.
+
+    Registered consumer for ``learning.reconcile_plan``. It is idempotent by
+    design: it re-anchors delayed tasks whose anchor moved, records what it did
+    on the plan, and never creates a second copy of an existing task. A missing
+    or already-superseded plan is reported, not treated as an error.
+    """
+    if not plan_id:
+        updated = pairing_service.reconcile_delayed_tasks()
+        return f"plan_missing delayed_updated={updated}"
+    plan = StudyPlan.objects.filter(id=plan_id).first()
+    if plan is None:
+        return "plan_missing"
+    moment = timezone.now()
+    newer = StudyPlan.objects.filter(
+        user_id=plan.user_id, plan_date=plan.plan_date, revision__gt=plan.revision
+    ).exists()
+    updated = pairing_service.reconcile_delayed_tasks()
+    open_tasks = list(
+        plan.tasks.filter(status__in=[TaskStatus.PENDING, TaskStatus.DEFERRED]).select_related("review_task")
+    )
+    for task in open_tasks:
+        _refresh_task_due_date(task)
+    plan.notes = list(plan.notes or []) + [
+        f"计划核对：{moment.isoformat()}，未开始任务 {len(open_tasks)} 个，延迟锚点顺延 {updated} 个"
+        + ("（该修订已被更新修订取代）" if newer else "")
+    ]
+    plan.save(update_fields=["notes", "updated_at"])
+    return f"pending={len(open_tasks)} delayed_updated={updated} superseded={bool(newer)}"
+
+
+def _refresh_task_due_date(task: StudyTask) -> None:
+    """Recompute a task's due date from its own stored rule, without inventing one."""
+    review = getattr(task, "review_task", None)
+    if review is None:
+        return
+    expected = review.not_before
+    if task.not_before != expected or task.due_at != expected:
+        task.not_before = expected
+        task.due_at = expected
+        task.delay_anchor_at = review.delay_anchor_at
+        task.save(update_fields=["not_before", "due_at", "delay_anchor_at", "updated_at"])
+
+
 def plan_payload(plan: StudyPlan | None, *, now=None) -> dict:
     if plan is None:
         return {"plan": None, "tasks": [], "notes": ["今日还没有计划：可点击“生成今日计划”"]}
