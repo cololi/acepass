@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest, newIdempotencyKey, type QuestionListItem, type SyllabusOut } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
+import { ExposurePanel, ExposureToggle } from './ExposurePanel'
 
 const TYPE_LABELS: Record<string, string> = {
   single_choice: '单选题',
@@ -44,6 +45,8 @@ export function QuestionBankPage() {
   const [importText, setImportText] = useState('')
   const [sourceNote, setSourceNote] = useState('')
   const [importError, setImportError] = useState('')
+  /** One question's exposure explanation is expanded at a time. */
+  const [exposureQuestionId, setExposureQuestionId] = useState<string | null>(null)
 
   const projectId = currentProject?.id ?? null
 
@@ -222,39 +225,57 @@ export function QuestionBankPage() {
                   <th>来源</th>
                   <th>可信答案</th>
                   <th>考点</th>
+                  <th>严格独立</th>
                   <th>操作</th>
                 </tr>
               </thead>
               <tbody>
                 {(questionsQuery.data ?? []).map((question) => (
-                  <tr key={question.id}>
-                    <td>
-                      {question.display_label || '（无标签）'}
-                      {question.is_demo ? <span className="pill warn" style={{ marginLeft: 6 }}>演示</span> : null}
-                    </td>
-                    <td>{question.question_type ? (TYPE_LABELS[question.question_type] ?? question.question_type) : '—'}</td>
-                    <td className="small">{ORIGIN_LABELS[question.origin_type] ?? question.origin_type}</td>
-                    <td>
-                      {question.has_trusted_answer ? (
-                        <span className="pill ok">已核对</span>
-                      ) : (
-                        <span className="pill danger">无</span>
-                      )}
-                    </td>
-                    <td className="small">{question.knowledge_nodes.join('、') || '未映射'}</td>
-                    <td>
-                      <div className="row">
-                        <button
-                          className="btn small"
-                          disabled={!question.has_trusted_answer || !currentSubject}
-                          onClick={() => createSession.mutate(question.id)}
-                          title={question.has_trusted_answer ? '开始练习' : '缺少已核对答案，不能进入计分练习'}
-                        >
-                          开始练习
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  <Fragment key={question.id}>
+                    <tr>
+                      <td>
+                        {question.display_label || '（无标签）'}
+                        {question.is_demo ? <span className="pill warn" style={{ marginLeft: 6 }}>演示</span> : null}
+                      </td>
+                      <td>{question.question_type ? (TYPE_LABELS[question.question_type] ?? question.question_type) : '—'}</td>
+                      <td className="small">{ORIGIN_LABELS[question.origin_type] ?? question.origin_type}</td>
+                      <td>
+                        {question.has_trusted_answer ? (
+                          <span className="pill ok">已核对</span>
+                        ) : (
+                          <span className="pill danger">无</span>
+                        )}
+                      </td>
+                      <td className="small">{question.knowledge_nodes.join('、') || '未映射'}</td>
+                      <td>
+                        <ExposureToggle
+                          open={exposureQuestionId === question.id}
+                          onToggle={() =>
+                            setExposureQuestionId((current) => (current === question.id ? null : question.id))
+                          }
+                        />
+                      </td>
+                      <td>
+                        <div className="row">
+                          <button
+                            className="btn small"
+                            disabled={!question.has_trusted_answer || !currentSubject}
+                            onClick={() => createSession.mutate(question.id)}
+                            title={question.has_trusted_answer ? '开始练习' : '缺少已核对答案，不能进入计分练习'}
+                          >
+                            开始练习
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {exposureQuestionId === question.id ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: 0, background: '#fbfcfe' }}>
+                          <ExposurePanel questionId={question.id} />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

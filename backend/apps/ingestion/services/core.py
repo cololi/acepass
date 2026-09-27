@@ -21,6 +21,7 @@ from apps.common.enums import (
 )
 from apps.common.errors import InvalidInput, ScopeViolation, StructureInvalid, VersionConflict
 from apps.ingestion.models import Asset, CandidateRevision, ImportCandidate, ImportJob, SourceDocument, SourceRegion
+from apps.ingestion.services import layout
 from apps.ingestion.storage import build_key, get_storage
 
 
@@ -502,6 +503,37 @@ def refresh_candidate_issues(candidate: ImportCandidate) -> list[dict]:
         issues.append(
             {"code": "no_source_region", "message": "缺少来源区域；题目必须可追溯到原文或原图", "severity": "warning"}
         )
+    # P2 batch 1: layout that a deterministic parser cannot read reliably has to
+    # reach a human *before* publication. The issues come from the pages this
+    # candidate actually occupies, and only an explicit layout confirmation clears
+    # them — nothing here can publish a multi-column, table/formula or scanned
+    # page on its own (错误无法自动发布).
+    if candidate.layout_review_confirmed_at is None:
+        issues.extend(
+            layout.layout_review_issues(
+                page_diagnostics=candidate.job.page_diagnostics,
+                pages=[
+                    (region.document_id, region.page_index)
+                    for region in candidate.source_regions.all()
+                ],
+            )
+        )
+    continues_on_pages = [int(page) for page in (payload.get("continues_on_pages") or [])]
+    if len(continues_on_pages) > 1:
+        # Non-blocking: the join is wanted, the proofreader just has to know that
+        # the question was assembled across pages.
+        issues.append(
+            {
+                "code": layout.ISSUE_CROSS_PAGE,
+                "message": (
+                    "该题跨页（第 "
+                    + "、".join(str(page) for page in continues_on_pages)
+                    + " 页）：题干/选项在页面之间被自动接续，请对照原页确认没有漏字或缺行"
+                ),
+                "severity": "warning",
+                "pages": continues_on_pages,
+            }
+        )
 
     if question_type and content:
         digest = hashlib.sha256(
@@ -628,6 +660,51 @@ def ignore_candidate(candidate: ImportCandidate, *, actor, reason: str = "") -> 
         reason=reason[:500],
     )
     maybe_complete_job(locked.job)
+    return locked
+
+
+@transaction.atomic
+def confirm_layout_review(candidate: ImportCandidate, *, actor, note: str = "") -> ImportCandidate:
+    """A human confirms the layout of the pages this candidate came from.
+
+    This is the *only* way to clear the blocking layout issues
+    (``multi_column_needs_review`` / ``table_or_formula_needs_review`` /
+    ``page_without_text_layer_needs_manual_entry``), and it records who confirmed
+    what and when: publishing a candidate from a page the parser could not read
+    reliably therefore always leaves an auditable confirmation behind.
+    """
+    locked = ImportCandidate.objects.select_for_update().get(id=candidate.id)
+    if locked.status == ImportCandidateStatus.PUBLISHED:
+        raise InvalidInput(message="已发布的候选无需再确认版式")
+    locked.layout_review_confirmed_at = timezone.now()
+    locked.layout_review_note = (note or "")[:500]
+    locked.reviewed_by = actor
+    locked.reviewed_at = locked.layout_review_confirmed_at
+    locked.save(
+        update_fields=[
+            "layout_review_confirmed_at",
+            "layout_review_note",
+            "reviewed_by",
+            "reviewed_at",
+            "updated_at",
+        ]
+    )
+    ContentRevision.objects.create(
+        actor=actor,
+        entity_type="import_candidate",
+        entity_id=str(locked.id),
+        action="layout_confirm",
+        project_id=locked.project_id,
+        reason=locked.layout_review_note,
+        detail={
+            "pages": [
+                {"document_id": str(region.document_id), "page_index": region.page_index}
+                for region in locked.source_regions.all()
+            ],
+            "continues_on_pages": (locked.draft_payload or {}).get("continues_on_pages") or [],
+        },
+    )
+    refresh_candidate_issues(locked)
     return locked
 
 

@@ -507,6 +507,8 @@ export interface ImportJobOut {
   document_ids: string[]
   candidate_count: number
   candidate_status_counts: Record<string, number>
+  /** P2 batch 1: per-page layout diagnosis of every uploaded PDF (C01). */
+  page_diagnostics: PageDiagnosticOut[]
   created_at: string
 }
 
@@ -516,7 +518,7 @@ export interface CandidateOut {
   subject_id: string | null
   status: string
   revision: number
-  review_issues: Array<{ code: string; message: string; severity: string }>
+  review_issues: ReviewIssueOut[]
   is_stub_output: boolean
   extractor_version: string
   draft_payload: Record<string, unknown>
@@ -557,6 +559,13 @@ export interface CandidateOut {
     document_id?: string
     document_title?: string
   }
+  /**
+   * P2 batch 1: the explicit layout confirmation that clears the blocking
+   * issues a suspicious source page (multi-column / table / formula / scan)
+   * raised. Until it is set those issues stay blocking.
+   */
+  layout_review_confirmed_at: string | null
+  layout_review_note: string
   updated_at: string
 }
 
@@ -1593,4 +1602,239 @@ export function tutorStreamUrl(projectId: string, jobId: string, after: number |
   if (after !== null && Number.isFinite(after)) params.set('after', String(after))
   const suffix = params.toString()
   return `${BASE}/projects/${projectId}/tutor-jobs/${jobId}/stream${suffix ? `?${suffix}` : ''}`
+}
+
+/* ==================================================== P2 批次 1：版面（C01） */
+/**
+ * One page's deterministic layout diagnosis, exactly as the parser saw it.
+ *
+ * Nothing here is a recognition result: `is_scanned` means the page has no text
+ * layer at all (no OCR was attempted), and `reading_order_reliable === false`
+ * means the extractor kept the original order instead of guessing.
+ */
+export interface PageDiagnosticOut {
+  /** Added by the job collector; the extractor's own rows carry no document id. */
+  document_id?: string | null
+  document_title?: string
+  page_index: number
+  reasons: string[]
+  columns: number
+  has_table_grid: boolean
+  has_formula_tokens: boolean
+  is_scanned: boolean
+  reading_order_reliable: boolean
+  character_count: number
+  /** The server's own verdict: this page blocks until a human confirms it. */
+  needs_review?: boolean
+  fragment_count?: number
+}
+
+/** One proofreading issue; layout entries also name the pages that raised them. */
+export interface ReviewIssueOut {
+  code: string
+  message: string
+  severity: string
+  /**
+   * The three blocking layout codes carry `{document_id, page_index, reason}`;
+   * the non-blocking `cross_page_question` carries plain page numbers. Both
+   * shapes are accepted so the panel never prints `第 undefined 页`.
+   */
+  pages?: Array<{ document_id?: string | null; page_index: number; reason?: string } | number>
+  page_indexes?: number[]
+  reasons?: string[]
+  [key: string]: unknown
+}
+
+/** Page numbers of a layout issue, from whichever shape the server sent. */
+export function issuePageIndexes(issue: ReviewIssueOut): number[] {
+  const raw: number[] = []
+  for (const value of issue.page_indexes ?? []) {
+    const index = Number(value)
+    if (Number.isFinite(index)) raw.push(index)
+  }
+  for (const page of issue.pages ?? []) {
+    const index = typeof page === 'number' ? Number(page) : Number((page as { page_index?: unknown }).page_index)
+    if (Number.isFinite(index)) raw.push(index)
+  }
+  return raw.filter((value, position) => raw.indexOf(value) === position)
+}
+
+/** The page reasons that make a candidate unpublishable until a human confirms. */
+export const LAYOUT_BLOCKING_ISSUE_CODES = [
+  'page_without_text_layer_needs_manual_entry',
+  'multi_column_needs_review',
+  'table_or_formula_needs_review',
+] as const
+
+/** Non-blocking, but the proofreader still has to know the question spans pages. */
+export const LAYOUT_WARNING_ISSUE_CODES = ['cross_page_question'] as const
+
+export function isLayoutBlockingIssue(issue: { code: string; severity?: string }): boolean {
+  return (
+    issue.severity === 'blocking' &&
+    (LAYOUT_BLOCKING_ISSUE_CODES as readonly string[]).includes(issue.code)
+  )
+}
+
+export function isLayoutIssue(issue: { code: string }): boolean {
+  return (
+    (LAYOUT_BLOCKING_ISSUE_CODES as readonly string[]).includes(issue.code) ||
+    (LAYOUT_WARNING_ISSUE_CODES as readonly string[]).includes(issue.code)
+  )
+}
+
+/**
+ * A 422 refusal carries the server's own problem rows.
+ *
+ * Publication is refused server-side, so the UI shows that list verbatim instead
+ * of inventing a summary (and never claims a candidate is publishable when the
+ * server just said otherwise).
+ */
+export interface ApiProblemRow {
+  code: string
+  message: string
+  severity?: string
+}
+
+export function problemsOf(error: unknown): ApiProblemRow[] {
+  if (!(error instanceof ApiError)) return []
+  const raw = error.details?.problems
+  if (!Array.isArray(raw)) return []
+  return raw
+    .map((entry) => (entry ?? {}) as Record<string, unknown>)
+    .map((entry) => ({
+      code: String(entry.code ?? ''),
+      message: String(entry.message ?? ''),
+      severity: entry.severity === undefined ? undefined : String(entry.severity),
+    }))
+    .filter((entry) => entry.code.length > 0 || entry.message.length > 0)
+}
+
+/** The job payload that carries `page_diagnostics` (the candidate payload does not). */
+export function fetchImportJob(projectId: string, jobId: string) {
+  return apiRequest<ImportJobOut>(`/projects/${projectId}/imports/${jobId}`)
+}
+
+/**
+ * Confirm the layout of the pages a candidate came from.
+ *
+ * One fresh `Idempotency-Key` per attempt: a second click is a second attempt
+ * with its own key, while a network retry of the same click reuses the row the
+ * server already recorded.
+ */
+export function confirmCandidateLayout(projectId: string, candidateId: string, note: string) {
+  return apiRequest<CandidateOut>(
+    `/projects/${projectId}/import-candidates/${candidateId}/layout-confirm`,
+    {
+      method: 'POST',
+      idempotencyKey: newIdempotencyKey('candidate-layout-confirm'),
+      body: { note },
+    },
+  )
+}
+
+/* ============================================ P2 批次 1：曝光与已见（C04） */
+/** Which ledger row proves one contamination reason. */
+export interface ContaminationEvidenceOut {
+  evidence_id: string
+  /** `exposure_event` or `session_item`. */
+  evidence_type: string
+  exposure_kind: string | null
+  question_id: string
+  project_id: string | null
+  session_item_id: string | null
+  server_time: string | null
+}
+
+export interface ExclusionReasonOut {
+  code: string
+  message: string
+  evidence: ContaminationEvidenceOut
+}
+
+/** Why (and whether) a question can still count as strictly independent. */
+export interface QuestionExposureOut {
+  question_id: string
+  seen: boolean
+  reasons: string[]
+  first_seen_at: string | null
+  /** e.g. `exposure_event:external_seen`, `session_item:presented_without_submit`. */
+  sources: string[]
+  strict_independent_eligible: boolean
+  exclusion_reasons: ExclusionReasonOut[]
+}
+
+function normalizeEvidence(raw: unknown): ContaminationEvidenceOut {
+  const row = (raw ?? {}) as Record<string, unknown>
+  return {
+    evidence_id: String(row.evidence_id ?? ''),
+    evidence_type: String(row.evidence_type ?? ''),
+    exposure_kind: row.exposure_kind === null || row.exposure_kind === undefined ? null : String(row.exposure_kind),
+    question_id: String(row.question_id ?? ''),
+    project_id: row.project_id === null || row.project_id === undefined ? null : String(row.project_id),
+    session_item_id:
+      row.session_item_id === null || row.session_item_id === undefined ? null : String(row.session_item_id),
+    server_time: row.server_time === null || row.server_time === undefined ? null : String(row.server_time),
+  }
+}
+
+/**
+ * `null` means the payload did not carry a usable state.
+ *
+ * The panel then says the server returned nothing rather than defaulting to
+ * "未见": an unreadable answer must never be rendered as a clean bill of health.
+ */
+export function normalizeExposureState(payload: unknown): QuestionExposureOut | null {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null
+  const row = payload as Record<string, unknown>
+  if (typeof row.seen !== 'boolean' && typeof row.strict_independent_eligible !== 'boolean') return null
+  const eligible =
+    typeof row.strict_independent_eligible === 'boolean' ? row.strict_independent_eligible : !Boolean(row.seen)
+  const reasons = asStringArray(row.reasons)
+  return {
+    question_id: String(row.question_id ?? ''),
+    seen: typeof row.seen === 'boolean' ? row.seen : !eligible,
+    reasons,
+    first_seen_at:
+      row.first_seen_at === null || row.first_seen_at === undefined ? null : String(row.first_seen_at),
+    sources: asStringArray(row.sources),
+    strict_independent_eligible: eligible,
+    exclusion_reasons: Array.isArray(row.exclusion_reasons)
+      ? row.exclusion_reasons.map((raw) => {
+          const entry = (raw ?? {}) as Record<string, unknown>
+          return {
+            code: String(entry.code ?? ''),
+            message: String(entry.message ?? ''),
+            evidence: normalizeEvidence(entry.evidence),
+          }
+        })
+      : [],
+  }
+}
+
+export function fetchQuestionExposure(projectId: string, questionId: string) {
+  return apiRequest<unknown>(`/projects/${projectId}/questions/${questionId}/exposure`).then(
+    normalizeExposureState,
+  )
+}
+
+/**
+ * The learner's own declaration (append-only ledger).
+ *
+ * `seen: false` is recorded as a *correction row*; it never removes the
+ * contamination marker, so the UI must not present it as a reset. One fresh key
+ * per attempt keeps a double click from writing two rows in one intent.
+ */
+export function declareQuestionExternalSeen(
+  projectId: string,
+  questionId: string,
+  payload: { seen: boolean; note: string },
+) {
+  return apiRequest<unknown>(`/projects/${projectId}/questions/${questionId}/external-seen`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey(
+      payload.seen ? 'question-external-seen' : 'question-external-seen-correction',
+    ),
+    body: { seen: payload.seen, note: payload.note },
+  }).then(normalizeExposureState)
 }

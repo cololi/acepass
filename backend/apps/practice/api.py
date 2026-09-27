@@ -136,6 +136,45 @@ class DiagnosisOut(Schema):
     note: str
 
 
+class ContaminationEvidenceOut(Schema):
+    """Which ledger row proves one contamination reason."""
+
+    evidence_id: str
+    evidence_type: str
+    exposure_kind: str | None = None
+    question_id: str
+    project_id: str | None = None
+    session_item_id: str | None = None
+    server_time: str | None = None
+
+
+class ExclusionReasonOut(Schema):
+    code: str
+    message: str
+    evidence: ContaminationEvidenceOut
+
+
+class QuestionExposureOut(Schema):
+    """Why (and whether) a question can no longer be called strictly unseen."""
+
+    question_id: str
+    seen: bool
+    reasons: list[str]
+    first_seen_at: str | None = None
+    sources: list[str]
+    strict_independent_eligible: bool
+    exclusion_reasons: list[ExclusionReasonOut]
+
+
+class ExternalSeenIn(Schema):
+    seen: bool = True
+    note: str = ""
+
+
+class EditorialPreviewIn(Schema):
+    note: str = ""
+
+
 def _item_scope(user, project, session_item_id: str) -> SessionItem:
     item = (
         SessionItem.objects.filter(
@@ -546,6 +585,157 @@ def list_exposures(request, project_id: str, item_id: str):
         }
         for row in rows
     ]
+
+
+# --------------------------------------------------------------------------
+# C04: why a question is no longer "strictly unseen" (read + the two writers)
+# --------------------------------------------------------------------------
+def _question_scope(user, project, question_id: str):
+    """Owner-scoped question inside this project; a foreign id is a 404."""
+    from apps.question_bank.models import Question
+
+    question = (
+        Question.objects.filter(id=question_id, subject__project=project)
+        .select_related("subject", "current_published_version")
+        .first()
+    )
+    if question is None:
+        raise ScopeViolation(message="题目不存在或不属于该项目")
+    return question
+
+
+def _exposure_payload(*, user, project, question) -> dict:
+    """The question-level C04 state: seen or not, and the exact reason rows."""
+    from apps.learning.services import contamination
+
+    question_id = str(question.id)
+    state = contamination.exposure_state(
+        user=user, question_ids=[question_id], project=project
+    )[question_id]
+    return {"question_id": question_id, **state}
+
+
+@practice_router.get(
+    "/projects/{project_id}/questions/{question_id}/exposure", auth=auth, response=QuestionExposureOut
+)
+def get_question_exposure(request, project_id: str, question_id: str):
+    """Read-only: everything that stops this question counting as strictly unseen.
+
+    ``strict_independent_eligible`` is false once the question has been
+    delivered, proofread, declared as seen outside or exposed in another project
+    — and there is no reset path back (C04). The rows explain which ledger entry
+    proves each reason, so the UI can answer "为什么这题不算严格独立".
+    """
+    project = require_project(request.user, project_id)
+    question = _question_scope(request.user, project, question_id)
+    return _exposure_payload(user=request.user, project=project, question=question)
+
+
+@practice_router.post(
+    "/projects/{project_id}/questions/{question_id}/external-seen",
+    auth=auth,
+    response={201: QuestionExposureOut},
+)
+def declare_external_seen(request, project_id: str, question_id: str, payload: ExternalSeenIn):
+    """Record the learner's declaration that they met this question outside.
+
+    The ledger is append-only: ``seen=false`` is stored as a correction row, but
+    the conservative rule stands — once a question has ever been declared seen it
+    can never produce strict-independent evidence again (C04: no path back to
+    "strictly unseen"). Replaying the same Idempotency-Key reuses the same row.
+    """
+    from apps.learning.services import contamination
+
+    project = require_project(request.user, project_id)
+    question = _question_scope(request.user, project, question_id)
+    key = idempotency_key(request)
+    scope = f"questions.external-seen:{question_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    event = contamination.record_external_seen(
+        question=question,
+        actor=request.user,
+        project=project,
+        seen=payload.seen,
+        note=payload.note,
+    )
+    result = _exposure_payload(user=request.user, project=project, question=question)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="exposure_event",
+        resource_id=event.id,
+    )
+    return 201, result
+
+
+@practice_router.post(
+    "/projects/{project_id}/import-candidates/{candidate_id}/editorial-preview",
+    auth=auth,
+    response={201: QuestionExposureOut},
+)
+def record_candidate_editorial_preview(
+    request, project_id: str, candidate_id: str, payload: EditorialPreviewIn
+):
+    """Log that an already-published question was opened for proofreading.
+
+    This is the write path for ``EDITORIAL_PREVIEW`` (C04 source 1): the
+    proofreader sees the answer, so the question can never again be presented as
+    strictly unseen. It is deliberately gated on a re-import candidate linked to
+    a published question (``ImportCandidate.publication_question_id``), which is
+    the only case the product can attest honestly today; the ingestion endpoints
+    (``get_candidate`` / ``patch_candidate`` in ``apps/ingestion/api.py``) should
+    call ``contamination.record_editorial_preview`` with their own ``source`` so
+    the ledger names the real entry point. Re-opening the same candidate reuses
+    the existing row instead of stacking duplicates.
+    """
+    from apps.ingestion.models import ImportCandidate
+    from apps.learning.services import contamination
+    from apps.question_bank.models import QuestionVersion
+
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(
+        id=candidate_id, project=project, job__created_by=request.user
+    ).first()
+    if candidate is None:
+        raise ScopeViolation(message="导入候选不存在或不在当前权限范围")
+    if not candidate.publication_question_id:
+        raise InvalidInput(message="该候选尚未关联已发布题目：只有对已发布内容的再次校对才记录编辑预览")
+    question = _question_scope(request.user, project, str(candidate.publication_question_id))
+    key = idempotency_key(request)
+    scope = f"candidates.editorial-preview:{candidate_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    version = None
+    if candidate.publication_version_id:
+        version = QuestionVersion.objects.filter(id=candidate.publication_version_id).first()
+    event = contamination.record_editorial_preview(
+        question=question,
+        actor=request.user,
+        source="ingestion_candidate_proofread",
+        candidate=candidate,
+        project=project,
+        version=version,
+        note=payload.note,
+    )
+    result = _exposure_payload(user=request.user, project=project, question=question)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=201,
+        response_body=result,
+        resource_type="exposure_event",
+        resource_id=event.id,
+    )
+    return 201, result
 
 
 @practice_router.post("/projects/{project_id}/attempts/{attempt_id}/diagnosis", auth=auth, response=DiagnosisOut)

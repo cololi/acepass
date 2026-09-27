@@ -1,3 +1,4 @@
+import { Fragment, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -8,6 +9,7 @@ import {
   type ReviewTaskRow,
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
+import { ExposurePanel, ExposureToggle } from '../questions/ExposurePanel'
 
 const DIMENSION_LABELS: Record<string, string> = {
   repeat_practice: '重复练习',
@@ -24,6 +26,11 @@ export function ReviewPage() {
   const toast = useToast()
   const queryClient = useQueryClient()
   const projectId = currentProject?.id ?? null
+  /**
+   * C04 also belongs here: a mistake row carries a question context, so the same
+   * exposure explanation answers 「为什么这道题的证据不算严格独立」.
+   */
+  const [exposureQuestionId, setExposureQuestionId] = useState<string | null>(null)
 
   const subjectQuery = currentSubject ? `?subject_id=${currentSubject.id}` : ''
 
@@ -202,36 +209,56 @@ export function ReviewPage() {
                   <th>得分</th>
                   <th>失分</th>
                   <th>时间</th>
+                  <th>严格独立</th>
                   <th>操作</th>
                 </tr>
               </thead>
               <tbody>
                 {mistakes.map((row) => (
-                  <tr key={row.attempt_id}>
-                    <td className="small">{row.display_label || row.question_id.slice(0, 8)}</td>
-                    <td className="small">{row.question_type}</td>
-                    <td className="small">
-                      {row.confirmed_score} / {row.max_score}
-                    </td>
-                    <td className="small">{row.lost_score}</td>
-                    <td className="small">{new Date(row.submitted_at).toLocaleString()}</td>
-                    <td className="small">
-                      {row.can_tutor ? (
-                        <button
-                          className="btn small"
-                          onClick={() =>
-                            navigate(
-                              `/practice?subject=${row.subject_id}&session=${row.session_id}&item=${row.session_item_id}`,
+                  <Fragment key={row.attempt_id}>
+                    <tr>
+                      <td className="small">{row.display_label || row.question_id.slice(0, 8)}</td>
+                      <td className="small">{row.question_type}</td>
+                      <td className="small">
+                        {row.confirmed_score} / {row.max_score}
+                      </td>
+                      <td className="small">{row.lost_score}</td>
+                      <td className="small">{new Date(row.submitted_at).toLocaleString()}</td>
+                      <td>
+                        <ExposureToggle
+                          open={exposureQuestionId === row.question_id}
+                          onToggle={() =>
+                            setExposureQuestionId((current) =>
+                              current === row.question_id ? null : row.question_id,
                             )
                           }
-                        >
-                          查看作答与辅导
-                        </button>
-                      ) : (
-                        <span className="muted">—</span>
-                      )}
-                    </td>
-                  </tr>
+                        />
+                      </td>
+                      <td className="small">
+                        {row.can_tutor ? (
+                          <button
+                            className="btn small"
+                            onClick={() =>
+                              navigate(
+                                `/practice?subject=${row.subject_id}&session=${row.session_id}&item=${row.session_item_id}`,
+                              )
+                            }
+                          >
+                            查看作答与辅导
+                          </button>
+                        ) : (
+                          <span className="muted">—</span>
+                        )}
+                      </td>
+                    </tr>
+                    {exposureQuestionId === row.question_id ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: 0, background: '#fbfcfe' }}>
+                          <ExposurePanel questionId={row.question_id} />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

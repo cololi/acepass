@@ -15,12 +15,26 @@ PDF from scratch:
 Nothing here is production code and nothing here calls a model: the acceptance
 point for P1-A is that a *native* PDF's text layer can be imported without any AI
 key.
+
+P2 batch 1 (C01) adds two more generators, because layout has to be exercised
+against real geometry rather than against a mocked reader:
+
+* :func:`build_layout_pdf` — every fragment is placed by an explicit ``Tm``, so a
+  test can lay out two columns, a table grid or a formula line at chosen
+  coordinates and the extractor sees exactly those positions;
+* :func:`build_scanned_pdf` — an *image-only* page (a real ``/Image`` XObject and
+  no text-showing operator at all), which is what a scanned page actually is.
 """
 
 from __future__ import annotations
 
 import zlib
 from dataclasses import dataclass
+
+#: US Letter/A4-ish page in PDF points; the geometry thresholds in
+#: ``apps.ingestion.services.pdf_text`` are expressed in points and converted
+#: with the page size, so tests and production agree on this default.
+DEFAULT_MEDIA_BOX = (595.0, 842.0)
 
 
 @dataclass
@@ -60,6 +74,12 @@ class PdfBuilder:
             b"<< /Length %d /Filter /FlateDecode >>\nstream\n" % len(compressed) + compressed + b"\nendstream"
         )
 
+    def raw_stream(self, data: bytes, *, extra: bytes = b"") -> int:
+        """An uncompressed stream; image XObjects must not be flate-wrapped here."""
+        return self.add(
+            b"<< /Length %d %s>>\nstream\n" % (len(data), extra) + data + b"\nendstream"
+        )
+
     def build(self) -> bytes:
         header = b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n"
         out = bytearray(header)
@@ -86,24 +106,29 @@ class PdfBuilder:
         self._info = info
 
 
-def build_text_pdf(pages: list[str], *, title: str = "AcePass 测试材料（自动生成，非真题）") -> bytes:
-    """Build a native-text PDF whose text layer contains ``pages`` verbatim."""
-    builder = PdfBuilder(title=title)
-    catalog = builder.reserve()
-    pages_node = builder.reserve()
-    info = builder.reserve()
-    font = builder.reserve()
-    descendant = builder.reserve()
-    descriptor = builder.reserve()
-    to_unicode = builder.reserve()
-
+def _collect_characters(pages: list[str]) -> list[str]:
     characters: list[str] = []
     for page in pages:
         for character in page:
             if character not in characters and character not in "\n\r":
                 characters.append(character)
+    return characters
+
+
+def _font_codes(characters: list[str]) -> dict[str, int]:
     # Glyph id == code point keeps the ToUnicode map trivial and lossless.
-    codes = {character: ord(character) for character in characters}
+    return {character: ord(character) for character in characters}
+
+
+def _write_font(
+    builder: PdfBuilder,
+    codes: dict[str, int],
+    *,
+    font: int,
+    descendant: int,
+    descriptor: int,
+    to_unicode: int,
+) -> None:
     bfchar = "".join(f"<{code:04X}> <{ord(character):04X}>\n" for character, code in codes.items())
     cmap = (
         "/CIDInit /ProcSet findresource begin\n"
@@ -115,18 +140,6 @@ def build_text_pdf(pages: list[str], *, title: str = "AcePass 测试材料（自
         "endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend"
     ).encode()
     builder.set(to_unicode, b"<< /Length %d >>\nstream\n" % len(cmap) + cmap + b"\nendstream")
-
-    page_refs = []
-    for page_text in pages:
-        content = _page_content(page_text, codes)
-        content_ref = builder.stream(content)
-        page = builder.add(
-            b"<< /Type /Page /Parent %d 0 R /MediaBox [0 0 595 842] "
-            b"/Resources << /Font << /F1 %d 0 R >> >> /Contents %d 0 R >>"
-            % (pages_node, font, content_ref)
-        )
-        page_refs.append(page)
-
     font_file = builder.add(b"<< /Length 0 >>\nstream\n\nendstream")
     builder.set(
         descriptor,
@@ -144,10 +157,64 @@ def build_text_pdf(pages: list[str], *, title: str = "AcePass 测试材料（自
         b"<< /Type /Font /Subtype /Type0 /BaseFont /AcePassTest /Encoding /Identity-H "
         b"/DescendantFonts [%d 0 R] /ToUnicode %d 0 R >>" % (descendant, to_unicode),
     )
-    builder.set(pages_node, b"<< /Type /Pages /Kids [%s] /Count %d >>" % (
-        b" ".join(b"%d 0 R" % ref for ref in page_refs),
-        len(page_refs),
-    ))
+
+
+def _image_xobject(builder: PdfBuilder) -> int:
+    """A tiny real greyscale image: the *content* of a scanned-looking page."""
+    return builder.raw_stream(
+        bytes([0x00, 0x40, 0x80, 0xFF]),
+        extra=b"/Type /XObject /Subtype /Image /Width 2 /Height 2 /ColorSpace /DeviceGray /BitsPerComponent 8 ",
+    )
+
+
+def _assemble(
+    *,
+    title: str,
+    characters: list[str],
+    page_contents: list[bytes],
+    scanned_pages: list[bool] | None = None,
+    media_box: tuple[float, float] = DEFAULT_MEDIA_BOX,
+) -> bytes:
+    """Write the shared font/page objects around already-built page contents.
+
+    ``scanned_pages[i]`` marks a page that must carry a full-page image and no
+    text layer; the image XObject is created here so the page dictionary and the
+    object it points at always belong to the same builder.
+    """
+    builder = PdfBuilder(title=title)
+    catalog = builder.reserve()
+    pages_node = builder.reserve()
+    info = builder.reserve()
+    font = builder.reserve()
+    descendant = builder.reserve()
+    descriptor = builder.reserve()
+    to_unicode = builder.reserve()
+    codes = _font_codes(characters)
+    _write_font(builder, codes, font=font, descendant=descendant, descriptor=descriptor, to_unicode=to_unicode)
+
+    scanned_pages = scanned_pages or [False] * len(page_contents)
+    image: int | None = None
+    if any(scanned_pages):
+        image = _image_xobject(builder)
+
+    box = b"[0 0 %g %g]" % media_box
+    page_refs = []
+    for index, content in enumerate(page_contents):
+        content_ref = builder.stream(content)
+        resources = b"/Font << /F1 %d 0 R >>" % font
+        if scanned_pages[index]:
+            resources += b" /XObject << /Im0 %d 0 R >>" % image
+        page = builder.add(
+            b"<< /Type /Page /Parent %d 0 R /MediaBox %s /Resources << %s >> /Contents %d 0 R >>"
+            % (pages_node, box, resources, content_ref)
+        )
+        page_refs.append(page)
+
+    builder.set(
+        pages_node,
+        b"<< /Type /Pages /Kids [%s] /Count %d >>"
+        % (b" ".join(b"%d 0 R" % ref for ref in page_refs), len(page_refs)),
+    )
     builder.set(catalog, b"<< /Type /Catalog /Pages %d 0 R >>" % pages_node)
     builder.set(
         info,
@@ -155,6 +222,14 @@ def build_text_pdf(pages: list[str], *, title: str = "AcePass 测试材料（自
     )
     builder.set_document(root=catalog, info=info)
     return builder.build()
+
+
+def build_text_pdf(pages: list[str], *, title: str = "AcePass 测试材料（自动生成，非真题）") -> bytes:
+    """Build a native-text PDF whose text layer contains ``pages`` verbatim."""
+    characters = _collect_characters(pages)
+    codes = _font_codes(characters)
+    contents = [_page_content(page_text, codes) for page_text in pages]
+    return _assemble(title=title, characters=characters, page_contents=contents)
 
 
 def _page_content(page_text: str, codes: dict[str, int]) -> bytes:
@@ -168,3 +243,86 @@ def _page_content(page_text: str, codes: dict[str, int]) -> bytes:
         parts.append(b"<" + encoded.encode("ascii") + b"> Tj\n")
     parts.append(b"ET\n")
     return b"".join(parts)
+
+
+# --------------------------------------------------------------------------
+# P2 batch 1 (C01): explicit geometry and image-only ("scanned") pages
+# --------------------------------------------------------------------------
+def _fragment_content(fragments: list[dict], codes: dict[str, int]) -> bytes:
+    """Place every fragment with ``1 0 0 1 x y Tm`` (no ``T*`` leading maths).
+
+    ``y`` is the PDF baseline measured **from the bottom** of the page, exactly
+    what ``pypdf`` reports as ``tm.f``, so a test that lays out a fragment at
+    ``y=700`` can assert the extractor saw 700.
+    """
+    parts: list[bytes] = [b"BT\n"]
+    current_size: float | None = None
+    for fragment in fragments:
+        size = float(fragment.get("size") or 12.0)
+        if size != current_size:
+            parts.append(b"/F1 %g Tf\n" % size)
+            current_size = size
+        x = float(fragment.get("x") or 0.0)
+        y = float(fragment.get("y") or 0.0)
+        parts.append(b"1 0 0 1 %g %g Tm\n" % (x, y))
+        text = str(fragment.get("text") or "")
+        encoded = "".join(f"{codes[character]:04X}" for character in text if character in codes)
+        parts.append(b"<" + encoded.encode("ascii") + b"> Tj\n")
+    parts.append(b"ET\n")
+    return b"".join(parts)
+
+
+def build_layout_pdf(
+    pages: list[list[dict]],
+    *,
+    title: str = "AcePass 版式测试材料（自动生成，非真题）",
+    media_box: tuple[float, float] = DEFAULT_MEDIA_BOX,
+) -> bytes:
+    """Build a real PDF from ``{"x", "y", "text"}`` fragments placed per page.
+
+    Each page is a list of fragments; ``x``/``y`` are PDF user-space points with
+    the origin at the bottom-left (``y`` grows upwards), optionally with a
+    ``size`` key for the font size. A two-column page is two x bands, a table is
+    a set of aligned rows, and a formula is simply a fragment whose text contains
+    the symbols — the extractor has to work the positions out for itself.
+    """
+    flat: list[str] = []
+    for page in pages:
+        flat.extend(str(fragment.get("text") or "") for fragment in page)
+    characters = _collect_characters(flat)
+    codes = _font_codes(characters)
+    contents = [_fragment_content(page, codes) for page in pages]
+    return _assemble(title=title, characters=characters, page_contents=contents, media_box=media_box)
+
+
+def build_scanned_pdf(
+    pages: list[str | None],
+    *,
+    title: str = "AcePass 扫描件测试材料（自动生成，非真题）",
+    media_box: tuple[float, float] = DEFAULT_MEDIA_BOX,
+) -> bytes:
+    """Build a PDF where ``None`` pages are image-only, without a text layer.
+
+    The point is to exercise "scanned page" detection against real bytes rather
+    than a flag: a scanned page carries a full-page ``/Image`` XObject and *no*
+    text-showing operator, so any extractor finds zero characters on it. A ``str``
+    page keeps the P1 behaviour (that page's text is laid out as one fragment per
+    line), which is what makes a "scanned page mixed with native pages" document
+    expressible in one file.
+    """
+    needles = [page for page in pages if page is not None]
+    characters = _collect_characters(needles)
+    codes = _font_codes(characters)
+    contents = [
+        _page_content(page, codes)
+        if page is not None
+        else b"%% scanned page: image only, no text layer\nq\n%g 0 0 %g 0 0 cm\n/Im0 Do\nQ\n" % media_box
+        for page in pages
+    ]
+    return _assemble(
+        title=title,
+        characters=characters,
+        page_contents=contents,
+        scanned_pages=[page is None for page in pages],
+        media_box=media_box,
+    )

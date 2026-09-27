@@ -687,6 +687,172 @@ def attach_source_pages(
     return segments
 
 
+# --------------------------------------------------------------------------
+# P2 batch 1 (C01): questions that continue across a page break
+# --------------------------------------------------------------------------
+#: A line that ends with one of these has finished its sentence.
+TERMINAL_PUNCTUATION = "。！？；!?;.…"
+#: Trailing closing marks carry no meaning of their own when deciding that.
+CLOSING_MARKS = "”\"'’）)】》」』"
+#: Shapes that clearly continue the previous sentence.
+CONTINUATION_PATTERNS = (
+    re.compile(r"^[a-z]"),  # a lower-case continuation
+    re.compile(r"^[（(]\s*\d{1,3}\s*[)）]"),  # （1）… / (2)…
+    re.compile(r"^\d{1,3}\s*[、,)）]"),  # 1、… without 题
+    re.compile(r"^[，,、；;：:]"),  # starts mid-sentence
+)
+#: Standalone headings/passages that open a page without continuing anything.
+HEADING_PATTERNS = (
+    re.compile(r"^\s*[一二三四五六七八九十]+\s*[、.．]"),  # 一、二、 section headings
+    re.compile(r"^\s*第\s*[一二三四五六七八九十\d]+\s*[章节部分卷篇]"),
+)
+
+
+def _page_lines(text: str) -> list[str]:
+    return [line.strip() for line in (text or "").split("\n") if line.strip()]
+
+
+def _ends_with_terminal_punctuation(line: str) -> bool:
+    stripped = (line or "").strip().rstrip(CLOSING_MARKS).rstrip()
+    if not stripped:
+        return True
+    return stripped[-1] in TERMINAL_PUNCTUATION
+
+
+def _looks_like_standalone_heading(line: str) -> bool:
+    text = (line or "").strip()
+    if len(text) <= 30 and text.endswith(("：", ":")):
+        return True
+    return any(pattern.match(text) for pattern in HEADING_PATTERNS)
+
+
+def _looks_like_continuation(line: str) -> bool:
+    """Does this line continue the previous page instead of opening a question?
+
+    An explicit structure marker (``【题干】``, ``1.``) always wins: such a line owns
+    itself and is never treated as a continuation. Otherwise an option line, a
+    lower-case/numbered continuation or a line starting mid-sentence is a
+    continuation, and so is a plain sentence fragment — the remainder of the
+    sentence the previous page started.
+    """
+    text = (line or "").strip()
+    if not text:
+        return False
+    if SECTION_PATTERN.match(text) or LEADING_NUMBER_PATTERN.match(text):
+        return False
+    if OPTION_PATTERN.match(text):
+        return True
+    if any(pattern.match(text) for pattern in CONTINUATION_PATTERNS):
+        return True
+    return not _looks_like_standalone_heading(text)
+
+
+def detect_page_continuations(pages: list) -> list[dict[str, Any]]:
+    """Page boundaries at which the running question is still open.
+
+    ``pages`` are the extracted pages (``page_index`` + ``text``). A boundary is
+    reported only when the last non-empty line of a page does *not* end a
+    sentence **and** the next page opens with a continuation; both conditions are
+    required so an ordinary question that happens to end a page is never joined.
+    """
+    boundaries: list[dict[str, Any]] = []
+    for current, following in zip(pages, pages[1:], strict=False):
+        current_lines = _page_lines(getattr(current, "text", "") or "")
+        next_lines = _page_lines(getattr(following, "text", "") or "")
+        if not current_lines or not next_lines:
+            continue
+        last_line = current_lines[-1]
+        first_line = next_lines[0]
+        if _ends_with_terminal_punctuation(last_line):
+            continue
+        if not _looks_like_continuation(first_line):
+            continue
+        boundaries.append(
+            {
+                "from_page": int(getattr(current, "page_index", 0) or 0),
+                "to_page": int(getattr(following, "page_index", 0) or 0),
+                "last_line": last_line[:200],
+                "first_line": first_line[:200],
+                "reason": "line_continues_across_page_break",
+            }
+        )
+    return boundaries
+
+
+def attach_cross_page_continua(
+    segments: list[dict[str, Any]],
+    text: str,
+    page_map: list[tuple[int, int, int]],
+    continuations: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """Split each segment into per-page spans and record page-break joins.
+
+    The parser reads the whole document text, so a question whose stem runs over
+    a page break is already a *single* segment — what was missing was the record:
+    ``source_char_end`` (where the segment really ends), ``source_spans`` (the
+    slice on every page it occupies, used for the source regions) and
+    ``continues_on_pages`` (set only when :func:`detect_page_continuations`
+    confirmed the break). The segment keeps the page it *starts* on, so
+    ``source_position_key`` still names the starting page (跨页题目归属到起始页).
+    """
+    confirmed = {
+        (int(boundary.get("from_page") or 0), int(boundary.get("to_page") or 0))
+        for boundary in (continuations or [])
+    }
+    for index, segment in enumerate(segments):
+        start = int(segment.get("source_char_start") or 0)
+        next_start = (
+            int(segments[index + 1].get("source_char_start") or start)
+            if index + 1 < len(segments)
+            else len(text)
+        )
+        segment["source_char_end"] = max(start, next_start)
+    for segment in segments:
+        spans = _spans_for_segment(segment, text, page_map)
+        segment["source_spans"] = spans
+        pages = [span["page_index"] for span in spans]
+        if len(pages) < 2:
+            continue
+        if not all((pages[position], pages[position + 1]) in confirmed for position in range(len(pages) - 1)):
+            continue
+        segment["continues_on_pages"] = pages
+    return segments
+
+
+def _spans_for_segment(
+    segment: dict[str, Any], text: str, page_map: list[tuple[int, int, int]]
+) -> list[dict[str, Any]]:
+    """The part of one segment that lies on each page it occupies."""
+    start = int(segment.get("source_char_start") or 0)
+    end = int(segment.get("source_char_end") or start)
+    spans: list[dict[str, Any]] = []
+    for page_index, page_start, page_end in page_map:
+        span_start = max(start, page_start)
+        span_end = min(end, page_end)
+        if span_end <= span_start:
+            continue
+        span_text = text[span_start:span_end]
+        if not spans or span_text.strip():
+            spans.append(
+                {
+                    "page_index": page_index,
+                    "char_start": span_start,
+                    "char_end": span_end,
+                    "text": span_text,
+                }
+            )
+    if not spans:
+        spans.append(
+            {
+                "page_index": int(segment.get("source_page_index") or 1),
+                "char_start": start,
+                "char_end": end,
+                "text": (segment.get("source_excerpt") or "")[:2000],
+            }
+        )
+    return spans
+
+
 def _page_for_offset(page_map: list[tuple[int, int, int]], offset: int) -> int:
     for page_index, start, end in page_map:
         if start <= offset <= end:

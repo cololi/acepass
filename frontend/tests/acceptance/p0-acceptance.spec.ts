@@ -37,8 +37,11 @@ test.describe('acceptance: setup and scope', () => {
   }) => {
     await expect(page.locator('.context-strip')).toContainText(PROJECT_A)
     const subjectSelect = page.getByLabel('选择科目')
-    const before = await subjectSelect.locator('option').count()
-    expect(before).toBeGreaterThanOrEqual(2)
+    // The subject list arrives with the scope query: poll instead of sampling a
+    // single time, which measured the fetch latency rather than the product.
+    await expect
+      .poll(async () => subjectSelect.locator('option').count(), { timeout: 15_000 })
+      .toBeGreaterThanOrEqual(2)
 
     await page.goto('/settings')
     await expect(page.getByRole('heading', { name: '设置', exact: true })).toBeVisible()

@@ -21,7 +21,7 @@ function escapePdfText(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 }
 
-class PdfBuilder {
+export class PdfBuilder {
   private objects = new Map<number, Buffer>()
   private next = 1
   private root = 0

@@ -3,6 +3,16 @@
 Rules (docs/03 §5): evidence is derived from server-side facts, never from a
 client claim. Each row keeps its exclusion reasons so the UI can state exactly
 why an attempt did not count towards a stricter dimension.
+
+The strict dimensions (``independent_correct``, ``template_variant``,
+``unseen_variant`` and, through them, ``delayed_verification``) consult
+:mod:`apps.learning.services.contamination` for the "strictly unseen" rules
+(C04): a proofread question, a question declared as met outside the system, and
+a question that was presented but never submitted can never be first contact
+again. The rules are evaluated as of this item's presentation, so a genuinely
+fresh question — never presented, never proofread, never seen elsewhere — still
+qualifies, while no recomputation can turn a contaminated attempt back into
+strict evidence.
 """
 
 from __future__ import annotations
@@ -24,9 +34,13 @@ from apps.common.enums import (
     SessionMode,
     SessionStatus,
 )
+from apps.learning.services import contamination
 from apps.practice.models import Attempt, ExposureEvent, LearningEvidence
 
-RULE_VERSION = "p0-1"
+#: C04 broadened the "strictly unseen" rules (proofreading previews, external
+#: declarations, presented-but-never-submitted items), so rows written from now
+#: on are marked with the rule set that decided them.
+RULE_VERSION = "p2-c04"
 
 #: Dimensions that an attempt produces; the state summary consumes qualified rows.
 ALL_DIMENSIONS = (
@@ -69,49 +83,18 @@ def _pre_submit_assistance(attempt: Attempt) -> tuple[bool, list[str]]:
 
 
 def _cross_project_lineage_seen(attempt: Attempt) -> list[str]:
-    """Same content in another of this user's projects still counts as seen."""
-    question = attempt.session_item.question_version.question
-    if question.content_lineage_id is None:
-        return []
-    seen = (
-        ExposureEvent.objects.filter(
-            user=attempt.user,
-            content_lineage_id=question.content_lineage_id,
-            reveals_answer=True,
-            server_time__lt=attempt.submitted_at,
-        )
-        .exclude(project_id=attempt.project_id)
-        .exists()
-    )
-    if seen:
-        return ["该题在本人其他项目中已看过答案（内容谱系跨项目暴露）"]
-    return []
+    """Cross-project lineage reasons for one attempt (acceptance A41 pointer).
 
-
-def _question_seen_before(attempt: Attempt) -> list[str]:
-    """Did this user meet the *same question* before this item was presented?
-
-    Deliberately exact: a systematic preview, an earlier practice item of the
-    same question version, or an earlier answer/explanation delivery all count.
-    This is what stops "repeated practice on one question" from ever being
-    presented as several independent, first-contact successes.
+    The rule itself lives in :mod:`apps.learning.services.contamination`, which
+    every strict dimension consults; this helper only projects the lineage
+    reason out of that single evaluation so the name A41 points at still
+    resolves to the code that implements it.
     """
-    reasons: list[str] = []
-    delivered_at = attempt.session_item.first_delivered_at
-    prior = ExposureEvent.objects.filter(
-        user=attempt.user,
-        question_version_id=attempt.session_item.question_version_id,
-        server_time__lt=delivered_at or attempt.submitted_at,
-    ).exclude(session_item_id=attempt.session_item_id)
-    if prior.filter(kind=ExposureKind.EDITORIAL_PREVIEW).exists():
-        reasons.append("本人校对/编辑过本题")
-    elif prior.filter(kind__in=[ExposureKind.ANSWER_DELIVERED, ExposureKind.EXPLANATION_DELIVERED]).exists():
-        reasons.append("本次呈现前已看过本题答案或解析")
-    elif prior.filter(kind=ExposureKind.STEM_DELIVERED).exists():
-        reasons.append(
-            "本次呈现前已接触过同一道题（重复练习按重复统计，不作为首次接触或陌生变式证据）"
-        )
-    return reasons
+    return [
+        row["message"]
+        for row in contamination.attempt_exclusion_reasons(attempt=attempt)
+        if row["code"] == "lineage_seen_in_other_project"
+    ]
 
 
 def _delay_evaluation_instant(attempt: Attempt) -> tuple[object, str]:
@@ -168,7 +151,11 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
             )
         )
     assistance, assistance_reasons = _pre_submit_assistance(attempt)
-    seen_reasons = _question_seen_before(attempt) + _cross_project_lineage_seen(attempt)
+    # C04: the "strictly unseen" rules come from the single contamination
+    # evaluation, judged as of this item's presentation (so the item's own stem
+    # delivery is not held against the attempt that it belongs to).
+    contamination_rows = contamination.attempt_exclusion_reasons(attempt=attempt)
+    seen_reasons = [row["message"] for row in contamination_rows]
 
     trusted_question = bool(item.answer_key_version and item.answer_key_version.is_usable)
     # `graded` = every scoring part has been decided. `correct` = it also reached
@@ -334,6 +321,11 @@ def compute_dimensions(attempt: Attempt) -> list[dict]:
                 )
         if not independent:
             delayed_reasons.append("本次作答不是严格独立正确，不能作为延迟验证证据")
+            # ... and, when the reason is contamination, name it precisely (C04):
+            # "not independent" alone would hide that the question was proofread,
+            # declared as seen outside, presented without a submission, or seen
+            # in another project.
+            delayed_reasons.extend(reason for reason in seen_reasons if reason not in delayed_reasons)
         if item.purpose != "delayed_verification" and item.session.origin_task_id:
             pass
         delayed = independent and anchor is not None and not delayed_reasons

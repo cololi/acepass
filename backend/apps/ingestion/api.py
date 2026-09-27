@@ -69,6 +69,8 @@ class ImportJobOut(Schema):
     document_ids: list[str]
     candidate_count: int
     candidate_status_counts: dict[str, int]
+    #: P2 batch 1: per-page layout diagnosis (added field, nothing renamed).
+    page_diagnostics: list[dict[str, Any]] = []
     created_at: str
 
 
@@ -114,6 +116,10 @@ class CandidateOut(Schema):
     paper_revision_id: str | None = None
     #: How an answer page was matched onto this candidate (proposal, not a key).
     answer_match: dict[str, Any] = {}
+    #: P2 batch 1: the explicit layout confirmation that clears the blocking
+    #: issues a suspicious source page (multi-column/table/formula/scan) raises.
+    layout_review_confirmed_at: str | None = None
+    layout_review_note: str = ""
     updated_at: str
 
 
@@ -121,6 +127,12 @@ class CandidatePatch(Schema):
     draft_payload: dict[str, Any] | None = None
     subject_id: str | None = None
     expected_revision: int | None = None
+    note: str = ""
+
+
+class CandidateLayoutConfirmIn(Schema):
+    """Body of the layout confirmation; the note is what the human checked."""
+
     note: str = ""
 
 
@@ -571,7 +583,35 @@ def get_candidate(request, project_id: str, candidate_id: str):
     candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
     if candidate is None:
         raise ScopeViolation(message="候选不存在或不属于该项目")
+    _record_editorial_preview(candidate, request.user, source="ingestion.candidate_detail")
     return import_services.candidate_summary(candidate)
+
+
+def _record_editorial_preview(candidate: ImportCandidate, actor, *, source: str) -> None:
+    """Proofreading published content is an exposure (C04 source 1).
+
+    A re-import candidate linked to an already published question shows the
+    proofreader that question's answer, so opening or editing it must make the
+    question permanently ineligible for *strictly independent* evidence. The rule
+    itself lives in ``apps.learning.services.contamination``; this is only the
+    call site, and it stays silent while the candidate is not linked to a
+    question (nothing published has been looked at yet).
+    """
+    if not candidate.publication_question_id:
+        return
+    from apps.learning.services import contamination
+    from apps.question_bank.models import Question
+
+    question = Question.objects.filter(id=candidate.publication_question_id).first()
+    if question is None:  # pragma: no cover - defensive: the link is written at publish time
+        return
+    contamination.record_editorial_preview(
+        question=question,
+        actor=actor,
+        source=source,
+        candidate=candidate,
+        project=candidate.project,
+    )
 
 
 @ingestion_router.patch("/projects/{project_id}/import-candidates/{candidate_id}", auth=auth, response=CandidateOut)
@@ -581,6 +621,7 @@ def patch_candidate(request, project_id: str, candidate_id: str, payload: Candid
     if candidate is None:
         raise ScopeViolation(message="候选不存在或不属于该项目")
     subject = require_subject(request.user, project, payload.subject_id) if payload.subject_id else None
+    _record_editorial_preview(candidate, request.user, source="ingestion.candidate_edit")
     candidate = ingestion_services.update_candidate(
         candidate,
         payload=payload.draft_payload,
@@ -604,6 +645,47 @@ def ignore_candidate(request, project_id: str, candidate_id: str, reason: str = 
     if replay is not None:
         return replay.status_code, replay.body
     candidate = ingestion_services.ignore_candidate(candidate, actor=request.user, reason=reason)
+    result = import_services.candidate_summary(candidate)
+    idempotency.record_result(
+        request.user,
+        scope,
+        key,
+        status_code=200,
+        response_body=result,
+        resource_type="import_candidate",
+        resource_id=candidate.id,
+    )
+    return result
+
+
+@ingestion_router.post(
+    "/projects/{project_id}/import-candidates/{candidate_id}/layout-confirm",
+    auth=auth,
+    response=CandidateOut,
+)
+def confirm_candidate_layout(
+    request, project_id: str, candidate_id: str, payload: CandidateLayoutConfirmIn
+):
+    """Confirm the layout of the pages a candidate came from (P2 batch 1).
+
+    Multi-column order, table/formula wording and scanned pages are reported as
+    *blocking* issues on the candidate; publishing stays the single gate, so this
+    explicit human action is what makes such a candidate publishable. The note
+    records what the proofreader compared against the original page.
+    """
+    project = require_project(request.user, project_id)
+    candidate = ImportCandidate.objects.filter(id=candidate_id, project=project, job__created_by=request.user).first()
+    if candidate is None:
+        raise ScopeViolation(message="候选不存在或不属于该项目")
+    key = idempotency_key(request)
+    scope = f"candidates.layout_confirm:{candidate_id}"
+    body = payload.model_dump(mode="json")
+    replay = idempotency.claim(request.user, scope, key, body)
+    if replay is not None:
+        return replay.status_code, replay.body
+    candidate = ingestion_services.confirm_layout_review(
+        candidate, actor=request.user, note=payload.note
+    )
     result = import_services.candidate_summary(candidate)
     idempotency.record_result(
         request.user,

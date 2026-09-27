@@ -1,9 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiRequest, newIdempotencyKey, type CandidateOut, type KnowledgeNode, type SpecOut } from '../../api/client'
+import {
+  ApiError,
+  apiRequest,
+  confirmCandidateLayout,
+  fetchImportJob,
+  isLayoutBlockingIssue,
+  isLayoutIssue,
+  newIdempotencyKey,
+  problemsOf,
+  type ApiProblemRow,
+  type CandidateOut,
+  type KnowledgeNode,
+  type SpecOut,
+} from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
 import { Blocks, type BlockLike } from '../../components/Content'
+import { LayoutDiagnostics, LayoutIssueRows } from './LayoutReview'
 
 /**
  * Proofreading editor.
@@ -45,6 +59,11 @@ const ISSUE_LABELS: Record<string, string> = {
   duplicate_paper_position: '该试卷题号已发布过版本，不能重复发布',
   material_without_children: '材料题还没有子题',
   material_children_unpublished: '仍有子题未发布',
+  // P2 batch 1 / C01: layout blockers a human clears with 「确认版面无误」.
+  page_without_text_layer_needs_manual_entry: '来源页没有文字层，需人工录入',
+  multi_column_needs_review: '多栏阅读顺序需人工确认',
+  table_or_formula_needs_review: '表格/公式版式需人工确认',
+  cross_page_question: '题目跨页接续（仅提醒）',
 }
 
 const ANSWER_METHOD_LABELS: Record<string, string> = {
@@ -59,6 +78,44 @@ function IssueItem({ issue }: { issue: { code: string; message: string } }) {
       {label ?? issue.message}（{issue.code}）
       {label && label !== issue.message ? <div className="tiny muted">{issue.message}</div> : null}
     </li>
+  )
+}
+
+/**
+ * A refused request, in the server's own words.
+ *
+ * A 422 (publication refused) carries `details.problems`: the list is shown
+ * verbatim. The UI never decides by itself that a candidate is publishable —
+ * the server remains authoritative and its refusal must reach the proofreader.
+ */
+type PublishFailure = { message: string; problems: ApiProblemRow[] }
+
+function failureOf(error: unknown): PublishFailure {
+  return {
+    message: error instanceof ApiError ? error.message : describeError(error),
+    problems: problemsOf(error),
+  }
+}
+
+function FailureNotice({ failure, testId }: { failure: PublishFailure; testId: string }) {
+  return (
+    <div className="notice danger" data-testid={testId}>
+      <strong>{failure.message}</strong>
+      {failure.problems.length ? (
+        <>
+          <div className="small">服务端列出的问题：</div>
+          <ul style={{ margin: '6px 0 0 18px' }}>
+            {failure.problems.map((problem, index) => (
+              <li key={`${problem.code}-${index}`}>
+                {problem.severity === 'blocking' ? '⛔ ' : problem.severity ? '⚠️ ' : ''}
+                {problem.message}
+                {problem.code ? `（${problem.code}）` : ''}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+    </div>
   )
 }
 
@@ -90,6 +147,9 @@ export function CandidateReviewPage() {
   const [nodeIds, setNodeIds] = useState<string[]>([])
   const [saveError, setSaveError] = useState('')
   const [rawMode, setRawMode] = useState(false)
+  const [layoutNote, setLayoutNote] = useState('')
+  const [layoutFailure, setLayoutFailure] = useState<PublishFailure | null>(null)
+  const [publishFailure, setPublishFailure] = useState<PublishFailure | null>(null)
   const seeded = useRef<string | null>(null)
 
   const projectId = currentProject?.id ?? null
@@ -98,6 +158,18 @@ export function CandidateReviewPage() {
     queryKey: ['candidate', projectId, candidateId],
     queryFn: () => apiRequest<CandidateOut>(`/projects/${projectId}/import-candidates/${candidateId}`),
     enabled: Boolean(projectId && candidateId),
+  })
+
+  /**
+   * The candidate payload carries the issues but not the per-page diagnosis, so
+   * the 「版面检查」 panel reads the job's `page_diagnostics`. The pages shown are
+   * still the candidate's own source pages — the payload's page numbers are the
+   * only source of page numbers.
+   */
+  const jobQuery = useQuery({
+    queryKey: ['importJob', projectId, jobId],
+    queryFn: () => fetchImportJob(projectId as string, jobId as string),
+    enabled: Boolean(projectId && jobId),
   })
 
   const nodesQuery = useQuery({
@@ -238,6 +310,30 @@ export function CandidateReviewPage() {
     onError: (err) => setSaveError(describeError(err)),
   })
 
+  /**
+   * Confirm the layout of the pages this candidate came from.
+   *
+   * This is the only human act that clears the blocking layout issues, and the
+   * server records who confirmed what and when. One fresh Idempotency-Key per
+   * attempt: a repetitive click is a new confirmation, a network retry of the
+   * same click is not.
+   */
+  const confirmLayout = useMutation({
+    mutationFn: () => confirmCandidateLayout(projectId as string, candidateId as string, layoutNote),
+    onSuccess: async (data) => {
+      setLayoutFailure(null)
+      setLayoutNote('')
+      // The response is the server's recomputed candidate: the cleared issues
+      // must disappear from the blocking list without a local guess.
+      queryClient.setQueryData(['candidate', projectId, candidateId], data)
+      await queryClient.invalidateQueries({ queryKey: ['candidate', projectId, candidateId] })
+      await queryClient.invalidateQueries({ queryKey: ['candidates', projectId, jobId] })
+      await queryClient.invalidateQueries({ queryKey: ['imports', projectId] })
+      toast.push('已确认版面：本题的版面阻止项已清除，确认时间与备注已写入审计', 'ok')
+    },
+    onError: (err) => setLayoutFailure(failureOf(err)),
+  })
+
   const publish = useMutation({
     mutationFn: () =>
       apiRequest<CandidateOut & { question_id?: string }>(`/projects/${projectId}/import-candidates/${candidateId}/publish`, {
@@ -251,6 +347,7 @@ export function CandidateReviewPage() {
         },
       }),
     onSuccess: async (data) => {
+      setPublishFailure(null)
       toast.push('已发布为不可变题目版本', 'ok')
       await queryClient.invalidateQueries({ queryKey: ['candidate', projectId, candidateId] })
       await queryClient.invalidateQueries({ queryKey: ['candidates', projectId, jobId] })
@@ -258,7 +355,15 @@ export function CandidateReviewPage() {
       await queryClient.invalidateQueries({ queryKey: ['questions'] })
       if (data.publication_question_id) navigate('/questions')
     },
-    onError: (err) => setSaveError(describeError(err)),
+    /**
+     * A refusal is information, not a dead end: show the server's message and
+     * its problem list, then re-read the candidate so the visible blockers are
+     * the ones the server just enforced.
+     */
+    onError: async (err) => {
+      setPublishFailure(failureOf(err))
+      await queryClient.invalidateQueries({ queryKey: ['candidate', projectId, candidateId] })
+    },
   })
 
   if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
@@ -277,6 +382,26 @@ export function CandidateReviewPage() {
   const parentCandidate = candidate.parent_candidate_id ? jobCandidates.get(candidate.parent_candidate_id) : undefined
   const childRows = candidate.child_candidate_ids.map((id) => ({ id, row: jobCandidates.get(id) }))
   const unloadedChildren = childRows.filter((child) => !child.row).length
+
+  // The layout panel is scoped to the pages this candidate actually came from:
+  // the page numbers come from the payload, never from the row order.
+  const layoutIssues = candidate.review_issues.filter(isLayoutIssue)
+  const layoutBlocking = layoutIssues.filter(isLayoutBlockingIssue)
+  const sourcePages = candidate.source_regions
+    .map((region) => ({
+      document_id: region.document_id,
+      document_title: region.document_title,
+      page_index: region.page_index,
+    }))
+    .filter(
+      (page, index, all) =>
+        all.findIndex(
+          (other) => other.document_id === page.document_id && other.page_index === page.page_index,
+        ) === index,
+    )
+    .sort((a, b) => a.page_index - b.page_index)
+  const layoutConfirmedAt = candidate.layout_review_confirmed_at
+  const jobDiagnostics = jobQuery.data?.page_diagnostics
 
   const setOptionText = (index: number, text: string) => {
     const next = options.map((option, position) =>
@@ -369,6 +494,74 @@ export function CandidateReviewPage() {
           </ul>
         </div>
       ) : null}
+
+      {/*
+        C01: what the deterministic parser saw on each source page, and the one
+        human act that clears the layout blockers. The panel shows the raw page
+        facts before asking for a confirmation, so "确认版面无误" means the
+        proofreader compared against the original page — not that the system read
+        it.
+      */}
+      <LayoutDiagnostics
+        diagnostics={jobDiagnostics}
+        pages={sourcePages}
+        loading={jobQuery.isLoading}
+        error={jobQuery.isError ? describeError(jobQuery.error) : ''}
+        footer={
+          <div style={{ marginTop: 10 }}>
+            {layoutFailure ? (
+              <FailureNotice failure={layoutFailure} testId="layout-confirm-error" />
+            ) : null}
+            {layoutConfirmedAt ? (
+              <div className="notice ok" data-testid="layout-confirmed-note">
+                <strong>已确认版面（{new Date(layoutConfirmedAt).toLocaleString()}）</strong>
+                {candidate.layout_review_note ? (
+                  <div className="small">备注：{candidate.layout_review_note}</div>
+                ) : (
+                  <div className="small muted">备注：（未填写）</div>
+                )}
+                <div className="tiny muted">
+                  确认只记录「已对照原页核对版式」，不改变题目内容；确认人与时间写入审计。
+                </div>
+              </div>
+            ) : layoutBlocking.length ? (
+              <div className="notice warn" data-testid="layout-unconfirmed-notice">
+                <strong>本题尚未确认版面。</strong>
+                服务器仍在本题上保留 {layoutBlocking.length} 项阻止发布的版面问题，确认前无法发布。
+              </div>
+            ) : (
+              <p className="small muted" style={{ marginTop: 0 }}>
+                本题当前没有版面阻止项。如果已对照原页核对过纸张版式，也可以在这里记录一次确认。
+              </p>
+            )}
+            <h3>版面相关的问题</h3>
+            <LayoutIssueRows issues={layoutIssues} />
+            <label className="field">
+              <span>版面确认备注（可选）：写清你对照原页核对了什么</span>
+              <textarea
+                value={layoutNote}
+                onChange={(event) => setLayoutNote(event.target.value)}
+                placeholder="例如：已对照原页确认左栏四题在前、右栏四题在后"
+                data-testid="layout-confirm-note"
+                style={{ minHeight: 60 }}
+              />
+            </label>
+            <div className="row">
+              <button
+                className="btn primary"
+                data-testid="layout-confirm"
+                disabled={confirmLayout.isPending}
+                onClick={() => confirmLayout.mutate()}
+              >
+                {layoutConfirmedAt ? '重新确认版面' : '确认版面无误'}
+              </button>
+              <span className="small muted">
+                确认只清除版面阻止项：扫描页仍需你按原页人工录入，表格与公式仍需逐字核对。
+              </span>
+            </div>
+          </div>
+        }
+      />
 
       {answerMatch.matched ? (
         <div className="notice warn" data-testid="candidate-answer-match">
@@ -672,12 +865,54 @@ export function CandidateReviewPage() {
             该科目还没有已发布的考试规范：未填写练习分值的题目将无法发布。请先到「设置」发布规范。
           </div>
         )}
+        {/*
+          The server is authoritative: publishing with an unresolved blocker is
+          refused with 422 and its own problem list, which is shown above the
+          button. The visible notice explains the block *before* the attempt.
+        */}
+        {layoutBlocking.length ? (
+          <div className="notice warn" data-testid="layout-blocked-notice">
+            <strong>发布已被阻止：版面检查尚未确认（{layoutBlocking.length} 项）</strong>
+            <ul style={{ margin: '6px 0 0 18px' }}>
+              {layoutBlocking.map((issue, index) => (
+                <IssueItem key={index} issue={issue} />
+              ))}
+            </ul>
+            <p className="small" style={{ margin: '6px 0 0' }}>
+              请在「版面检查」中对照原页逐项核对，然后点击「确认版面无误」。在确认之前，服务端会拒绝发布并把阻止项返回本页。
+            </p>
+          </div>
+        ) : null}
+        {publishFailure ? <FailureNotice failure={publishFailure} testId="candidate-publish-error" /> : null}
+        {/*
+          The button stays clickable while blockers exist on purpose: the server
+          is authoritative, so a click must reach it and its 422 (message + full
+          problem list) must land on this page. Hiding that behind a locally
+          disabled button would replace the real refusal with a local guess.
+        */}
         <div className="row">
-          <button className="btn primary" disabled={publish.isPending || blocking.length > 0} onClick={() => publish.mutate()}>
+          <button
+            className="btn primary"
+            data-testid="candidate-publish"
+            disabled={publish.isPending}
+            onClick={() => publish.mutate()}
+            title={
+              blocking.length
+                ? '服务端会拒绝发布：仍有阻止项未解决，点击可看到服务端返回的完整问题清单'
+                : '发布题目版本'
+            }
+          >
             发布题目版本
           </button>
-          {blocking.length ? <span className="small muted">先解决阻止发布的问题</span> : null}
+          {blocking.length ? (
+            <span className="pill danger" data-testid="candidate-publish-blocked">
+              阻止发布：{blocking.length} 项未解决
+            </span>
+          ) : null}
         </div>
+        <p className="tiny muted">
+          发布校验以服务端为准：还有阻止项时点击发布会被拒绝，本页会原样显示服务端的错误信息与问题清单。
+        </p>
       </div>
 
       {questionType === 'material' || candidate.child_candidate_ids.length ? (

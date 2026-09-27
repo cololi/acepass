@@ -171,6 +171,11 @@ class ImportJob(BaseModel):
     progress_percent = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(100)])
     #: Structured problem list: [{"code": ..., "message": ..., "severity": ...}]
     problems = models.JSONField(default=list, blank=True)
+    #: Per-page layout diagnosis of a PDF import (P2 batch 1): one row per page
+    #: with its reason codes (multi-column, table grid, formula tokens, scanned).
+    #: Persisted on the job so "which page needs a human" is a fact of the data,
+    #: not something the UI has to re-derive from the file.
+    page_diagnostics = models.JSONField(default=list, blank=True)
     attempts = models.PositiveSmallIntegerField(default=0)
     max_attempts = models.PositiveSmallIntegerField(default=3)
     last_error = models.CharField(max_length=500, blank=True)
@@ -239,6 +244,13 @@ class ImportCandidate(BaseModel):
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_candidates"
     )
     reviewed_at = models.DateTimeField(null=True, blank=True)
+    #: P2 batch 1: a human confirmed the *layout* of the pages this candidate came
+    #: from (multi-column order, table/formula wording, or a scanned page). Until
+    #: this is set the candidate carries the blocking issues that come from the
+    #: page diagnosis, so nothing parsed from a page nobody could read reliably is
+    #: ever published automatically (错误无法自动发布).
+    layout_review_confirmed_at = models.DateTimeField(null=True, blank=True)
+    layout_review_note = models.CharField(max_length=500, blank=True)
     publication_question_id = models.UUIDField(null=True, blank=True)
     publication_version_id = models.UUIDField(null=True, blank=True)
     #: PaperItem created when this candidate was published (idempotency marker).

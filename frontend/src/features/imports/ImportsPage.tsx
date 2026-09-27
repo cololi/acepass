@@ -1,8 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiRequest, newIdempotencyKey, type ImportJobOut } from '../../api/client'
+import {
+  apiRequest,
+  isLayoutBlockingIssue,
+  isLayoutIssue,
+  newIdempotencyKey,
+  type CandidateOut,
+  type ImportJobOut,
+} from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
+import { LAYOUT_ISSUE_LABELS, LayoutDiagnostics } from './LayoutReview'
 
 const STATUS_LABELS: Record<string, string> = {
   queued: '排队中',
@@ -123,7 +131,7 @@ export function ImportsPage() {
 
   const candidatesQuery = useQuery({
     queryKey: ['candidates', projectId, selectedJobId],
-    queryFn: () => apiRequest<Array<Record<string, unknown>>>(`/projects/${projectId}/import-candidates?job_id=${selectedJobId}`),
+    queryFn: () => apiRequest<CandidateOut[]>(`/projects/${projectId}/import-candidates?job_id=${selectedJobId}`),
     enabled: Boolean(projectId && selectedJobId),
   })
 
@@ -376,85 +384,115 @@ export function ImportsPage() {
       </div>
 
       {selectedJob ? (
-        <div className="card">
-          <div className="row between">
-            <h2 style={{ margin: 0 }}>候选列表（任务 {selectedJob.id.slice(0, 8)}…）</h2>
-            <span className="small muted">
-              状态分布：
-              {Object.entries(selectedJob.candidate_status_counts)
-                .map(([status, count]) => `${status}:${count}`)
-                .join('、') || '—'}
-            </span>
-          </div>
-          {candidatesQuery.data?.length === 0 ? (
-            <div className="empty-state">
-              该任务没有候选。可能是解析未识别出结构（请使用模板重新导入），或图片任务只创建了人工结构化入口。
+        <>
+          {/*
+            C01 at job level: the same deterministic page facts the candidate
+            page shows, here for the whole import. A page that needs a human is
+            visible before anyone opens a candidate.
+          */}
+          <LayoutDiagnostics
+            diagnostics={selectedJob.page_diagnostics}
+            footer={
+              <p className="small muted" style={{ marginBottom: 0 }}>
+                需要人工确认版面的候选在下方列表中标出；只有逐题「确认版面无误」后，这些候选才能发布。
+              </p>
+            }
+          />
+          <div className="card">
+            <div className="row between">
+              <h2 style={{ margin: 0 }}>候选列表（任务 {selectedJob.id.slice(0, 8)}…）</h2>
+              <span className="small muted">
+                状态分布：
+                {Object.entries(selectedJob.candidate_status_counts)
+                  .map(([status, count]) => `${status}:${count}`)
+                  .join('、') || '—'}
+              </span>
             </div>
-          ) : (
-            <div className="table-scroll">
-              <table className="data">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>题型</th>
-                    <th>标签</th>
-                    <th>状态</th>
-                    <th>问题</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(candidatesQuery.data ?? []).map((row, index) => {
-                    const candidate = row as unknown as {
-                      id: string
-                      status: string
-                      draft_payload: Record<string, unknown>
-                      review_issues: Array<{ message: string; severity: string }>
-                      is_stub_output: boolean
-                    }
-                    return (
-                      <tr key={candidate.id}>
-                        <td>{index + 1}</td>
-                        <td className="small">{String(candidate.draft_payload.question_type ?? '—')}</td>
-                        <td className="small">{String(candidate.draft_payload.display_label ?? '')}</td>
-                        <td>
-                          <span className={`pill ${candidate.status === 'published' ? 'ok' : candidate.status === 'ignored' ? 'neutral' : 'warn'}`}>
-                            {candidate.status}
-                          </span>
-                          {candidate.is_stub_output ? <span className="pill warn">stub</span> : null}
-                        </td>
-                        <td className="small">
-                          {candidate.review_issues.slice(0, 3).map((issue, issueIndex) => (
-                            <div key={issueIndex}>
-                              {issue.severity === 'blocking' ? '⛔ ' : '⚠️ '}
-                              {issue.message}
-                            </div>
-                          ))}
-                        </td>
-                        <td>
-                          <div className="row">
-                            <Link className="btn small" to={`/imports/${selectedJob.id}/candidates/${candidate.id}`}>
-                              校对/编辑
-                            </Link>
-                            {candidate.status !== 'published' ? (
-                              <button
-                                className="btn small ghost"
-                                disabled={ignoreCandidate.isPending}
-                                onClick={() => ignoreCandidate.mutate(candidate.id)}
-                              >
-                                忽略
-                              </button>
+            {candidatesQuery.data?.length === 0 ? (
+              <div className="empty-state">
+                该任务没有候选。可能是解析未识别出结构（请使用模板重新导入），或图片任务只创建了人工结构化入口。
+              </div>
+            ) : (
+              <div className="table-scroll">
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>题型</th>
+                      <th>标签</th>
+                      <th>状态</th>
+                      <th>版面</th>
+                      <th>问题</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(candidatesQuery.data ?? []).map((candidate, index) => {
+                      const layoutIssues = candidate.review_issues.filter(isLayoutIssue)
+                      const layoutBlocking = layoutIssues.filter(isLayoutBlockingIssue)
+                      return (
+                        <tr key={candidate.id}>
+                          <td>{index + 1}</td>
+                          <td className="small">{String(candidate.draft_payload.question_type ?? '—')}</td>
+                          <td className="small">{String(candidate.draft_payload.display_label ?? '')}</td>
+                          <td>
+                            <span className={`pill ${candidate.status === 'published' ? 'ok' : candidate.status === 'ignored' ? 'neutral' : 'warn'}`}>
+                              {candidate.status}
+                            </span>
+                            {candidate.is_stub_output ? <span className="pill warn">stub</span> : null}
+                          </td>
+                          <td className="small">
+                            {layoutBlocking.length ? (
+                              <span className="pill danger">待确认版面：{layoutBlocking.length} 项阻止发布</span>
+                            ) : candidate.layout_review_confirmed_at ? (
+                              <span className="pill ok">已确认版面</span>
+                            ) : (
+                              <span className="muted">—</span>
+                            )}
+                            {layoutIssues.map((issue) => (
+                              <div className="tiny muted" key={issue.code}>
+                                {LAYOUT_ISSUE_LABELS[issue.code] ?? issue.message}
+                              </div>
+                            ))}
+                            {candidate.layout_review_confirmed_at ? (
+                              <div className="tiny muted">
+                                确认时间 {new Date(candidate.layout_review_confirmed_at).toLocaleString()}
+                              </div>
                             ) : null}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                          </td>
+                          <td className="small">
+                            {candidate.review_issues.slice(0, 3).map((issue, issueIndex) => (
+                              <div key={issueIndex}>
+                                {issue.severity === 'blocking' ? '⛔ ' : '⚠️ '}
+                                {issue.message}
+                              </div>
+                            ))}
+                          </td>
+                          <td>
+                            <div className="row">
+                              <Link className="btn small" to={`/imports/${selectedJob.id}/candidates/${candidate.id}`}>
+                                校对/编辑
+                              </Link>
+                              {candidate.status !== 'published' ? (
+                                <button
+                                  className="btn small ghost"
+                                  disabled={ignoreCandidate.isPending}
+                                  onClick={() => ignoreCandidate.mutate(candidate.id)}
+                                >
+                                  忽略
+                                </button>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
       ) : null}
     </>
   )

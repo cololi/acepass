@@ -24,7 +24,7 @@ from apps.common.enums import AssetRole, ImportJobStatus, QuestionType, SourceKi
 from apps.common.errors import InvalidInput
 from apps.ingestion.models import ImportCandidate, ImportJob, SourceDocument
 from apps.ingestion.services import core as ingestion
-from apps.ingestion.services import pdf_text, text_parser
+from apps.ingestion.services import layout, pdf_text, text_parser
 
 
 @transaction.atomic
@@ -221,6 +221,9 @@ def job_summary(job: ImportJob) -> dict:
         "extractor_version": job.extractor_version,
         "duplicate_of_job_id": str(job.duplicate_of_id) if job.duplicate_of_id else None,
         "document_ids": [str(document.id) for document in job.documents.all()],
+        # P2 batch 1: per-page layout diagnosis (multi-column, grid, formula,
+        # scanned) so the proofreading UI can point at the pages that need a human.
+        "page_diagnostics": job.page_diagnostics or [],
         "candidate_count": candidates.count(),
         "candidate_status_counts": {
             status: sum(1 for candidate in candidates if candidate.status == status)
@@ -276,6 +279,14 @@ def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = Tru
         # How an answer page was matched onto this candidate: a proposal that a
         # human still has to confirm before an answer key can be published.
         "answer_match": candidate.answer_match or {},
+        # P2 batch 1: the layout confirmation that clears the blocking issues a
+        # suspicious source page produces (multi-column / table / formula / scan).
+        "layout_review_confirmed_at": (
+            candidate.layout_review_confirmed_at.isoformat()
+            if candidate.layout_review_confirmed_at
+            else None
+        ),
+        "layout_review_note": candidate.layout_review_note,
         "updated_at": candidate.updated_at.isoformat(),
     }
 
@@ -297,7 +308,12 @@ class PdfUpload:
 
 
 #: Recorded on every candidate and job so the producer of a parse is traceable.
-PDF_EXTRACTOR_VERSION = "pdf-text-v1"
+#: v2 is the layout-aware parser (P2 batch 1): column-major reading order,
+#: cross-page joins and per-page layout diagnostics.
+PDF_EXTRACTOR_VERSION = "pdf-text-v2"
+#: Upper bound on the per-page diagnosis rows persisted on one job (a job may
+#: carry several PDFs of up to MAX_PDF_PAGES pages each).
+MAX_JOB_PAGE_DIAGNOSTICS = 500
 
 
 @dataclass
@@ -419,7 +435,11 @@ def start_pdf_import(
     )
     job.status = ImportJobStatus.PROCESSING
     job.started_at = timezone.now()
-    job.save(update_fields=["status", "started_at", "updated_at"])
+    # The diagnosis is stored *before* any candidate is created: the candidate's
+    # blocking layout issues are derived from it, so the guard cannot depend on a
+    # later write that might not happen.
+    job.page_diagnostics = _collect_page_diagnostics([*sources, *answer_sources])
+    job.save(update_fields=["status", "started_at", "page_diagnostics", "updated_at"])
 
     revision = _prepare_paper_revision(
         owner=owner,
@@ -491,13 +511,47 @@ def _parse_paper_sources(sources: list[_SourceFile]) -> list[tuple[_SourceFile, 
     """Parse each paper PDF independently, keeping page offsets per document."""
     parsed: list[tuple[_SourceFile, list[dict]]] = []
     for source in sources:
-        text = source.extraction.text
+        extraction = source.extraction
+        text = extraction.text
+        page_map = extraction.page_map()
         segments = text_parser.parse_paste(text, structure_only=True)
-        text_parser.attach_source_pages(segments, text, source.extraction.page_map())
+        text_parser.attach_source_pages(segments, text, page_map)
+        # P2 batch 1: per-page spans (a question may occupy two pages), the
+        # confirmed page-break joins, and the geometry of each span.
+        text_parser.attach_cross_page_continua(
+            segments,
+            text,
+            page_map,
+            text_parser.detect_page_continuations(extraction.pages),
+        )
+        _attach_source_geometry(segments, extraction)
         for segment in segments:
             segment.setdefault("parse_issues", [])
         parsed.append((source, segments))
     return parsed
+
+
+def _attach_source_geometry(segments: list[dict], extraction: pdf_text.PdfExtraction) -> None:
+    """Give every segment span a locatable box, when geometry exists.
+
+    The box is the union of the fragments that produced the stem on the page the
+    question starts on, and of the fragments that produced each continuation span
+    on the pages it runs onto. When the page has no usable geometry the span keeps
+    ``bbox = None`` and the region falls back to the whole page — the character
+    offsets still make it traceable, and nothing is invented.
+    """
+    pages_by_index = {page.page_index: page for page in extraction.pages}
+    for segment in segments:
+        stem = segment.get("source_excerpt") or ""
+        for position, span in enumerate(segment.get("source_spans") or []):
+            page = pages_by_index.get(int(span.get("page_index") or 0))
+            if page is None:  # pragma: no cover - defensive: span outside the file
+                continue
+            # On the starting page the stem itself is the anchor; on a
+            # continuation page the stem is not printed there, so the span's own
+            # wording is what the fragments are matched against.
+            needle = stem if position == 0 else (span.get("text") or "")
+            span["bbox"] = pdf_text.bbox_for_text(page, needle)
 
 
 def _create_candidates(
@@ -543,13 +597,13 @@ def _create_candidates(
                     "document_id": match.get("document_id"),
                     "document_title": match.get("document_title"),
                 }
-            region = _region_for_segment(source.document, segment)
+            region = _regions_for_segment(source.document, segment)
             candidate = ingestion.create_candidate(
                 job=job,
                 payload=payload,
                 subject=subject,
                 machine_payload=payload,
-                regions=[region],
+                regions=region,
                 extractor_version=PDF_EXTRACTOR_VERSION,
                 source_position_key=_unique_position_key(
                     str(segment.get("display_label") or ""), used_positions, running_index
@@ -567,24 +621,50 @@ def _create_candidates(
     )
 
 
-def _region_for_segment(document: SourceDocument, segment: dict):
-    """The source region of one parsed question: its page and its wording."""
+def _regions_for_segment(document: SourceDocument, segment: dict) -> list:
+    """The source regions of one parsed question: one per page it occupies.
+
+    The first region is the page the question starts on and keeps the historic
+    payload (the stem excerpt); a continuation adds one region per further page,
+    so a question split across a page break is locatable on both pages while its
+    position key still names the starting page (跨页题目归属到起始页).
+
+    The bounding box comes from the fragment geometry when it exists and falls
+    back to the whole page otherwise; the character offsets are always recorded.
+    """
     excerpt = segment.get("source_excerpt") or ""
-    char_start = segment.get("source_char_start")
-    region = ingestion.create_source_region(
-        document=document,
-        page_index=int(segment.get("source_page_index") or 1),
-        x=0.0,
-        y=0.0,
-        width=1.0,
-        height=1.0,
-        role=AssetRole.PAST_PAPER_PAGE,
-        text_span=excerpt[:2000],
-    )
-    region.char_start = char_start
-    region.char_end = (char_start or 0) + len(excerpt)
-    region.save(update_fields=["char_start", "char_end", "updated_at"])
-    return region
+    spans = segment.get("source_spans") or [
+        {
+            "page_index": int(segment.get("source_page_index") or 1),
+            "char_start": segment.get("source_char_start"),
+            "char_end": segment.get("source_char_end"),
+            "text": excerpt,
+            "bbox": segment.get("source_bbox"),
+        }
+    ]
+    regions = []
+    for position, span in enumerate(spans):
+        bbox = span.get("bbox") or {}
+        text_span = excerpt if position == 0 else (span.get("text") or "")
+        region = ingestion.create_source_region(
+            document=document,
+            page_index=int(span.get("page_index") or 1),
+            x=float(bbox.get("x", 0.0)),
+            y=float(bbox.get("y", 0.0)),
+            width=float(bbox.get("width", 1.0)),
+            height=float(bbox.get("height", 1.0)),
+            role=AssetRole.PAST_PAPER_PAGE,
+            text_span=(text_span or "")[:2000],
+        )
+        region.char_start = span.get("char_start")
+        region.char_end = (
+            span.get("char_end")
+            if span.get("char_end") is not None
+            else (region.char_start or 0) + len(text_span or "")
+        )
+        region.save(update_fields=["char_start", "char_end", "updated_at"])
+        regions.append(region)
+    return regions
 
 
 def _link_material_parents(
@@ -597,6 +677,34 @@ def _link_material_parents(
             candidate.parent_candidate = local_ids[parent_local]
             candidate.save(update_fields=["parent_candidate", "updated_at"])
             ingestion.refresh_candidate_issues(candidate)
+
+
+def _collect_page_diagnostics(sources: list[_SourceFile]) -> list[dict]:
+    """Per-page layout diagnosis of every uploaded PDF, tagged with its document.
+
+    The document id is what lets a candidate be blocked by the page it actually
+    came from instead of by the whole job: a scanned page in file A must not stop
+    a clean page in file B from publishing.
+    """
+    rows: list[dict] = []
+    for source in sources:
+        for row in source.extraction.page_diagnostics:
+            rows.append(
+                {
+                    **row,
+                    "document_id": str(source.document.id),
+                    "document_title": source.document.title,
+                }
+            )
+            if len(rows) >= MAX_JOB_PAGE_DIAGNOSTICS:
+                return rows
+    return rows
+
+
+def _page_labels(rows: list[dict], limit: int = 5) -> str:
+    return "; ".join(
+        f"{row.get('document_title') or 'PDF'} 第 {row.get('page_index')} 页" for row in rows[:limit]
+    )
 
 
 def _empty_pages(sources: list[_SourceFile]) -> list[dict]:
@@ -642,6 +750,7 @@ def _report_job_problems(
             severity="warning",
             pages=empty_pages[:20],
         )
+    _report_layout_problems(job, page_diagnostics=job.page_diagnostics or [])
     matched = int(match_counts.get("matched") or 0)
     position_matched = int(match_counts.get("position_matched") or 0)
     if matched:
@@ -669,6 +778,56 @@ def _report_job_problems(
             "未能从 PDF 文本层识别出题目结构：请确认使用的是原生文字 PDF，"
             "并在校对页按【题型】【题干】【选项】【答案】模板补录。",
             severity="warning",
+        )
+
+
+def _report_layout_problems(job: ImportJob, *, page_diagnostics: list[dict]) -> None:
+    """Tell the proofreader which pages a human has to look at before publishing.
+
+    These problems use the *same* codes as the blocking candidate issues, so the
+    job payload and the candidate list cannot drift apart: a page reported here is
+    exactly a page whose candidates stay blocked until the layout is confirmed.
+    """
+    reasons_by_page = [(row, set(row.get("reasons") or [])) for row in page_diagnostics]
+    scanned = [row for row, reasons in reasons_by_page if layout.REASON_SCANNED in reasons]
+    if scanned:
+        ingestion.add_job_problem(
+            job,
+            layout.ISSUE_SCANNED,
+            "以下页面没有文字层（扫描件/图片页）：本功能不做 OCR、不猜测内容，这些页面不会被自动结构化；"
+            "请按原页人工录入，或改走图片导入的人工校对路径：" + _page_labels(scanned),
+            severity="warning",
+            pages=scanned[:20],
+        )
+    multi_column = [
+        row
+        for row, reasons in reasons_by_page
+        if layout.REASON_MULTI_COLUMN in reasons
+        or layout.REASON_COLUMN_ORDER_AMBIGUOUS in reasons
+    ]
+    if multi_column:
+        ingestion.add_job_problem(
+            job,
+            layout.ISSUE_MULTI_COLUMN,
+            f"{len(multi_column)} 页为多栏版式：栏内顺序无法完全确定时已保留提取顺序而未强行重排，"
+            "相关候选必须人工确认版式后才能发布：" + _page_labels(multi_column),
+            severity="warning",
+            pages=multi_column[:20],
+        )
+    table_or_formula = [
+        row
+        for row, reasons in reasons_by_page
+        if layout.REASON_TABLE_GRID in reasons or layout.REASON_FORMULA in reasons
+    ]
+    if table_or_formula:
+        ingestion.add_job_problem(
+            job,
+            layout.ISSUE_TABLE_FORMULA,
+            f"{len(table_or_formula)} 页含表格网格或公式符号：文本提取会改变版式，"
+            "公式按原样保留、不做“纠正”，相关候选必须逐字人工确认后才能发布："
+            + _page_labels(table_or_formula),
+            severity="warning",
+            pages=table_or_formula[:20],
         )
 
 
