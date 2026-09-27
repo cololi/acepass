@@ -1,0 +1,78 @@
+[WebServer] [27/Sep/2026 21:41:41] "GET /health/live HTTP/1.1" 200 42
+[WebServer] (node:3739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:3742) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 21:41:41,588 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 21:41:41,595 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 21:41:41] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/syllabus-versions?subject_id=560844cb-f88b-43ae-b11b-fd9f15a9c86f HTTP/1.1" 200 363
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:41] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/questions?limit=100&subject_id=560844cb-f88b-43ae-b11b-fd9f15a9c86f HTTP/1.1" 200 2817
+[WebServer] [27/Sep/2026 21:41:42] "POST /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/practice-sessions HTTP/1.1" 201 942
+[WebServer] [27/Sep/2026 21:41:42] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/practice-sessions/74818cd4-ce30-4de2-b283-9c9157a2ad5a HTTP/1.1" 200 942
+[WebServer] [27/Sep/2026 21:41:42] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/session-items/8721ab69-83a2-4dff-861f-6862305ede65/presentation HTTP/1.1" 200 877
+[WebServer] [27/Sep/2026 21:41:42] "POST /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/assets HTTP/1.1" 201 470
+[WebServer] [27/Sep/2026 21:41:42] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/assets/0dd81d00-37e2-4d55-a298-7fbfd9e03ad5 HTTP/1.1" 200 78
+[WebServer] [27/Sep/2026 21:41:42] "PUT /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/session-items/8721ab69-83a2-4dff-861f-6862305ede65/draft HTTP/1.1" 200 151
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/practice-sessions/74818cd4-ce30-4de2-b283-9c9157a2ad5a HTTP/1.1" 200 971
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/session-items/8721ab69-83a2-4dff-861f-6862305ede65/presentation HTTP/1.1" 200 1085
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/assets/0dd81d00-37e2-4d55-a298-7fbfd9e03ad5 HTTP/1.1" 200 78
+PHOTO_COUNT_AFTER_RELOAD 1
+  ✓  1 [desktop] › docs/review/2026-09-27/p01-independent/draft-regression.spec.ts:4:5 › unsubmitted photo draft survives refresh (1.8s)
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/csrf HTTP/1.1" 200 82
+[WebServer] 2026-09-27 21:41:43,376 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] 2026-09-27 21:41:43,384 WARNING django.request Unauthorized: /api/v1/auth/me
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 401 89
+[WebServer] [27/Sep/2026 21:41:43] "POST /api/v1/auth/login HTTP/1.1" 200 303
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/me/study-settings HTTP/1.1" 200 165
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/auth/me HTTP/1.1" 200 293
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/subjects HTTP/1.1" 200 508
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/imports?limit=50 HTTP/1.1" 200 2
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects HTTP/1.1" 200 932
+[WebServer] [27/Sep/2026 21:41:43] "POST /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/imports/images HTTP/1.1" 201 1034
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/imports?limit=50 HTTP/1.1" 200 1036
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/import-candidates?job_id=7621d8ad-c961-4944-82b8-0d8e64b2f903 HTTP/1.1" 200 1792
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/exam-spec-versions?subject_id=560844cb-f88b-43ae-b11b-fd9f15a9c86f HTTP/1.1" 200 1144
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/import-candidates/2ac1478e-e9e7-4115-9ae4-92e540a701ec HTTP/1.1" 200 1790
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/knowledge-nodes?subject_id=560844cb-f88b-43ae-b11b-fd9f15a9c86f HTTP/1.1" 200 879
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/imports/7621d8ad-c961-4944-82b8-0d8e64b2f903 HTTP/1.1" 200 1034
+[WebServer] [27/Sep/2026 21:41:43] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/assets/eef70402-bf5d-49a3-9f8f-f6ec40f6b5b6?purpose=editorial HTTP/1.1" 200 105
+[WebServer] [27/Sep/2026 21:41:44] "PATCH /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/import-candidates/2ac1478e-e9e7-4115-9ae4-92e540a701ec HTTP/1.1" 200 1750
+persisted candidate {"content":{"blocks":[{"kind":"text","text":"独立验收填空：2 + 3 = ____。"}],"blanks":[{"blank_id":"b1","label":"第 1 空","accepted_values":["5"],"max_score":"2"}]},"answer_payload":{"kind":"fill_blank","blanks":{"b1":{"mismatch_policy":"review","accepted_values":["5"],"max_score":"2"}}}}
+[WebServer] [27/Sep/2026 21:41:44] "GET /api/v1/projects/bd38713d-66e0-4b06-98b7-6320c0f15402/import-candidates/2ac1478e-e9e7-4115-9ae4-92e540a701ec HTTP/1.1" 200 1750
+  ✓  2 [desktop] › docs/review/2026-09-27/p01-independent/fill-editor.spec.ts:5:5 › visible fill-blank answers persist in the authoritative answer payload (889ms)
+
+  2 passed (3.6s)
