@@ -107,6 +107,7 @@ bash scripts/dev/measure-hot-paths.sh          # 查询数/耗时量尺（独立
 | 浏览器主套件 / stub 专跑 / 归档浏览器反例 | 78 / 8 / 2 | **78 / 8 / 2**，无 skip，两次之间重置库与空媒体目录 |
 | 真故障演练 | `ok=true` | **`ok=true`**（真实 SIGKILL、真实 FLUSHALL，恢复 exactly-once，`unresolved={}`） |
 | 前端 `typecheck` / `vitest` / `build` | vitest 死 | 全部通过（vitest 5 tests，见 §4） |
+| 干净副本发布门槛 `scripts/verify_proxy.sh` | 通过 | **component exit 0**（301 目标、TLS、真实产物、上游解析；服务的是新入口块 `index-BFrTDZ2v.js` 而不是 886 KB 旧块）+ **full-stack exit 0**（真实镜像、真实迁移、经 TLS 代理真实登录与会话 HTTP 200） |
 
 **没有任何既有测试文件被修改**：`git diff --name-only` 里不含任何 `test`/`spec` 文件，本轮测试全是新增
 （`test_outbox_dispatch_lease.py`、`test_read_path_query_budget.py`、`Content.test.tsx`）。
@@ -134,3 +135,21 @@ bash scripts/dev/measure-hot-paths.sh          # 查询数/耗时量尺（独立
    也没有生产规模的真实延迟统计。outbox 的"5.5 分钟"是租约 + beat 的推算，本轮实测的是"同一轮内完成"。
 6. **仍未验证（外部阻塞，保持未验证）**：真实模型凭据（DeepSeek 账户 402 无余额）、真实 ≥24 小时间隔
    的学习效果、真实考试材料、远程部署与 GitHub Actions 实际执行。
+
+## 7. 干净副本发布门槛（提交内容）
+
+按本仓库既有口径，发布门槛在**提交内容的干净导出**上执行，本机 Docker 真跑，不代表 CI 已执行：
+
+```bash
+bash scripts/verify_proxy.sh component    # 301 目标 / TLS / 真实 frontend/dist / 上游解析
+bash scripts/verify_proxy.sh full-stack   # 真实 postgres·redis·api·web 镜像 + 真实迁移 + 经 HTTPS 代理的真实登录
+```
+
+| 检查 | 结果 | 关键输出 |
+|---|---|---|
+| component | **exit 0** | `Location: https://127.0.0.1:53641/login`、`Location (no port): https://acepass.example.com/login`、上游解析与代理转发 ok、登录页脚本资源 `/assets/index-BFrTDZ2v.js` HTTP 200 —— **代理实际服务的是优化后的新入口块，不是 886 KB 的旧块** |
+| full-stack | **exit 0** | 真实镜像构建 + 全部迁移 `OK`（本轮没有新迁移，与 `makemigrations --check` 的 `No changes detected` 一致）+ `全栈登录 HTTP 200` |
+
+原始日志：[logs/40-release-gate-component.txt](review/2026-09-28/optimization/logs/40-release-gate-component.txt)、
+[logs/41-release-gate-full-stack.txt](review/2026-09-28/optimization/logs/41-release-gate-full-stack.txt)。
+**远程部署与 GitHub Actions 实际执行仍未验证**：门槛只在提交内容的本机副本上跑过。

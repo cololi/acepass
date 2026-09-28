@@ -1,0 +1,8 @@
+== 范围：代理组件（nginx + 真实 frontend/dist + 桩上游）。不证明 AcePass API 登录。==
+== 本次运行：项目/资源前缀 20260928054648-47240-297，临时目录 /var/folders/r2/sd875mc96rq9207bhkm512rh0000gn/T//acepass-proxy-20260928054648-47240-297.DHc4DN ==
+Location: https://127.0.0.1:53641/login
+Location (no port): https://acepass.example.com/login
+上游解析与代理转发：ok
+登录页脚本资源 /assets/index-BFrTDZ2v.js: HTTP 200 (application/javascript)
+组件检查通过：301 目标、TLS、真实产物与上游解析。
+component_exit=0
