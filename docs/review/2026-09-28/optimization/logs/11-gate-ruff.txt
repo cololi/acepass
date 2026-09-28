@@ -1,0 +1,5 @@
+### gate: ruff
+### cmd: bash -c cd backend && .venv/bin/ruff check apps ai domain config tests
+### started: 2026-09-28T05:13:16-0700
+All checks passed!
+EXIT=0

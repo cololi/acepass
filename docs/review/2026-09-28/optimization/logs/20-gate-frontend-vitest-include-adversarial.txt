@@ -1,0 +1,254 @@
+### 对抗性检查：W3 改动的 vite.config.ts test.include 是【修好死门禁】还是【放宽门禁】
+### date: 2026-09-28T05:26:08-0700
+### 方法：git archive HEAD 导出改动前的前端配置到 ��再叠加当前新增的 src/components/Content.test.tsx
+###       (1) 用 HEAD 的 vite.config.ts（无 test 键）跑 vitest  → 改动前
+###       (2) 再把当前工作区的 vite.config.ts 覆盖进去跑     → 改动后
+### 注意：全程不修改仓库内任何文件
+===========================================================
+### md5 of HEAD vite.config.ts (in export): 66da46d34a2c19da0d8d729b04f1595a
+### ---- (1) BEFORE: HEAD vite.config.ts (default vitest include) ----
+
+ RUN  v2.1.9 /private/tmp/acepass-w4-vitest/frontend
+
+ ❯ tests/acceptance/p2-batch2.spec.ts (0 test)
+ ❯ tests/acceptance/p0-acceptance.spec.ts (0 test)
+ ❯ tests/acceptance/p1-batch3.spec.ts (0 test)
+ ❯ tests/acceptance/p1-batch2.spec.ts (0 test)
+ ❯ tests/acceptance/p1-import-and-cycles.spec.ts (0 test)
+ ❯ tests/acceptance/p0-2-empty-account.spec.ts (0 test)
+ ❯ tests/acceptance/p2-batch3.spec.ts (0 test)
+ ❯ tests/acceptance/p2-batch1.spec.ts (0 test)
+ ❯ tests/e2e/p0-loop.spec.ts (0 test)
+ ✓ src/components/Content.test.tsx (5 tests) 5ms
+ ❯ tests/acceptance/p0-2-regressions.spec.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 10 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/acceptance/p0-2-empty-account.spec.ts [ tests/acceptance/p0-2-empty-account.spec.ts ]
+Error: Playwright Test did not expect test() to be called here.
+Most common reasons include:
+- You are calling test() in a configuration file.
+- You are calling test() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._createTest ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2238:24
+ ❯ Module.<anonymous> ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p0-2-empty-account.spec.ts:68:1
+     66| }
+     67| 
+     68| test('an empty account sets up, imports, publishes and practises throu…
+       | ^
+     69|   // The suite runs once per device project against the same database,…
+     70|   // pass builds its own project and subject.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/acceptance/p0-2-regressions.spec.ts [ tests/acceptance/p0-2-regressions.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p0-2-regressions.spec.ts:52:6
+     50| }
+     51| 
+     52| test.describe('p0.2: drafts keep every kind of user input', () => {
+       |      ^
+     53|   test.beforeEach(async ({ page }) => {
+     54|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/acceptance/p0-acceptance.spec.ts [ tests/acceptance/p0-acceptance.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p0-acceptance.spec.ts:30:6
+     28|  */
+     29| 
+     30| test.describe('acceptance: setup and scope', () => {
+       |      ^
+     31|   test.beforeEach(async ({ page }) => {
+     32|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/acceptance/p1-batch2.spec.ts [ tests/acceptance/p1-batch2.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p1-batch2.spec.ts:18:6
+     16|  */
+     17| 
+     18| test.describe('P1 batch 2: prerequisites, tag suggestions, retrieval, …
+       |      ^
+     19|   test.beforeEach(async ({ page }) => {
+     20|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/acceptance/p1-batch3.spec.ts [ tests/acceptance/p1-batch3.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p1-batch3.spec.ts:101:6
+     99| }
+    100| 
+    101| test.describe('P1 batch 3: transcription gate, AI estimation and valid…
+       |      ^
+    102|   test.beforeEach(async ({ page }) => {
+    103|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/acceptance/p1-import-and-cycles.spec.ts [ tests/acceptance/p1-import-and-cycles.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p1-import-and-cycles.spec.ts:101:6
+     99| }
+    100| 
+    101| test.describe('p1: native-text PDF import', () => {
+       |      ^
+    102|   test.beforeEach(async ({ page }) => {
+    103|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/acceptance/p2-batch1.spec.ts [ tests/acceptance/p2-batch1.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p2-batch1.spec.ts:107:6
+    105| }
+    106| 
+    107| test.describe('P2 batch 1: layout review and contamination', () => {
+       |      ^
+    108|   test.beforeEach(async ({ page }) => {
+    109|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/acceptance/p2-batch2.spec.ts [ tests/acceptance/p2-batch2.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p2-batch2.spec.ts:26:6
+     24| }
+     25| 
+     26| test.describe('P2 batch 2: sealing, families and validated variants', …
+       |      ^
+     27|   test.beforeEach(async ({ page }) => {
+     28|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/acceptance/p2-batch3.spec.ts [ tests/acceptance/p2-batch3.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/acceptance/p2-batch3.spec.ts:32:6
+     30| }
+     31| 
+     32| test.describe('P2 batch 3: timed exam, honest report scope and calibra…
+       |      ^
+     33|   test.beforeEach(async ({ page }) => {
+     34|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  tests/e2e/p0-loop.spec.ts [ tests/e2e/p0-loop.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2224:13
+ ❯ _TestTypeImpl._describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:2266:24
+ ❯ Function.describe ../../../../Users/cololi/Documents/AcePass/frontend/node_modules/playwright/lib/common/index.js:1154:12
+ ❯ tests/e2e/p0-loop.spec.ts:12:6
+     10|  */
+     11| 
+     12| test.describe('P0 learning loop', () => {
+       |      ^
+     13|   test.beforeEach(async ({ page }) => {
+     14|     await login(page)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+ Test Files  10 failed | 1 passed (11)
+      Tests  5 passed (5)
+   Start at  05:26:08
+   Duration  864ms (transform 328ms, setup 0ms, collect 33ms, tests 5ms, environment 1ms, prepare 559ms)
+
+VITEST_BEFORE_EXIT=1
+### ---- (2) AFTER: current working-tree vite.config.ts (test.include) ----
+
+ RUN  v2.1.9 /private/tmp/acepass-w4-vitest/frontend
+
+ ✓ src/components/Content.test.tsx (5 tests) 4ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  05:26:09
+   Duration  203ms (transform 16ms, setup 0ms, collect 32ms, tests 4ms, environment 0ms, prepare 36ms)
+
+VITEST_AFTER_EXIT=0

@@ -1,0 +1,65 @@
+{
+  "probe": "w4-outbox-fast-consumer",
+  "label": "before",
+  "cases": [
+    {
+      "case": "fast_consumer_not_skipped",
+      "dispatcher_returned": 1,
+      "broker_calls": [
+        {
+          "task": "w4.probe.fast_consumer",
+          "event_id": "3715c7af-841a-4659-b08d-f84d83cf8ab4",
+          "dispatcher_in_atomic_block": true,
+          "options": []
+        }
+      ],
+      "consumer_attempts": [
+        {
+          "event_id": "3715c7af-841a-4659-b08d-f84d83cf8ab4",
+          "mode": "consume",
+          "row_locked_by_other_before_claim": true,
+          "consumer_executed": false,
+          "consumer_result": null,
+          "outcome": "consumer skipped: claim was not available"
+        }
+      ],
+      "effects": [],
+      "event_after_round": {
+        "status": "dispatched",
+        "attempts": 1,
+        "processed": false,
+        "processed_at": null,
+        "lease_expires_at": "2026-09-28 11:32:04.138635+00:00",
+        "claim_token_present": false,
+        "last_error": ""
+      },
+      "verdict": "FAIL"
+    },
+    {
+      "case": "handoff_dropped_then_next_round",
+      "round_1_dispatched": 1,
+      "after_round_1": {
+        "status": "dispatched",
+        "attempts": 1,
+        "processed": false,
+        "processed_at": null,
+        "lease_expires_at": "2026-09-28 11:32:04.337867+00:00",
+        "claim_token_present": false,
+        "last_error": ""
+      },
+      "round_2_selected": 0,
+      "after_round_2": {
+        "status": "dispatched",
+        "attempts": 1,
+        "processed": false,
+        "processed_at": null,
+        "lease_expires_at": "2026-09-28 11:32:04.337867+00:00",
+        "claim_token_present": false,
+        "last_error": ""
+      },
+      "lease_seconds_after_round_1": 300.0,
+      "effects": [],
+      "verdict": "FAIL (still unconfirmed; would wait out a 300.0s lease)"
+    }
+  ]
+}

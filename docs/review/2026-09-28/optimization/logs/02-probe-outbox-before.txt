@@ -1,0 +1,73 @@
+### command: PYTHONPATH=backend:probes W4_PROBE_LABEL=before pytest probes/test_w4_outbox_fast_consumer.py -c backend/pytest.ini --ds=verifier_settings -q
+### started: 2026-09-28T04:27:00-0700
+### backend tracked changes at start: ?? backend/perfprobe/|
+### ------
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10af709e0>
+
+    @override_settings(ACEPASS_INLINE_TASKS=False)
+    def test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock(monkeypatch):
+        """HARD assertion: one dispatch round must end with the effect applied."""
+        from apps.audit.services import outbox
+    
+        event = outbox.enqueue("w4.probe.fast_consumer", {"probe": "w4-lock"})
+        effects: list[str] = []
+        broker = FastBroker(mode="consume", effects=effects)
+        _install(monkeypatch, broker)
+    
+        dispatched = outbox.dispatch_pending(limit=10)
+        broker.join()
+        after = _snapshot(event)
+    
+        case = {
+            "case": "fast_consumer_not_skipped",
+            "dispatcher_returned": dispatched,
+            "broker_calls": broker.calls,
+            "consumer_attempts": broker.attempts,
+            "effects": effects,
+            "event_after_round": after,
+            "verdict": (
+                "PASS" if (effects and after["processed"] and broker.attempts and broker.attempts[0].get("consumer_executed"))
+                else "FAIL"
+            ),
+        }
+        REPORT["cases"].append(case)
+        _write_report()
+    
+        assert broker.calls, (
+            "the dispatcher never handed the event to the broker, so this probe cannot "
+            "observe the hand-off: " + json.dumps(case, ensure_ascii=False, default=str)
+        )
+        assert case["consumer_attempts"][0].get("row_locked_by_other_before_claim") is not None
+>       assert case["verdict"] == "PASS", "fast consumer was not served inside the dispatch round: " + json.dumps(
+            case, ensure_ascii=False, default=str
+        )
+E       AssertionError: fast consumer was not served inside the dispatch round: {"case": "fast_consumer_not_skipped", "dispatcher_returned": 1, "broker_calls": [{"task": "w4.probe.fast_consumer", "event_id": "3715c7af-841a-4659-b08d-f84d83cf8ab4", "dispatcher_in_atomic_block": true, "options": []}], "consumer_attempts": [{"event_id": "3715c7af-841a-4659-b08d-f84d83cf8ab4", "mode": "consume", "row_locked_by_other_before_claim": true, "consumer_executed": false, "consumer_result": null, "outcome": "consumer skipped: claim was not available"}], "effects": [], "event_after_round": {"status": "dispatched", "attempts": 1, "processed": false, "processed_at": null, "lease_expires_at": "2026-09-28 11:32:04.138635+00:00", "claim_token_present": false, "last_error": ""}, "verdict": "FAIL"}
+E       assert 'FAIL' == 'PASS'
+E         
+E         - PASS
+E         + FAIL
+
+docs/review/2026-09-28/optimization/probes/test_w4_outbox_fast_consumer.py:226: AssertionError
+----------------------------- Captured stdout call -----------------------------
+W4PROBE wrote /Users/cololi/Documents/AcePass/docs/review/2026-09-28/optimization/logs/probe-outbox-before.json
+----------------------------- Captured stderr call -----------------------------
+2026-09-28 11:27:04,138 INFO apps.audit.outbox outbox event 3715c7af-841a-4659-b08d-f84d83cf8ab4 is not claimable by this consumer; skipping
+=============================== warnings summary ===============================
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+1 failed, 1 passed, 3 warnings in 3.81s
+EXIT=1

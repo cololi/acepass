@@ -1,0 +1,5 @@
+### gate: makemigrations --check --dry-run
+### cmd: bash -c cd backend && DJANGO_SETTINGS_MODULE=config.settings.dev .venv/bin/python manage.py makemigrations --check --dry-run
+### started: 2026-09-28T05:13:16-0700
+No changes detected
+EXIT=0

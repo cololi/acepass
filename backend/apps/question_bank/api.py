@@ -12,12 +12,15 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
+from django.db.models import OuterRef, Prefetch, Subquery
 from ninja import Schema
 
 from apps.audit.services import idempotency, outbox
 from apps.common.api import auth, idempotency_key, project_scoped_router
+from apps.common.enums import VerificationStatus
 from apps.common.errors import InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
+from apps.knowledge.models import QuestionKnowledge
 from apps.question_bank import services
 from apps.question_bank.models import AnswerKeyVersion, Question, QuestionFamily, QuestionVersion, RubricVersion
 from apps.question_bank.services import families as family_services
@@ -290,10 +293,45 @@ def list_questions(
     limit: int = 20,
     offset: int = 0,
 ):
-    """Metadata only: never the stem text or the answer."""
+    """Metadata only: never the stem text or the answer.
+
+    One page is serialised with a *constant* number of queries, independent of the
+    page size: the published version travels with its row (``select_related``), the
+    newest version's number and type come from two correlated sub-queries inside
+    the same ``SELECT``, and the trusted answer key plus the primary knowledge
+    mappings of the whole page are fetched up front (``Prefetch`` with
+    ``to_attr``). The per-row *decisions* are unchanged — only their inputs are
+    read once instead of once per row.
+    """
     project = require_project(request.user, project_id)
     limit = max(1, min(limit, 100))
-    queryset = Question.objects.filter(subject__project=project).select_related("subject")
+    #: ``question.versions.order_by("-version").first()``: (question, version) is
+    #: unique, so the newest row is well defined without a tie-breaker.
+    ordered_versions = QuestionVersion.objects.filter(question=OuterRef("pk")).order_by("-version")
+    queryset = (
+        Question.objects.filter(subject__project=project)
+        .select_related("subject", "current_published_version")
+        .annotate(
+            newest_version=Subquery(ordered_versions.values("version")[:1]),
+            newest_version_type=Subquery(ordered_versions.values("question_type")[:1]),
+        )
+        .prefetch_related(
+            # current_published_version is already loaded above; this only adds one
+            # query per page (not per row) for the keys and mappings underneath it.
+            Prefetch(
+                "current_published_version__answer_keys",
+                queryset=AnswerKeyVersion.objects.filter(
+                    is_disputed=False, verification_status=VerificationStatus.CHECKED
+                ),
+                to_attr="trusted_answer_keys",
+            ),
+            Prefetch(
+                "current_published_version__knowledge_mappings",
+                queryset=QuestionKnowledge.objects.filter(is_primary=True).select_related("node"),
+                to_attr="primary_knowledge_mappings",
+            ),
+        )
+    )
     if subject_id:
         require_subject(request.user, project, subject_id)
         queryset = queryset.filter(subject_id=subject_id)
@@ -311,10 +349,6 @@ def list_questions(
     items = []
     for question in queryset[offset : offset + limit]:
         published = question.current_published_version
-        latest = question.versions.order_by("-version").first()
-        answer = None
-        if published is not None:
-            answer = published.answer_keys.filter(is_disputed=False, verification_status="checked").first()
         items.append(
             {
                 "id": str(question.id),
@@ -322,15 +356,15 @@ def list_questions(
                 "display_label": question.display_label,
                 "origin_type": question.origin_type,
                 "is_demo": question.is_demo,
-                "question_type": published.question_type if published else (latest.question_type if latest else None),
+                "question_type": (published.question_type if published else question.newest_version_type),
                 "published_version_id": str(published.id) if published else None,
-                "latest_version": latest.version if latest else None,
-                "has_trusted_answer": answer is not None,
-                "knowledge_nodes": [
-                    mapping.node.canonical_name
-                    for mapping in (published.knowledge_mappings.all() if published else [])
-                    if mapping.is_primary
-                ],
+                "latest_version": question.newest_version,
+                "has_trusted_answer": bool(published.trusted_answer_keys) if published else False,
+                "knowledge_nodes": (
+                    [mapping.node.canonical_name for mapping in published.primary_knowledge_mappings]
+                    if published
+                    else []
+                ),
             }
         )
     return items

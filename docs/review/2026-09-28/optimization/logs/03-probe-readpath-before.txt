@@ -1,0 +1,118 @@
+### command: PYTHONPATH=backend:probes W4_PROBE_LABEL=before pytest probes/test_w4_read_path_query_count.py -c backend/pytest.ini --ds=verifier_settings -q
+### started: 2026-09-28T04:28:15-0700
+### HEAD: fe68b073e34161c4cf2188106494d9aed01cc4ba
+### backend tracked changes at start:
+?? backend/perfprobe/
+?? backend/tests/integration/test_outbox_dispatch_lease.py
+### ------
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_query_count_does_not_grow_with_row_count _________________
+
+fixture_data = {'client': <django.test.client.Client object at 0x10b7579e0>, 'project_id': '54361294-9098-4802-8108-7df96d3fcee5', 'questions_before_clone': 24, 'questions_cloned': 16, ...}
+
+    def test_query_count_does_not_grow_with_row_count(fixture_data):
+        client: Client = fixture_data["client"]
+        project_id = fixture_data["project_id"]
+    
+        small_sessions = _measure(client, f"/api/v1/projects/{project_id}/practice-sessions?limit=50")
+        small_questions = _measure(client, f"/api/v1/projects/{project_id}/questions?limit={FIRST_ROWS}")
+    
+        # Grow to TOTAL_ROWS practice sessions through the real API.
+        from apps.exams.models import Subject
+        from apps.practice.models import PracticeSession
+        from apps.question_bank.models import QuestionVersion
+    
+        project = PracticeSession.objects.filter(project_id=project_id).first().project
+        subject = Subject.objects.filter(project=project).order_by("display_order").first()
+        versions = list(
+            QuestionVersion.objects.filter(
+                question__subject=subject, question_type="single_choice", status="published"
+            )
+            .select_related("question")
+            .order_by("question__display_label")[:8]
+        )
+        grown = 0
+        for index in range(FIRST_ROWS, TOTAL_ROWS):
+            version = versions[index % len(versions)]
+            response = _post(
+                client,
+                f"/api/v1/projects/{project_id}/practice-sessions",
+                {"mode": "practice", "subject_id": str(subject.id), "question_ids": [str(version.question_id)]},
+                key=f"w4-verifier-seed-{index}",
+            )
+            if response.status_code == 201:
+                grown += 1
+        assert grown == TOTAL_ROWS - FIRST_ROWS, f"grew only {grown} sessions"
+    
+        large_sessions = _measure(client, f"/api/v1/projects/{project_id}/practice-sessions?limit=50")
+        large_questions = _measure(client, f"/api/v1/projects/{project_id}/questions?limit={TOTAL_ROWS}")
+    
+        cases = {
+            "practice_sessions_list": {
+                "small": small_sessions,
+                "large": large_sessions,
+                "target_queries": 12,
+            },
+            "questions_list": {
+                "small": small_questions,
+                "large": large_questions,
+                "target_queries": 12,
+            },
+        }
+        for name, case in cases.items():
+            small, large = case["small"], case["large"]
+            case["rows_small"] = small["fingerprint"]["row_count"]
+            case["rows_large"] = large["fingerprint"]["row_count"]
+            case["queries_small"] = small["queries"]
+            case["queries_large"] = large["queries"]
+            case["independent_of_rows"] = small["queries"] == large["queries"]
+            case["under_target"] = large["queries"] <= case["target_queries"]
+            case["verdict"] = (
+                "PASS"
+                if case["independent_of_rows"] and case["under_target"] and case["rows_large"] > case["rows_small"]
+                else "FAIL"
+            )
+        REPORT["cases"] = [{"case": name, **case} for name, case in cases.items()]
+        REPORT["fixture"] = {k: v for k, v in fixture_data.items() if k != "client"}
+        _write_report()
+        print("W4PROBE summary " + json.dumps(REPORT["cases"], ensure_ascii=False, default=str), flush=True)
+    
+        for name, case in cases.items():
+            assert case["rows_large"] > case["rows_small"], f"{name}: row counts did not grow ({case})"
+>           assert case["independent_of_rows"], (
+                f"{name}: query count still grows with rows "
+                f"({case['rows_small']} rows -> {case['queries_small']} queries, "
+                f"{case['rows_large']} rows -> {case['queries_large']} queries)"
+            )
+E           AssertionError: practice_sessions_list: query count still grows with rows (5 rows -> 22 queries, 40 rows -> 127 queries)
+E           assert False
+
+docs/review/2026-09-28/optimization/probes/test_w4_read_path_query_count.py:358: AssertionError
+----------------------------- Captured stdout call -----------------------------
+W4PROBE wrote /Users/cololi/Documents/AcePass/docs/review/2026-09-28/optimization/logs/probe-readpath-before.json
+W4PROBE summary [{"case": "practice_sessions_list", "small": {"status": 200, "queries": 22, "bytes": 1535, "fingerprint": {"top": "list", "row_count": 5, "extra_keys": {}, "item_keys": {"created_at": ["str"], "exam_deadline": ["null"], "expired_at": ["null"], "grading_hidden": ["bool"], "item_count": ["int"], "mode": ["str"], "session_id": ["str"], "status": ["str"], "subject_id": ["str"], "submitted_count": ["int"]}}, "path": "/api/v1/projects/54361294-9098-4802-8108-7df96d3fcee5/practice-sessions?limit=50", "repeats": 3, "query_count_stable_across_repeats": true}, "large": {"status": 200, "queries": 127, "bytes": 12280, "fingerprint": {"top": "list", "row_count": 40, "extra_keys": {}, "item_keys": {"created_at": ["str"], "exam_deadline": ["null"], "expired_at": ["null"], "grading_hidden": ["bool"], "item_count": ["int"], "mode": ["str"], "session_id": ["str"], "status": ["str"], "subject_id": ["str"], "submitted_count": ["int"]}}, "path": "/api/v1/projects/54361294-9098-4802-8108-7df96d3fcee5/practice-sessions?limit=50", "repeats": 3, "query_count_stable_across_repeats": true}, "target_queries": 12, "rows_small": 5, "rows_large": 40, "queries_small": 22, "queries_large": 127, "independent_of_rows": false, "under_target": false, "verdict": "FAIL"}, {"case": "questions_list", "small": {"status": 200, "queries": 29, "bytes": 1889, "fingerprint": {"top": "list", "row_count": 5, "extra_keys": {}, "item_keys": {"display_label": ["str"], "has_trusted_answer": ["bool"], "id": ["str"], "is_demo": ["bool"], "knowledge_nodes": ["list"], "latest_version": ["int"], "origin_type": ["str"], "published_version_id": ["str"], "question_type": ["str"], "subject_id": ["str"]}}, "path": "/api/v1/projects/54361294-9098-4802-8108-7df96d3fcee5/questions?limit=5", "repeats": 3, "query_count_stable_across_repeats": true}, "large": {"status": 200, "queries": 201, "bytes": 15143, "fingerprint": {"top": "list", "row_count": 40, "extra_keys": {}, "item_keys": {"display_label": ["str"], "has_trusted_answer": ["bool"], "id": ["str"], "is_demo": ["bool"], "knowledge_nodes": ["list"], "latest_version": ["int"], "origin_type": ["str"], "published_version_id": ["str"], "question_type": ["str"], "subject_id": ["str"]}}, "path": "/api/v1/projects/54361294-9098-4802-8108-7df96d3fcee5/questions?limit=40", "repeats": 3, "query_count_stable_across_repeats": true}, "target_queries": 12, "rows_small": 5, "rows_large": 40, "queries_small": 29, "queries_large": 201, "independent_of_rows": false, "under_target": false, "verdict": "FAIL"}]
+--------------------------- Captured stdout teardown ---------------------------
+W4PROBE wrote /Users/cololi/Documents/AcePass/docs/review/2026-09-28/optimization/logs/probe-readpath-before.json
+=============================== warnings summary ===============================
+::test_query_count_does_not_grow_with_row_count
+::test_query_count_does_not_grow_with_row_count
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+::test_query_count_does_not_grow_with_row_count
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+::test_query_count_does_not_grow_with_row_count
+  /Users/cololi/Documents/AcePass/backend/apps/audit/services/outbox.py:284: AlwaysEagerIgnored: task_always_eager has no effect on send_task
+    celery_app.send_task(event.topic, kwargs={"outbox_event_id": str(event.id), **event.payload})
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend::test_query_count_does_not_grow_with_row_count - AssertionErro...
+1 failed, 4 warnings in 6.41s
+EXIT=1
+### backend tracked changes at end:
+?? backend/perfprobe/
+?? backend/tests/integration/test_outbox_dispatch_lease.py

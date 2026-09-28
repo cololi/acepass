@@ -534,6 +534,27 @@ table.data th {
   color: var(--muted);
 }
 
+/* Route chunk loading state (React.Suspense fallback) — never a blank screen. */
+.route-loading {
+  animation: route-loading-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes route-loading-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading {
+    animation: none;
+  }
+}
+
 .login-wrap {
   min-height: 100vh;
   display: flex;

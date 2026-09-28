@@ -1,0 +1,17 @@
+### gate: probe-outbox-after
+### cmd: env PYTHONPATH=/Users/cololi/Documents/AcePass/backend:/Users/cololi/Documents/AcePass/docs/review/2026-09-28/optimization/probes W4_PROBE_LABEL=after backend/.venv/bin/python -m pytest docs/review/2026-09-28/optimization/probes/test_w4_outbox_fast_consumer.py -c backend/pytest.ini --ds=verifier_settings -q
+### started: 2026-09-28T05:22:29-0700
+..                                                                       [100%]
+=============================== warnings summary ===============================
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+::test_fast_consumer_is_not_skipped_by_the_dispatchers_row_lock
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 3 warnings in 3.20s
+EXIT=0

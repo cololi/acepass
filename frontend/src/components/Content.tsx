@@ -1,5 +1,26 @@
 import { useEffect, useRef } from 'react'
-import katex from 'katex'
+
+type KatexApi = typeof import('katex')['default']
+
+/**
+ * KaTeX is ~280 kB of minified JavaScript plus its own stylesheet, and it is
+ * only useful once a question actually contains a formula. Both are therefore
+ * fetched on demand instead of being welded into the first screen, and the
+ * renderer + its CSS resolve together so a formula is never painted unstyled.
+ */
+let katexModule: Promise<KatexApi> | null = null
+
+function loadKatex(): Promise<KatexApi> {
+  if (!katexModule) {
+    katexModule = Promise.all([import('katex'), import('katex/dist/katex.min.css')])
+      .then(([module]) => module.default)
+      .catch((error: unknown) => {
+        katexModule = null // do not cache a failure: a retry may succeed
+        throw error
+      })
+  }
+  return katexModule
+}
 
 /**
  * Structured STEM rendering.
@@ -12,8 +33,22 @@ import katex from 'katex'
 export function MathText({ latex }: { latex: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   useEffect(() => {
-    if (!ref.current) return
-    katex.render(latex, ref.current, { throwOnError: false, trust: false, displayMode: false })
+    let cancelled = false
+    loadKatex()
+      .then((katex) => {
+        if (cancelled || !ref.current) return
+        katex.render(latex, ref.current, { throwOnError: false, trust: false, displayMode: false })
+      })
+      .catch((error: unknown) => {
+        if (cancelled || !ref.current) return
+        // Never leave the line blank: show the source when the renderer cannot
+        // be fetched (offline, stale deployment after a rebuild).
+        console.error('KaTeX failed to load; showing raw LaTeX', error)
+        ref.current.textContent = latex
+      })
+    return () => {
+      cancelled = true
+    }
   }, [latex])
   return <span className="math" ref={ref} />
 }

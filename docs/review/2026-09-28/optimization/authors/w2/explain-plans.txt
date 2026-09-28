@@ -1,0 +1,187 @@
+
+questions rows=30 sessions=28
+
+questions_list page: 3 queries
+
+=== questions_list query 1/3 ===
+SELECT "question_bank_question"."id", "question_bank_question"."created_at", "question_bank_question"."updated_at", "question_bank_question"."subject_id", "question_bank_question"."origin_type", "question_bank_question"."current_published_version_id", "question_bank_question"."family_id", "question_bank_question"."content_lineage_id", "question_bank_question"."created_by_id", "question_bank_question"."is_demo", "question_bank_question"."display_label", (SELECT U0."version" AS "version" FROM "question_bank_question_version" U0 WHERE U0."question_id" = ("question_bank_question"."id") ORDER BY 1 DESC LIMIT 1) AS "newest_version", (SELECT U0."question_type" AS "question_type" FROM "question_bank_question_version" U0 WHERE U0."question_id" = ("question_bank_question"."id") ORDER BY U0."version" DESC LIMIT 1) AS "newest_version_type", "exams_subject"."id", "exams_subject"."created_at", "exams_subject"."updated_at", "exams_subject"."project_id", "exams_subject"."name", "exams_subject"."code", "exams_subject"."display_order", "exams_subject"."total_score", "exams_subject"."pass_score", "question_bank_question_version"."id", "question_bank_question_version"."created_at", "question_bank_question_version"."updated_at", "question_bank_question_version"."question_id", "question_bank_question_version"."version", "question_bank_question_version"."question_type", "question_bank_question_version"."content", "question_bank_question_version"."parent_material_version_id", "question_bank_question_version"."material_child_version_ids", "question_bank_question_version"."practice_max_score", "question_bank_question_version"."estimated_seconds", "question_bank_question_version"."status", "question_bank_question_version"."revision_reason", "question_bank_question_version"."source_note", "question_bank_question_version"."created_by_id", "question_bank_question_version"."published_at", "question_bank_question_version"."withdrawn_at", "question_bank_question_version"."withdrawn_reason", "question_bank_question_version"."content_digest" FROM "question_bank_question" INNER JOIN "exams_subject" ON ("question_bank_question"."subject_id" = "exams_subject"."id") LEFT OUTER JOIN "question_bank_question_version" ON ("question_bank_question"."current_published_version_id" = "question_bank_question_version"."id") WHERE "exams_subject"."project_id" = '00000000000000000000000000000001'::uuid ORDER BY "question_bank_question"."created_at" DESC LIMIT 50
+--- plan ---
+Limit  (cost=16.89..33.22 rows=1 width=3293) (actual time=0.039..0.068 rows=30 loops=1)
+  Buffers: shared hit=179
+  ->  Result  (cost=16.89..33.22 rows=1 width=3293) (actual time=0.039..0.067 rows=30 loops=1)
+        Buffers: shared hit=179
+        ->  Sort  (cost=16.89..16.90 rows=1 width=3207) (actual time=0.034..0.035 rows=30 loops=1)
+              Sort Key: question_bank_question.created_at DESC
+              Sort Method: quicksort  Memory: 39kB
+              Buffers: shared hit=61
+              ->  Nested Loop Left Join  (cost=0.43..16.88 rows=1 width=3207) (actual time=0.006..0.023 rows=30 loops=1)
+                    Buffers: shared hit=61
+                    ->  Nested Loop  (cost=0.29..16.34 rows=1 width=1197) (actual time=0.004..0.010 rows=30 loops=1)
+                          Buffers: shared hit=5
+                          ->  Index Scan using exams_subject_project_id_caef9d62 on exams_subject  (cost=0.14..8.16 rows=1 width=600) (actual time=0.001..0.001 rows=1 loops=1)
+                                Index Cond: (project_id = '00000000-0000-0000-0000-000000000001'::uuid)
+                                Buffers: shared hit=2
+                          ->  Index Scan using question_bank_question_subject_id_87f12fbf on question_bank_question  (cost=0.14..8.16 rows=1 width=597) (actual time=0.002..0.005 rows=30 loops=1)
+                                Index Cond: (subject_id = exams_subject.id)
+                                Buffers: shared hit=3
+                    ->  Index Scan using question_bank_question_version_pkey on question_bank_question_version  (cost=0.14..0.53 rows=1 width=2010) (actual time=0.000..0.000 rows=1 loops=30)
+                          Index Cond: (id = question_bank_question.current_published_version_id)
+                          Buffers: shared hit=56
+        SubPlan 1
+          ->  Limit  (cost=0.14..8.16 rows=1 width=4) (actual time=0.000..0.000 rows=1 loops=30)
+                Buffers: shared hit=59
+                ->  Index Only Scan Backward using uniq_question_version on question_bank_question_version u0  (cost=0.14..8.16 rows=1 width=4) (actual time=0.000..0.000 rows=1 loops=30)
+                      Index Cond: (question_id = question_bank_question.id)
+                      Heap Fetches: 29
+                      Buffers: shared hit=59
+        SubPlan 2
+          ->  Limit  (cost=0.14..8.16 rows=1 width=86) (actual time=0.000..0.000 rows=1 loops=30)
+                Buffers: shared hit=59
+                ->  Index Scan Backward using uniq_question_version on question_bank_question_version u0_1  (cost=0.14..8.16 rows=1 width=86) (actual time=0.000..0.000 rows=1 loops=30)
+                      Index Cond: (question_id = question_bank_question.id)
+                      Buffers: shared hit=59
+Planning Time: 0.136 ms
+Execution Time: 0.085 ms
+
+=== questions_list query 2/3 ===
+SELECT "question_bank_answer_key_version"."id", "question_bank_answer_key_version"."created_at", "question_bank_answer_key_version"."updated_at", "question_bank_answer_key_version"."question_version_id", "question_bank_answer_key_version"."version", "question_bank_answer_key_version"."answer_payload", "question_bank_answer_key_version"."source_type", "question_bank_answer_key_version"."verification_status", "question_bank_answer_key_version"."checked_by_id", "question_bank_answer_key_version"."checked_at", "question_bank_answer_key_version"."check_basis", "question_bank_answer_key_version"."source_region_id", "question_bank_answer_key_version"."explanation_blocks", "question_bank_answer_key_version"."is_disputed", "question_bank_answer_key_version"."dispute_reason", "question_bank_answer_key_version"."supersedes_id", "question_bank_answer_key_version"."created_by_id" FROM "question_bank_answer_key_version" INNER JOIN "question_bank_question_version" ON ("question_bank_answer_key_version"."question_version_id" = "question_bank_question_version"."id") INNER JOIN "question_bank_question" ON ("question_bank_question_version"."question_id" = "question_bank_question"."id") WHERE (NOT "question_bank_answer_key_version"."is_disputed" AND "question_bank_answer_key_version"."verification_status" = 'checked' AND "question_bank_answer_key_version"."question_version_id" IN ('000000000000000000000000000003e9'::uuid, '00000000000000000000000000000515'::uuid, '00000000000000000000000000000579'::uuid, '000000000000000000000000000005dd'::uuid, '00000000000000000000000000002711'::uuid, '00000000000000000000000000002775'::uuid, '000000000000000000000000000027d9'::uuid, '0000000000000000000000000000283d'::uuid, '000000000000000000000000000028a1'::uuid, '00000000000000000000000000002905'::uuid, '00000000000000000000000000002969'::uuid, '000000000000000000000000000029cd'::uuid, '00000000000000000000000000002a31'::uuid, '00000000000000000000000000002a95'::uuid, '00000000000000000000000000002af9'::uuid, '00000000000000000000000000002b5d'::uuid, '00000000000000000000000000002bc1'::uuid, '00000000000000000000000000002c25'::uuid, '00000000000000000000000000002c89'::uuid, '00000000000000000000000000002ced'::uuid, '00000000000000000000000000002d51'::uuid, '00000000000000000000000000002db5'::uuid, '00000000000000000000000000002e19'::uuid, '00000000000000000000000000002e7d'::uuid, '00000000000000000000000000002ee1'::uuid, '00000000000000000000000000002f45'::uuid, '00000000000000000000000000002fa9'::uuid, '0000000000000000000000000000300d'::uuid)) ORDER BY "question_bank_question"."created_at" DESC, "question_bank_question_version"."version" DESC, "question_bank_answer_key_version"."version" DESC
+--- plan ---
+Sort  (cost=18.17..18.18 rows=1 width=1349) (actual time=0.037..0.038 rows=26 loops=1)
+  Sort Key: question_bank_question.created_at DESC, question_bank_question_version.version DESC, question_bank_answer_key_version.version DESC
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=108
+  ->  Nested Loop  (cost=0.49..18.16 rows=1 width=1349) (actual time=0.007..0.031 rows=26 loops=1)
+        Buffers: shared hit=108
+        ->  Nested Loop  (cost=0.35..16.78 rows=1 width=1357) (actual time=0.005..0.018 rows=26 loops=1)
+              Buffers: shared hit=55
+              ->  Index Scan using question_bank_answer_key_verification_status_7c40e1f2_like on question_bank_answer_key_version  (cost=0.21..8.23 rows=1 width=1337) (actual time=0.004..0.007 rows=26 loops=1)
+                    Index Cond: ((verification_status)::text = 'checked'::text)
+                    Filter: ((NOT is_disputed) AND (question_version_id = ANY ('{00000000-0000-0000-0000-0000000003e9,00000000-0000-0000-0000-000000000515,00000000-0000-0000-0000-000000000579,00000000-0000-0000-0000-0000000005dd,00000000-0000-0000-0000-000000002711,00000000-0000-0000-0000-000000002775,00000000-0000-0000-0000-0000000027d9,00000000-0000-0000-0000-00000000283d,00000000-0000-0000-0000-0000000028a1,00000000-0000-0000-0000-000000002905,00000000-0000-0000-0000-000000002969,00000000-0000-0000-0000-0000000029cd,00000000-0000-0000-0000-000000002a31,00000000-0000-0000-0000-000000002a95,00000000-0000-0000-0000-000000002af9,00000000-0000-0000-0000-000000002b5d,00000000-0000-0000-0000-000000002bc1,00000000-0000-0000-0000-000000002c25,00000000-0000-0000-0000-000000002c89,00000000-0000-0000-0000-000000002ced,00000000-0000-0000-0000-000000002d51,00000000-0000-0000-0000-000000002db5,00000000-0000-0000-0000-000000002e19,00000000-0000-0000-0000-000000002e7d,00000000-0000-0000-0000-000000002ee1,00000000-0000-0000-0000-000000002f45,00000000-0000-0000-0000-000000002fa9,00000000-0000-0000-0000-00000000300d}'::uuid[])))
+                    Buffers: shared hit=3
+              ->  Index Scan using question_bank_question_version_pkey on question_bank_question_version  (cost=0.14..8.16 rows=1 width=36) (actual time=0.000..0.000 rows=1 loops=26)
+                    Index Cond: (id = question_bank_answer_key_version.question_version_id)
+                    Buffers: shared hit=52
+        ->  Index Scan using question_bank_question_pkey on question_bank_question  (cost=0.14..1.36 rows=1 width=24) (actual time=0.000..0.000 rows=1 loops=26)
+              Index Cond: (id = question_bank_question_version.question_id)
+              Buffers: shared hit=53
+Planning Time: 0.085 ms
+Execution Time: 0.049 ms
+
+=== questions_list query 3/3 ===
+SELECT "knowledge_question_mapping"."id", "knowledge_question_mapping"."created_at", "knowledge_question_mapping"."updated_at", "knowledge_question_mapping"."question_version_id", "knowledge_question_mapping"."mapping_revision", "knowledge_question_mapping"."node_id", "knowledge_question_mapping"."is_primary", "knowledge_question_mapping"."score_weight", "knowledge_question_mapping"."template_id", "knowledge_question_mapping"."note", "knowledge_node"."id", "knowledge_node"."created_at", "knowledge_node"."updated_at", "knowledge_node"."syllabus_version_id", "knowledge_node"."parent_id", "knowledge_node"."kind", "knowledge_node"."canonical_name", "knowledge_node"."aliases", "knowledge_node"."code", "knowledge_node"."is_unclassified", "knowledge_node"."display_order" FROM "knowledge_question_mapping" INNER JOIN "question_bank_question_version" ON ("knowledge_question_mapping"."question_version_id" = "question_bank_question_version"."id") INNER JOIN "knowledge_node" ON ("knowledge_question_mapping"."node_id" = "knowledge_node"."id") INNER JOIN "question_bank_question" ON ("question_bank_question_version"."question_id" = "question_bank_question"."id") INNER JOIN "exams_syllabus_version" ON ("knowledge_node"."syllabus_version_id" = "exams_syllabus_version"."id") WHERE ("knowledge_question_mapping"."is_primary" AND "knowledge_question_mapping"."question_version_id" IN ('000000000000000000000000000003e9'::uuid, '00000000000000000000000000000515'::uuid, '00000000000000000000000000000579'::uuid, '000000000000000000000000000005dd'::uuid, '00000000000000000000000000002711'::uuid, '00000000000000000000000000002775'::uuid, '000000000000000000000000000027d9'::uuid, '0000000000000000000000000000283d'::uuid, '000000000000000000000000000028a1'::uuid, '00000000000000000000000000002905'::uuid, '00000000000000000000000000002969'::uuid, '000000000000000000000000000029cd'::uuid, '00000000000000000000000000002a31'::uuid, '00000000000000000000000000002a95'::uuid, '00000000000000000000000000002af9'::uuid, '00000000000000000000000000002b5d'::uuid, '00000000000000000000000000002bc1'::uuid, '00000000000000000000000000002c25'::uuid, '00000000000000000000000000002c89'::uuid, '00000000000000000000000000002ced'::uuid, '00000000000000000000000000002d51'::uuid, '00000000000000000000000000002db5'::uuid, '00000000000000000000000000002e19'::uuid, '00000000000000000000000000002e7d'::uuid, '00000000000000000000000000002ee1'::uuid, '00000000000000000000000000002f45'::uuid, '00000000000000000000000000002fa9'::uuid, '0000000000000000000000000000300d'::uuid)) ORDER BY "question_bank_question"."created_at" DESC, "question_bank_question_version"."version" DESC, "knowledge_question_mapping"."mapping_revision" ASC, "exams_syllabus_version"."created_at" DESC, "knowledge_node"."display_order" ASC, "knowledge_node"."canonical_name" ASC
+--- plan ---
+Sort  (cost=55.35..55.39 rows=14 width=1302) (actual time=0.056..0.057 rows=27 loops=1)
+  Sort Key: question_bank_question.created_at DESC, question_bank_question_version.version DESC, knowledge_question_mapping.mapping_revision, exams_syllabus_version.created_at DESC, knowledge_node.display_order, knowledge_node.canonical_name
+  Sort Method: quicksort  Memory: 30kB
+  Buffers: shared hit=60
+  ->  Nested Loop  (cost=34.94..55.09 rows=14 width=1302) (actual time=0.036..0.049 rows=27 loops=1)
+        Buffers: shared hit=60
+        ->  Hash Join  (cost=34.80..46.73 rows=14 width=1294) (actual time=0.035..0.041 rows=27 loops=1)
+              Hash Cond: (question_bank_question.id = question_bank_question_version.question_id)
+              Buffers: shared hit=6
+              ->  Seq Scan on question_bank_question  (cost=0.00..11.30 rows=130 width=24) (actual time=0.002..0.003 rows=30 loops=1)
+                    Buffers: shared hit=2
+              ->  Hash  (cost=34.62..34.62 rows=14 width=1302) (actual time=0.031..0.032 rows=27 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 14kB
+                    Buffers: shared hit=4
+                    ->  Hash Join  (cost=22.95..34.62 rows=14 width=1302) (actual time=0.021..0.025 rows=27 loops=1)
+                          Hash Cond: (knowledge_question_mapping.question_version_id = question_bank_question_version.id)
+                          Buffers: shared hit=4
+                          ->  Hash Join  (cost=12.04..23.69 rows=14 width=1282) (actual time=0.011..0.014 rows=27 loops=1)
+                                Hash Cond: (knowledge_node.id = knowledge_question_mapping.node_id)
+                                Buffers: shared hit=2
+                                ->  Seq Scan on knowledge_node  (cost=0.00..11.10 rows=110 width=667) (actual time=0.001..0.001 rows=2 loops=1)
+                                      Buffers: shared hit=1
+                                ->  Hash  (cost=11.87..11.87 rows=14 width=615) (actual time=0.009..0.009 rows=27 loops=1)
+                                      Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                      Buffers: shared hit=1
+                                      ->  Seq Scan on knowledge_question_mapping  (cost=0.07..11.87 rows=14 width=615) (actual time=0.002..0.006 rows=27 loops=1)
+                                            Filter: (is_primary AND (question_version_id = ANY ('{00000000-0000-0000-0000-0000000003e9,00000000-0000-0000-0000-000000000515,00000000-0000-0000-0000-000000000579,00000000-0000-0000-0000-0000000005dd,00000000-0000-0000-0000-000000002711,00000000-0000-0000-0000-000000002775,00000000-0000-0000-0000-0000000027d9,00000000-0000-0000-0000-00000000283d,00000000-0000-0000-0000-0000000028a1,00000000-0000-0000-0000-000000002905,00000000-0000-0000-0000-000000002969,00000000-0000-0000-0000-0000000029cd,00000000-0000-0000-0000-000000002a31,00000000-0000-0000-0000-000000002a95,00000000-0000-0000-0000-000000002af9,00000000-0000-0000-0000-000000002b5d,00000000-0000-0000-0000-000000002bc1,00000000-0000-0000-0000-000000002c25,00000000-0000-0000-0000-000000002c89,00000000-0000-0000-0000-000000002ced,00000000-0000-0000-0000-000000002d51,00000000-0000-0000-0000-000000002db5,00000000-0000-0000-0000-000000002e19,00000000-0000-0000-0000-000000002e7d,00000000-0000-0000-0000-000000002ee1,00000000-0000-0000-0000-000000002f45,00000000-0000-0000-0000-000000002fa9,00000000-0000-0000-0000-00000000300d}'::uuid[])))
+                                            Rows Removed by Filter: 25
+                                            Buffers: shared hit=1
+                          ->  Hash  (cost=10.40..10.40 rows=40 width=36) (actual time=0.008..0.008 rows=54 loops=1)
+                                Buckets: 1024  Batches: 1  Memory Usage: 12kB
+                                Buffers: shared hit=2
+                                ->  Seq Scan on question_bank_question_version  (cost=0.00..10.40 rows=40 width=36) (actual time=0.001..0.005 rows=54 loops=1)
+                                      Buffers: shared hit=2
+        ->  Index Scan using exams_syllabus_version_pkey on exams_syllabus_version  (cost=0.14..0.60 rows=1 width=24) (actual time=0.000..0.000 rows=1 loops=27)
+              Index Cond: (id = knowledge_node.syllabus_version_id)
+              Buffers: shared hit=54
+Planning Time: 0.143 ms
+Execution Time: 0.074 ms
+
+practice_sessions_list page: 2 queries
+
+=== sessions_list query 1/2 ===
+SELECT "practice_session"."id", "practice_session"."created_at", "practice_session"."updated_at", "practice_session"."user_id", "practice_session"."project_id", "practice_session"."subject_id", "practice_session"."mode", "practice_session"."status", "practice_session"."policy_version", "practice_session"."revealed_at", "practice_session"."finished_at", "practice_session"."exam_started_at", "practice_session"."exam_deadline", "practice_session"."expired_at", "practice_session"."origin_task_id", "practice_session"."note", COUNT(DISTINCT "practice_session_item"."id") AS "item_count", COUNT(DISTINCT "practice_attempt"."id") AS "submitted_count" FROM "practice_session" LEFT OUTER JOIN "practice_session_item" ON ("practice_session"."id" = "practice_session_item"."session_id") LEFT OUTER JOIN "practice_attempt" ON ("practice_session_item"."id" = "practice_attempt"."session_item_id") WHERE "practice_session"."project_id" = '00000000000000000000000000000001'::uuid GROUP BY "practice_session"."id" ORDER BY "practice_session"."created_at" DESC LIMIT 50
+--- plan ---
+Limit  (cost=16.77..16.78 rows=1 width=866) (actual time=0.058..0.059 rows=28 loops=1)
+  Buffers: shared hit=101
+  ->  Sort  (cost=16.77..16.78 rows=1 width=866) (actual time=0.058..0.059 rows=28 loops=1)
+        Sort Key: practice_session.created_at DESC
+        Sort Method: quicksort  Memory: 32kB
+        Buffers: shared hit=101
+        ->  GroupAggregate  (cost=16.72..16.76 rows=1 width=866) (actual time=0.039..0.053 rows=28 loops=1)
+              Group Key: practice_session.id
+              Buffers: shared hit=101
+              ->  Sort  (cost=16.72..16.73 rows=3 width=882) (actual time=0.035..0.035 rows=29 loops=1)
+                    Sort Key: practice_session.id, practice_session_item.id
+                    Sort Method: quicksort  Memory: 29kB
+                    Buffers: shared hit=101
+                    ->  Nested Loop Left Join  (cost=0.43..16.70 rows=3 width=882) (actual time=0.005..0.029 rows=29 loops=1)
+                          Buffers: shared hit=101
+                          ->  Index Scan using practice_session_project_id_c0d05c2a on practice_session  (cost=0.14..8.16 rows=1 width=850) (actual time=0.001..0.003 rows=28 loops=1)
+                                Index Cond: (project_id = '00000000-0000-0000-0000-000000000001'::uuid)
+                                Buffers: shared hit=2
+                          ->  Nested Loop Left Join  (cost=0.29..8.53 rows=1 width=48) (actual time=0.001..0.001 rows=1 loops=28)
+                                Buffers: shared hit=99
+                                ->  Index Scan using practice_session_item_session_id_93144544 on practice_session_item  (cost=0.14..8.16 rows=1 width=32) (actual time=0.000..0.000 rows=1 loops=28)
+                                      Index Cond: (session_id = practice_session.id)
+                                      Buffers: shared hit=56
+                                ->  Index Scan using practice_attempt_session_item_id_key on practice_attempt  (cost=0.14..0.36 rows=1 width=32) (actual time=0.000..0.000 rows=0 loops=29)
+                                      Index Cond: (session_item_id = practice_session_item.id)
+                                      Buffers: shared hit=43
+Planning Time: 0.090 ms
+Execution Time: 0.072 ms
+
+=== sessions_list query 2/2 ===
+SELECT "practice_session_item"."id", "practice_session_item"."created_at", "practice_session_item"."updated_at", "practice_session_item"."session_id", "practice_session_item"."ordinal", "practice_session_item"."question_version_id", "practice_session_item"."answer_key_version_id", "practice_session_item"."rubric_version_id", "practice_session_item"."spec_version_id", "practice_session_item"."mapping_revision", "practice_session_item"."max_score", "practice_session_item"."purpose", "practice_session_item"."paper_item_id", "practice_session_item"."pairing_id", "practice_session_item"."tutoring_allowed", "practice_session_item"."first_delivered_at", "practice_session_item"."draft", "practice_session_item"."draft_revision", "practice_session_item"."draft_updated_at", "question_bank_question_version"."id", "question_bank_question_version"."created_at", "question_bank_question_version"."updated_at", "question_bank_question_version"."question_id", "question_bank_question_version"."version", "question_bank_question_version"."question_type", "question_bank_question_version"."content", "question_bank_question_version"."parent_material_version_id", "question_bank_question_version"."material_child_version_ids", "question_bank_question_version"."practice_max_score", "question_bank_question_version"."estimated_seconds", "question_bank_question_version"."status", "question_bank_question_version"."revision_reason", "question_bank_question_version"."source_note", "question_bank_question_version"."created_by_id", "question_bank_question_version"."published_at", "question_bank_question_version"."withdrawn_at", "question_bank_question_version"."withdrawn_reason", "question_bank_question_version"."content_digest" FROM "practice_session_item" INNER JOIN "practice_session" ON ("practice_session_item"."session_id" = "practice_session"."id") INNER JOIN "question_bank_question_version" ON ("practice_session_item"."question_version_id" = "question_bank_question_version"."id") WHERE "practice_session_item"."session_id" IN ('00000000000000000000000000000014'::uuid, '00000000000000000000000000000015'::uuid, '00000000000000000000000000000016'::uuid, '00000000000000000000000000000017'::uuid, '00000000000000000000000000000064'::uuid, '00000000000000000000000000000065'::uuid, '00000000000000000000000000000066'::uuid, '00000000000000000000000000000067'::uuid, '00000000000000000000000000000068'::uuid, '00000000000000000000000000000069'::uuid, '0000000000000000000000000000006a'::uuid, '0000000000000000000000000000006b'::uuid, '0000000000000000000000000000006c'::uuid, '0000000000000000000000000000006d'::uuid, '0000000000000000000000000000006e'::uuid, '0000000000000000000000000000006f'::uuid, '00000000000000000000000000000070'::uuid, '00000000000000000000000000000071'::uuid, '00000000000000000000000000000072'::uuid, '00000000000000000000000000000073'::uuid, '00000000000000000000000000000074'::uuid, '00000000000000000000000000000075'::uuid, '00000000000000000000000000000076'::uuid, '00000000000000000000000000000077'::uuid, '00000000000000000000000000000078'::uuid, '00000000000000000000000000000079'::uuid, '0000000000000000000000000000007a'::uuid, '0000000000000000000000000000007b'::uuid) ORDER BY "practice_session"."created_at" DESC, "practice_session_item"."ordinal" ASC
+--- plan ---
+Sort  (cost=37.64..37.72 rows=34 width=2321) (actual time=0.042..0.043 rows=29 loops=1)
+  Sort Key: practice_session.created_at DESC, practice_session_item.ordinal
+  Sort Method: quicksort  Memory: 33kB
+  Buffers: shared hit=4
+  ->  Hash Join  (cost=23.00..36.77 rows=34 width=2321) (actual time=0.023..0.032 rows=29 loops=1)
+        Hash Cond: (practice_session_item.question_version_id = question_bank_question_version.id)
+        Buffers: shared hit=4
+        ->  Hash Join  (cost=12.10..25.78 rows=34 width=311) (actual time=0.007..0.011 rows=29 loops=1)
+              Hash Cond: (practice_session_item.session_id = practice_session.id)
+              Buffers: shared hit=2
+              ->  Seq Scan on practice_session_item  (cost=0.07..13.67 rows=34 width=303) (actual time=0.002..0.004 rows=29 loops=1)
+                    Filter: (session_id = ANY ('{00000000-0000-0000-0000-000000000014,00000000-0000-0000-0000-000000000015,00000000-0000-0000-0000-000000000016,00000000-0000-0000-0000-000000000017,00000000-0000-0000-0000-000000000064,00000000-0000-0000-0000-000000000065,00000000-0000-0000-0000-000000000066,00000000-0000-0000-0000-000000000067,00000000-0000-0000-0000-000000000068,00000000-0000-0000-0000-000000000069,00000000-0000-0000-0000-00000000006a,00000000-0000-0000-0000-00000000006b,00000000-0000-0000-0000-00000000006c,00000000-0000-0000-0000-00000000006d,00000000-0000-0000-0000-00000000006e,00000000-0000-0000-0000-00000000006f,00000000-0000-0000-0000-000000000070,00000000-0000-0000-0000-000000000071,00000000-0000-0000-0000-000000000072,00000000-0000-0000-0000-000000000073,00000000-0000-0000-0000-000000000074,00000000-0000-0000-0000-000000000075,00000000-0000-0000-0000-000000000076,00000000-0000-0000-0000-000000000077,00000000-0000-0000-0000-000000000078,00000000-0000-0000-0000-000000000079,00000000-0000-0000-0000-00000000007a,00000000-0000-0000-0000-00000000007b}'::uuid[]))
+                    Buffers: shared hit=1
+              ->  Hash  (cost=10.90..10.90 rows=90 width=24) (actual time=0.004..0.004 rows=28 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                    Buffers: shared hit=1
+                    ->  Seq Scan on practice_session  (cost=0.00..10.90 rows=90 width=24) (actual time=0.001..0.002 rows=28 loops=1)
+                          Buffers: shared hit=1
+        ->  Hash  (cost=10.40..10.40 rows=40 width=2010) (actual time=0.015..0.015 rows=54 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 19kB
+              Buffers: shared hit=2
+              ->  Seq Scan on question_bank_question_version  (cost=0.00..10.40 rows=40 width=2010) (actual time=0.002..0.007 rows=54 loops=1)
+                    Buffers: shared hit=2
+Planning Time: 0.072 ms
+Execution Time: 0.059 ms
+.
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 3 warnings in 2.97s

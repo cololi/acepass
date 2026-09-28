@@ -1,0 +1,94 @@
+### Playwright 仍由自己的配置单独收集（不依赖 vitest 的 include）
+### cmd: cd frontend && POSTGRES_DB=... REDIS_URL=... npx playwright test --list --config playwright.acceptance.config.ts
+### started: 2026-09-28T05:27:21-0700
+npm notice run acepass-frontend@0.1.0 npx
+npm notice run 'playwright' test --list --config playwright.acceptance.config.ts
+Listing tests:
+  [desktop] › p0-2-empty-account.spec.ts:68:1 › an empty account sets up, imports, publishes and practises through the UI
+  [desktop] › p0-2-regressions.spec.ts:57:3 › p0.2: drafts keep every kind of user input › an unsubmitted answer photo survives a refresh
+  [desktop] › p0-2-regressions.spec.ts:80:3 › p0.2: drafts keep every kind of user input › the visible fill-blank answer reaches the authoritative answer payload
+  [desktop] › p0-acceptance.spec.ts:35:3 › acceptance: setup and scope › a new account sees two projects and three subjects, and can add a subject without a reload
+  [desktop] › p0-acceptance.spec.ts:55:3 › acceptance: setup and scope › switching project changes the data, not only the label
+  [desktop] › p0-acceptance.spec.ts:72:3 › acceptance: five question types with real scores › every one of the five types is answered and reports a real score or a real pending state
+  [desktop] › p0-acceptance.spec.ts:167:3 › acceptance: five question types with real scores › a wrong objective answer is fully graded, scores 0, and is not called correct
+  [desktop] › p0-acceptance.spec.ts:189:3 › acceptance: five question types with real scores › an answered constructed response can be confirmed criterion by criterion down to a real partial score
+  [desktop] › p0-acceptance.spec.ts:246:3 › acceptance: verification never leaks › an active verification returns no score anywhere and blocks reveal
+  [desktop] › p0-acceptance.spec.ts:320:3 › acceptance: submitted item survives a reload › reveal after a reload uses the attempt route and returns 200
+  [desktop] › p0-acceptance.spec.ts:338:3 › acceptance: submitted item survives a reload › a submitted item exposes the tutoring entry after reload
+  [desktop] › p0-acceptance.spec.ts:358:3 › acceptance: submitted item survives a reload › attachments uploaded with a constructed response are visible back to the student and the reviewer
+  [desktop] › p0-acceptance.spec.ts:392:3 › acceptance: reports, review and evidence are real › review page loads its queues over 2xx and shows confirmed mistakes
+  [desktop] › p0-acceptance.spec.ts:405:3 › acceptance: reports, review and evidence are real › knowledge page loads states and evidence over 2xx
+  [desktop] › p0-acceptance.spec.ts:416:3 › acceptance: reports, review and evidence are real › report separates grading completeness from full marks
+  [desktop] › p0-acceptance.spec.ts:423:3 › acceptance: reports, review and evidence are real › a subject filter changes the rows the server returns
+  [desktop] › p0-acceptance.spec.ts:440:3 › acceptance: cross-project tasks and server-side mode › starting a delayed-verification task fixes the mode and the project server-side
+  [desktop] › p0-acceptance.spec.ts:496:3 › acceptance: errors are surfaced, not shown as empty › a failing learning endpoint shows an error instead of an empty state
+  [desktop] › p1-batch2.spec.ts:23:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › a prerequisite edge is created, a cycle is refused with its path, and the edge is deactivated
+  [desktop] › p1-batch2.spec.ts:74:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › tag suggestions fail honestly without a configured model and never touch the node list
+  [desktop] › p1-batch2.spec.ts:97:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › retrieval returns indexed stems, reports the missing vector channel, and stays inside the project
+  [desktop] › p1-batch2.spec.ts:132:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › a memory card can be created, reviewed and replayed without claiming solving ability
+  [desktop] › p1-batch2.spec.ts:170:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › the project context is honoured by the retrieval scope
+  [desktop] › p1-batch3.spec.ts:106:3 › P1 batch 3: transcription gate, AI estimation and validated streaming › a photo answer cannot be AI-graded before the learner records what they wrote
+  [desktop] › p1-batch3.spec.ts:158:3 › P1 batch 3: transcription gate, AI estimation and validated streaming › the tutor stream reports the real reason instead of inventing content
+  [desktop] › p1-batch3.spec.ts:181:3 › P1 batch 3 stub-provider run › @stub a stub transcription is labelled, confirmable, and the estimate stays inert
+  [desktop] › p1-batch3.spec.ts:212:3 › P1 batch 3 stub-provider run › @stub diagnosis proposes an unproven cause honestly and asks a follow-up
+  [desktop] › p1-batch3.spec.ts:235:3 › P1 batch 3 stub-provider run › @stub validated segments stream, and reconnecting does not call the model again
+  [desktop] › p1-import-and-cycles.spec.ts:108:3 › p1: native-text PDF import › a born-digital PDF becomes proofreadable candidates with their source page
+  [desktop] › p1-import-and-cycles.spec.ts:145:3 › p1: native-text PDF import › a confirmed match publishes the question and its paper position
+  [desktop] › p1-import-and-cycles.spec.ts:189:3 › p1: native-text PDF import › re-importing the same paper cannot publish the same position twice
+  [desktop] › p1-import-and-cycles.spec.ts:251:3 › p1: syllabus word list and manual mapping › a word list builds a node tree, merges synonyms and refuses a cycle
+  [desktop] › p1-import-and-cycles.spec.ts:301:3 › p1: real cycle analysis › five complete real cycles are counted and the demo cycle is excluded
+  [desktop] › p1-import-and-cycles.spec.ts:328:3 › p1: real cycle analysis › a subject without complete cycles shows the insufficient state
+  [desktop] › p2-batch1.spec.ts:112:3 › P2 batch 1: layout review and contamination › a multi-column page is read in column order and cannot publish before a human confirms the layout
+  [desktop] › p2-batch1.spec.ts:189:3 › P2 batch 1: layout review and contamination › a question marked as seen outside the system can never be strictly independent again
+  [desktop] › p2-batch2.spec.ts:33:3 › P2 batch 2: sealing, families and validated variants › a sealed question cannot be practised, and unsealing restores it
+  [desktop] › p2-batch2.spec.ts:68:3 › P2 batch 2: sealing, families and validated variants › merging two families shows the impact first and then invalidates the stale evidence
+  [desktop] › p2-batch2.spec.ts:107:3 › P2 batch 2: sealing, families and validated variants › proposing a variant without a model reports the real reason and creates nothing
+  [desktop] › p2-batch2.spec.ts:136:3 › P2 batch 2 stub-provider run › @stub the offline stub can never produce a usable variant
+  [desktop] › p2-batch3.spec.ts:39:3 › P2 batch 3: timed exam, honest report scope and calibration › the exam clock belongs to the server and the result appears only after finishing
+  [desktop] › p2-batch3.spec.ts:98:3 › P2 batch 3: timed exam, honest report scope and calibration › an unscored answer makes the report show its missing range instead of a final score
+  [desktop] › p2-batch3.spec.ts:168:3 › P2 batch 3: timed exam, honest report scope and calibration › the calibration panel withholds numbers it cannot support and states its caveats
+  [mobile] › p0-2-empty-account.spec.ts:68:1 › an empty account sets up, imports, publishes and practises through the UI
+  [mobile] › p0-2-regressions.spec.ts:57:3 › p0.2: drafts keep every kind of user input › an unsubmitted answer photo survives a refresh
+  [mobile] › p0-2-regressions.spec.ts:80:3 › p0.2: drafts keep every kind of user input › the visible fill-blank answer reaches the authoritative answer payload
+  [mobile] › p0-acceptance.spec.ts:35:3 › acceptance: setup and scope › a new account sees two projects and three subjects, and can add a subject without a reload
+  [mobile] › p0-acceptance.spec.ts:55:3 › acceptance: setup and scope › switching project changes the data, not only the label
+  [mobile] › p0-acceptance.spec.ts:72:3 › acceptance: five question types with real scores › every one of the five types is answered and reports a real score or a real pending state
+  [mobile] › p0-acceptance.spec.ts:167:3 › acceptance: five question types with real scores › a wrong objective answer is fully graded, scores 0, and is not called correct
+  [mobile] › p0-acceptance.spec.ts:189:3 › acceptance: five question types with real scores › an answered constructed response can be confirmed criterion by criterion down to a real partial score
+  [mobile] › p0-acceptance.spec.ts:246:3 › acceptance: verification never leaks › an active verification returns no score anywhere and blocks reveal
+  [mobile] › p0-acceptance.spec.ts:320:3 › acceptance: submitted item survives a reload › reveal after a reload uses the attempt route and returns 200
+  [mobile] › p0-acceptance.spec.ts:338:3 › acceptance: submitted item survives a reload › a submitted item exposes the tutoring entry after reload
+  [mobile] › p0-acceptance.spec.ts:358:3 › acceptance: submitted item survives a reload › attachments uploaded with a constructed response are visible back to the student and the reviewer
+  [mobile] › p0-acceptance.spec.ts:392:3 › acceptance: reports, review and evidence are real › review page loads its queues over 2xx and shows confirmed mistakes
+  [mobile] › p0-acceptance.spec.ts:405:3 › acceptance: reports, review and evidence are real › knowledge page loads states and evidence over 2xx
+  [mobile] › p0-acceptance.spec.ts:416:3 › acceptance: reports, review and evidence are real › report separates grading completeness from full marks
+  [mobile] › p0-acceptance.spec.ts:423:3 › acceptance: reports, review and evidence are real › a subject filter changes the rows the server returns
+  [mobile] › p0-acceptance.spec.ts:440:3 › acceptance: cross-project tasks and server-side mode › starting a delayed-verification task fixes the mode and the project server-side
+  [mobile] › p0-acceptance.spec.ts:496:3 › acceptance: errors are surfaced, not shown as empty › a failing learning endpoint shows an error instead of an empty state
+  [mobile] › p1-batch2.spec.ts:23:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › a prerequisite edge is created, a cycle is refused with its path, and the edge is deactivated
+  [mobile] › p1-batch2.spec.ts:74:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › tag suggestions fail honestly without a configured model and never touch the node list
+  [mobile] › p1-batch2.spec.ts:97:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › retrieval returns indexed stems, reports the missing vector channel, and stays inside the project
+  [mobile] › p1-batch2.spec.ts:132:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › a memory card can be created, reviewed and replayed without claiming solving ability
+  [mobile] › p1-batch2.spec.ts:170:3 › P1 batch 2: prerequisites, tag suggestions, retrieval, memory cards › the project context is honoured by the retrieval scope
+  [mobile] › p1-batch3.spec.ts:106:3 › P1 batch 3: transcription gate, AI estimation and validated streaming › a photo answer cannot be AI-graded before the learner records what they wrote
+  [mobile] › p1-batch3.spec.ts:158:3 › P1 batch 3: transcription gate, AI estimation and validated streaming › the tutor stream reports the real reason instead of inventing content
+  [mobile] › p1-batch3.spec.ts:181:3 › P1 batch 3 stub-provider run › @stub a stub transcription is labelled, confirmable, and the estimate stays inert
+  [mobile] › p1-batch3.spec.ts:212:3 › P1 batch 3 stub-provider run › @stub diagnosis proposes an unproven cause honestly and asks a follow-up
+  [mobile] › p1-batch3.spec.ts:235:3 › P1 batch 3 stub-provider run › @stub validated segments stream, and reconnecting does not call the model again
+  [mobile] › p1-import-and-cycles.spec.ts:108:3 › p1: native-text PDF import › a born-digital PDF becomes proofreadable candidates with their source page
+  [mobile] › p1-import-and-cycles.spec.ts:145:3 › p1: native-text PDF import › a confirmed match publishes the question and its paper position
+  [mobile] › p1-import-and-cycles.spec.ts:189:3 › p1: native-text PDF import › re-importing the same paper cannot publish the same position twice
+  [mobile] › p1-import-and-cycles.spec.ts:251:3 › p1: syllabus word list and manual mapping › a word list builds a node tree, merges synonyms and refuses a cycle
+  [mobile] › p1-import-and-cycles.spec.ts:301:3 › p1: real cycle analysis › five complete real cycles are counted and the demo cycle is excluded
+  [mobile] › p1-import-and-cycles.spec.ts:328:3 › p1: real cycle analysis › a subject without complete cycles shows the insufficient state
+  [mobile] › p2-batch1.spec.ts:112:3 › P2 batch 1: layout review and contamination › a multi-column page is read in column order and cannot publish before a human confirms the layout
+  [mobile] › p2-batch1.spec.ts:189:3 › P2 batch 1: layout review and contamination › a question marked as seen outside the system can never be strictly independent again
+  [mobile] › p2-batch2.spec.ts:33:3 › P2 batch 2: sealing, families and validated variants › a sealed question cannot be practised, and unsealing restores it
+  [mobile] › p2-batch2.spec.ts:68:3 › P2 batch 2: sealing, families and validated variants › merging two families shows the impact first and then invalidates the stale evidence
+  [mobile] › p2-batch2.spec.ts:107:3 › P2 batch 2: sealing, families and validated variants › proposing a variant without a model reports the real reason and creates nothing
+  [mobile] › p2-batch2.spec.ts:136:3 › P2 batch 2 stub-provider run › @stub the offline stub can never produce a usable variant
+  [mobile] › p2-batch3.spec.ts:39:3 › P2 batch 3: timed exam, honest report scope and calibration › the exam clock belongs to the server and the result appears only after finishing
+  [mobile] › p2-batch3.spec.ts:98:3 › P2 batch 3: timed exam, honest report scope and calibration › an unscored answer makes the report show its missing range instead of a final score
+  [mobile] › p2-batch3.spec.ts:168:3 › P2 batch 3: timed exam, honest report scope and calibration › the calibration panel withholds numbers it cannot support and states its caveats
+Total: 86 tests in 9 files
+EXIT=0

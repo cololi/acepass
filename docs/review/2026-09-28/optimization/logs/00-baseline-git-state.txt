@@ -1,0 +1,23 @@
+date: invalid argument 's' for -I
+=== date:  ===
+=== git rev-parse HEAD ===
+fe68b073e34161c4cf2188106494d9aed01cc4ba
+=== git status --porcelain ===
+?? backend/perfprobe/
+?? docs/23-code-optimization-plan.md
+?? docs/review/2026-09-28/
+?? scripts/dev/measure-hot-paths.sh
+=== git diff --stat (unstaged, tracked) ===
+=== git log -1 --stat ===
+commit fe68b073e34161c4cf2188106494d9aed01cc4ba
+Author: AcePass Dev <dev@acepass.local>
+Date:   Sun Sep 27 17:46:12 2026 -0700
+
+    Record the clean-copy release gate for the P2 third batch
+    
+    Ran on the committed tree (05f0432): both proxy checks exit 0 from a `git archive`
+    export, the full-stack login returns HTTP 200 through the TLS proxy, and the
+    pre-existing infra/docker/.env sentinel is preserved unchanged.
+
+ .../p2-batch3/clean-export-release-gate.txt        | 172 +++++++++++++++++++++
+ 1 file changed, 172 insertions(+)

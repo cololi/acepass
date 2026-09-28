@@ -1,0 +1,38 @@
+{
+  "label": "before",
+  "dist": "/tmp/acepass-w4-before-frontend/frontend/dist",
+  "entry_chunks": [
+    {
+      "file": "index-CizSZg1U.js",
+      "bytes": 886357,
+      "gzip_bytes": 258543,
+      "referenced_by_index_html": true,
+      "katex_occurrences": 15
+    }
+  ],
+  "entry_js_bytes": 886357,
+  "entry_js_gzip_bytes": 258543,
+  "entry_katex_occurrences": 15,
+  "js_chunk_count": 1,
+  "js_chunks": [
+    {
+      "file": "index-CizSZg1U.js",
+      "bytes": 886357,
+      "gzip_bytes": 258543
+    }
+  ],
+  "css_chunks": [
+    {
+      "file": "index-CVQ9sIOV.css",
+      "bytes": 36459,
+      "gzip_bytes": 10073
+    }
+  ],
+  "dist_total_bytes": 1996204,
+  "chunks_containing_katex": [
+    "index-CizSZg1U.js"
+  ],
+  "index_html_script_refs": [
+    "/assets/index-CizSZg1U.js"
+  ]
+}

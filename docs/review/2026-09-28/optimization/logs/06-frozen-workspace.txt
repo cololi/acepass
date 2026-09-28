@@ -1,0 +1,60 @@
+### FROZEN WORKSPACE AT W4 FULL VERIFICATION START
+### date: 2026-09-28T05:10:30-0700
+### HEAD: fe68b073e34161c4cf2188106494d9aed01cc4ba  branch: main
+
+### git status --porcelain
+ M .gitignore
+ M backend/apps/audit/services/outbox.py
+ M backend/apps/practice/api.py
+ M backend/apps/question_bank/api.py
+ M frontend/src/app/AppShell.tsx
+ M frontend/src/components/Content.tsx
+ M frontend/src/main.tsx
+ M frontend/src/styles/app.css
+ M frontend/tsconfig.app.tsbuildinfo
+ M frontend/vite.config.ts
+?? backend/perfprobe/
+?? backend/tests/integration/test_outbox_dispatch_lease.py
+?? backend/tests/integration/test_read_path_query_budget.py
+?? docs/23-code-optimization-plan.md
+?? docs/review/2026-09-28/
+?? frontend/perfprobe/
+?? frontend/src/components/Content.test.tsx
+?? scripts/dev/measure-hot-paths.sh
+?? scripts/dev/optimization-gate.sh
+
+### git diff --stat (tracked, unstaged)
+ .gitignore                            |   3 +
+ backend/apps/audit/services/outbox.py | 114 +++++++++++++++++++++++++++-----
+ backend/apps/practice/api.py          |  27 ++++++--
+ backend/apps/question_bank/api.py     |  62 +++++++++++++----
+ frontend/src/app/AppShell.tsx         | 121 ++++++++++++++++++++++++++--------
+ frontend/src/components/Content.tsx   |  41 +++++++++++-
+ frontend/src/main.tsx                 |   5 +-
+ frontend/src/styles/app.css           |  21 ++++++
+ frontend/tsconfig.app.tsbuildinfo     |   2 +-
+ frontend/vite.config.ts               |  58 ++++++++++++++--
+ 10 files changed, 382 insertions(+), 72 deletions(-)
+
+### git diff --numstat (tracked, unstaged)
+3	0	.gitignore
+97	17	backend/apps/audit/services/outbox.py
+23	4	backend/apps/practice/api.py
+48	14	backend/apps/question_bank/api.py
+93	28	frontend/src/app/AppShell.tsx
+38	3	frontend/src/components/Content.tsx
+4	1	frontend/src/main.tsx
+21	0	frontend/src/styles/app.css
+1	1	frontend/tsconfig.app.tsbuildinfo
+54	4	frontend/vite.config.ts
+
+### frontend/tests/** modified?  (must be empty)
+### docs/review/2026-09-27/** modified? (archived counter-examples must be untouched)
+### backend/tests/** status
+?? backend/tests/integration/test_outbox_dispatch_lease.py
+?? backend/tests/integration/test_read_path_query_budget.py
+
+### browser lock dir
+total 0
+drwxr-xr-x   2 cololi  staff   64 Sep 28 04:33 .
+drwxr-xr-x  20 cololi  staff  640 Sep 28 05:10 ..

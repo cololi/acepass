@@ -27,6 +27,11 @@ frontend/dist/
 frontend/test-results/
 frontend/playwright-report/
 frontend/.vite/
+# Bulk before/after bundle backups: the numbers live in perfprobe/*.json, the
+# 900 KB copy of the old bundle does not belong in the repository.
+frontend/perfprobe/dist-before/
+# Build output of the KaTeX on-demand browser probe (rebuilt by math-probe.mjs).
+frontend/perfprobe/dist-math-harness/
 
 # Runtime data (never commit learner data or uploaded material)
 var/

@@ -1,0 +1,152 @@
+{
+  "label": "after",
+  "dist": "/tmp/acepass-w4-after-frontend/frontend/dist",
+  "entry_chunks": [
+    {
+      "file": "index-BFrTDZ2v.js",
+      "bytes": 39762,
+      "gzip_bytes": 12404,
+      "referenced_by_index_html": true,
+      "katex_occurrences": 0
+    }
+  ],
+  "entry_js_bytes": 39762,
+  "entry_js_gzip_bytes": 12404,
+  "entry_katex_occurrences": 0,
+  "first_screen_files": [
+    {
+      "file": "vendor-react-C4-hOpdN.js",
+      "bytes": 262438,
+      "gzip_bytes": 83057
+    },
+    {
+      "file": "vendor-query-C9CjAvfR.js",
+      "bytes": 40682,
+      "gzip_bytes": 12055
+    }
+  ],
+  "first_screen_bytes": 342882,
+  "first_screen_gzip_bytes": 107516,
+  "modulepreload_refs": [
+    "/assets/vendor-react-C4-hOpdN.js",
+    "/assets/vendor-query-C9CjAvfR.js"
+  ],
+  "js_chunk_count": 19,
+  "js_chunks": [
+    {
+      "file": "CandidateReviewPage-Ca09KJmM.js",
+      "bytes": 24155,
+      "gzip_bytes": 8526
+    },
+    {
+      "file": "Content-Esn1vM1B.js",
+      "bytes": 1983,
+      "gzip_bytes": 1004
+    },
+    {
+      "file": "ExposurePanel-D3Et3ChA.js",
+      "bytes": 6922,
+      "gzip_bytes": 2955
+    },
+    {
+      "file": "GradingPage-51COvx-P.js",
+      "bytes": 9125,
+      "gzip_bytes": 3752
+    },
+    {
+      "file": "ImportsPage-CeQ93Kgz.js",
+      "bytes": 17059,
+      "gzip_bytes": 5548
+    },
+    {
+      "file": "KnowledgePage-etHTjjmO.js",
+      "bytes": 50189,
+      "gzip_bytes": 13784
+    },
+    {
+      "file": "LayoutReview-CI2WggPY.js",
+      "bytes": 6712,
+      "gzip_bytes": 2723
+    },
+    {
+      "file": "MemoryPage-BUfNYu2v.js",
+      "bytes": 11397,
+      "gzip_bytes": 3905
+    },
+    {
+      "file": "PracticePage-CNFcQy6m.js",
+      "bytes": 64416,
+      "gzip_bytes": 19642
+    },
+    {
+      "file": "QuestionBankPage-BoU4t5uL.js",
+      "bytes": 27505,
+      "gzip_bytes": 8714
+    },
+    {
+      "file": "ReportsPage-DTHMjy_0.js",
+      "bytes": 36185,
+      "gzip_bytes": 9899
+    },
+    {
+      "file": "ReviewPage-DrJ3QdgM.js",
+      "bytes": 7753,
+      "gzip_bytes": 2862
+    },
+    {
+      "file": "SearchPage-CkdzgNP0.js",
+      "bytes": 6900,
+      "gzip_bytes": 2949
+    },
+    {
+      "file": "SettingsPage-D_UulorP.js",
+      "bytes": 9820,
+      "gzip_bytes": 3514
+    },
+    {
+      "file": "TodayPage-DdsmHLBC.js",
+      "bytes": 6733,
+      "gzip_bytes": 2779
+    },
+    {
+      "file": "index-BFrTDZ2v.js",
+      "bytes": 39762,
+      "gzip_bytes": 12404
+    },
+    {
+      "file": "vendor-katex-CBezJsc7.js",
+      "bytes": 261511,
+      "gzip_bytes": 76753
+    },
+    {
+      "file": "vendor-query-C9CjAvfR.js",
+      "bytes": 40682,
+      "gzip_bytes": 12055
+    },
+    {
+      "file": "vendor-react-C4-hOpdN.js",
+      "bytes": 262438,
+      "gzip_bytes": 83057
+    }
+  ],
+  "css_chunks": [
+    {
+      "file": "index-D5z-b74d.css",
+      "bytes": 7376,
+      "gzip_bytes": 2307
+    },
+    {
+      "file": "vendor-katex-BYZTj3zW.css",
+      "bytes": 29288,
+      "gzip_bytes": 7941
+    }
+  ],
+  "dist_total_bytes": 2001465,
+  "chunks_containing_katex": [
+    "Content-Esn1vM1B.js",
+    "vendor-katex-CBezJsc7.js"
+  ],
+  "index_html_script_refs": [
+    "/assets/index-BFrTDZ2v.js"
+  ]
+}

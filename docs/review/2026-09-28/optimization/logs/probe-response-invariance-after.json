@@ -1,0 +1,253 @@
+{
+  "probe": "w4-read-path-response-invariance",
+  "label": "after",
+  "cases": [
+    {
+      "endpoint": "questions_list",
+      "results": [
+        {
+          "case": "all",
+          "rows": 32,
+          "byte_identical": true,
+          "params": {
+            "limit": 50
+          }
+        },
+        {
+          "case": "subject_id",
+          "rows": 20,
+          "byte_identical": true,
+          "params": {
+            "subject_id": "6dfefbf7-835a-4382-9c5b-4e0e5748c8d3",
+            "limit": 50
+          }
+        },
+        {
+          "case": "question_type",
+          "rows": 14,
+          "byte_identical": true,
+          "params": {
+            "question_type": "single_choice",
+            "limit": 50
+          }
+        },
+        {
+          "case": "status_published",
+          "rows": 31,
+          "byte_identical": true,
+          "params": {
+            "status": "published",
+            "limit": 50
+          }
+        },
+        {
+          "case": "status_draft",
+          "rows": 2,
+          "byte_identical": true,
+          "params": {
+            "status": "draft",
+            "limit": 50
+          }
+        },
+        {
+          "case": "origin_type",
+          "rows": 32,
+          "byte_identical": true,
+          "params": {
+            "origin_type": "demo",
+            "limit": 50
+          }
+        },
+        {
+          "case": "search",
+          "rows": 8,
+          "byte_identical": true,
+          "params": {
+            "search": "W4",
+            "limit": 50
+          }
+        },
+        {
+          "case": "search_no_hit",
+          "rows": 0,
+          "byte_identical": true,
+          "params": {
+            "search": "绝不存在的标签",
+            "limit": 50
+          }
+        },
+        {
+          "case": "limit_offset",
+          "rows": 3,
+          "byte_identical": true,
+          "params": {
+            "limit": 3,
+            "offset": 2
+          }
+        },
+        {
+          "case": "limit_offset_deep",
+          "rows": 4,
+          "byte_identical": true,
+          "params": {
+            "limit": 4,
+            "offset": 9
+          }
+        },
+        {
+          "case": "empty_page",
+          "rows": 0,
+          "byte_identical": true,
+          "params": {
+            "limit": 10,
+            "offset": 100000
+          }
+        },
+        {
+          "case": "empty_subject",
+          "rows": 12,
+          "byte_identical": true,
+          "params": {
+            "subject_id": "9c26433d-5126-42e8-83c6-5b109a7817dc",
+            "limit": 50
+          }
+        },
+        {
+          "case": "limit_zero_clamped",
+          "rows": 1,
+          "byte_identical": true,
+          "params": {
+            "limit": 0
+          }
+        },
+        {
+          "case": "limit_over_max_clamped",
+          "rows": 32,
+          "byte_identical": true,
+          "params": {
+            "limit": 500
+          }
+        },
+        {
+          "case": "combined",
+          "rows": 7,
+          "byte_identical": true,
+          "params": {
+            "subject_id": "6dfefbf7-835a-4382-9c5b-4e0e5748c8d3",
+            "question_type": "single_choice",
+            "status": "published",
+            "origin_type": "demo",
+            "limit": 7,
+            "offset": 1
+          }
+        }
+      ]
+    },
+    {
+      "case": "tied_created_at_page_order",
+      "sessions": {
+        "endpoint_stable_across_3_calls": true,
+        "oracle_stable_across_3_calls": true,
+        "endpoint_order_equals_oracle_order": false,
+        "set_identical": true,
+        "rows": 19,
+        "oracle_order_is_plan_dependent": false,
+        "oracle_other_plan_set_identical": true
+      },
+      "questions": {
+        "endpoint_stable_across_3_calls": true,
+        "oracle_stable_across_3_calls": true,
+        "endpoint_order_equals_oracle_order": true,
+        "set_identical": true,
+        "rows": 32
+      }
+    },
+    {
+      "endpoint": "practice_sessions_list",
+      "results": [
+        {
+          "case": "all_limit_50",
+          "rows": 19,
+          "byte_identical": true,
+          "params": {
+            "limit": 50
+          }
+        },
+        {
+          "case": "default_limit",
+          "rows": 19,
+          "byte_identical": true,
+          "params": {}
+        },
+        {
+          "case": "limit_2",
+          "rows": 2,
+          "byte_identical": true,
+          "params": {
+            "limit": 2
+          }
+        },
+        {
+          "case": "limit_zero_clamped",
+          "rows": 1,
+          "byte_identical": true,
+          "params": {
+            "limit": 0
+          }
+        },
+        {
+          "case": "limit_over_max_clamped",
+          "rows": 19,
+          "byte_identical": true,
+          "params": {
+            "limit": 500
+          }
+        },
+        {
+          "case": "subject_id",
+          "rows": 19,
+          "byte_identical": true,
+          "params": {
+            "subject_id": "6dfefbf7-835a-4382-9c5b-4e0e5748c8d3",
+            "limit": 50
+          }
+        }
+      ]
+    },
+    {
+      "case": "verification_gate_semantics",
+      "checks": {
+        "same_version": {
+          "session_id": "38ee93ff-56df-4c10-a8ed-85f46df7d6d0",
+          "expected_grading_hidden": true,
+          "actual_grading_hidden": true,
+          "pass": true
+        },
+        "family": {
+          "session_id": "fb552812-ee37-4d5b-a0e6-ab321a717f79",
+          "expected_grading_hidden": true,
+          "actual_grading_hidden": true,
+          "pass": true
+        },
+        "lineage": {
+          "session_id": "276c3db7-5bbf-4095-9320-1ffda7249019",
+          "expected_grading_hidden": true,
+          "actual_grading_hidden": true,
+          "pass": true
+        },
+        "uncovered": {
+          "session_id": "2dfbc68f-e658-4597-9e53-e5fec1f10130",
+          "expected_grading_hidden": false,
+          "actual_grading_hidden": false,
+          "pass": true
+        },
+        "verification_itself": {
+          "session_id": "353f8440-b528-4c83-afad-8bc06bd79f9a",
+          "expected_grading_hidden": true,
+          "actual_grading_hidden": true,
+          "pass": true
+        }
+      }
+    }
+  ]
+}

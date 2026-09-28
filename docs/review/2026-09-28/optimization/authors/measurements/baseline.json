@@ -1,0 +1,96 @@
+{
+  "seeded_sessions": 20,
+  "repeats": 3,
+  "cases": [
+    {
+      "case": "practice_sessions_list",
+      "status": 200,
+      "queries": 67,
+      "median_ms": 19.85,
+      "min_ms": 19.46,
+      "bytes": 6140,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "questions_list",
+      "status": 200,
+      "queries": 123,
+      "median_ms": 41.09,
+      "min_ms": 40.92,
+      "bytes": 9088,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "grading_queue",
+      "status": 200,
+      "queries": 7,
+      "median_ms": 4.39,
+      "min_ms": 4.22,
+      "bytes": 2,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "memory_cards",
+      "status": 200,
+      "queries": 5,
+      "median_ms": 2.37,
+      "min_ms": 2.37,
+      "bytes": 2,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "knowledge_map",
+      "status": 200,
+      "queries": 11,
+      "median_ms": 3.54,
+      "min_ms": 3.16,
+      "bytes": 2244,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "knowledge_nodes",
+      "status": 200,
+      "queries": 12,
+      "median_ms": 3.31,
+      "min_ms": 3.26,
+      "bytes": 2013,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "today_plan",
+      "status": 200,
+      "queries": 11,
+      "median_ms": 3.84,
+      "min_ms": 2.94,
+      "bytes": 193,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "reports_practice",
+      "status": 200,
+      "queries": 18,
+      "median_ms": 7.65,
+      "min_ms": 7.3,
+      "bytes": 2912,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "search_hybrid",
+      "status": 200,
+      "queries": 6,
+      "median_ms": 3.53,
+      "min_ms": 3.25,
+      "bytes": 1617,
+      "at": "2026-09-28T11:17:41+00:00"
+    },
+    {
+      "case": "question_families",
+      "status": 200,
+      "queries": 5,
+      "median_ms": 1.48,
+      "min_ms": 1.46,
+      "bytes": 2,
+      "at": "2026-09-28T11:17:41+00:00"
+    }
+  ]
+}

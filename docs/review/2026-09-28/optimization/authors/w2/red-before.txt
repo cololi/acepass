@@ -1,0 +1,65 @@
+FF...                                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_questions_list_query_count_does_not_grow_with_rows ____________
+
+api = <django.test.client.Client object at 0x10c5c39b0>
+world = {'key_questions': {'disputed': <Question: 单选-答案有争议>, 'draft': <Question: 多选-仅草稿>, 'empty': <Question: 无版本>, 'mapped': ...ctice>}, 'nodes': {'几何初步': <KnowledgeNode: 几何初步>, '数与式': <KnowledgeNode: 数与式>}, 'owner': <User: owner@test.local>, ...}
+
+    def test_questions_list_query_count_does_not_grow_with_rows(api, world):
+        first, small_queries = _queries(lambda: api.get(_questions_url(world)))
+        assert first.status_code == 200
+        small_rows = len(first.json())
+        assert small_rows == len(world["questions"])
+    
+        _build_questions(world, first=100, count=small_rows)
+    
+        second, big_queries = _queries(lambda: api.get(_questions_url(world)))
+        assert second.status_code == 200
+        assert len(second.json()) == small_rows * 2, "the fixture must actually double the rows"
+>       assert big_queries == small_queries, (
+            f"questions_list issued {small_queries} queries for {small_rows} rows and "
+            f"{big_queries} for {small_rows * 2} rows: the endpoint still queries per row"
+        )
+E       AssertionError: questions_list issued 26 queries for 6 rows and 56 for 12 rows: the endpoint still queries per row
+E       assert 56 == 26
+
+tests/integration/test_read_path_query_budget.py:406: AssertionError
+_______ test_practice_sessions_list_query_count_does_not_grow_with_rows ________
+
+api = <django.test.client.Client object at 0x10cb10440>
+world = {'key_questions': {'disputed': <Question: 单选-答案有争议>, 'draft': <Question: 多选-仅草稿>, 'empty': <Question: 无版本>, 'mapped': ...ctice>}, 'nodes': {'几何初步': <KnowledgeNode: 几何初步>, '数与式': <KnowledgeNode: 数与式>}, 'owner': <User: owner@test.local>, ...}
+
+    def test_practice_sessions_list_query_count_does_not_grow_with_rows(api, world):
+        first, small_queries = _queries(lambda: api.get(_sessions_url(world)))
+        assert first.status_code == 200
+        small_rows = len(first.json())
+        assert small_rows == len(world["sessions"])
+    
+        _build_sessions(world, first=100, count=small_rows)
+    
+        second, big_queries = _queries(lambda: api.get(_sessions_url(world)))
+        assert second.status_code == 200
+        assert len(second.json()) == small_rows * 2, "the fixture must actually double the rows"
+>       assert big_queries == small_queries, (
+            f"practice_sessions_list issued {small_queries} queries for {small_rows} rows and "
+            f"{big_queries} for {small_rows * 2} rows: the endpoint still queries per row"
+        )
+E       AssertionError: practice_sessions_list issued 19 queries for 4 rows and 31 for 8 rows: the endpoint still queries per row
+E       assert 31 == 19
+
+tests/integration/test_read_path_query_budget.py:424: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_read_path_query_budget.py::test_questions_list_query_count_does_not_grow_with_rows
+FAILED tests/integration/test_read_path_query_budget.py::test_practice_sessions_list_query_count_does_not_grow_with_rows
+2 failed, 3 passed, 3 warnings in 3.53s

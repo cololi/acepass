@@ -1,0 +1,19 @@
+### 归档反例分组映射：实测核对（pre-fix 快照）
+### date: 2026-09-28T04:30:36-0700  HEAD: fe68b073e34161c4cf2188106494d9aed01cc4ba
+
+实测四组（每组命令见各自 gate-*.prefix.txt 首行）：
+  p01-independent/test_*.py           -> 11 passed      (3 test files, 11 test functions)
+  p02-independent/test_*.py           -> 9 passed, 1 deselected  (10 functions, 1 deselected by -k)
+  p02-final-independent/test_*.py     -> 3 passed      (3 test files, 3 functions)
+  docs/review/2026-09-27/test_p0_regressions.py -> 1 failed, 13 passed (14 collected)
+
+结论：11/9/3 = p01-independent / p02-independent / p02-final-independent。
+  - 与 docs/19-p1-third-batch-delivery.md §5 一致（p01-independent 11、p02-independent 9(+1 deselected)、p02-final-independent 3）
+  - 与 docs/review/2026-09-27/p2-batch3/README.md 的 reviewer-eleven/archived-nine/reviewer-three 一致
+  - 与各目录 test_*.py 的函数计数一致
+  - 与 lead 消息中的映射（p02-independent 11 / p02-final-independent 9 / test_p0_regressions 3）不一致：
+    test_p0_regressions.py 实际 14 条（12 个函数，含参数化），且 1 条失败（test_image_service_invokes_configured_vision_provider）。
+    该文件不是 docs/19 §5 / p2-batch3 声明的三组归档反例之一。
+
+处置：最终门禁按【四组全跑】执行，覆盖所有解释；test_p0_regressions.py 的失败与优化范围（audit outbox / 读路径查询 / 前端包体）无关，
+      本轮以 before/after 是否同为 '1 failed, 13 passed' 判定有无回归。

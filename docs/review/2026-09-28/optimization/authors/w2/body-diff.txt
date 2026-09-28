@@ -1,0 +1,37 @@
+OK   grading_queue.json               positional=same      projection=same rows=0
+OK   knowledge_map.json               positional=same      projection=same rows=-
+OK   knowledge_nodes.json             positional=same      projection=same rows=7
+OK   memory_cards.json                positional=same      projection=same rows=0
+OK   practice_sessions_list.json      positional=same      projection=same rows=20
+OK   question_families.json           positional=same      projection=same rows=0
+OK   questions_list.json              positional=same      projection=same rows=24
+OK   reports_practice.json            positional=same      projection=same rows=-
+OK   search_hybrid.json               positional=same      projection=same rows=-
+OK   today_plan.json                  positional=same      projection=same rows=-
+
+queries per endpoint (same fixture: 20 practice sessions):
+  case                              before   after   delta
+  practice_sessions_list                67       8     -59
+  questions_list                       123       7    -116
+  grading_queue                          7       7       0
+  memory_cards                           5       5       0
+  knowledge_map                         11      11       0
+  knowledge_nodes                       12      12       0
+  today_plan                            11      11       0
+  reports_practice                      18      18       0
+  search_hybrid                          6       6       0
+  question_families                      5       5       0
+
+legacy-vs-live parity measured on the same rows, in one process (after run):
+  questions_list[default]          byte_equal=True rows=20 legacy_queries=100 live_queries=4
+  questions_list[subject]          byte_equal=True rows=12 legacy_queries=62 live_queries=5
+  questions_list[question_type]    byte_equal=True rows=6 legacy_queries=32 live_queries=4
+  questions_list[status_published] byte_equal=True rows=20 legacy_queries=100 live_queries=4
+  questions_list[origin_type]      byte_equal=True rows=20 legacy_queries=100 live_queries=4
+  questions_list[search]           byte_equal=True rows=4 legacy_queries=22 live_queries=4
+  questions_list[page]             byte_equal=True rows=3 legacy_queries=16 live_queries=4
+  questions_list[page_wide]        byte_equal=True rows=24 legacy_queries=120 live_queries=4
+  questions_list[empty_page]       byte_equal=True rows=0 legacy_queries=2 live_queries=2
+  practice_sessions_list[default]  byte_equal=True rows=20 legacy_queries=64 live_queries=5
+  practice_sessions_list[subject]  byte_equal=True rows=20 legacy_queries=65 live_queries=6
+  practice_sessions_list[page]     byte_equal=True rows=3 legacy_queries=13 live_queries=5

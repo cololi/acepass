@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.db.models import Count, Prefetch
 from ninja import Schema
 
 from ai.providers import base as providers
@@ -310,11 +311,29 @@ def finish_session(request, project_id: str, session_id: str):
 
 @practice_router.get("/projects/{project_id}/practice-sessions", auth=auth)
 def list_sessions(request, project_id: str, subject_id: str | None = None, limit: int = 20):
+    """One page of runs, with a *constant* number of queries.
+
+    ``item_count`` and ``submitted_count`` are annotated onto the page query
+    itself, and every page row's items are fetched by a single
+    ``Prefetch`` — so the gate walk below still runs per item, on the same rows
+    and with the same ``content_map``, but no longer re-reads them per session.
+    """
     project = require_project(request.user, project_id)
     # C05: reconcile this user's overdue exams before the list is built, so the
     # list cannot disagree with the detail view about a run that is already over.
     session_services.expire_due_mock_exams(user=request.user, project=project)
-    queryset = PracticeSession.objects.filter(project=project, user=request.user).order_by("-created_at")
+    queryset = (
+        PracticeSession.objects.filter(project=project, user=request.user)
+        .order_by("-created_at")
+        # Both counts are DISTINCT so the two joins cannot multiply each other;
+        # an item without an attempt counts 0, exactly like the two .count()
+        # calls this replaces.
+        .annotate(
+            item_count=Count("items", distinct=True),
+            submitted_count=Count("items__attempt", distinct=True),
+        )
+        .prefetch_related(Prefetch("items", queryset=SessionItem.objects.select_related("question_version")))
+    )
     if subject_id:
         require_subject(request.user, project, subject_id)
         queryset = queryset.filter(subject_id=subject_id)
@@ -325,7 +344,7 @@ def list_sessions(request, project_id: str, subject_id: str | None = None, limit
         # session's grading is currently deliverable.
         withheld = any(
             verification_gate.content_gate_blocks_item(item=item, content_map=content_map)
-            for item in session.items.select_related("question_version").all()
+            for item in session.items.all()
         )
         rows.append(
             {
@@ -334,8 +353,8 @@ def list_sessions(request, project_id: str, subject_id: str | None = None, limit
                 "mode": session.mode,
                 "status": session.status,
                 "created_at": session.created_at.isoformat(),
-                "item_count": session.items.count(),
-                "submitted_count": Attempt.objects.filter(session_item__session=session).count(),
+                "item_count": session.item_count,
+                "submitted_count": session.submitted_count,
                 "grading_hidden": session.hides_grading or withheld,
                 "exam_deadline": session.exam_deadline.isoformat() if session.exam_deadline else None,
                 "expired_at": session.expired_at.isoformat() if session.expired_at else None,

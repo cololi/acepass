@@ -1,0 +1,131 @@
+
+scale fixture: questions=5000 versions=5000 sessions=20000 items=20000 attempts=10000
+
+questions page: 50 rows, 1 queries
+
+=== questions page (50 rows of 5000) ===
+Limit  (cost=49.10..212.80 rows=13 width=3293) (actual time=2.000..2.061 rows=50 loops=1)
+  Buffers: shared hit=446
+  ->  Result  (cost=49.10..212.80 rows=13 width=3293) (actual time=2.000..2.060 rows=50 loops=1)
+        Buffers: shared hit=446
+        ->  Sort  (cost=49.10..49.13 rows=13 width=3207) (actual time=1.997..1.998 rows=50 loops=1)
+              Sort Key: question_bank_question.created_at DESC
+              Sort Method: top-N heapsort  Memory: 37kB
+              Buffers: shared hit=146
+              ->  Nested Loop Left Join  (cost=4.76..48.86 rows=13 width=3207) (actual time=0.117..1.094 rows=5000 loops=1)
+                    Buffers: shared hit=146
+                    ->  Nested Loop  (cost=4.49..41.71 rows=13 width=1197) (actual time=0.117..0.515 rows=5000 loops=1)
+                          Buffers: shared hit=146
+                          ->  Index Scan using exams_subject_project_id_caef9d62 on exams_subject  (cost=0.14..8.16 rows=1 width=600) (actual time=0.001..0.001 rows=1 loops=1)
+                                Index Cond: (project_id = '00000000-0000-0000-0000-000000000001'::uuid)
+                                Buffers: shared hit=2
+                          ->  Bitmap Heap Scan on question_bank_question  (cost=4.35..33.46 rows=9 width=597) (actual time=0.115..0.260 rows=5000 loops=1)
+                                Recheck Cond: (subject_id = exams_subject.id)
+                                Heap Blocks: exact=134
+                                Buffers: shared hit=144
+                                ->  Bitmap Index Scan on question_bank_question_subject_id_87f12fbf  (cost=0.00..4.34 rows=9 width=0) (actual time=0.063..0.063 rows=10000 loops=1)
+                                      Index Cond: (subject_id = exams_subject.id)
+                                      Buffers: shared hit=10
+                    ->  Index Scan using question_bank_question_version_pkey on question_bank_question_version  (cost=0.27..0.55 rows=1 width=2010) (actual time=0.000..0.000 rows=0 loops=5000)
+                          Index Cond: (id = question_bank_question.current_published_version_id)
+        SubPlan 1
+          ->  Limit  (cost=0.27..6.29 rows=1 width=4) (actual time=0.001..0.001 rows=1 loops=50)
+                Buffers: shared hit=150
+                ->  Index Only Scan Backward using uniq_question_version on question_bank_question_version u0  (cost=0.27..12.31 rows=2 width=4) (actual time=0.000..0.000 rows=1 loops=50)
+                      Index Cond: (question_id = question_bank_question.id)
+                      Heap Fetches: 50
+                      Buffers: shared hit=150
+        SubPlan 2
+          ->  Limit  (cost=0.27..6.29 rows=1 width=86) (actual time=0.000..0.000 rows=1 loops=50)
+                Buffers: shared hit=150
+                ->  Index Scan Backward using uniq_question_version on question_bank_question_version u0_1  (cost=0.27..12.31 rows=2 width=86) (actual time=0.000..0.000 rows=1 loops=50)
+                      Index Cond: (question_id = question_bank_question.id)
+                      Buffers: shared hit=150
+Planning Time: 0.104 ms
+Execution Time: 2.078 ms
+
+sessions page: 50 rows, 2 queries
+
+=== sessions page (50 rows of 20000) ===
+Limit  (cost=129.93..129.94 rows=1 width=866) (actual time=39.736..39.740 rows=50 loops=1)
+  Buffers: shared hit=110760
+  ->  Sort  (cost=129.93..129.94 rows=1 width=866) (actual time=39.736..39.738 rows=50 loops=1)
+        Sort Key: practice_session.created_at DESC
+        Sort Method: top-N heapsort  Memory: 37kB
+        Buffers: shared hit=110760
+        ->  GroupAggregate  (cost=129.90..129.92 rows=1 width=866) (actual time=28.387..37.261 rows=20000 loops=1)
+              Group Key: practice_session.id
+              Buffers: shared hit=110760
+              ->  Sort  (cost=129.90..129.91 rows=1 width=882) (actual time=28.384..28.749 rows=20000 loops=1)
+                    Sort Key: practice_session.id, practice_session_item.id
+                    Sort Method: quicksort  Memory: 3660kB
+                    Buffers: shared hit=110760
+                    ->  Nested Loop Left Join  (cost=14.14..129.89 rows=1 width=882) (actual time=0.909..25.669 rows=20000 loops=1)
+                          Buffers: shared hit=110760
+                          ->  Nested Loop Left Join  (cost=13.87..129.48 rows=1 width=866) (actual time=0.907..17.721 rows=20000 loops=1)
+                                Buffers: shared hit=60760
+                                ->  Bitmap Heap Scan on practice_session  (cost=9.28..13.30 rows=1 width=850) (actual time=0.904..1.608 rows=20000 loops=1)
+                                      Recheck Cond: ((user_id = '3773e813-5921-4ad5-bb4f-6d28ad9e88f2'::uuid) AND (project_id = '00000000-0000-0000-0000-000000000001'::uuid))
+                                      Heap Blocks: exact=690
+                                      Buffers: shared hit=760
+                                      ->  BitmapAnd  (cost=9.28..9.28 rows=1 width=0) (actual time=0.615..0.615 rows=0 loops=1)
+                                            Buffers: shared hit=70
+                                            ->  Bitmap Index Scan on practice_session_user_id_e7a76d73  (cost=0.00..4.51 rows=31 width=0) (actual time=0.301..0.301 rows=40000 loops=1)
+                                                  Index Cond: (user_id = '3773e813-5921-4ad5-bb4f-6d28ad9e88f2'::uuid)
+                                                  Buffers: shared hit=35
+                                            ->  Bitmap Index Scan on practice_session_project_id_c0d05c2a  (cost=0.00..4.51 rows=31 width=0) (actual time=0.302..0.302 rows=40000 loops=1)
+                                                  Index Cond: (project_id = '00000000-0000-0000-0000-000000000001'::uuid)
+                                                  Buffers: shared hit=35
+                                ->  Bitmap Heap Scan on practice_session_item  (cost=4.58..115.79 rows=39 width=32) (actual time=0.000..0.000 rows=1 loops=20000)
+                                      Recheck Cond: (practice_session.id = session_id)
+                                      Heap Blocks: exact=20000
+                                      Buffers: shared hit=60000
+                                      ->  Bitmap Index Scan on practice_session_item_session_id_93144544  (cost=0.00..4.58 rows=39 width=0) (actual time=0.000..0.000 rows=1 loops=20000)
+                                            Index Cond: (session_id = practice_session.id)
+                                            Buffers: shared hit=40000
+                          ->  Index Scan using practice_attempt_session_item_id_key on practice_attempt  (cost=0.28..0.41 rows=1 width=32) (actual time=0.000..0.000 rows=0 loops=20000)
+                                Index Cond: (session_item_id = practice_session_item.id)
+                                Buffers: shared hit=50000
+Planning Time: 0.092 ms
+Execution Time: 39.755 ms
+
+=== sessions items prefetch ===
+Sort  (cost=3474.18..3479.10 rows=1968 width=2321) (actual time=4.631..4.632 rows=50 loops=1)
+  Sort Key: practice_session.created_at DESC, practice_session_item.ordinal
+  Sort Method: quicksort  Memory: 37kB
+  Buffers: shared hit=1109
+  ->  Hash Join  (cost=929.04..1385.51 rows=1968 width=2321) (actual time=3.032..4.614 rows=50 loops=1)
+        Hash Cond: (practice_session_item.question_version_id = question_bank_question_version.id)
+        Buffers: shared hit=1109
+        ->  Hash Join  (cost=829.85..1281.10 rows=1968 width=311) (actual time=1.932..3.507 rows=50 loops=1)
+              Hash Cond: (practice_session_item.session_id = practice_session.id)
+              Buffers: shared hit=1018
+              ->  Seq Scan on practice_session_item  (cost=0.12..446.20 rows=1968 width=303) (actual time=0.003..1.573 rows=50 loops=1)
+                    Filter: (session_id = ANY ('{00000000-0000-0000-0000-0000003d0901,00000000-0000-0000-0000-0000003d0902,00000000-0000-0000-0000-0000003d0903,00000000-0000-0000-0000-0000003d0904,00000000-0000-0000-0000-0000003d0905,00000000-0000-0000-0000-0000003d0906,00000000-0000-0000-0000-0000003d0907,00000000-0000-0000-0000-0000003d0908,00000000-0000-0000-0000-0000003d0909,00000000-0000-0000-0000-0000003d090a,00000000-0000-0000-0000-0000003d090b,00000000-0000-0000-0000-0000003d090c,00000000-0000-0000-0000-0000003d090d,00000000-0000-0000-0000-0000003d090e,00000000-0000-0000-0000-0000003d090f,00000000-0000-0000-0000-0000003d0910,00000000-0000-0000-0000-0000003d0911,00000000-0000-0000-0000-0000003d0912,00000000-0000-0000-0000-0000003d0913,00000000-0000-0000-0000-0000003d0914,00000000-0000-0000-0000-0000003d0915,00000000-0000-0000-0000-0000003d0916,00000000-0000-0000-0000-0000003d0917,00000000-0000-0000-0000-0000003d0918,00000000-0000-0000-0000-0000003d0919,00000000-0000-0000-0000-0000003d091a,00000000-0000-0000-0000-0000003d091b,00000000-0000-0000-0000-0000003d091c,00000000-0000-0000-0000-0000003d091d,00000000-0000-0000-0000-0000003d091e,00000000-0000-0000-0000-0000003d091f,00000000-0000-0000-0000-0000003d0920,00000000-0000-0000-0000-0000003d0921,00000000-0000-0000-0000-0000003d0922,00000000-0000-0000-0000-0000003d0923,00000000-0000-0000-0000-0000003d0924,00000000-0000-0000-0000-0000003d0925,00000000-0000-0000-0000-0000003d0926,00000000-0000-0000-0000-0000003d0927,00000000-0000-0000-0000-0000003d0928,00000000-0000-0000-0000-0000003d0929,00000000-0000-0000-0000-0000003d092a,00000000-0000-0000-0000-0000003d092b,00000000-0000-0000-0000-0000003d092c,00000000-0000-0000-0000-0000003d092d,00000000-0000-0000-0000-0000003d092e,00000000-0000-0000-0000-0000003d092f,00000000-0000-0000-0000-0000003d0930,00000000-0000-0000-0000-0000003d0931,00000000-0000-0000-0000-0000003d0900}'::uuid[]))
+                    Rows Removed by Filter: 19950
+                    Buffers: shared hit=328
+              ->  Hash  (cost=752.10..752.10 rows=6210 width=24) (actual time=1.927..1.927 rows=20000 loops=1)
+                    Buckets: 32768 (originally 8192)  Batches: 1 (originally 1)  Memory Usage: 1350kB
+                    Buffers: shared hit=690
+                    ->  Seq Scan on practice_session  (cost=0.00..752.10 rows=6210 width=24) (actual time=0.250..1.063 rows=20000 loops=1)
+                          Buffers: shared hit=690
+        ->  Hash  (cost=94.64..94.64 rows=364 width=2010) (actual time=1.099..1.099 rows=5000 loops=1)
+              Buckets: 8192 (originally 1024)  Batches: 1 (originally 1)  Memory Usage: 797kB
+              Buffers: shared hit=91
+              ->  Seq Scan on question_bank_question_version  (cost=0.00..94.64 rows=364 width=2010) (actual time=0.003..0.421 rows=5000 loops=1)
+                    Buffers: shared hit=91
+Planning Time: 0.120 ms
+Execution Time: 4.653 ms
+.
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 3 warnings in 6.63s

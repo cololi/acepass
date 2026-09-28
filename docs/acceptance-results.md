@@ -1,5 +1,16 @@
 # AcePass P0 验收结果
 
+> **最新：代码优化轮已交付（2026-09-28，起点 `fe68b07`）——本轮不新增/不关闭任何验收条目，
+> 只验证"优化没有让既有门禁变松"。** 后端 **501 passed**（489 基线 + 本轮新增 12 条回归，
+> 0 failed / 0 skipped）、ruff / `manage.py check` / `makemigrations --check` 干净、三组归档后端反例
+> **11 / 9（+1 deselected）/ 3** 原样通过（13 个归档文件逐一 `==HEAD`）、浏览器主套件 **78 passed**、
+> stub 专跑 **8 passed**、归档浏览器反例 **2 passed**、真故障演练 **ok=true**；
+> `git diff --name-only` 不含任何 `test`/`spec` 文件（本轮测试全为新增）。测量结果：
+> `questions_list` 123→7 查询、`practice_sessions_list` 67→8、入口 JS 886,357→39,762 B。
+> 见 [24 代码优化轮交付](24-code-optimization-delivery.md)。**未验证项保持未验证**：真实模型凭据、
+> 真实 ≥24 小时、真实考试材料、远程部署与 GitHub Actions 实际执行；另有两处如实登记的下一轮候选
+> （并列 `created_at` 的排列需要次级排序键、KaTeX 运行时渲染尚未固化为常设验收用例）。
+
 > **最新：P2 第三批已交付，P1/P2 规划内验收条目全部关闭（2026-09-28，起点 `ac58807`）。** 后端
 > **489 passed**、隔离浏览器主套件 **78 passed 连续两次**、stub 专跑 **8 passed**、三组归档后端反例
 > 11/9/3 原样通过、归档浏览器反例 2 passed、真故障演练 **ok=true**、干净副本发布门槛通过。

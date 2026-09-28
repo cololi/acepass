@@ -1,0 +1,96 @@
+{
+  "seeded_sessions": 20,
+  "repeats": 3,
+  "cases": [
+    {
+      "case": "practice_sessions_list",
+      "status": 200,
+      "queries": 8,
+      "median_ms": 4.84,
+      "min_ms": 4.65,
+      "bytes": 6140,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "questions_list",
+      "status": 200,
+      "queries": 7,
+      "median_ms": 5.65,
+      "min_ms": 5.44,
+      "bytes": 9088,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "grading_queue",
+      "status": 200,
+      "queries": 7,
+      "median_ms": 3.89,
+      "min_ms": 3.76,
+      "bytes": 2,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "memory_cards",
+      "status": 200,
+      "queries": 5,
+      "median_ms": 2.4,
+      "min_ms": 2.25,
+      "bytes": 2,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "knowledge_map",
+      "status": 200,
+      "queries": 11,
+      "median_ms": 3.35,
+      "min_ms": 3.13,
+      "bytes": 2244,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "knowledge_nodes",
+      "status": 200,
+      "queries": 12,
+      "median_ms": 3.17,
+      "min_ms": 3.16,
+      "bytes": 2013,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "today_plan",
+      "status": 200,
+      "queries": 11,
+      "median_ms": 3.61,
+      "min_ms": 2.96,
+      "bytes": 193,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "reports_practice",
+      "status": 200,
+      "queries": 18,
+      "median_ms": 7.72,
+      "min_ms": 7.46,
+      "bytes": 2912,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "search_hybrid",
+      "status": 200,
+      "queries": 6,
+      "median_ms": 3.95,
+      "min_ms": 3.62,
+      "bytes": 1617,
+      "at": "2026-09-28T12:01:56+00:00"
+    },
+    {
+      "case": "question_families",
+      "status": 200,
+      "queries": 5,
+      "median_ms": 1.61,
+      "min_ms": 1.52,
+      "bytes": 2,
+      "at": "2026-09-28T12:01:56+00:00"
+    }
+  ]
+}

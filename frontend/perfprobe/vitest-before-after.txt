@@ -1,0 +1,24 @@
+W3 evidence: `npm run test` (vitest run) was ALREADY broken before this task.
+Reproduction uses the unmodified HEAD vite.config.ts (no 'test' key), copied verbatim:
+  git show HEAD:frontend/vite.config.ts > perfprobe/vite.config.before.ts
+  cd frontend && npx vitest run --root . --config perfprobe/vite.config.before.ts
+
+Result with the BEFORE config:
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+ Test Files  10 failed | 1 passed (11)
+      Tests  5 passed (5)
+   Start at  04:28:56
+   Duration  1.06s (transform 332ms, setup 0ms, collect 51ms, tests 8ms, environment 1ms, prepare 589ms)
+
+
+Result with the AFTER config (test.include scoped to src/**):
+
+ ✓ src/components/Content.test.tsx (5 tests) 5ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  04:28:57
+   Duration  232ms (transform 24ms, setup 0ms, collect 33ms, tests 5ms, environment 0ms, prepare 45ms)
+

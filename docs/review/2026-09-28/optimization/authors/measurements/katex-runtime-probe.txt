@@ -1,0 +1,40 @@
+../dist-math-harness/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff        13.21 kB
+../dist-math-harness/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff           13.30 kB
+../dist-math-harness/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2    13.57 kB
+../dist-math-harness/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff       14.11 kB
+../dist-math-harness/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff         14.41 kB
+../dist-math-harness/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff     16.03 kB
+../dist-math-harness/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2       16.40 kB
+../dist-math-harness/assets/KaTeX_Math-Italic-t53AETM-.woff2           16.44 kB
+../dist-math-harness/assets/KaTeX_Script-Regular-C5JkGWo-.ttf          16.65 kB
+../dist-math-harness/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2       16.78 kB
+../dist-math-harness/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2           16.99 kB
+../dist-math-harness/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff        18.67 kB
+../dist-math-harness/assets/KaTeX_Math-Italic-DA0__PXp.woff            18.75 kB
+../dist-math-harness/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff        19.41 kB
+../dist-math-harness/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf       19.44 kB
+../dist-math-harness/assets/KaTeX_Fraktur-Regular-CB_wures.ttf         19.57 kB
+../dist-math-harness/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf            19.58 kB
+../dist-math-harness/assets/KaTeX_Main-Italic-BMLOBm91.woff            19.68 kB
+../dist-math-harness/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf        22.36 kB
+../dist-math-harness/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf          24.50 kB
+../dist-math-harness/assets/KaTeX_Main-Bold-Cx986IdX.woff2             25.32 kB
+../dist-math-harness/assets/KaTeX_Main-Regular-B22Nviop.woff2          26.27 kB
+../dist-math-harness/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf      27.56 kB
+../dist-math-harness/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2           28.08 kB
+../dist-math-harness/assets/KaTeX_Main-Bold-Jm3AIy58.woff              29.91 kB
+../dist-math-harness/assets/KaTeX_Main-Regular-Dr94JaBh.woff           30.77 kB
+../dist-math-harness/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf         31.20 kB
+../dist-math-harness/assets/KaTeX_Math-Italic-flOr_0UB.ttf             31.31 kB
+../dist-math-harness/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf         32.97 kB
+../dist-math-harness/assets/KaTeX_AMS-Regular-DMm9YOAa.woff            33.52 kB
+../dist-math-harness/assets/KaTeX_Main-Italic-3WenGoN9.ttf             33.58 kB
+../dist-math-harness/assets/KaTeX_Main-Bold-waoOVXN0.ttf               51.34 kB
+../dist-math-harness/assets/KaTeX_Main-Regular-ypZvNtVU.ttf            53.58 kB
+../dist-math-harness/assets/KaTeX_AMS-Regular-DRggAlZN.ttf             63.63 kB
+../dist-math-harness/assets/katex-BYZTj3zW.css                         29.29 kB │ gzip:  8.05 kB
+../dist-math-harness/assets/index-BX0r7T0D.js                         227.13 kB │ gzip: 71.04 kB
+../dist-math-harness/assets/katex-C5jXJg4s.js                         261.33 kB │ gzip: 77.57 kB
+✓ built in 458ms
+PASS [dev] katex requests: on load=0, after rendering a formula=3; font=KaTeX_Main; height=22px
+PASS [preview] katex requests: on load=0, after rendering a formula=3; font=KaTeX_Main; height=22px

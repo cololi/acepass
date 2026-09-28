@@ -21,6 +21,22 @@ the original implementation could not survive:
 Re-delivery is safe because every consumer is idempotent and re-checks the real
 state before writing, and because ``attempts``/``max_attempts`` bound the retry
 loop instead of hammering a poisoned event forever.
+
+Dispatch contract
+-----------------
+
+The dispatcher must never hold an outbox row lock while a consumer can see its
+message. Every consumer claims its row with
+``select_for_update(skip_locked=True)`` (:func:`run_leased` →
+:func:`claim_event`), so a scan that called one from inside its own locking
+transaction made a worker that was faster than the commit skip itself
+(``skipped_lease_not_held``) and left the event leased for the whole
+``OUTBOX_LEASE_SECONDS``. The same skip happens for a write that merely runs
+*after* ``send_task``: the message is already in the broker, the worker claims
+while the row is still locked, and the delivery is lost until the lease expires.
+:func:`dispatch_pending` therefore selects its batch and commits the delivery
+record (``dispatched`` + lease + one attempt) in one short transaction, and only
+then hands the messages to the broker.
 """
 
 from __future__ import annotations
@@ -32,7 +48,7 @@ from typing import Any
 
 from django.conf import settings
 from django.db import transaction as db_transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.utils import timezone
 
 from apps.audit.models import OutboxEvent
@@ -281,22 +297,13 @@ def dispatch_event(event: OutboxEvent) -> bool:
     from config.celery import app as celery_app
 
     try:
+        # Nothing may be written to this row once the message exists: the worker
+        # is free to claim it the moment the broker accepts it (docs/15 §7.1).
+        # The delivery record was already committed by `_record_deliveries`.
         celery_app.send_task(event.topic, kwargs={"outbox_event_id": str(event.id), **event.payload})
     except Exception as exc:  # broker down: keep the row recoverable
         mark_retryable_failure(event, str(exc))
         return False
-    now = timezone.now()
-    OutboxEvent.objects.filter(id=event.id).update(
-        status=OutboxStatus.DISPATCHED,
-        dispatched_at=now,
-        attempts=event.attempts + 1,
-        # A dispatched row is leased too: if the worker never confirms, the
-        # lease expires and the scanner re-delivers it.
-        lease_expires_at=now + timedelta(seconds=_lease_seconds()),
-        updated_at=now,
-    )
-    event.status = OutboxStatus.DISPATCHED
-    event.attempts = event.attempts + 1
     return True
 
 
@@ -354,23 +361,96 @@ def _recoverable_queryset(*, cutoff, now=None):
     ).filter(lease_available_q(moment))
 
 
+def _record_deliveries(events: list[OutboxEvent]) -> None:
+    """Write the delivery record for a batch *before* any message exists.
+
+    Called inside the transaction that selected the rows (they are locked
+    ``FOR UPDATE``); that transaction commits before the broker is called, so by
+    the time a consumer can see a message, the row is free and already marked.
+
+    Both halves of that order are load-bearing (docs/15 §7.1):
+
+    * every consumer claims its row with ``select_for_update(skip_locked=True)``
+      (:func:`run_leased` → :func:`claim_event`), so a row lock that is still
+      held while the worker claims makes the worker skip its own event. A
+      delivery write that ran *after* ``send_task`` had exactly that effect: the
+      message was already in the broker while the row was still being updated;
+    * the row must already carry its delivery lease when the message appears,
+      otherwise a concurrent scan sees an undelivered row and hands the same
+      event out twice.
+
+    ``processing`` rows are the dead-worker case: their claim columns belong to
+    the takeover consumer that :func:`claim_event` must let through, so only
+    ``attempts``/``dispatched_at`` are recorded for them.
+
+    ``attempts`` is incremented in SQL while the in-memory rows keep their
+    pre-delivery values on purpose: a broker failure is recorded by
+    :func:`mark_retryable_failure`, which computes ``event.attempts + 1`` from
+    that same pre-delivery value, so one failed hand-off counts exactly once.
+
+    Inline mode is the exception: the consumer runs in-process and records the
+    attempt through its own freshly claimed row, so counting the hand-off here
+    as well would double the retry budget (this keeps the inline accounting
+    exactly as it was).
+    """
+    if not events:
+        return
+    # Rows that already exhausted their budget must not be marked dispatched and
+    # must not consume another attempt: `dispatch_event` marks those failed
+    # without a hand-off, and the counter is a cap, not a rough guide (B05).
+    # This uses the same pre-delivery values `dispatch_event` will see.
+    handoff = [event for event in events if int(event.attempts) < int(event.max_attempts or 8)]
+    if not handoff:
+        return
+    now = timezone.now()
+    ids = [event.id for event in handoff]
+    updates: dict[str, Any] = {"dispatched_at": now, "updated_at": now}
+    if not inline_mode():
+        updates["attempts"] = F("attempts") + 1
+    OutboxEvent.objects.filter(id__in=ids, processed_at__isnull=True).update(**updates)
+    # A dispatched row is leased too: if the worker never confirms, the lease
+    # expires and the scanner re-delivers it. A dispatcher killed between this
+    # commit and the broker call therefore leaves a recoverable leased row, not
+    # a silently lost message.
+    OutboxEvent.objects.filter(
+        id__in=ids,
+        processed_at__isnull=True,
+        status__in=(OutboxStatus.PENDING, OutboxStatus.DISPATCHED),
+    ).update(
+        status=OutboxStatus.DISPATCHED,
+        lease_expires_at=now + timedelta(seconds=_lease_seconds()),
+        updated_at=now,
+    )
+
+
 def dispatch_pending(limit: int = 100) -> int:
     """Re-deliver every event that no consumer has confirmed yet.
 
     Named for compatibility, but it is deliberately *not* limited to ``pending``:
     a row sitting in ``dispatched`` or ``processing`` with an expired lease is
     exactly the Redis-flush / killed-worker case that must be recovered.
+
+    The row lock covers only the *choice* of the batch and its delivery record,
+    never a consumer run: every consumer claims its own row with
+    ``select_for_update(skip_locked=True)`` (:func:`run_leased` →
+    :func:`claim_event`), so invoking one while this transaction still held the
+    lock made a fast worker skip its own event (``skipped_lease_not_held``) and
+    left the row leased for the whole ``OUTBOX_LEASE_SECONDS`` before a later
+    scan could try again (docs/15 §7.1). The batch is selected and recorded in a
+    short transaction, and the messages are handed to the broker only after that
+    transaction has committed.
     """
-    dispatched = 0
     with db_transaction.atomic():
         events = list(
             _recoverable_queryset(cutoff=timezone.now())
             .select_for_update(skip_locked=True)
             .order_by("available_at")[:limit]
         )
-        for event in events:
-            if dispatch_event(event):
-                dispatched += 1
+        _record_deliveries(events)
+    dispatched = 0
+    for event in events:
+        if dispatch_event(event):
+            dispatched += 1
     return dispatched
 
 

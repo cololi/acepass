@@ -1,0 +1,215 @@
+{
+  "probe": "w4-read-path-query-count",
+  "label": "after",
+  "cases": [
+    {
+      "case": "practice_sessions_list",
+      "small": {
+        "status": 200,
+        "queries": 8,
+        "bytes": 1535,
+        "fingerprint": {
+          "top": "list",
+          "row_count": 5,
+          "extra_keys": {},
+          "item_keys": {
+            "created_at": [
+              "str"
+            ],
+            "exam_deadline": [
+              "null"
+            ],
+            "expired_at": [
+              "null"
+            ],
+            "grading_hidden": [
+              "bool"
+            ],
+            "item_count": [
+              "int"
+            ],
+            "mode": [
+              "str"
+            ],
+            "session_id": [
+              "str"
+            ],
+            "status": [
+              "str"
+            ],
+            "subject_id": [
+              "str"
+            ],
+            "submitted_count": [
+              "int"
+            ]
+          }
+        },
+        "path": "/api/v1/projects/3d40b6e9-c647-4fff-a010-8116be50dcd0/practice-sessions?limit=50",
+        "repeats": 3,
+        "query_count_stable_across_repeats": true
+      },
+      "large": {
+        "status": 200,
+        "queries": 8,
+        "bytes": 12280,
+        "fingerprint": {
+          "top": "list",
+          "row_count": 40,
+          "extra_keys": {},
+          "item_keys": {
+            "created_at": [
+              "str"
+            ],
+            "exam_deadline": [
+              "null"
+            ],
+            "expired_at": [
+              "null"
+            ],
+            "grading_hidden": [
+              "bool"
+            ],
+            "item_count": [
+              "int"
+            ],
+            "mode": [
+              "str"
+            ],
+            "session_id": [
+              "str"
+            ],
+            "status": [
+              "str"
+            ],
+            "subject_id": [
+              "str"
+            ],
+            "submitted_count": [
+              "int"
+            ]
+          }
+        },
+        "path": "/api/v1/projects/3d40b6e9-c647-4fff-a010-8116be50dcd0/practice-sessions?limit=50",
+        "repeats": 3,
+        "query_count_stable_across_repeats": true
+      },
+      "target_queries": 12,
+      "rows_small": 5,
+      "rows_large": 40,
+      "queries_small": 8,
+      "queries_large": 8,
+      "independent_of_rows": true,
+      "under_target": true,
+      "verdict": "PASS"
+    },
+    {
+      "case": "questions_list",
+      "small": {
+        "status": 200,
+        "queries": 7,
+        "bytes": 1889,
+        "fingerprint": {
+          "top": "list",
+          "row_count": 5,
+          "extra_keys": {},
+          "item_keys": {
+            "display_label": [
+              "str"
+            ],
+            "has_trusted_answer": [
+              "bool"
+            ],
+            "id": [
+              "str"
+            ],
+            "is_demo": [
+              "bool"
+            ],
+            "knowledge_nodes": [
+              "list"
+            ],
+            "latest_version": [
+              "int"
+            ],
+            "origin_type": [
+              "str"
+            ],
+            "published_version_id": [
+              "str"
+            ],
+            "question_type": [
+              "str"
+            ],
+            "subject_id": [
+              "str"
+            ]
+          }
+        },
+        "path": "/api/v1/projects/3d40b6e9-c647-4fff-a010-8116be50dcd0/questions?limit=5",
+        "repeats": 3,
+        "query_count_stable_across_repeats": true
+      },
+      "large": {
+        "status": 200,
+        "queries": 7,
+        "bytes": 15143,
+        "fingerprint": {
+          "top": "list",
+          "row_count": 40,
+          "extra_keys": {},
+          "item_keys": {
+            "display_label": [
+              "str"
+            ],
+            "has_trusted_answer": [
+              "bool"
+            ],
+            "id": [
+              "str"
+            ],
+            "is_demo": [
+              "bool"
+            ],
+            "knowledge_nodes": [
+              "list"
+            ],
+            "latest_version": [
+              "int"
+            ],
+            "origin_type": [
+              "str"
+            ],
+            "published_version_id": [
+              "str"
+            ],
+            "question_type": [
+              "str"
+            ],
+            "subject_id": [
+              "str"
+            ]
+          }
+        },
+        "path": "/api/v1/projects/3d40b6e9-c647-4fff-a010-8116be50dcd0/questions?limit=40",
+        "repeats": 3,
+        "query_count_stable_across_repeats": true
+      },
+      "target_queries": 12,
+      "rows_small": 5,
+      "rows_large": 40,
+      "queries_small": 7,
+      "queries_large": 7,
+      "independent_of_rows": true,
+      "under_target": true,
+      "verdict": "PASS"
+    }
+  ],
+  "fixture": {
+    "project_id": "3d40b6e9-c647-4fff-a010-8116be50dcd0",
+    "subject_id": "9a710b44-7523-430c-a904-3f4b53b32ba1",
+    "questions_before_clone": 24,
+    "questions_cloned": 16,
+    "sessions": 5
+  }
+}

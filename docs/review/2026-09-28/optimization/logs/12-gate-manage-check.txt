@@ -1,0 +1,5 @@
+### gate: manage.py check
+### cmd: bash -c cd backend && DJANGO_SETTINGS_MODULE=config.settings.dev .venv/bin/python manage.py check
+### started: 2026-09-28T05:13:16-0700
+System check identified no issues (0 silenced).
+EXIT=0

@@ -1,19 +1,80 @@
-import { useState } from 'react'
+import {
+  Component,
+  Suspense,
+  lazy,
+  useState,
+  type ComponentType,
+  type LazyExoticComponent,
+  type ReactNode,
+} from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import { useAuth, useScope } from './context'
 import { HomePage } from '../features/projects/HomePage'
-import { TodayPage } from '../features/today/TodayPage'
-import { QuestionBankPage } from '../features/questions/QuestionBankPage'
-import { ImportsPage } from '../features/imports/ImportsPage'
-import { CandidateReviewPage } from '../features/imports/CandidateReviewPage'
-import { PracticePage } from '../features/practice/PracticePage'
-import { GradingPage } from '../features/practice/GradingPage'
-import { KnowledgePage } from '../features/knowledge/KnowledgePage'
-import { SearchPage } from '../features/search/SearchPage'
-import { MemoryPage } from '../features/memory/MemoryPage'
-import { ReviewPage } from '../features/review/ReviewPage'
-import { ReportsPage } from '../features/reports/ReportsPage'
-import { SettingsPage } from '../features/settings/SettingsPage'
+
+/**
+ * Route-level code splitting.
+ *
+ * The first screen only needs the shell, the scope selectors and the project
+ * landing page; every other route is a separate chunk fetched when the user
+ * actually navigates there. `HomePage` stays eager because `/` is the landing
+ * route after login and must paint without a second round trip.
+ */
+function page<T extends Record<string, unknown>, K extends keyof T & string>(
+  loader: () => Promise<T>,
+  name: K,
+): LazyExoticComponent<ComponentType> {
+  return lazy(async () => ({ default: (await loader())[name] as unknown as ComponentType }))
+}
+
+const TodayPage = page(() => import('../features/today/TodayPage'), 'TodayPage')
+const QuestionBankPage = page(() => import('../features/questions/QuestionBankPage'), 'QuestionBankPage')
+const ImportsPage = page(() => import('../features/imports/ImportsPage'), 'ImportsPage')
+const CandidateReviewPage = page(
+  () => import('../features/imports/CandidateReviewPage'),
+  'CandidateReviewPage',
+)
+const PracticePage = page(() => import('../features/practice/PracticePage'), 'PracticePage')
+const GradingPage = page(() => import('../features/practice/GradingPage'), 'GradingPage')
+const KnowledgePage = page(() => import('../features/knowledge/KnowledgePage'), 'KnowledgePage')
+const SearchPage = page(() => import('../features/search/SearchPage'), 'SearchPage')
+const MemoryPage = page(() => import('../features/memory/MemoryPage'), 'MemoryPage')
+const ReviewPage = page(() => import('../features/review/ReviewPage'), 'ReviewPage')
+const ReportsPage = page(() => import('../features/reports/ReportsPage'), 'ReportsPage')
+const SettingsPage = page(() => import('../features/settings/SettingsPage'), 'SettingsPage')
+
+/** Visible loading state: a route chunk is always fetched, never a blank screen. */
+export function RouteFallback() {
+  return (
+    <div className="empty-state route-loading" role="status" aria-live="polite" style={{ paddingTop: 80 }}>
+      页面加载中…
+    </div>
+  )
+}
+
+/**
+ * A chunk can fail to load (offline, stale hash after a deploy). Showing a
+ * reload affordance is the difference between "still loading" and "broken":
+ * without this the Suspense fallback would sit there forever.
+ */
+class RouteErrorBoundary extends Component<{ children: ReactNode }, { message: string | null }> {
+  state: { message: string | null } = { message: null }
+
+  static getDerivedStateFromError(error: unknown) {
+    return { message: error instanceof Error ? error.message : String(error) }
+  }
+
+  render() {
+    if (this.state.message === null) return this.props.children
+    return (
+      <div className="empty-state" style={{ paddingTop: 80 }}>
+        <div className="notice danger">页面资源加载失败：{this.state.message}</div>
+        <button className="btn small" onClick={() => window.location.reload()}>
+          重新加载
+        </button>
+      </div>
+    )
+  }
+}
 
 export function AppShell() {
   const { user, logout } = useAuth()
@@ -108,21 +169,25 @@ export function AppShell() {
       </div>
 
       <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/today" element={<TodayPage />} />
-          <Route path="/practice" element={<PracticePage />} />
-          <Route path="/questions" element={<QuestionBankPage />} />
-          <Route path="/imports" element={<ImportsPage />} />
-          <Route path="/imports/:jobId/candidates/:candidateId" element={<CandidateReviewPage />} />
-          <Route path="/knowledge" element={<KnowledgePage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/review" element={<ReviewPage />} />
-          <Route path="/memory" element={<MemoryPage />} />
-          <Route path="/grading" element={<GradingPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
+        <RouteErrorBoundary>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/today" element={<TodayPage />} />
+              <Route path="/practice" element={<PracticePage />} />
+              <Route path="/questions" element={<QuestionBankPage />} />
+              <Route path="/imports" element={<ImportsPage />} />
+              <Route path="/imports/:jobId/candidates/:candidateId" element={<CandidateReviewPage />} />
+              <Route path="/knowledge" element={<KnowledgePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="/memory" element={<MemoryPage />} />
+              <Route path="/grading" element={<GradingPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
       </main>
     </div>
   )

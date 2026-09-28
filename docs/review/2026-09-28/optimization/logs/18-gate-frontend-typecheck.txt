@@ -1,0 +1,6 @@
+### gate: frontend typecheck
+### cmd: cd frontend && npm run typecheck
+### started: 2026-09-28T05:25:42-0700
+npm notice run acepass-frontend@0.1.0 typecheck
+npm notice run tsc --noEmit
+EXIT=0

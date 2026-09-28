@@ -1,0 +1,102 @@
+### 真故障演练（独立库 acepass_acceptance_opt_v_drill / Redis 6395；脚本自己起停真实 Worker 并做真实 FLUSHALL + SIGKILL）
+### started: 2026-09-28T05:33:27-0700
+### ---- setup 1/3: reset db + redis 6395 ----
+NOTICE:  database "acepass_acceptance_opt_v_drill" does not exist, skipping
+reset acepass_acceptance_opt_v_drill / /Users/cololi/Documents/AcePass/var/private-media-p2-batch3 / redis 6395
+RESET_EXIT=0
+### ---- setup 2/3: migrate ----
+Operations to perform:
+  Apply all migrations: accounts, admin, analytics, audit, auth, contenttypes, exams, ingestion, knowledge, learning, memory, practice, question_bank, search, sessions, tutoring
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying exams.0001_initial... OK
+  Applying ingestion.0001_initial... OK
+  Applying question_bank.0001_initial... OK
+  Applying analytics.0001_initial... OK
+  Applying analytics.0002_initial... OK
+  Applying analytics.0003_p0_1_grading_and_regrade_semantics... OK
+  Applying analytics.0004_p0_2_regrade_generation_sequence... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_p0_1_outbox_lease_and_recovery... OK
+  Applying exams.0002_initial... OK
+  Applying ingestion.0002_p1_pdf_import_and_paper_link... OK
+  Applying ingestion.0003_p2_layout_import... OK
+  Applying knowledge.0001_initial... OK
+  Applying knowledge.0002_knowledgerelation_tagsuggestion... OK
+  Applying learning.0001_initial... OK
+  Applying practice.0001_initial... OK
+  Applying practice.0002_p0_1_grading_and_regrade_semantics... OK
+  Applying memory.0001_initial... OK
+  Applying learning.0002_initial... OK
+  Applying learning.0003_alter_studytask_options_and_more... OK
+  Applying learning.0004_studytask_memory_card_alter_studytask_task_kind... OK
+  Applying practice.0003_p1_transcription_and_follow_ups... OK
+  Applying practice.0004_transcription_origin... OK
+  Applying practice.0005_p2_mock_exam_deadline... OK
+  Applying question_bank.0002_questionfamily_merged_at_questionfamily_merged_into_and_more... OK
+  Applying search.0001_initial... OK
+  Applying sessions.0001_initial... OK
+  Applying tutoring.0001_initial... OK
+  Applying tutoring.0002_p0_2_tutor_job_finalized_at... OK
+  Applying tutoring.0003_b08_tutor_segment... OK
+MIGRATE_EXIT=0
+### ---- setup 3/3: create_account + bootstrap_acceptance ----
+已创建账户：acceptance@acepass.local
+CREATE_EXIT=0
+email=acceptance@acepass.local
+project_a=0fa0a2e9-bfcc-4dbe-bb1f-942c47b25337
+project_b=9a2a3d4a-be76-4cf9-96d5-3ee57ca3e4b1
+project_c=e474dc46-5fe3-4bd6-a3cb-9b994115bc53
+subjects=5
+published_versions=28
+delayed_verification_tasks=2
+cycle_subject_id=ea574e88-d964-4546-a5e9-2206d5ca21f5
+cycle_subject_name=验收历年科目·周期统计
+complete_cycles=['2019', '2020', '2021', '2022', '2023']
+incomplete_cycle=2024
+cycle_scored_items=10
+BOOTSTRAP_EXIT=0
+### ---- drill ----
+{"step": "environment", "database": "acepass_acceptance_opt_v_drill", "redis_url": "redis://127.0.0.1:6395/0", "redis_instance": {"host": "127.0.0.1", "port": 6395, "db": 0, "redis_version": "8.10.2", "run_id": "45e53d85b4b2339db1c44a8dce8d487f1462d0ca", "mode": "dedicated_instance", "keys_before_drill": 0}, "inline": false, "outbox_lease_seconds": 5, "ai_provider": "stub"}
+{"step": "scope", "project": "验收项目A·基础能力", "subject": "验收科目一·数量关系"}
+{"step": "baseline", "attempts": 2, "evidence": 0, "states": 0, "study_tasks": 2, "outbox": 10}
+{"step": "pre_existing_unresolved", "count": 10}
+{"step": "broker_flushed_before_drill", "queue_depth": 0, "real": true}
+{"step": "attempt_submitted", "attempt_id": "5ffc77d5-ccac-4ab6-a09e-2171852b3659", "grade_status": "confirmed", "worker": "drill-primary"}
+{"step": "worker_consumes_attempt_events", "ok": true, "evidence_rows": 6, "paired_tasks": 0, "grade_event": "9fca806f-dd1e-48fd-862a-8ec26bd9f91e", "real": true}
+{"step": "worker_consumes_reconcile_plan", "ok": true, "status": "processed", "processed_at": "2026-09-28 12:33:37.136055+00:00", "attempts": 1, "real": true}
+{"step": "worker_stopped_for_flush", "worker": "drill-primary", "killed_with": "SIGKILL", "real": true}
+{"step": "flush_prepared", "attempt_id": "82b63633-cd07-48bf-8dc7-68323b5a21d3", "rows": ["e31b083a-db81-4e9d-95fc-63f9dad1ff65", "67bdb08f-ac73-4ad6-a494-d0a71f11b167"], "queue_depth_before_flush": 2, "real": true}
+{"step": "redis_flushed_for_real", "flushed": true, "queue_depth_after_flush": 0, "real": true}
+{"step": "flush_recovery_scan", "delivered": 2, "lease_seconds": 5, "real": true}
+{"step": "redis_flush_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "real": true}
+{"step": "worker_killed_mid_flight", "worker": "drill-primary", "signal": 9, "rows": 2, "caught_while_processing": true, "unconfirmed_after_kill": 2, "real": true}
+{"step": "killed_worker_recovery", "ok": true, "evidence_rows": 6, "evidence_before_recovery": 0, "applied_exactly_once": true, "lease_seconds": 5, "real": true}
+{"step": "second_consumer_started", "workers": 2, "real": true}
+{"step": "stale_consumer_holds_lease", "outbox_event_id": "ff6fb483-0608-4809-ae2c-f7620a945681", "status": "processing", "lease_seconds": 5, "real": true}
+{"step": "duplicate_delivery_sent", "outbox_event_id": "ff6fb483-0608-4809-ae2c-f7620a945681", "topic": "tutoring.run_job", "real": true}
+2026-09-28 12:34:07,614 INFO apps.tutoring tutor job 92bef1fb-112b-4ae7-82e3-5269943b8d32: stale consumer did not store its result
+{"step": "stale_consumer_takeover", "ok": true, "duplicate_delivery": "observed_by_second_consumer", "stale_consumer_returned": true, "stale_consumer_result_blocks": [{"kind": "text", "text": "【stub 讲解】这是测试/演示模式的占位讲解，不是真实模型输出。"}, {"kind": "text", "text": "请以已审核的人工解析为准；系统不会把 stub 内容当作真实结果。"}], "assistant_turns": 1, "exposures": 1, "job_status": "succeeded", "outbox_status": "processed", "real": true}
+{"step": "final_state", "unresolved": {}, "attempts": 5, "evidence": 30, "states": 3, "study_tasks": 39, "review_tasks": 1, "outbox": 18, "processed": 18}
+{"step": "workers_stopped_in_finally", "workers": ["drill-primary", "drill-secondary"], "real": true}
+{"note": "report written to /Users/cololi/Documents/AcePass/docs/review/2026-09-28/optimization/logs/25-gate-worker-drill.json"}
+{"ok": true}
+DRILL_EXIT=0
+### finished: 2026-09-28T05:34:07-0700

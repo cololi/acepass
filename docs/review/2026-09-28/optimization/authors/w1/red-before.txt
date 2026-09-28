@@ -1,0 +1,172 @@
+F...FF                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_the_delivery_record_is_committed_before_the_message_exists ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c3ba3c0>
+settings = <pytest_django.fixtures.Settings object at 0x10c9ccf80>
+
+    def test_the_delivery_record_is_committed_before_the_message_exists(monkeypatch, settings):
+        """The row is free and already leased when the broker is handed the message."""
+        settings.ACEPASS_INLINE_TASKS = False
+        settings.OUTBOX_LEASE_SECONDS = 300  # production lease: a skipped event waits ~5 minutes
+    
+        event = outbox.enqueue(TOPIC, {"attempt_id": str(uuid.uuid4())})
+        task = _registered_task(TOPIC)
+        at_send: dict = {}
+        worker: dict = {}
+        handoffs: list[str] = []
+    
+        def immediate_broker(topic, kwargs=None, **options):
+            # This is the instant the message starts to exist. Anything the
+            # dispatcher writes to the row after this point runs while the worker is
+            # claiming it, and `select_for_update(skip_locked=True)` then skips the
+            # row — the observed "is not claimable by this consumer".
+            row = OutboxEvent.objects.get(id=event.id)
+            at_send.update(
+                {
+                    "status": row.status,
+                    "attempts": row.attempts,
+                    "lease_is_live": row.lease_expires_at is not None and row.lease_expires_at > timezone.now(),
+                }
+            )
+            # A worker that is faster than the dispatcher: it claims the row while
+            # the dispatcher is still inside `dispatch_pending`.
+            worker.update(_run_in_worker_thread(lambda: _consume_with_real_consumer(task, kwargs or {})))
+            handoffs.append(topic)
+            return SimpleNamespace(id="outbox-case-message")
+    
+        monkeypatch.setattr(celery_module.app, "send_task", immediate_broker)
+    
+        dispatched = outbox.dispatch_pending()
+        event.refresh_from_db()
+        observed = {
+            "dispatch_pending_returned": dispatched,
+            "at_send": at_send,
+            "worker": worker,
+            "handoffs": handoffs,
+            "status": event.status,
+            "processed_at": str(event.processed_at),
+            "attempts": event.attempts,
+            "lease_expires_at": str(event.lease_expires_at),
+        }
+>       assert at_send == {"status": OutboxStatus.DISPATCHED, "attempts": 1, "lease_is_live": True}, (
+            "the delivery record (dispatched + attempt + lease) must be committed before the broker "
+            f"is called: {observed!r}. A record written after `send_task` locks the row while the "
+            "worker claims it, and the event then stays unconfirmed until the lease expires."
+        )
+E       AssertionError: the delivery record (dispatched + attempt + lease) must be committed before the broker is called: {'dispatch_pending_returned': 1, 'at_send': {'status': 'pending', 'attempts': 0, 'lease_is_live': False}, 'worker': {'verdict': 'skipped_lease_not_held'}, 'handoffs': ['projection.rebuild_attempt_evidence'], 'status': 'dispatched', 'processed_at': 'None', 'attempts': 1, 'lease_expires_at': '2026-09-28 11:56:40.442684+00:00'}. A record written after `send_task` locks the row while the worker claims it, and the event then stays unconfirmed until the lease expires.
+E       assert {'attempts': ...s': 'pending'} == {'attempts': ...us.DISPATCHED}
+E         
+E         Differing items:
+E         {'status': 'pending'} != {'status': OutboxStatus.DISPATCHED}
+E         {'lease_is_live': False} != {'lease_is_live': True}
+E         {'attempts': 0} != {'attempts': 1}
+E         Use -v to get more diff
+
+tests/integration/test_outbox_dispatch_lease.py:145: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-09-28 11:51:40,426 INFO apps.audit.outbox outbox event b4440b91-ea28-406c-a61e-d3e19ee4a706 is not claimable by this consumer; skipping
+2026-09-28 11:51:40,442 INFO celery.app.trace Task projection.rebuild_attempt_evidence[49856343-b48a-4fe6-9efa-08a104555eff] succeeded in 0.02609725001093466s: 'skipped_lease_not_held'
+_______ test_a_claim_taken_before_the_delivery_write_is_never_clobbered ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ca6fd70>
+settings = <pytest_django.fixtures.Settings object at 0x10ca6d100>
+
+    def test_a_claim_taken_before_the_delivery_write_is_never_clobbered(monkeypatch, settings):
+        """The consumer owns ``status``/``claim_token`` once it has claimed the row."""
+        settings.ACEPASS_INLINE_TASKS = False
+    
+        event = outbox.enqueue(TOPIC, {"attempt_id": str(uuid.uuid4())})
+        claimed: dict = {}
+    
+        def broker_that_claims(topic, kwargs=None, **options):
+            claimed.update(_run_in_worker_thread(lambda: {"token": _claim(event.id)}))
+            return SimpleNamespace(id="outbox-case-message")
+    
+        monkeypatch.setattr(celery_module.app, "send_task", broker_that_claims)
+    
+        assert outbox.dispatch_pending() == 1
+        event.refresh_from_db()
+        observed = {
+            "claimed": claimed,
+            "status": event.status,
+            "claim_token": event.claim_token,
+            "processed_at": str(event.processed_at),
+            "attempts": event.attempts,
+        }
+>       assert claimed.get("token"), f"the worker must be able to claim the row it was woken for: {observed!r}"
+E       AssertionError: the worker must be able to claim the row it was woken for: {'claimed': {'token': None}, 'status': 'dispatched', 'claim_token': '', 'processed_at': 'None', 'attempts': 1}
+E       assert None
+E        +  where None = <built-in method get of dict object at 0x10cfb5380>('token')
+E        +    where <built-in method get of dict object at 0x10cfb5380> = {'token': None}.get
+
+tests/integration/test_outbox_dispatch_lease.py:276: AssertionError
+__________ test_an_expired_lease_is_still_recovered_by_the_next_scan ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10c96aff0>
+settings = <pytest_django.fixtures.Settings object at 0x10c96bda0>
+
+    def test_an_expired_lease_is_still_recovered_by_the_next_scan(monkeypatch, settings):
+        """The repair must not cost the recovery path its meaning: expiry still re-delivers.
+    
+        A dead worker leaves a ``processing`` row behind. Its expired lease has to
+        stay claimable by the takeover the scan performs — if the scan reserved that
+        row the way it reserves a ``pending`` one, the takeover consumer would read
+        the reservation as a live competitor lease and skip, and every later scan
+        would refresh the reservation and skip again.
+        """
+        settings.ACEPASS_INLINE_TASKS = False
+    
+        event = outbox.enqueue(TOPIC, {"attempt_id": str(uuid.uuid4())})
+        task = _registered_task(TOPIC)
+        expired = timezone.now() - timedelta(seconds=1)
+        OutboxEvent.objects.filter(id=event.id).update(
+            status=OutboxStatus.PROCESSING,
+            claim_token="dead-worker-token",
+            claimed_at=expired,
+            lease_expires_at=expired,
+        )
+        event.refresh_from_db()
+        assert event.status == OutboxStatus.PROCESSING
+        assert OutboxEvent.objects.filter(outbox.lease_available_q()).filter(id=event.id).exists(), (
+            "an expired consumer lease must stay recoverable"
+        )
+    
+        worker: dict = {}
+    
+        def immediate_broker(topic, kwargs=None, **options):
+            worker.update(_run_in_worker_thread(lambda: _consume_with_real_consumer(task, kwargs or {})))
+            return SimpleNamespace(id="outbox-case-message")
+    
+        monkeypatch.setattr(celery_module.app, "send_task", immediate_broker)
+    
+        assert outbox.dispatch_pending() == 1
+        event.refresh_from_db()
+        observed = {"worker": worker, "status": event.status, "processed_at": str(event.processed_at)}
+>       assert worker.get("verdict") == "evidence_rows=0", observed
+E       AssertionError: {'processed_at': 'None', 'status': 'dispatched', 'worker': {'verdict': 'skipped_lease_not_held'}}
+E       assert 'skipped_lease_not_held' == 'evidence_rows=0'
+E         
+E         - evidence_rows=0
+E         + skipped_lease_not_held
+
+tests/integration/test_outbox_dispatch_lease.py:323: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-09-28 11:51:41,491 INFO apps.audit.outbox outbox event 6d8e2d3a-5da1-419e-811c-a545b49e5a2e is not claimable by this consumer; skipping
+2026-09-28 11:51:41,493 INFO celery.app.trace Task projection.rebuild_attempt_evidence[104269bf-af51-4534-9ec9-39773120ffd0] succeeded in 0.007681333998334594s: 'skipped_lease_not_held'
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+.venv/lib/python3.12/site-packages/ninja/schema.py:181
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/schema.py:181: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    result = super().__new__(cls, name, bases, namespace, **kwargs)
+
+.venv/lib/python3.12/site-packages/ninja/conf.py:8
+  /Users/cololi/Documents/AcePass/backend/.venv/lib/python3.12/site-packages/ninja/conf.py:8: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Settings(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_outbox_dispatch_lease.py::test_the_delivery_record_is_committed_before_the_message_exists
+FAILED tests/integration/test_outbox_dispatch_lease.py::test_a_claim_taken_before_the_delivery_write_is_never_clobbered
+FAILED tests/integration/test_outbox_dispatch_lease.py::test_an_expired_lease_is_still_recovered_by_the_next_scan
+3 failed, 3 passed, 3 warnings in 4.61s
