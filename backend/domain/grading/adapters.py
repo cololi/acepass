@@ -3,10 +3,31 @@
 Every adapter returns the same :class:`GradeResult` shape (docs/03 §4.1). A type
 that has no complete rule returns ``pending_review`` for the affected part
 instead of a guessed score, and a not-yet-graded part is never treated as 0.
+
+Fill-in-the-blank expression mode (docs/05 §3, acceptance C07) is *additive* to
+the answer contract and only needs one extra key on a blank spec::
+
+    {"kind": "fill_blank",
+     "blanks": {"b1": {"equivalence": "expression",
+                       "accepted_values": ["x^2+2x+1", "(x+1)^2"],
+                       "mismatch_policy": "wrong",
+                       "max_score": "3.00"}}}
+
+``accepted`` may be used as an alias for ``accepted_values``.  With
+``equivalence: "expression"`` a submission is evaluated by the restricted engine
+in :mod:`domain.grading.expressions`: literal matches win first, then sampled
+equivalence.  Anything the engine cannot decide (illegal syntax, unknown symbol
+or unit, domain hole, hard limit, wall-clock timeout) goes to ``pending_review``
+— never to "wrong" — while a *proven* mismatch follows the blank's
+``mismatch_policy`` exactly like the numeric path.  Blanks without the flag keep
+the previous text/numeric behaviour unchanged.  A blank that declares both
+``equivalence`` and ``numeric``/``unit`` uses expression mode; units are then
+reported for review instead of converted.
 """
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
@@ -14,8 +35,33 @@ from typing import Any
 
 from apps.common.answers import blank_max_score, blank_specs, normalization_flags
 from apps.common.enums import GradeMethod, GradeStatus, MismatchPolicy, MultipleChoicePolicy, QuestionType
+from domain.grading import expressions
 
 ZERO = Decimal("0")
+
+#: Blank-spec key that switches one blank to restricted expression equivalence.
+EQUIVALENCE_KEY = "equivalence"
+#: The only equivalence mode that exists today.
+EXPRESSION_MODE = "expression"
+#: Optional per-blank overrides of the engine defaults (relative tolerance and a
+#: wall-clock budget in milliseconds, capped by the engine's own ceiling).
+EXPRESSION_TOLERANCE_KEY = "expression_tolerance"
+EXPRESSION_TIME_BUDGET_MS_KEY = "expression_time_budget_ms"
+#: A configured tolerance may never be looser than this: 1.0 would accept anything.
+MAX_EXPRESSION_TOLERANCE = 1.0
+
+#: Human-facing reasons for every way the restricted engine can refuse a verdict.
+_EXPRESSION_REVIEW_REASONS = {
+    expressions.ERROR_SYNTAX: "表达式语法非法或含未知函数/符号，转人工复核",
+    expressions.ERROR_LIMIT: "表达式超出受限计算上限，转人工复核",
+    expressions.ERROR_DOMAIN: "表达式在采样点无定义，无法判定等价，转人工复核",
+    expressions.ERROR_TIMEOUT: "表达式判分超时，转人工复核",
+}
+_EXPRESSION_FALLBACK_REASON = "表达式等价判定未完成，转人工复核"
+_EXPRESSION_MISMATCH_REASON = "表达式与已登记答案不等价，且规则未明确判错，转人工复核"
+_EXPRESSION_UNKNOWN_SYMBOL_REASON = "提交含未登记符号（可能是未知单位），转人工复核"
+_EXPRESSION_NO_ANSWER_REASON = "表达式等价规则缺少已登记的标准答案，转人工复核"
+_EXPRESSION_UNKNOWN_MODE_REASON = "未登记的等价判定模式，转人工复核"
 
 
 @dataclass
@@ -357,9 +403,36 @@ def grade_fill_blank(*, raw_answer: dict, answer_payload: dict, max_score: Decim
     snapshot = {
         "blank_ids": list(specs.keys()),
         "default_mismatch_policy": default_mismatch,
+        "expression_blanks": [
+            blank_id
+            for blank_id, spec in specs.items()
+            if isinstance(spec, dict) and spec.get(EQUIVALENCE_KEY) == EXPRESSION_MODE
+        ],
         "rule": rule,
     }
-    return _finalize(parts, max_score, snapshot, [])
+    # An expression blank that could not be decided is worth reporting once, so
+    # the reviewer queue shows why the item is pending.
+    notes: list[str] = []
+    for part in parts:
+        if part.status == GradeStatus.PENDING_REVIEW and part.detail.get("equivalence") == EXPRESSION_MODE:
+            reason = part.detail.get("reason")
+            if isinstance(reason, str) and reason and reason not in notes:
+                notes.append(reason)
+    return _finalize(parts, max_score, snapshot, notes)
+
+
+def _accepted_values(spec: dict) -> list[str]:
+    """Accepted answers of one blank.
+
+    ``accepted_values`` is the documented answer-contract key; ``accepted`` is an
+    additive alias (the shape used in the C07 plan) so an expression blank can be
+    written either way.
+    """
+    for key in ("accepted_values", "accepted"):
+        raw = spec.get(key)
+        if isinstance(raw, list) and raw:
+            return [str(value) for value in raw]
+    return []
 
 
 def _grade_one_blank(
@@ -367,15 +440,38 @@ def _grade_one_blank(
 ) -> GradePart:
     policy = spec.get("mismatch_policy", default_mismatch)
     numeric = spec.get("numeric")
-    accepted = spec.get("accepted_values") or []
+    accepted = _accepted_values(spec)
     flags = normalization_flags(spec)
     unit_rule = spec.get("unit") or {}
+    equivalence = spec.get(EQUIVALENCE_KEY)
 
     if submitted is None:
         return GradePart(blank_id, GradeStatus.PENDING_REVIEW, None, blank_max, None, {"reason": "未作答"})
     text = submitted if isinstance(submitted, str) else str(submitted)
     if not text.strip():
         return GradePart(blank_id, GradeStatus.PENDING_REVIEW, None, blank_max, None, {"reason": "空作答"})
+
+    if equivalence not in (None, "", EXPRESSION_MODE):
+        # A mode this build does not know must never be guessed at.
+        return GradePart(
+            blank_id,
+            GradeStatus.PENDING_REVIEW,
+            None,
+            blank_max,
+            None,
+            {"reason": _EXPRESSION_UNKNOWN_MODE_REASON, "submitted": text, "equivalence": str(equivalence)},
+        )
+
+    if equivalence == EXPRESSION_MODE:
+        return _grade_expression_blank(
+            blank_id=blank_id,
+            spec=spec,
+            text=text,
+            blank_max=blank_max,
+            policy=policy,
+            flags=flags,
+            accepted=accepted,
+        )
 
     if numeric:
         return _grade_numeric_blank(blank_id=blank_id, numeric=numeric, text=text, blank_max=blank_max, policy=policy, unit_rule=unit_rule)
@@ -407,6 +503,240 @@ def _grade_one_blank(
         blank_max,
         None,
         {"reason": "未匹配到已登记的等价答案，等待人工复核", "submitted": text, "policy": policy},
+    )
+
+
+# --------------------------------------------------------------------------
+# Restricted expression blanks (docs/05 §3, C07)
+# --------------------------------------------------------------------------
+def _expression_tolerance(spec: dict) -> float:
+    raw = spec.get(EXPRESSION_TOLERANCE_KEY)
+    if raw in (None, ""):
+        return expressions.DEFAULT_TOLERANCE
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return expressions.DEFAULT_TOLERANCE
+    if not math.isfinite(value) or value <= 0.0:
+        return expressions.DEFAULT_TOLERANCE
+    return min(value, MAX_EXPRESSION_TOLERANCE)
+
+
+def _expression_budget(spec: dict) -> float:
+    """Wall-clock budget for one full comparison; never above the engine ceiling."""
+    raw = spec.get(EXPRESSION_TIME_BUDGET_MS_KEY)
+    if raw in (None, ""):
+        return expressions.DEFAULT_TIME_BUDGET_SECONDS
+    try:
+        milliseconds = float(raw)
+    except (TypeError, ValueError):
+        return expressions.DEFAULT_TIME_BUDGET_SECONDS
+    if not math.isfinite(milliseconds) or milliseconds <= 0.0:
+        return expressions.DEFAULT_TIME_BUDGET_SECONDS
+    return min(milliseconds / 1000.0, expressions.MAX_TIME_BUDGET_SECONDS)
+
+
+def _expression_reason(verdict: expressions.ExpressionVerdict) -> str:
+    return _EXPRESSION_REVIEW_REASONS.get(verdict.error_type or "", _EXPRESSION_FALLBACK_REASON)
+
+
+def _unregistered_symbols(target: str, candidates: list[str]) -> list[str]:
+    """Symbols in the submission that no accepted answer declares.
+
+    An extra symbol is how an unknown or ambiguous unit (``2x^2 m``) shows up in
+    expression mode; treating it as a variable would silently change the meaning,
+    so it is reported instead of judged.
+    """
+    try:
+        submitted_symbols = expressions.free_variables(target)
+    except expressions.ExpressionError:
+        return []
+    registered: set[str] = set()
+    for candidate in candidates:
+        try:
+            registered.update(expressions.free_variables(candidate))
+        except expressions.ExpressionError:
+            continue
+    return sorted(symbol for symbol in submitted_symbols if symbol not in registered)
+
+
+def _mentions_more_symbols_than_accepted(target: str, candidates: list[str]) -> bool:
+    """True when the submission introduces a symbol no accepted answer mentions.
+
+    Compared by *count*: renaming a symbol (`2t+2` for `2x+2`) is still the same
+    function, but ``2x^2+1 m`` mentions one symbol more, and that extra symbol is
+    a unit or an unknown variable until a human says otherwise.
+    """
+    try:
+        submitted_count = len(expressions.free_variables(target))
+    except expressions.ExpressionError:
+        return False
+    accepted_counts = []
+    for candidate in candidates:
+        try:
+            accepted_counts.append(len(expressions.free_variables(candidate)))
+        except expressions.ExpressionError:
+            continue
+    if not accepted_counts:
+        return False
+    return submitted_count > max(accepted_counts)
+
+
+def _grade_expression_blank(
+    *, blank_id: str, spec: dict, text: str, blank_max: Decimal, policy: str, flags: dict, accepted: list[str]
+) -> GradePart:
+    """Restricted expression equivalence for one blank.
+
+    1. a literally accepted answer wins first (unchanged behaviour);
+    2. a submission that mentions a symbol no accepted answer uses (a unit, or an
+       unknown variable) is never absorbed as "the same expression": it goes to
+       review with the symbol named;
+    3. otherwise every accepted expression is compared by the engine: equivalent
+       -> correct;
+    4. anything undecidable (syntax, unknown symbol/unit, domain hole, limit,
+       timeout) -> ``pending_review`` with the engine's specific reason;
+    5. a proven mismatch follows ``mismatch_policy``: ``wrong`` only when the rule
+       says so, otherwise review — the same rule the numeric path uses.
+
+    A ``numeric``/``unit`` block on the same blank is ignored: expression mode
+    never converts units, it reports them (step 2).
+    """
+    if not accepted:
+        return GradePart(
+            blank_id,
+            GradeStatus.PENDING_REVIEW,
+            None,
+            blank_max,
+            None,
+            {"reason": _EXPRESSION_NO_ANSWER_REASON, "submitted": text, "equivalence": EXPRESSION_MODE},
+        )
+    target = normalize_text(text, flags)
+    candidates = [normalize_text(candidate, flags) for candidate in accepted]
+    for candidate in candidates:
+        if candidate == target:
+            return GradePart(
+                blank_id,
+                GradeStatus.CONFIRMED,
+                blank_max,
+                blank_max,
+                GradeMethod.DETERMINISTIC,
+                {
+                    "outcome": "correct",
+                    "submitted": text,
+                    "equivalence": EXPRESSION_MODE,
+                    "match": "exact",
+                    "accepted": candidate,
+                },
+            )
+
+    tolerance = _expression_tolerance(spec)
+    budget = _expression_budget(spec)
+    if _mentions_more_symbols_than_accepted(target, candidates):
+        # Never let an extra symbol (a unit, or a variable the answer key does
+        # not use) be absorbed as "the same expression".
+        return GradePart(
+            blank_id,
+            GradeStatus.PENDING_REVIEW,
+            None,
+            blank_max,
+            None,
+            {
+                "reason": _EXPRESSION_UNKNOWN_SYMBOL_REASON,
+                "submitted": text,
+                "equivalence": EXPRESSION_MODE,
+                "unknown_symbols": _unregistered_symbols(target, candidates),
+            },
+        )
+    verdicts: list[tuple[str, expressions.ExpressionVerdict]] = []
+    for candidate in candidates:
+        verdict = expressions.compare_expressions(target, candidate, tolerance=tolerance, time_budget=budget)
+        if verdict.outcome == expressions.OUTCOME_EQUIVALENT:
+            return GradePart(
+                blank_id,
+                GradeStatus.CONFIRMED,
+                blank_max,
+                blank_max,
+                GradeMethod.DETERMINISTIC,
+                {
+                    "outcome": "correct",
+                    "submitted": text,
+                    "equivalence": EXPRESSION_MODE,
+                    "match": "expression",
+                    "accepted": candidate,
+                    "samples_checked": verdict.samples_checked,
+                    "tolerance": str(tolerance),
+                    "reason": verdict.reason,
+                },
+            )
+        verdicts.append((candidate, verdict))
+
+    undecided = next((item for item in verdicts if item[1].outcome == expressions.OUTCOME_UNKNOWN), None)
+    if undecided is not None:
+        candidate, verdict = undecided
+        return GradePart(
+            blank_id,
+            GradeStatus.PENDING_REVIEW,
+            None,
+            blank_max,
+            None,
+            {
+                "reason": _expression_reason(verdict),
+                "submitted": text,
+                "equivalence": EXPRESSION_MODE,
+                "accepted": candidate,
+                "error": verdict.error_type,
+                "message": verdict.reason,
+                "samples_checked": verdict.samples_checked,
+                "sample": verdict.sample,
+            },
+        )
+
+    unknown_symbols = _unregistered_symbols(target, [candidate for candidate, _ in verdicts])
+    if unknown_symbols:
+        return GradePart(
+            blank_id,
+            GradeStatus.PENDING_REVIEW,
+            None,
+            blank_max,
+            None,
+            {
+                "reason": _EXPRESSION_UNKNOWN_SYMBOL_REASON,
+                "submitted": text,
+                "equivalence": EXPRESSION_MODE,
+                "unknown_symbols": unknown_symbols,
+            },
+        )
+
+    samples_checked = min(verdict.samples_checked for _, verdict in verdicts)
+    if policy == MismatchPolicy.WRONG:
+        return GradePart(
+            blank_id,
+            GradeStatus.CONFIRMED,
+            ZERO,
+            blank_max,
+            GradeMethod.DETERMINISTIC,
+            {
+                "outcome": "wrong",
+                "submitted": text,
+                "equivalence": EXPRESSION_MODE,
+                "policy": "wrong",
+                "reason": "表达式与已登记答案不等价",
+                "samples_checked": samples_checked,
+            },
+        )
+    return GradePart(
+        blank_id,
+        GradeStatus.PENDING_REVIEW,
+        None,
+        blank_max,
+        None,
+        {
+            "reason": _EXPRESSION_MISMATCH_REASON,
+            "submitted": text,
+            "equivalence": EXPRESSION_MODE,
+            "policy": policy,
+            "samples_checked": samples_checked,
+        },
     )
 
 

@@ -220,6 +220,7 @@ export interface PresentationOut {
   session_item_id: string
   session_id: string
   mode: string
+  status: string
   ordinal: number
   max_score: string
   purpose: string
@@ -232,7 +233,10 @@ export interface PresentationOut {
   stem: StemPayload
   assets: string[]
   grading_hidden: boolean
+  /** C05: the server-owned exam clock, echoed on every item delivery too. */
+  exam_started_at: string | null
   exam_deadline: string | null
+  expired_at: string | null
 }
 
 export interface GradePart {
@@ -334,6 +338,8 @@ export interface SessionItemState {
   /** Stable ids for reveal / tutoring after a reload or deep link. */
   attempt_id: string | null
   can_reveal: boolean
+  /** C01: this item's grading is withheld by the shared content gate. */
+  grading_withheld?: boolean
   attempt: AttemptState | null
 }
 
@@ -348,11 +354,24 @@ export interface SessionOut {
   revealed_at: string | null
   created_at: string
   finished_at: string | null
+  /**
+   * C05: the server-owned exam clock, part of every snapshot.
+   *
+   * `server_time` is the instant the payload was built from; the deadline never
+   * moves, so the remaining time must be derived from these two fields instead
+   * of the device clock.
+   */
+  server_time: string | null
+  exam_started_at: string | null
+  exam_deadline: string | null
+  /** Set when the server finished the exam because the deadline had passed. */
+  expired_at: string | null
   items: SessionItemState[]
   confirmed_score: string | null
   pending_max_score: string | null
   score_visible: boolean
   score_hidden_reason?: string | null
+  grading_withheld_session_item_ids?: string[]
 }
 
 export interface RevealOut {
@@ -478,17 +497,92 @@ export interface KnowledgeStateRow {
   evidence?: EvidenceRow[]
 }
 
+/** C06: a bucket fraction is a final rate only when every mark in it is confirmed. */
+export type ReportFractionStatus = 'final' | 'partial_lower_bound'
+
+export interface ReportBucketOut {
+  attempts: number
+  confirmed_score: string
+  max_score: string
+  pending_max_score: string
+  confirmed_fraction: string | null
+  /** Every scoring mark in this bucket is confirmed (`pending_max_score <= 0`). */
+  is_final: boolean
+  fraction_status: ReportFractionStatus
+}
+
+/** One reason the report is not final, with its count and the affected ids. */
+export interface ReportIncompleteReasonOut {
+  code: string
+  message: string
+  attempt_count: number
+  attempt_ids: string[]
+  session_item_ids: string[]
+  question_ids: string[]
+  ids_truncated: boolean
+}
+
+export interface ReportIncompleteScopeOut {
+  is_incomplete: boolean
+  attempts_in_scope: number
+  incomplete_attempts: number
+  attempt_ids: string[]
+  session_item_ids: string[]
+  question_ids: string[]
+  ids_truncated: boolean
+  reasons: ReportIncompleteReasonOut[]
+  missing_note: string | null
+}
+
+export interface ReportAggregateOut {
+  status: 'final' | 'partial_lower_bound' | 'no_data'
+  attempts_in_scope: number
+  confirmed_score: string
+  max_score: string
+  unresolved_max_score: string
+  unresolved_attempts: number
+  /** Null unless every in-scope attempt is confirmed. */
+  score_rate: string | null
+  /** The confirmed part as a lower bound; present while partial too. */
+  lower_bound: string | null
+  includes_self_assessed_attempts: number
+  label: string
+  missing: {
+    unresolved_max_score: string
+    unresolved_attempts: number
+    reason_codes: string[]
+    note: string
+  } | null
+}
+
+/** The final result; null whenever the report is not final. */
+export interface ReportFinalResultOut {
+  score_rate: string
+  confirmed_score: string
+  max_score: string
+  attempts: number
+  includes_self_assessed_attempts: number
+  basis: string
+}
+
 export interface ReportOut {
   report_kind: string
   calculation_version: string
   as_of: string
   project_id: string
   subject_id: string | null
-  totals: Record<string, { attempts: number; confirmed_score: string; max_score: string; pending_max_score: string; confirmed_fraction: string | null }>
-  by_question_type: Record<string, { attempts: number; confirmed_score: string; max_score: string; pending_max_score: string; confirmed_fraction: string | null }>
-  by_knowledge_node: Record<string, { attempts: number; confirmed_score: string; max_score: string; confirmed_fraction: string | null; node_name: string; weight: string }>
+  totals: Record<string, ReportBucketOut>
+  by_question_type: Record<string, ReportBucketOut>
+  by_knowledge_node: Record<string, ReportBucketOut & { node_name: string; weight: string }>
   excluded_evidence: Array<{ attempt_id: string; dimension: string; reasons: string[]; node_id: string | null }>
   notes: string[]
+  hidden_verification_attempts?: number
+  hidden_verification_content_attempts?: number
+  /** C06: `final` only when every in-scope attempt is fully confirmed. */
+  result_status?: 'final' | 'incomplete' | 'no_data'
+  incomplete_scope?: ReportIncompleteScopeOut
+  aggregate?: ReportAggregateOut
+  final_result?: ReportFinalResultOut | null
 }
 
 export interface ImportJobOut {
@@ -2377,4 +2471,462 @@ export function fetchVariantJobs(projectId: string, limit = 20): Promise<Variant
       jobs: Array.isArray(row.jobs) ? row.jobs.map(normalizeVariantJob) : [],
     }
   })
+}
+
+/* ==================================== P2 批次 3：C05–C08 */
+/**
+ * 模拟考试的时钟（C05）。
+ *
+ * The server owns the exam clock: `exam_deadline` is written once at creation
+ * and `server_time` is the instant the payload was built from. The remaining
+ * time is therefore
+ *
+ *     deadline − server_time − (monotonic elapsed since the payload arrived)
+ *
+ * — the device's wall clock is read **once** (to record the offset between the
+ * device and the server, for display) and never again, so moving the device
+ * clock forward or backward cannot change, extend or shorten what is shown.
+ * `performance.now()` is monotonic, so it is immune to wall-clock jumps.
+ */
+export interface ExamClockPayload {
+  mode?: string | null
+  status?: string | null
+  server_time?: string | null
+  exam_started_at?: string | null
+  exam_deadline?: string | null
+  expired_at?: string | null
+}
+
+export interface ExamClock {
+  /** `exam_deadline` in epoch ms, or null when the payload carries none. */
+  deadlineMs: number | null
+  /** `server_time` in epoch ms, or null when the payload carries none. */
+  serverTimeMs: number | null
+  /**
+   * `server_time − device wall clock`, computed once when the payload arrived.
+   * Displayed for transparency; the countdown does not depend on it.
+   */
+  offsetMs: number | null
+  /** Server-anchored remaining ms, or null when the payload cannot support one. */
+  remainingMs: () => number | null
+  /** The server already recorded this run as over/expired. */
+  serverExpired: boolean
+}
+
+function parseInstant(value: string | null | undefined): number | null {
+  if (!value) return null
+  const parsed = Date.parse(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+export function createExamClock(
+  payload: ExamClockPayload | null | undefined,
+  monotonic: () => number = () =>
+    typeof performance !== 'undefined' ? performance.now() : Date.now(),
+): ExamClock | null {
+  if (!payload) return null
+  const deadlineMs = parseInstant(payload.exam_deadline)
+  const serverTimeMs = parseInstant(payload.server_time)
+  const anchor = monotonic()
+  const offsetMs = serverTimeMs === null ? null : serverTimeMs - Date.now()
+  return {
+    deadlineMs,
+    serverTimeMs,
+    offsetMs,
+    remainingMs: () => {
+      if (deadlineMs === null || serverTimeMs === null) return null
+      return deadlineMs - serverTimeMs - (monotonic() - anchor)
+    },
+    serverExpired: Boolean(payload.expired_at) || payload.status === 'finished',
+  }
+}
+
+/**
+ * `mm:ss` (or `h:mm:ss` past an hour) for a millisecond count, clamped at zero.
+ *
+ * `withTenths` keeps one decimal place, which the exam countdown uses: the
+ * sub-second digit makes it visible that the reading is anchored to the server's
+ * deadline and the monotonic clock, not redrawn from a cached second.
+ */
+export function formatRemaining(ms: number | null, withTenths = false): string | null {
+  if (ms === null || !Number.isFinite(ms)) return null
+  const clamped = Math.max(0, ms)
+  const total = Math.floor(clamped / 1000)
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const seconds = total % 60
+  const pad = (value: number) => String(value).padStart(2, '0')
+  const base = hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`
+  if (!withTenths) return base
+  return `${base}.${Math.floor((clamped % 1000) / 100)}`
+}
+
+/** The server's deadline as a local wall-clock label (display only). */
+export function deadlineLabel(deadline: string | null | undefined): string | null {
+  const parsed = parseInstant(deadline ?? null)
+  if (parsed === null) return null
+  return new Date(parsed).toLocaleString()
+}
+
+/** One page of published questions of a subject; the mock exam picks from these. */
+export function fetchPublishedQuestions(projectId: string, subjectId: string) {
+  const params = new URLSearchParams({ limit: '100', subject_id: subjectId })
+  return apiRequest<QuestionListItem[]>(`/projects/${projectId}/questions?${params.toString()}`)
+}
+
+export interface MockExamCreateIn {
+  subject_id: string
+  question_ids: string[]
+  /** 5–600, or omitted/null to let the server derive it from the published spec. */
+  duration_minutes?: number | null
+}
+
+/**
+ * Start a timed mock exam.
+ *
+ * `duration_minutes` is only sent when the learner gave one: the server refuses
+ * the field on any other mode and derives the length from the published spec
+ * when it is absent. One fresh `Idempotency-Key` per attempt.
+ */
+export function createMockExamSession(projectId: string, input: MockExamCreateIn) {
+  const body: Record<string, unknown> = {
+    mode: 'mock_exam',
+    subject_id: input.subject_id,
+    question_ids: input.question_ids,
+    purpose: 'practice',
+  }
+  if (input.duration_minutes !== undefined && input.duration_minutes !== null) {
+    body.duration_minutes = input.duration_minutes
+  }
+  return apiRequest<SessionOut>(`/projects/${projectId}/practice-sessions`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('mock-exam-create'),
+    body,
+  })
+}
+
+/** One-shot finish (交卷). The server refuses to extend an exam past its deadline. */
+export function finishPracticeSession(projectId: string, sessionId: string) {
+  return apiRequest<SessionOut>(`/projects/${projectId}/practice-sessions/${sessionId}/finish`, {
+    method: 'POST',
+    idempotencyKey: newIdempotencyKey('session-finish'),
+  })
+}
+
+/**
+ * The server refused an answer because the exam's deadline had passed (409).
+ *
+ * The message is the server's own sentence (it names the deadline in the
+ * server's local time); `deadline` is the same instant in ISO form.
+ */
+export interface ExamDeadlineRefusal {
+  message: string
+  deadline: string | null
+  sessionId: string | null
+}
+
+export function examDeadlineRefusalOf(error: unknown): ExamDeadlineRefusal | null {
+  if (!(error instanceof ApiError)) return null
+  if (error.status !== 409 || error.details?.reason !== 'exam_deadline_passed') return null
+  const deadline = error.details?.exam_deadline
+  const sessionId = error.details?.session_id
+  return {
+    message: error.message,
+    deadline: typeof deadline === 'string' ? deadline : null,
+    sessionId: typeof sessionId === 'string' ? sessionId : null,
+  }
+}
+
+/** Chinese glosses for the detail codes this app can act on; unknown codes are
+ *  shown verbatim rather than guessed at. */
+const API_DETAIL_LABELS: Record<string, string> = {
+  reason: '原因',
+  exam_deadline: '服务器截止时间',
+  deadline: '服务器截止时间',
+  session_id: '会话',
+  attempt_id: '作答',
+  question_id: '题目',
+  mode: '会话用途',
+  purpose: '用途',
+  duration_minutes: '时长（分钟）',
+  expected: '期望版本',
+  actual: '当前版本',
+}
+
+const API_DETAIL_REASONS: Record<string, string> = {
+  exam_deadline_passed: '已过服务器截止时间',
+  grading_hidden: '判分仍在隐藏中',
+  mock_exam_duration_unknown: '无法从已发布规范推导考试时长',
+}
+
+function detailText(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  if (Array.isArray(value)) return value.map((item) => String(item)).join('、')
+  if (typeof value === 'object') return JSON.stringify(value)
+  return String(value)
+}
+
+/**
+ * The server's message plus the details that carry the actionable part.
+ *
+ * `ApiError.message` is always surfaced verbatim; for the statuses whose
+ * `details` hold the only actionable information (a deadline or a version on a
+ * 409, a rejected field on a 400/422, a `reason` code, a project's `problems`)
+ * the relevant entries are appended — never summarised away and never replaced
+ * by a client-side guess. Other statuses keep the plain message, exactly like
+ * :func:`describeError`.
+ */
+export function describeApiError(error: unknown): string {
+  const message = serverMessageOf(error)
+  if (!(error instanceof ApiError)) return message
+  if (error.status !== 400 && error.status !== 409 && error.status !== 422) return message
+  const rows: string[] = []
+  for (const [key, value] of Object.entries(error.details ?? {})) {
+    if (key === 'problems') continue
+    const text = detailText(value)
+    if (!text) continue
+    const label = key === 'errors' ? '字段错误' : (API_DETAIL_LABELS[key] ?? key)
+    if (key === 'reason') {
+      rows.push(`${label}：${text}（${API_DETAIL_REASONS[text] ?? '服务器给出的原因代码'}）`)
+    } else {
+      rows.push(`${label}：${text}`)
+    }
+  }
+  for (const problem of problemsOf(error)) {
+    if (problem.message) rows.push(`问题：${problem.message}`)
+  }
+  if (!rows.length) return message
+  return `${message}（${rows.join('；')}）`
+}
+
+/** C06: treat a bucket as final only when the server says every mark is confirmed. */
+export function bucketIsFinal(bucket: {
+  fraction_status?: string | null
+  is_final?: boolean | null
+  pending_max_score?: string | number | null
+}): boolean {
+  if (bucket.fraction_status != null) return bucket.fraction_status === 'final'
+  if (typeof bucket.is_final === 'boolean') return bucket.is_final
+  return Number(bucket.pending_max_score ?? 0) <= 0
+}
+
+/** A server fraction (`0.625`) as a percentage label; null stays a dash. */
+export function percentOfFraction(value: string | null | undefined, digits = 1): string {
+  if (value === null || value === undefined || value === '') return '—'
+  const number = Number(value)
+  if (!Number.isFinite(number)) return String(value)
+  return `${(number * 100).toFixed(digits)}%`
+}
+
+/* ---- C06 coverage completion ---- */
+export interface CoverageCompletionReasonOut {
+  code: string
+  message: string
+  paper_count: number
+  paper_ids: string[]
+  cycle_keys: string[]
+}
+
+export interface CoverageCompletionOut {
+  status: 'final' | 'partial_lower_bound' | 'no_data'
+  papers_total: number
+  papers_coverage_complete: number
+  /** Null unless every registered paper has a confirmed complete revision. */
+  coverage_rate: string | null
+  lower_bound: string | null
+  items: { scored_total: number; unscored_total: number }
+  incomplete_scope: {
+    is_incomplete: boolean
+    papers_total: number
+    blocked_paper_count: number
+    blocked_paper_ids: string[]
+    reasons: CoverageCompletionReasonOut[]
+    missing_note: string | null
+  }
+  final_result: { coverage_rate: string; papers_total: number; basis: string } | null
+  note: string
+}
+
+/* ---- C08 effect calibration ---- */
+export type CalibrationStatus = 'ok' | 'insufficient_sample'
+
+export interface CalibrationDimensionsOut {
+  question_type: string
+  question_type_label: string
+  difficulty_band: string
+  difficulty_proxy: string
+  timing_state: string
+  exposure_state: string
+}
+
+export interface CalibrationStatisticsOut {
+  mean_confirmed_fraction: string
+  median_confirmed_fraction: string
+  spread_stdev: string
+  min_confirmed_fraction: string
+  max_confirmed_fraction: string
+  metric: string
+}
+
+export interface CalibrationExclusionReasonOut {
+  code: string
+  message: string
+  attempt_count: number
+}
+
+export interface CalibrationGroupOut {
+  group_key: string
+  dimensions: CalibrationDimensionsOut
+  sample_size: number
+  confirmed_sample_size: number
+  status: CalibrationStatus
+  /** Withheld (null) below the minimum sample: never shown with a warning instead. */
+  statistics: CalibrationStatisticsOut | null
+  exclusions: {
+    attempts_without_confirmed_score: number
+    reasons: CalibrationExclusionReasonOut[]
+  }
+  /** What this group's numbers may be used for, stated by the server. */
+  comparability: string
+}
+
+export interface CalibrationDeltaOut {
+  metric: string
+  group_a_mean: string
+  group_b_mean: string
+  delta: string
+  sample_size: { group_a: number; group_b: number }
+  spread: { group_a_stdev: string; group_b_stdev: string }
+  caveats: string[]
+}
+
+export interface CalibrationComparisonOut {
+  group_a: string
+  group_b: string
+  comparable: boolean
+  code: string
+  message: string | null
+  /** Present only for comparable pairs; a bare delta is never emitted. */
+  delta: CalibrationDeltaOut | null
+}
+
+export interface CalibrationOut {
+  report_kind: string
+  calculation_version: string
+  as_of: string
+  project_id: string
+  subject_id: string | null
+  minimum_group_sample: number
+  grouping: {
+    dimensions: string[]
+    difficulty_proxy: string
+    difficulty_proxy_note: string
+    timing_note: string
+    exposure_note: string
+    attempts_in_scope: number
+    hidden_verification_attempts: number
+    hidden_verification_content_attempts: number
+  }
+  groups: CalibrationGroupOut[]
+  group_count: number
+  comparable_group_count: number
+  /** Every eligible pair; only `comparable: true` rows carry a delta. */
+  comparisons: CalibrationComparisonOut[]
+  comparable_pair_count: number
+  not_comparable: Array<{ group_key: string; code: string; message: string | null }>
+  exclusions: { attempts_in_scope: number; reasons: CalibrationExclusionReasonOut[] }
+  caveats: {
+    statements: string[]
+    claims: { causal_claim: boolean; improvement_claim: boolean }
+    minimum_group_sample: number
+  }
+}
+
+/**
+ * Effect calibration for the current project/subject.
+ *
+ * Read-only: nothing is written and no snapshot is produced. The payload is
+ * rendered as it arrives — no single headline number is derived from it.
+ */
+export function fetchEffectCalibration(projectId: string, subjectId?: string | null) {
+  const params = new URLSearchParams()
+  if (subjectId) params.set('subject_id', subjectId)
+  const query = params.toString()
+  return apiRequest<CalibrationOut>(
+    `/projects/${projectId}/reports/calibration${query ? `?${query}` : ''}`,
+  )
+}
+
+/* ---- C07 expression blanks sent to review ---- */
+/** Engine error types a restricted expression comparison can end in. */
+/**
+ * The engine error type -> the short parenthetical in 「表达式无法确认（超时）：…」.
+ * The server's own sentence always follows it, so nothing here replaces the
+ * reason — it only names the category the server already put in `detail.error`.
+ */
+export const EXPRESSION_REVIEW_CODE_LABELS: Record<string, string> = {
+  syntax: '语法非法',
+  limit: '超出受限计算上限',
+  domain: '采样点无定义',
+  timeout: '超时',
+  unknown_symbol: '未知符号',
+}
+
+export interface ExpressionReviewNotice {
+  partId: string
+  /** The server's own sentence for this part. */
+  reason: string
+  /** Engine error type when the server named one (`syntax`/`limit`/`domain`/`timeout`). */
+  errorType: string | null
+  /** The engine's own note, when present. */
+  engineMessage: string | null
+  unknownSymbols: string[]
+  submitted: string | null
+  /** Human label for the error type; falls back to "需人工复核". */
+  codeLabel: string
+}
+
+function isExpressionDetail(detail: Record<string, unknown> | undefined, reason: string): boolean {
+  if (detail?.equivalence === 'expression') return true
+  if (detail?.error !== undefined && detail?.error !== null) return true
+  if (Array.isArray(detail?.unknown_symbols) && detail.unknown_symbols.length > 0) return true
+  // The engine's review sentences all name the blank as an expression.
+  return reason.includes('表达式')
+}
+
+/**
+ * Why an expression blank went to human review, from the grade the server sent.
+ *
+ * Only `pending_review` parts with an expression detail are returned: an unknown
+ * verdict is never rendered as a correctness verdict, it is rendered as the
+ * server's own reason plus who reviews it.
+ */
+export function expressionReviewNoticesFromParts(
+  parts: GradePart[] | null | undefined,
+): ExpressionReviewNotice[] {
+  const rows: ExpressionReviewNotice[] = []
+  for (const part of parts ?? []) {
+    if (part.status !== 'pending_review') continue
+    const detail = (part.detail ?? {}) as Record<string, unknown>
+    const reason = detailText(detail.reason)
+    if (!isExpressionDetail(detail, reason)) continue
+    const errorType = detailText(detail.error) || null
+    const symbols = Array.isArray(detail.unknown_symbols) ? detail.unknown_symbols.map(String) : []
+    rows.push({
+      partId: part.part_id,
+      reason: reason || '表达式无法确认，已转人工复核',
+      errorType,
+      engineMessage: detailText(detail.message) || null,
+      unknownSymbols: symbols,
+      submitted: detailText(detail.submitted) || null,
+      codeLabel:
+        (errorType ? EXPRESSION_REVIEW_CODE_LABELS[errorType] : undefined) ??
+        (symbols.length ? EXPRESSION_REVIEW_CODE_LABELS.unknown_symbol : '需人工复核'),
+    })
+  }
+  return rows
+}
+
+export function expressionReviewNotices(grade: GradeOut | null | undefined): ExpressionReviewNotice[] {
+  return expressionReviewNoticesFromParts(grade?.parts ?? null)
 }

@@ -4,12 +4,26 @@ import { useSearchParams } from 'react-router-dom'
 import {
   ApiError,
   apiRequest,
+  createExamClock,
+  createMockExamSession,
+  deadlineLabel,
+  describeApiError,
+  examDeadlineRefusalOf,
+  expressionReviewNotices,
+  fetchPublishedQuestions,
+  fetchSealedContent,
+  finishPracticeSession,
+  formatRemaining,
   newIdempotencyKey,
   type AttemptDetail,
   type AttemptState,
+  type ExamClock,
+  type ExamDeadlineRefusal,
   type GradeOut,
   type PresentationOut,
+  type QuestionListItem,
   type RevealOut,
+  type SessionItemState,
   type SessionOut,
   type TutorJobOut,
   type UploadedAsset,
@@ -72,6 +86,33 @@ const QUESTION_TYPE_LABELS: Record<string, string> = {
   constructed_response: '大题',
 }
 
+const DEFAULT_EXAM_QUESTION_COUNT = 10
+/** The server's own bounds for an explicit mock-exam length. */
+const EXAM_MIN_MINUTES = 5
+const EXAM_MAX_MINUTES = 600
+
+/** A score that is an exact decimal on the wire, rendered without float noise. */
+function formatScore(value: number): string {
+  if (!Number.isFinite(value)) return '—'
+  return String(Number(value.toFixed(4)))
+}
+
+/**
+ * One item's outcome after a mock exam ended.
+ *
+ * `is_correct` is the only reading of "完全正确"; a fully graded but imperfect
+ * answer is not a wrong answer, and a half-confirmed one keeps its pending
+ * marks instead of being shown as lost.
+ */
+function itemOutcomeLabel(item: SessionItemState): string {
+  if (!item.attempt) return '未作答'
+  const grade = item.attempt.grade
+  if (!grade) return item.attempt.receipt_only ? '已提交（服务器尚未返回判分）' : '判分处理中'
+  if (grade.is_correct) return '完全正确'
+  if (grade.is_fully_confirmed) return '已评完，未满分'
+  return `待人工确认（待评 ${grade.pending_max_score} 分，不当作 0 分）`
+}
+
 function emptyAnswer(questionType: string, presentation: PresentationOut | null): AnswerState {
   switch (questionType) {
     case 'single_choice':
@@ -103,6 +144,22 @@ export function PracticePage() {
   const [tutorJob, setTutorJob] = useState<TutorJobOut | null>(null)
   const [startedAt, setStartedAt] = useState<number>(() => Date.now())
   const draftRevision = useRef<number>(0)
+  /* ---------------------------------------------------------- C05 模拟考试 */
+  // The subject is chosen on the start card (it may differ from the global
+  // context strip); the duration is optional and the count picks from the
+  // subject's published questions.
+  const [examSubjectId, setExamSubjectId] = useState('')
+  const [examMinutes, setExamMinutes] = useState('')
+  const [examCount, setExamCount] = useState(DEFAULT_EXAM_QUESTION_COUNT)
+  const [examConfirming, setExamConfirming] = useState(false)
+  const [examSubmitConfirming, setExamSubmitConfirming] = useState(false)
+  const [examValidation, setExamValidation] = useState<string | null>(null)
+  // A 409 from a late submission: the server's own sentence plus the deadline.
+  const [examRefusal, setExamRefusal] = useState<ExamDeadlineRefusal | null>(null)
+  // Re-render for the countdown; the clock itself is server-anchored.
+  const [, setClockTick] = useState(0)
+  const examReconciledFor = useRef<string | null>(null)
+  const examCardRef = useRef<HTMLDivElement | null>(null)
 
   // A task deep link names its own project and subject. Adopt them so a task
   // from another project is created in the right project instead of silently
@@ -136,6 +193,104 @@ export function PracticePage() {
   const session = sessionQuery.data ?? null
   const activeItem = session?.items[activeIndex] ?? null
   const attempt: AttemptState | null = activeItem?.attempt ?? null
+
+  /* ------------------------------------------------- C05 exam clock (server) */
+  const isMockExam = session?.mode === 'mock_exam'
+  /**
+   * The clock is built *once* per server snapshot: the remaining time is
+   * `exam_deadline − server_time − monotonic elapsed`, so neither a device clock
+   * change nor a page refresh can move it. A reconnect gets a fresh snapshot and
+   * therefore the server's current remaining time.
+   */
+  const examClock: ExamClock | null = useMemo(
+    () => (session && session.mode === 'mock_exam' ? createExamClock(session) : null),
+    [session],
+  )
+  useEffect(() => {
+    if (!examClock || examClock.deadlineMs === null || examClock.serverTimeMs === null) return
+    const timer = window.setInterval(() => setClockTick((value) => value + 1), 500)
+    return () => window.clearInterval(timer)
+  }, [examClock])
+  const remainingMs = examClock ? examClock.remainingMs() : null
+  const deadlineReached = remainingMs !== null && remainingMs <= 0
+  const examFinished = Boolean(
+    isMockExam && session && (session.status !== 'active' || Boolean(session.expired_at)),
+  )
+  // An expired-but-still-open exam must never look live: `deadlineReached` (the
+  // server-anchored clock) and a server refusal both remove every live
+  // affordance, and the refetch below lets the server record the finish
+  // (finished_at = deadline).
+  const examLive = Boolean(
+    isMockExam &&
+      session &&
+      session.status === 'active' &&
+      !session.expired_at &&
+      !deadlineReached &&
+      !examRefusal,
+  )
+  const examExpired = Boolean(
+    isMockExam &&
+      session &&
+      (examRefusal || session.expired_at || (!examLive && deadlineReached)),
+  )
+  const examRemainingLabel = formatRemaining(remainingMs, true)
+  const examDeadlineText = deadlineLabel(session?.exam_deadline ?? null)
+
+  useEffect(() => {
+    if (!isMockExam || !deadlineReached) return
+    if (!session || session.status !== 'active') return
+    const anchor = `${session.session_id}:${session.exam_deadline ?? ''}`
+    if (examReconciledFor.current === anchor) return
+    examReconciledFor.current = anchor
+    void sessionQuery.refetch()
+  }, [deadlineReached, isMockExam, session, sessionQuery])
+
+  const examQuestionQuery = useQuery({
+    queryKey: ['published-questions', projectId, examSubjectId],
+    queryFn: () => fetchPublishedQuestions(projectId as string, examSubjectId),
+    enabled: Boolean(projectId && examSubjectId),
+  })
+  // Sealing is a server-side policy, and a sealed question cannot enter a
+  // practice/exam session at all, so the pool never offers one. When the sealed
+  // inventory cannot be read the server still decides: its refusal is surfaced
+  // instead of a client-side guess.
+  const sealedQuery = useQuery({
+    queryKey: ['sealed-content', projectId],
+    queryFn: () => fetchSealedContent(projectId as string),
+    enabled: Boolean(projectId),
+    retry: false,
+  })
+  const sealedQuestionIds = new Set(
+    (sealedQuery.data?.questions ?? []).map((row) => row.question_id),
+  )
+  /**
+   * The pool a mock exam is built from: published, scorable (a material parent is
+   * expanded by the server, so it is not a submittable item), carrying a trusted
+   * answer (an item without one would make the *whole* creation fail), and not
+   * sealed.
+   */
+  const examQuestionPool: QuestionListItem[] = (examQuestionQuery.data ?? []).filter(
+    (question) =>
+      question.published_version_id &&
+      question.question_type !== 'material' &&
+      question.has_trusted_answer &&
+      !sealedQuestionIds.has(question.id),
+  )
+  const examCountOptions = examQuestionPool.length || DEFAULT_EXAM_QUESTION_COUNT
+  const examPlannedCount = Math.min(examCount, examQuestionPool.length || examCount)
+
+  useEffect(() => {
+    if (examSubjectId || !currentSubject) return
+    setExamSubjectId(currentSubject.id)
+  }, [examSubjectId, currentSubject])
+
+  useEffect(() => {
+    if (examCount < 1) return
+    if (examQuestionPool.length && examCount > examQuestionPool.length) {
+      setExamCount(examQuestionPool.length)
+    }
+  }, [examCount, examQuestionPool.length])
+
   // After a reload the presentation query is disabled because an attempt
   // exists, so every action must key off ids that survive in the session
   // response rather than off the one-shot presentation payload (R09).
@@ -180,6 +335,21 @@ export function PracticePage() {
     setReveal(null)
     setTutorJob(null)
   }, [activeIndex, sessionId])
+
+  // A new session starts with no refusal and no pending 交卷 confirmation: the
+  // previous exam's server message must not bleed into the next one.
+  useEffect(() => {
+    setExamRefusal(null)
+    setExamSubmitConfirming(false)
+  }, [sessionId])
+
+  // The today page links here with `?exam=1`: bring the mock-exam card into view
+  // instead of leaving the learner at the top of the practice screen.
+  const wantsExamEntry = params.get('exam') === '1'
+  useEffect(() => {
+    if (!wantsExamEntry || sessionId) return
+    examCardRef.current?.scrollIntoView({ block: 'start' })
+  }, [wantsExamEntry, sessionId])
 
   // A deep link (mistake list, review page) names the item directly; honour it
   // once the session has loaded so "查看作答与辅导" lands on the right item.
@@ -283,10 +453,73 @@ export function PracticePage() {
       if (itemId) window.localStorage.removeItem(`${DRAFT_PREFIX}${itemId}`)
       await queryClient.invalidateQueries({ queryKey: ['session', projectId, sessionId] })
       await queryClient.invalidateQueries({ queryKey: ['presentation'] })
-      toast.push('已提交（提交后不可修改，如需重做请新建题项）', 'ok')
+      toast.push(
+        isMockExam
+          ? '已收到作答（考试结束前不显示分数与正误；交卷后不能再修改）'
+          : '已提交（提交后不可修改，如需重做请新建题项）',
+        'ok',
+      )
     },
-    onError: (err) => toast.push(describeError(err), 'error'),
+    onError: (err) => {
+      // A late answer is refused with 409 `exam_deadline_passed`: show the
+      // server's own sentence and let the refetch put the exam in its finished
+      // state, instead of leaving an overdue run looking active.
+      const refusal = examDeadlineRefusalOf(err)
+      if (refusal) {
+        setExamRefusal(refusal)
+        void sessionQuery.refetch()
+      }
+      toast.push(describeApiError(err), 'error')
+    },
   })
+
+  const createMockExam = useMutation({
+    mutationFn: async () => {
+      if (!projectId) throw new Error('请先选择项目')
+      const subjectId = examSubjectId || currentSubject?.id
+      if (!subjectId) throw new Error('请先选择科目')
+      const trimmed = examMinutes.trim()
+      let duration: number | null = null
+      if (trimmed) {
+        const parsed = Number(trimmed)
+        // The 5–600 bound is the server's rule and the server's message is what
+        // the learner must see, so only a non-integer is refused here (it cannot
+        // be put on the wire as an int at all).
+        if (!Number.isFinite(parsed) || !Number.isInteger(parsed)) {
+          throw new Error(
+            `时长必须是整数分钟，或留空由服务器按已发布规范推导（服务器要求 ${EXAM_MIN_MINUTES}–${EXAM_MAX_MINUTES} 分钟）`,
+          )
+        }
+        duration = parsed
+      }
+      const ids = examQuestionPool.slice(0, Math.max(1, examCount)).map((question) => question.id)
+      if (!ids.length) throw new Error('该科目没有可用于模拟考试的已发布题目')
+      return createMockExamSession(projectId, {
+        subject_id: subjectId,
+        question_ids: ids,
+        duration_minutes: duration,
+      })
+    },
+    onSuccess: (data) => {
+      setExamConfirming(false)
+      setExamRefusal(null)
+      setExamSubmitConfirming(false)
+      examReconciledFor.current = null
+      setSessionId(data.session_id)
+      setActiveIndex(0)
+      setParams((current) => {
+        const next = new URLSearchParams(current)
+        next.set('session', data.session_id)
+        return next
+      })
+      void queryClient.invalidateQueries({ queryKey: ['today-plan'] })
+    },
+    onError: (err) => {
+      setExamValidation(describeApiError(err))
+      toast.push(describeApiError(err), 'error')
+    },
+  })
+
 
   const revealAttempt = useMutation({
     mutationFn: () => {
@@ -351,17 +584,23 @@ export function PracticePage() {
   })
 
   const finishSession = useMutation({
-    mutationFn: () =>
-      apiRequest<SessionOut>(`/projects/${projectId}/practice-sessions/${sessionId}/finish`, {
-        method: 'POST',
-        idempotencyKey: newIdempotencyKey('session-finish'),
-      }),
-    onSuccess: async () => {
+    mutationFn: () => {
+      if (!projectId || !sessionId) throw new Error('会话尚未创建')
+      return finishPracticeSession(projectId, sessionId)
+    },
+    onSuccess: async (data) => {
+      setExamSubmitConfirming(false)
+      setExamRefusal(null)
       await queryClient.invalidateQueries({ queryKey: ['session', projectId, sessionId] })
       await queryClient.invalidateQueries({ queryKey: ['today-plan'] })
-      toast.push('会话已结束', 'ok')
+      toast.push(
+        data.mode === 'mock_exam'
+          ? '已交卷：本次模拟考试结束，分数与逐题结果已可查看'
+          : '会话已结束',
+        'ok',
+      )
     },
-    onError: (err) => toast.push(describeError(err), 'error'),
+    onError: (err) => toast.push(describeApiError(err), 'error'),
   })
 
   const selectedOptions = (answer?.selected_option_ids as string[] | undefined) ?? []
@@ -414,6 +653,125 @@ export function PracticePage() {
             会话会在服务端固定题目、答案、评分标准与规则的版本；题干在你领取题项时才下发，避免提前暴露。
           </p>
         </div>
+
+        {/* C05: a timed mock exam. The timer is the server's, the questions come
+            from the subject's published pool, and nothing here can move the
+            deadline — refreshing or reconnecting cannot extend it either. */}
+        <div className="card" data-testid="mock-exam-start-card" ref={examCardRef}>
+          <h2>开始一次模拟考试</h2>
+          <p className="small muted">
+            计时由服务器负责：截止时间在创建时写入一次，刷新页面、断线重连或修改本机时间都不会延长考试。
+            考试进行中不显示分数、正误、答案与讲解，也不提供按需辅导；到点后服务器自动交卷。
+          </p>
+          <label className="field">
+            <span>科目</span>
+            <select
+              data-testid="mock-exam-subject"
+              value={examSubjectId}
+              onChange={(event) => {
+                setExamSubjectId(event.target.value)
+                setExamConfirming(false)
+                setExamValidation(null)
+                selectSubject(event.target.value)
+              }}
+            >
+              <option value="">请选择科目</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>时长（分钟，可留空：由服务器按已发布规范的时限规则推导；填写时为 {EXAM_MIN_MINUTES}–{EXAM_MAX_MINUTES}）</span>
+            <input
+              data-testid="mock-exam-duration"
+              type="number"
+              inputMode="numeric"
+              min={EXAM_MIN_MINUTES}
+              max={EXAM_MAX_MINUTES}
+              value={examMinutes}
+              placeholder="留空 = 服务器按规范推导"
+              onChange={(event) => {
+                setExamMinutes(event.target.value)
+                setExamValidation(null)
+              }}
+            />
+          </label>
+          <label className="field">
+            <span>题目数量（从该科目已发布题目中选择）</span>
+            <select
+              data-testid="mock-exam-question-count"
+              value={String(examCount)}
+              onChange={(event) => setExamCount(Number(event.target.value))}
+              disabled={!examQuestionPool.length}
+            >
+              {Array.from({ length: examCountOptions }, (_, index) => index + 1).map((count) => (
+                <option key={count} value={count}>
+                  {count} 题
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="small muted">
+            {!examSubjectId
+              ? '请先选择科目。'
+              : examQuestionQuery.isLoading
+                ? '正在读取该科目的已发布题目…'
+                : examQuestionQuery.isError
+                  ? `无法读取题目：${describeError(examQuestionQuery.error)}`
+                  : `该科目当前有 ${examQuestionPool.length} 道可用于模拟考试的已发布题目（已核对答案、未封存；共享材料题会展开为子题）。`}
+            {sealedQuery.isError
+              ? ' 封存清单读取失败：若题目已被封存，服务器会拒绝创建并说明原因。'
+              : ''}
+          </p>
+          <div className="row">
+            <button
+              className="btn primary"
+              data-testid="mock-exam-start"
+              disabled={!examSubjectId || !examQuestionPool.length || createMockExam.isPending}
+              onClick={() => {
+                setExamValidation(null)
+                setExamConfirming(true)
+              }}
+            >
+              开始模拟考试
+            </button>
+            {examConfirming ? (
+              <button className="btn ghost" onClick={() => setExamConfirming(false)}>
+                取消
+              </button>
+            ) : null}
+          </div>
+          {examConfirming ? (
+            <div className="notice warn" style={{ marginTop: 10 }}>
+              <p style={{ marginTop: 0 }}>
+                <strong>交卷后不能再修改。</strong>
+                本次将创建 {examPlannedCount} 道题的限时考试，
+                {examMinutes.trim()
+                  ? `时长 ${examMinutes.trim()} 分钟`
+                  : '时长由服务器按已发布规范的时限规则推导'}
+                ；考试进行中没有分数、正误、答案与讲解。
+              </p>
+              <div className="row">
+                <button
+                  className="btn primary"
+                  data-testid="mock-exam-confirm-start"
+                  disabled={createMockExam.isPending}
+                  onClick={() => createMockExam.mutate()}
+                >
+                  {createMockExam.isPending ? '正在创建…' : '确认开始（计时从服务器创建时刻开始）'}
+                </button>
+              </div>
+            </div>
+          ) : null}
+          {examValidation ? (
+            <div className="notice danger" style={{ marginTop: 10 }} data-testid="mock-exam-start-error">
+              {examValidation}
+            </div>
+          ) : null}
+        </div>
       </>
     )
   }
@@ -433,20 +791,169 @@ export function PracticePage() {
               className={`pill ${session.score_visible ? 'ok' : 'neutral'}`}
               data-testid="session-score"
             >
-              {session.score_visible
-                ? `已确认 ${session.confirmed_score ?? '—'} 分 · 待评 ${session.pending_max_score ?? '—'} 分`
-                : '验证进行中：不显示分数与正误'}
+              {isMockExam
+                ? session.score_visible
+                  ? `模拟考试已结束 · 已确认 ${session.confirmed_score ?? '—'} 分 · 待评 ${session.pending_max_score ?? '—'} 分`
+                  : examLive
+                    ? '模拟考试进行中：不显示分数与正误'
+                    : '模拟考试已结束：正在读取服务器结果'
+                : session.score_visible
+                  ? `已确认 ${session.confirmed_score ?? '—'} 分 · 待评 ${session.pending_max_score ?? '—'} 分`
+                  : '验证进行中：不显示分数与正误'}
             </span>
-            {session.status === 'active' ? (
-              <button className="btn small" disabled={finishSession.isPending} onClick={() => finishSession.mutate()}>
-                结束会话
-              </button>
+            {!isMockExam ? (
+              session.status === 'active' ? (
+                <button className="btn small" disabled={finishSession.isPending} onClick={() => finishSession.mutate()}>
+                  结束会话
+                </button>
+              ) : (
+                <span className="pill neutral">会话已结束</span>
+              )
             ) : (
-              <span className="pill neutral">会话已结束</span>
+              <span className="pill neutral">{examLive ? '考试进行中' : '考试已结束'}</span>
             )}
           </>
         ) : null}
       </div>
+
+      {isMockExam && session ? (
+        <div className="card" data-testid="mock-exam-timer">
+          <div className="row between">
+            <span className="pill warn">模拟考试 · 计时以服务器为准</span>
+            <strong data-testid="mock-exam-remaining">
+              {examLive
+                ? examRemainingLabel
+                  ? `剩余 ${examRemainingLabel}`
+                  : '剩余时间：未收到服务器时间，不估算'
+                : '考试已结束'}
+            </strong>
+          </div>
+          <p className="small muted" style={{ marginBottom: 6 }}>
+            {examDeadlineText ? `服务器截止时间：${examDeadlineText}。` : '服务器尚未提供截止时间。'}
+            {examClock?.offsetMs !== null && examClock?.offsetMs !== undefined
+              ? `倒计时按服务器的 server_time 锚定，并用单调时钟计时（读取时本机时间与服务器相差约 ${Math.round(
+                  examClock.offsetMs / 1000,
+                )} 秒）；修改本机时间不会改变剩余时间。`
+              : '未收到服务器时间，因此不估算剩余时间；一切以服务器判定为准。'}
+          </p>
+          {examLive ? (
+            <>
+              <p className="notice info" data-testid="mock-exam-no-feedback" style={{ marginBottom: 8 }}>
+                考试进行中：不显示分数、正误、答案与讲解，也不提供按需辅导。交卷或到达服务器截止时间后才可以查看结果。
+              </p>
+              <div className="row">
+                <button
+                  className="btn primary"
+                  data-testid="mock-exam-submit"
+                  onClick={() => setExamSubmitConfirming(true)}
+                >
+                  交卷
+                </button>
+                <span className="small muted">
+                  已提交 {session.items.filter((item) => item.attempt).length}/{session.items.length} 题；
+                  交卷后不能再修改
+                </span>
+              </div>
+              {examSubmitConfirming ? (
+                <div className="notice danger" style={{ marginTop: 10 }}>
+                  <p style={{ marginTop: 0 }}>
+                    <strong>交卷后不能再修改。</strong>
+                    交卷后本次模拟考试立即结束，并显示分数与逐题结果；未提交的题项按未作答处理。
+                  </p>
+                  <div className="row">
+                    <button
+                      className="btn primary"
+                      data-testid="mock-exam-submit-confirm"
+                      disabled={finishSession.isPending}
+                      onClick={() => finishSession.mutate()}
+                    >
+                      {finishSession.isPending ? '正在交卷…' : '确认交卷'}
+                    </button>
+                    <button
+                      className="btn ghost"
+                      disabled={finishSession.isPending}
+                      onClick={() => setExamSubmitConfirming(false)}
+                    >
+                      继续作答
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
+      {isMockExam && session && examExpired ? (
+        <div className="notice danger" data-testid="mock-exam-expired">
+          <p style={{ marginTop: 0 }}>
+            <strong>已到服务器截止时间，本次模拟考试不能再提交作答。</strong>
+            {session.status === 'active' ? '服务器正在结算本次考试…' : '服务器已自动交卷。'}
+          </p>
+          {examRefusal ? (
+            <p className="small" style={{ marginBottom: 4 }}>
+              {examRefusal.message}
+            </p>
+          ) : null}
+          <p className="small" style={{ marginBottom: 0 }}>
+            服务器截止时间：{examDeadlineText ?? deadlineLabel(examRefusal?.deadline ?? null) ?? '未提供'}；
+            截止时间在创建时写入一次，刷新、重连或修改本机时间都不会延长。
+          </p>
+        </div>
+      ) : null}
+
+      {isMockExam && session && examFinished ? (
+        <div className="card" data-testid="mock-exam-result">
+          <h2>模拟考试结果</h2>
+          <p className="small muted">
+            结束时间 {session.finished_at ? new Date(session.finished_at).toLocaleString() : '—'}
+            {session.expired_at
+              ? '（到达服务器截止时间，由服务器自动交卷）'
+              : '（已交卷）'}
+          </p>
+          {session.score_visible ? (
+            <>
+              <p className="small">
+                已确认 <strong>{session.confirmed_score ?? '—'}</strong> 分 · 满分{' '}
+                {formatScore(session.items.reduce((sum, item) => sum + Number(item.max_score || 0), 0))} 分
+                {Number(session.pending_max_score ?? 0) > 0
+                  ? ` · 待人工确认 ${session.pending_max_score} 分（待评不是 0 分）`
+                  : ''}
+              </p>
+              <div className="table-scroll">
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>题号</th>
+                      <th>题目</th>
+                      <th>结果</th>
+                      <th>得分</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {session.items.map((item) => (
+                      <tr key={item.session_item_id}>
+                        <td>{item.ordinal}</td>
+                        <td className="small">{item.display_label}</td>
+                        <td className="small">{itemOutcomeLabel(item)}</td>
+                        <td className="small">
+                          {item.attempt?.grade
+                            ? `${item.attempt.grade.confirmed_score ?? '—'} / ${item.attempt.grade.max_score}`
+                            : '未作答'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="notice warn">
+              {session.score_hidden_reason ?? '服务器尚未提供本次考试的分数；此处不显示任何推算分数。'}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {session && session.items.length > 0 ? (
         <div className="card">
@@ -483,11 +990,17 @@ export function PracticePage() {
           tutorPending={askTutor.isPending}
           tutorAllowed={Boolean(activeItem.tutoring_allowed)}
           tutorJob={tutorJob}
+          examLive={examLive}
         />
       ) : presentationQuery.isLoading ? (
         <div className="card empty-state">正在领取题项…</div>
       ) : presentationQuery.isError ? (
         <div className="notice danger">{describeError(presentationQuery.error)}</div>
+      ) : isMockExam && !examLive ? (
+        <div className="card empty-state" data-testid="mock-exam-closed-item">
+          本场模拟考试已结束，不能再提交作答。
+          {examExpired ? '到达服务器截止时间后，未提交的题项按未作答处理。' : ''}
+        </div>
       ) : presentation && answer ? (
         <div className="workbench">
           <div className="card">
@@ -603,11 +1116,17 @@ export function PracticePage() {
                       : '未修改'}
               </span>
               <div className="row">
-                <button className="btn" disabled={revealAttempt.isPending} onClick={() => revealAttempt.mutate()}>
-                  查看答案与解析（会记录辅助暴露）
-                </button>
+                {isMockExam ? (
+                  // No reveal affordance at all during an exam (and no disabled
+                  // button pretending one exists): state why it is unavailable.
+                  <span className="small muted">考试进行中不提供答案与解析，交卷或到点后才可以查看。</span>
+                ) : (
+                  <button className="btn" disabled={revealAttempt.isPending} onClick={() => revealAttempt.mutate()}>
+                    查看答案与解析（会记录辅助暴露）
+                  </button>
+                )}
                 <button className="btn primary" disabled={submit.isPending} onClick={() => submit.mutate(answer)}>
-                  提交作答
+                  {isMockExam ? '提交本题（提交后不可修改）' : '提交作答'}
                 </button>
               </div>
             </div>
@@ -633,7 +1152,9 @@ export function PracticePage() {
               </>
             ) : (
               <div className="notice warn">
-                当前会话不提供辅导：验证/考试模式下需要独立完成；如需讲解请结束验证后新建练习会话。
+                {isMockExam
+                  ? '模拟考试进行中不提供按需辅导：考试需要独立完成；交卷或到点后可以查看答案、讲解与结果。'
+                  : '当前会话不提供辅导：验证/考试模式下需要独立完成；如需讲解请结束验证后新建练习会话。'}
               </div>
             )}
             {tutorJob ? <TutorStreamPanel projectId={projectId} job={tutorJob} /> : null}
@@ -743,6 +1264,7 @@ function SubmittedView({
   tutorPending,
   tutorAllowed,
   tutorJob,
+  examLive = false,
 }: {
   attempt: AttemptState
   detail: AttemptDetail | null
@@ -758,6 +1280,8 @@ function SubmittedView({
   tutorPending: boolean
   tutorAllowed: boolean
   tutorJob: TutorJobOut | null
+  /** C05: a running mock exam hides every score/feedback surface. */
+  examLive?: boolean
 }) {
   const wrongOrPartial = Boolean(
     attempt.grade && attempt.grade.is_fully_confirmed && !attempt.grade.is_correct,
@@ -774,7 +1298,9 @@ function SubmittedView({
         </p>
         {attempt.receipt_only ? (
           <div className="notice warn">
-            验证进行中：系统只确认收到作答，不返回分数、正误或评分点。结束本次会话后即可查看。
+            {examLive
+              ? '模拟考试进行中：服务器只确认收到作答，不返回分数、正误或评分点；交卷或到达服务器截止时间后即可查看。'
+              : '验证进行中：系统只确认收到作答，不返回分数、正误或评分点。结束本次会话后即可查看。'}
           </div>
         ) : attempt.grade ? (
           <GradePanel grade={attempt.grade} projectId={projectId} />
@@ -803,7 +1329,7 @@ function SubmittedView({
         ) : null}
 
         <div className="row" style={{ marginTop: 10 }}>
-          {canReveal ? (
+          {canReveal && !examLive ? (
             <button
               className="btn"
               disabled={revealPending}
@@ -813,7 +1339,7 @@ function SubmittedView({
               查看答案与解析
             </button>
           ) : null}
-          {tutorAllowed ? (
+          {tutorAllowed && !examLive ? (
             <>
               <button
                 className="btn"
@@ -833,8 +1359,13 @@ function SubmittedView({
               </button>
             </>
           ) : null}
+          {examLive ? (
+            <span className="small muted">
+              模拟考试进行中：本题已收到，分数、正误、答案与讲解在交卷或到点后才显示。
+            </span>
+          ) : null}
         </div>
-        {wrongOrPartial ? (
+        {wrongOrPartial && !examLive ? (
           <p className="tiny muted" style={{ marginBottom: 0 }}>
             本题已评分但未满分：可以先用「针对我的作答给提示」看卡点，再看完整讲解。讲解不会改写分数。
           </p>
@@ -847,7 +1378,9 @@ function SubmittedView({
           <TutorStreamPanel projectId={projectId} job={tutorJob} />
         </div>
       ) : null}
-      <DiagnosisPanel projectId={projectId} attemptId={attempt.attempt_id} />
+      {/* Diagnosis is a feedback surface (it names error types off the grade):
+          during a live exam it is not offered at all, and the exam bar says so. */}
+      {examLive ? null : <DiagnosisPanel projectId={projectId} attemptId={attempt.attempt_id} />}
       {session ? null : null}
     </>
   )
@@ -914,7 +1447,16 @@ export function OriginalWork({ detail, projectId }: { detail: AttemptDetail; pro
   )
 }
 
-export function GradePanel({ grade, projectId }: { grade: GradeOut; projectId: string | null }) {
+export function GradePanel({
+  grade,
+  projectId,
+  showExpressionReview = true,
+}: {
+  grade: GradeOut
+  projectId: string | null
+  /** The grading page already renders the review reasons next to the item. */
+  showExpressionReview?: boolean
+}) {
   const statusLabel: Record<string, string> = {
     confirmed: '已确认',
     pending_review: '待复核/待评',
@@ -929,6 +1471,10 @@ export function GradePanel({ grade, projectId }: { grade: GradeOut; projectId: s
     mixed: '混合来源',
   }
   const pending = Number(grade.pending_max_score ?? 0)
+  // C07: an expression blank the restricted engine could not decide is not an
+  // unknown shown as "pending": the server names the reason (syntax, limit,
+  // domain, timeout, unknown symbol) and the reviewer who will decide it.
+  const expressionReviews = showExpressionReview ? expressionReviewNotices(grade) : []
   return (
     <div className="grade-box" data-testid="grade-panel">
       <div className="row between">
@@ -944,6 +1490,27 @@ export function GradePanel({ grade, projectId }: { grade: GradeOut; projectId: s
         <p className="small" data-testid="grade-correctness" style={{ margin: '4px 0' }}>
           {grade.is_correct ? '本题完全正确（满分）' : '本题已评完，但未达到满分（失分不是未评分）'}
         </p>
+      ) : null}
+      {expressionReviews.length ? (
+        <div className="notice warn" data-testid="expression-review-reason" style={{ margin: '6px 0' }}>
+          <strong>本空未作判定，已转人工复核：</strong>
+          <ul className="small" style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+            {expressionReviews.map((notice) => (
+              <li key={notice.partId}>
+                {`表达式无法确认（${notice.codeLabel}）：${notice.reason}`}
+                {notice.unknownSymbols.length
+                  ? `（未登记符号：${notice.unknownSymbols.join('、')}）`
+                  : ''}
+                {notice.engineMessage && notice.engineMessage !== notice.reason
+                  ? `；引擎说明：${notice.engineMessage}`
+                  : ''}
+              </li>
+            ))}
+          </ul>
+          <p className="tiny" style={{ margin: '4px 0 0' }}>
+            未知不等于错误：这里不会显示“正确/错误”，也不会计 0 分；复核确认后才会给出结论。
+          </p>
+        </div>
       ) : null}
       {grade.parts.map((part) => (
         <div className="grade-part" key={part.part_id}>

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   apiRequest,
+  expressionReviewNoticesFromParts,
   newIdempotencyKey,
   type AttemptDetail,
+  type ExpressionReviewNotice,
   type GradeOut,
   type GradingQueueRow,
 } from '../../api/client'
@@ -53,6 +55,47 @@ function answerPreview(row: GradingQueueRow): string {
   const trimmed = text.replace(/\s+/g, ' ').trim()
   if (!trimmed) return '（无文本作答）'
   return trimmed.length > 60 ? `${trimmed.slice(0, 60)}…` : trimmed
+}
+
+/**
+ * Why a blank went to review (C07), rendered once for a set of parts.
+ *
+ * A restricted expression engine can refuse a verdict (syntax, limit, domain,
+ * timeout, unknown symbol). That is not a wrong answer and must not be shown as
+ * a bare "待评": the server's own reason plus who decides it is the useful
+ * information for the reviewer.
+ */
+function ExpressionReviewNoticeList({ notices }: { notices: ExpressionReviewNotice[] }) {
+  if (!notices.length) return null
+  return (
+    <div className="notice warn" data-testid="expression-review-reason" style={{ margin: '8px 0' }}>
+      <strong>表达式判分未作结论，已转人工复核：</strong>
+      <ul className="small" style={{ margin: '4px 0 0', paddingLeft: 18 }}>
+        {notices.map((notice) => (
+          <li key={notice.partId}>
+            {notice.partId} · {`表达式无法确认（${notice.codeLabel}）：${notice.reason}`}
+            {notice.unknownSymbols.length
+              ? `（未登记符号：${notice.unknownSymbols.join('、')}）`
+              : ''}
+            {notice.engineMessage && notice.engineMessage !== notice.reason
+              ? `；引擎说明：${notice.engineMessage}`
+              : ''}
+          </li>
+        ))}
+      </ul>
+      <p className="tiny" style={{ margin: '4px 0 0' }}>
+        未知不等于错误：此处不显示“正确/错误”，也不按 0 分处理；请按评分标准逐点人工确认。
+      </p>
+    </div>
+  )
+}
+
+/** A short one-line hint for a queue row, so the reviewer knows why it is here. */
+function expressionReviewHint(row: GradingQueueRow): string | null {
+  const first = expressionReviewNoticesFromParts(row.parts)[0]
+  if (!first) return null
+  const part = row.parts.length > 1 ? `${first.partId}：` : ''
+  return `表达式无法确认（${first.codeLabel}）：已转人工复核 ${part}${first.reason}`
 }
 
 /**
@@ -125,6 +168,9 @@ export function GradingPage() {
   if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
 
   const rows = queueQuery.data ?? []
+  // One hint per row, computed once: the queue must show why an expression blank
+  // is waiting for a human, without recomputing it inside the render body.
+  const expressionHints = new Map(rows.map((row) => [row.attempt_id, expressionReviewHint(row)]))
 
   return (
     <>
@@ -183,6 +229,11 @@ export function GradingPage() {
                         <div className="tiny muted" data-testid="queue-answer-preview">
                           {answerPreview(row)}
                         </div>
+                        {expressionHints.get(row.attempt_id) ? (
+                          <div className="tiny" data-testid="queue-expression-review">
+                            {expressionHints.get(row.attempt_id)}
+                          </div>
+                        ) : null}
                       </td>
                       <td className="small">{TYPE_LABELS[row.question_type] ?? row.question_type}</td>
                       <td className="small">{new Date(row.submitted_at).toLocaleString()}</td>
@@ -212,6 +263,10 @@ export function GradingPage() {
 
                 <h3>学生的原始作答</h3>
                 <OriginalWork detail={toOriginalWork(active)} projectId={projectId} />
+
+                {/* C07: the reason the engine refused a verdict is shown next to
+                    the item, not left as a bare pending state. */}
+                <ExpressionReviewNoticeList notices={expressionReviewNoticesFromParts(active.parts)} />
 
                 {/* Transcriptions, estimates and diagnosis are owner-scoped on the
                     server: for someone else's attempt they would answer with a scope
@@ -307,7 +362,9 @@ export function GradingPage() {
                     查看证据与排除原因
                   </button>
                 </div>
-                {result ? <GradePanel grade={result} projectId={projectId} /> : null}
+                {result ? (
+                  <GradePanel grade={result} projectId={projectId} showExpressionReview={false} />
+                ) : null}
               </>
             )}
           </div>

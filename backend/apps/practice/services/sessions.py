@@ -1,11 +1,28 @@
-"""Practice session creation, presentation, drafts and finishing."""
+"""Practice session creation, presentation, drafts and finishing.
+
+Mock exams (C05) are timed runs with a **server-owned** deadline:
+
+* the length is either an explicit, bounded ``duration_minutes`` or the sum of the
+  published spec's per-type seconds for the items actually created; an unknown
+  length is refused, so a mock exam can never be open-ended;
+* ``exam_started_at`` / ``exam_deadline`` are written once, inside the creation
+  transaction, from :func:`django.utils.timezone.now` — a client-supplied
+  ``exam_deadline`` / ``deadline`` / ``now`` / ``started_at`` is dropped by the
+  request schema and never read here;
+* every read path reconciles the exam it touches through
+  :func:`expire_session_if_due`, so a refreshed tab, a reconnected socket or a
+  worker all observe the same end: the deadline, never "now".
+"""
 
 from __future__ import annotations
 
+import math
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.audit.services.outbox import enqueue
@@ -20,6 +37,22 @@ from apps.practice.models import Attempt, GradeEvent, PracticeSession, SessionIt
 from apps.practice.services import exposure
 from apps.question_bank.models import QuestionVersion
 from apps.question_bank.services import sealing
+
+#: Bounds for an explicit mock-exam length in minutes. The value comes straight
+#: from the request, so both ends are bounded: a zero/negative value would end the
+#: exam instantly and an unbounded one would make it effectively open-ended.
+MIN_MOCK_EXAM_MINUTES = 5
+MAX_MOCK_EXAM_MINUTES = 600
+
+#: Per-type seconds a published spec may use, in resolution order. The canonical
+#: key is ``{question_type}_seconds`` (the key the ingestion and acceptance
+#: fixtures write); the three choice-shaped types also accept the grouped
+#: ``choice_seconds`` key the demo fixture already carries.
+_GROUPED_TIME_RULE_KEYS = {
+    QuestionType.SINGLE_CHOICE: ("choice_seconds",),
+    QuestionType.MULTIPLE_CHOICE: ("choice_seconds",),
+    QuestionType.TRUE_FALSE: ("choice_seconds",),
+}
 
 
 def _latest_mapping_revision(version: QuestionVersion) -> int:
@@ -72,6 +105,272 @@ def resolve_task_mode(*, mode: str, task) -> str:
     return mode
 
 
+# --------------------------------------------------------------------------
+# C05: the server-owned exam clock
+# --------------------------------------------------------------------------
+def _time_rule_seconds(time_rules: Any, question_type: str) -> int | None:
+    """Per-question seconds from a published spec, or ``None`` when unspecified."""
+    rules = time_rules if isinstance(time_rules, dict) else {}
+    keys = [f"{question_type}_seconds", *_GROUPED_TIME_RULE_KEYS.get(question_type, ())]
+    for key in keys:
+        raw = rules.get(key)
+        if raw in (None, ""):
+            continue
+        try:
+            seconds = int(raw)
+        except (TypeError, ValueError) as exc:
+            raise InvalidInput(
+                message=f"考试规范中的 {key} 必须是整数秒",
+                details={"time_rule": key, "value": str(raw)},
+            ) from exc
+        if seconds <= 0:
+            raise InvalidInput(
+                message=f"考试规范中的 {key} 必须大于 0 秒",
+                details={"time_rule": key, "value": seconds},
+            )
+        return seconds
+    return None
+
+
+def resolve_mock_exam_minutes(*, duration_minutes, items, spec_version) -> int:
+    """Decide how long a mock exam lasts — on the server, from trusted inputs.
+
+    Either the caller gives an explicit, bounded ``duration_minutes``, or the
+    length is the sum of the published spec's per-type seconds for the items that
+    are *actually* in the session. There is deliberately no third option: when
+    neither exists the request is refused, because an unknown duration must never
+    become an open-ended exam.
+    """
+    if duration_minutes is not None:
+        try:
+            minutes = int(duration_minutes)
+        except (TypeError, ValueError) as exc:
+            raise InvalidInput(
+                message="模拟考试时长必须是整数分钟",
+                details={"duration_minutes": str(duration_minutes)},
+            ) from exc
+        if not MIN_MOCK_EXAM_MINUTES <= minutes <= MAX_MOCK_EXAM_MINUTES:
+            raise InvalidInput(
+                message=f"模拟考试时长必须在 {MIN_MOCK_EXAM_MINUTES}–{MAX_MOCK_EXAM_MINUTES} 分钟之间",
+                details={"duration_minutes": minutes},
+            )
+        return minutes
+
+    if spec_version is None:
+        raise InvalidInput(
+            message=(
+                "模拟考试必须有时长：请提供 duration_minutes（"
+                f"{MIN_MOCK_EXAM_MINUTES}–{MAX_MOCK_EXAM_MINUTES} 分钟），"
+                "或为该科目发布带 time_rules 的考试规范"
+            ),
+            details={"reason": "mock_exam_duration_unknown"},
+        )
+    total_seconds = 0
+    missing: set[str] = set()
+    time_rules = getattr(spec_version, "time_rules", None)
+    for item in items:
+        question_type = item.question_version.question_type
+        seconds = _time_rule_seconds(time_rules, question_type)
+        if seconds is None:
+            # One unknown type makes the sum a guess; name the type instead of
+            # returning a shorter exam than the spec describes.
+            missing.add(question_type)
+            continue
+        total_seconds += seconds
+    if missing:
+        raise InvalidInput(
+            message=(
+                "考试规范缺少这些题型的时长："
+                f"{'、'.join(sorted(missing))}；无法确定模拟考试的截止时间，"
+                "请补充 time_rules 或直接提供 duration_minutes"
+            ),
+            details={
+                "missing_question_types": sorted(missing),
+                "spec_version_id": str(getattr(spec_version, "id", "") or ""),
+            },
+        )
+    if total_seconds <= 0:
+        raise InvalidInput(
+            message="按考试规范推算的考试时长为 0，无法确定模拟考试的截止时间",
+            details={"spec_version_id": str(getattr(spec_version, "id", "") or "")},
+        )
+    minutes = max(1, math.ceil(total_seconds / 60))
+    if minutes > MAX_MOCK_EXAM_MINUTES:
+        raise InvalidInput(
+            message=(
+                f"按考试规范推算的考试时长 {minutes} 分钟超过上限 {MAX_MOCK_EXAM_MINUTES} 分钟，"
+                "请检查该规范的 time_rules"
+            ),
+            details={"spec_version_id": str(getattr(spec_version, "id", "") or ""), "minutes": minutes},
+        )
+    return minutes
+
+
+def _session_spec(session: PracticeSession):
+    """The published spec that governs an existing session's timing."""
+    item = (
+        session.items.filter(spec_version__isnull=False)
+        .select_related("spec_version")
+        .order_by("ordinal")
+        .first()
+    )
+    if item is not None:
+        return item.spec_version
+    return session.subject.exam_spec_versions.filter(status="published").order_by("-version").first()
+
+
+def effective_deadline(session: PracticeSession) -> datetime | None:
+    """The instant a mock exam ends, or ``None`` when none can be derived.
+
+    The stored ``exam_deadline`` is authoritative and wins. When only
+    ``exam_started_at`` exists (a partially written or legacy row) the length is
+    re-derived from the same published spec and the deadline is
+    ``exam_started_at + length``; when nothing can be derived this returns
+    ``None`` rather than inventing an unbounded exam.
+    """
+    if session.exam_deadline is not None:
+        return session.exam_deadline
+    if session.exam_started_at is None:
+        return None
+    spec_version = _session_spec(session)
+    try:
+        minutes = resolve_mock_exam_minutes(
+            duration_minutes=None,
+            items=list(session.items.select_related("question_version").order_by("ordinal")),
+            spec_version=spec_version,
+        )
+    except InvalidInput:
+        return None
+    return session.exam_started_at + timedelta(minutes=minutes)
+
+
+def _exam_is_due(session: PracticeSession, moment: datetime) -> bool:
+    """Pure check: is this an active mock exam whose deadline has passed?"""
+    if session.mode != SessionMode.MOCK_EXAM or session.status != SessionStatus.ACTIVE:
+        return False
+    deadline = effective_deadline(session)
+    return deadline is not None and moment >= deadline
+
+
+def _finish_locked(locked: PracticeSession, *, finished_at: datetime, expired_at: datetime | None = None) -> PracticeSession:
+    """The single writer of the finished state (manual finish and expiry).
+
+    ``finished_at`` is always the *end of the exam*: the caller passes the moment
+    of a manual submit, or the stored deadline for an expiry. One outbox event per
+    session is enqueued (dedupe key) once the row actually transitions.
+    """
+    locked.status = SessionStatus.FINISHED
+    locked.finished_at = finished_at
+    if locked.mode in {SessionMode.VERIFICATION, SessionMode.MOCK_EXAM}:
+        locked.revealed_at = locked.finished_at
+    update_fields = ["status", "finished_at", "revealed_at", "updated_at"]
+    if expired_at is not None:
+        locked.expired_at = expired_at
+        update_fields.append("expired_at")
+    locked.save(update_fields=update_fields)
+    if locked.origin_task_id:
+        from apps.learning.models import StudyTask
+
+        StudyTask.objects.filter(id=locked.origin_task_id).update(
+            status="completed", completed_at=locked.finished_at, updated_at=timezone.now()
+        )
+    enqueue(
+        "learning.on_session_finished",
+        {"session_id": str(locked.id)},
+        dedupe_key=f"session-finished:{locked.id}",
+    )
+    return locked
+
+
+def expire_session_if_due(session: PracticeSession, *, now=None) -> PracticeSession:
+    """Finish a mock exam whose server-owned deadline has passed.
+
+    Safe to call from every read path and from a worker. The fast path is a pure
+    in-memory check, so a non-exam session costs nothing. When the deadline *has*
+    passed the session row is locked and re-checked inside one transaction, so two
+    concurrent callers (two tabs, or a tab and the sweeper) produce exactly one
+    finish and one outbox event; the loser observes the finished row.
+
+    The exam ends at the **deadline**, never at the moment the expiry was noticed:
+    ``finished_at``/``revealed_at`` are the deadline, and ``expired_at`` records
+    when the server reconciled the run.
+    """
+    moment = now or timezone.now()
+    if not _exam_is_due(session, moment):
+        return session
+    with transaction.atomic():
+        locked = PracticeSession.objects.select_for_update().get(id=session.id)
+        if not _exam_is_due(locked, moment):
+            return locked
+        deadline = effective_deadline(locked)
+        return _finish_locked(locked, finished_at=deadline, expired_at=moment)
+
+
+def reconcile_item_session(item: SessionItem, *, now=None) -> PracticeSession:
+    """Reconcile the exam an item belongs to and rebind the item to that row.
+
+    The visibility gates read ``item.session.hides_grading``. An item still
+    pointing at a pre-expiry instance would keep skipping the content gate for a
+    run the server has already finished, so the in-memory object graph is rebound
+    to the reconciled session and every later decision sees the same state.
+    """
+    session = expire_session_if_due(item.session, now=now)
+    item.session = session
+    return session
+
+
+def expire_due_mock_exams(*, user=None, project=None, now=None, limit: int = 200) -> int:
+    """Finish every overdue mock exam nobody touched (worker / cron entry point).
+
+    Read paths reconcile the exam they touch; this sweep covers the runs whose
+    tab was closed for good. It is idempotent and safe to run concurrently with
+    any read path — every finish goes through the same locked, re-checked writer.
+    """
+    moment = now or timezone.now()
+    queryset = PracticeSession.objects.filter(mode=SessionMode.MOCK_EXAM, status=SessionStatus.ACTIVE).filter(
+        Q(exam_deadline__lte=moment) | Q(exam_deadline__isnull=True, exam_started_at__isnull=False)
+    )
+    if user is not None:
+        queryset = queryset.filter(user=user)
+    if project is not None:
+        queryset = queryset.filter(project=project)
+    expired = 0
+    for session in list(queryset.order_by("exam_deadline", "created_at")[: max(1, int(limit))]):
+        if expire_session_if_due(session, now=moment).expired_at is not None:
+            expired += 1
+    return expired
+
+
+def assert_submission_open(session: PracticeSession, *, now=None) -> None:
+    """Refuse an answer that arrives after the exam's server-owned deadline.
+
+    409, in the repo's error style, with the deadline named so the client can say
+    *when* the exam ended. The check is deadline-based rather than status-based: a
+    run finished earlier on purpose keeps its own "会话已结束" answer, while a run
+    the server closed at the deadline is refused here — and no second finish can
+    reopen it.
+    """
+    if session.mode != SessionMode.MOCK_EXAM:
+        return
+    deadline = effective_deadline(session)
+    if deadline is None:
+        return
+    moment = now or timezone.now()
+    if moment < deadline:
+        return
+    raise VersionConflict(
+        message=(
+            f"模拟考试已于 {timezone.localtime(deadline).strftime('%Y-%m-%d %H:%M:%S')} "
+            "结束，服务器已自动交卷并对已提交的作答判分；不能再提交新的作答。"
+        ),
+        details={
+            "reason": "exam_deadline_passed",
+            "exam_deadline": deadline.isoformat(),
+            "session_id": str(session.id),
+        },
+    )
+
+
 @transaction.atomic
 def create_session(
     *,
@@ -85,16 +384,24 @@ def create_session(
     purpose: str = "practice",
     pairing=None,
     tutoring_allowed: bool | None = None,
+    duration_minutes: int | None = None,
 ) -> PracticeSession:
     """Freeze the versions for every item at creation time.
 
     The response carries only item ids and version lists; the stem is delivered
     later through the presentation endpoint so first-contact timing is honest.
+
+    A ``mock_exam`` is a *timed* run: ``exam_started_at`` and ``exam_deadline``
+    are written here, once, from the server clock. The length comes from the
+    bounded ``duration_minutes`` or from the published spec's per-type seconds for
+    the items actually created; neither being available is a refusal, so an
+    unknown duration can never produce an open-ended exam. ``duration_minutes`` on
+    any other mode is refused rather than silently ignored, and the fields a
+    client might send to move the clock (``exam_deadline`` / ``deadline`` /
+    ``now`` / ``started_at``) are not part of the request schema at all.
     """
     if mode not in SessionMode.values:
         raise InvalidInput(message="会话模式无效")
-    if mode == SessionMode.MOCK_EXAM:
-        raise InvalidInput(message="模拟考试属于 P2，当前版本不提供；请使用练习或验证模式")
     if subject.project_id != project.id:
         raise ScopeViolation(message="科目不属于该项目")
     if spec_version is None:
@@ -134,7 +441,17 @@ def create_session(
             message="不能由客户端指定该会话用途；请通过对应的学习任务开始",
             details={"purpose": purpose},
         )
+    if duration_minutes is not None and mode != SessionMode.MOCK_EXAM:
+        # The mode may have been decided by the task above; an explicit exam
+        # length that would be ignored is a client mistake, not a no-op.
+        raise InvalidInput(
+            message="只有模拟考试（mock_exam）支持 duration_minutes；该会话的用途由任务决定",
+            details={"mode": mode},
+        )
 
+    # The exam clock starts here, on the server, before any item row exists. The
+    # request's own wall clock is never read.
+    exam_started_at = timezone.now() if mode == SessionMode.MOCK_EXAM else None
     session = PracticeSession.objects.create(
         user=user,
         project=project,
@@ -143,6 +460,7 @@ def create_session(
         status=SessionStatus.ACTIVE,
         origin_task=task,
         note=f"purpose={purpose}",
+        exam_started_at=exam_started_at,
     )
     ordinal = 0
     for question_id in question_ids:
@@ -205,6 +523,18 @@ def create_session(
         )
     if ordinal == 0:
         raise InvalidInput(message="没有可用于本次会话的计分题项")
+    if mode == SessionMode.MOCK_EXAM:
+        # The length is decided from the items that were actually created, so a
+        # material parent expanded into children contributes exactly the time of
+        # the submittable questions. A refusal here rolls the whole transaction
+        # back: no exam without a deadline is ever left behind.
+        minutes = resolve_mock_exam_minutes(
+            duration_minutes=duration_minutes,
+            items=list(session.items.select_related("question_version").order_by("ordinal")),
+            spec_version=spec_version,
+        )
+        session.exam_deadline = exam_started_at + timedelta(minutes=minutes)
+        session.save(update_fields=["exam_deadline", "updated_at"])
     return session
 
 
@@ -259,11 +589,17 @@ def deliverable_asset_ids(version: QuestionVersion) -> set[str]:
 
 
 def presentation(*, item: SessionItem, user, now=None) -> dict[str, Any]:
-    """Deliver the current item and record the first delivery exactly once."""
+    """Deliver the current item and record the first delivery exactly once.
+
+    A stale tab that reconnects after the deadline is reconciled first: it sees
+    the exam finished (and its in-time answers already submitted), never a run
+    that is still open.
+    """
     session = item.session
     if str(session.user_id) != str(user.id):
         raise ScopeViolation(message="题项不存在或不在当前权限范围")
     moment = now or timezone.now()
+    session = reconcile_item_session(item, now=moment)
     first_time = False
     if item.first_delivered_at is None:
         item.first_delivered_at = moment
@@ -286,6 +622,7 @@ def presentation(*, item: SessionItem, user, now=None) -> dict[str, Any]:
         "session_item_id": str(item.id),
         "session_id": str(session.id),
         "mode": session.mode,
+        "status": session.status,
         "ordinal": item.ordinal,
         "max_score": str(item.max_score),
         "purpose": item.purpose,
@@ -298,7 +635,9 @@ def presentation(*, item: SessionItem, user, now=None) -> dict[str, Any]:
         "stem": stem_payload(item.question_version),
         "assets": [str(value) for value in sorted(allowed_assets)],
         "grading_hidden": session.hides_grading,
+        "exam_started_at": session.exam_started_at.isoformat() if session.exam_started_at else None,
         "exam_deadline": session.exam_deadline.isoformat() if session.exam_deadline else None,
+        "expired_at": session.expired_at.isoformat() if session.expired_at else None,
     }
 
 
@@ -309,6 +648,10 @@ def save_draft(*, item: SessionItem, user, draft: dict, draft_revision: int | No
     session = locked.session
     if str(session.user_id) != str(user.id):
         raise ScopeViolation(message="题项不存在或不在当前权限范围")
+    # An overdue exam is finished here too: a draft written after the deadline is
+    # not an answer, but the run it belongs to must already read as over.
+    session = expire_session_if_due(session, now=now or timezone.now())
+    locked.session = session
     if session.status != SessionStatus.ACTIVE:
         raise InvalidInput(message="会话已结束，不能再保存草稿")
     if Attempt.objects.filter(session_item=locked).exists():
@@ -329,28 +672,22 @@ def save_draft(*, item: SessionItem, user, draft: dict, draft_revision: int | No
 
 @transaction.atomic
 def finish_session(*, session: PracticeSession, user, now=None) -> PracticeSession:
+    """One-shot submit: the first finish ends the run, a second is a no-op.
+
+    A manual finish that arrives *after* the server-owned deadline does not extend
+    the exam: it records the same end an automatic expiry would (``finished_at`` =
+    the deadline, ``expired_at`` = the moment the server noticed). The replay path
+    in the API relies on this being idempotent rather than an error.
+    """
     locked = PracticeSession.objects.select_for_update().get(id=session.id)
     if str(locked.user_id) != str(user.id):
         raise ScopeViolation(message="会话不存在或不在当前权限范围")
     if locked.status == SessionStatus.FINISHED:
         return locked
-    locked.status = SessionStatus.FINISHED
-    locked.finished_at = now or timezone.now()
-    if locked.mode in {SessionMode.VERIFICATION, SessionMode.MOCK_EXAM}:
-        locked.revealed_at = locked.finished_at
-    locked.save(update_fields=["status", "finished_at", "revealed_at", "updated_at"])
-    if locked.origin_task_id:
-        from apps.learning.models import StudyTask
-
-        StudyTask.objects.filter(id=locked.origin_task_id).update(
-            status="completed", completed_at=locked.finished_at, updated_at=timezone.now()
-        )
-    enqueue(
-        "learning.on_session_finished",
-        {"session_id": str(locked.id)},
-        dedupe_key=f"session-finished:{locked.id}",
-    )
-    return locked
+    moment = now or timezone.now()
+    if _exam_is_due(locked, moment):
+        return _finish_locked(locked, finished_at=effective_deadline(locked), expired_at=moment)
+    return _finish_locked(locked, finished_at=moment)
 
 
 def grade_payload(grade: GradeEvent | None, *, session: PracticeSession, hidden: bool | None = None) -> dict[str, Any] | None:
@@ -441,9 +778,14 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
     The second rule is content-based and shared with reports, evidence and the
     grading queue (:mod:`apps.practice.services.verification_gate`), so hiding one
     entry point cannot be bypassed through another.
+
+    The snapshot is also the reconciliation point for a mock exam: an overdue exam
+    is finished here first, so "the tab I refreshed after the deadline" observes
+    the finished run (with its in-time answers graded) instead of a live one.
     """
     from apps.practice.services import verification_gate
 
+    session = expire_session_if_due(session)
     content_map = verification_gate.active_verification_content_map(user=user)
     items = []
     withheld_item_ids: list[str] = []
@@ -487,10 +829,14 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
     totals_hidden = hidden or bool(withheld_item_ids)
     confirmed, pending = _session_score(session)
     if hidden:
-        hidden_reason = "验证进行中：结束本次验证后才会显示分数与正误。"
+        hidden_reason = (
+            "模拟考试进行中：交卷或到达服务器截止时间后才会显示分数与正误。"
+            if session.mode == SessionMode.MOCK_EXAM
+            else "验证进行中：结束本次验证后才会显示分数与正误。"
+        )
     elif withheld_item_ids:
         hidden_reason = (
-            "该会话包含正在验证中的同源内容：为避免泄露答案，验证结束前不显示本会话的分数。"
+            "该会话包含正在验证/模拟考试中的同源内容：为避免泄露答案，该会话结束前不显示本会话的分数。"
             "无关会话不受影响。"
         )
     else:
@@ -506,6 +852,13 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
         "revealed_at": session.revealed_at.isoformat() if session.revealed_at else None,
         "created_at": session.created_at.isoformat(),
         "finished_at": session.finished_at.isoformat() if session.finished_at else None,
+        # C05: the exam clock is part of every snapshot so a client can render the
+        # same remaining time the server enforces, without trusting its own clock
+        # (`server_time` is the instant this payload was built from).
+        "server_time": timezone.now().isoformat(),
+        "exam_started_at": session.exam_started_at.isoformat() if session.exam_started_at else None,
+        "exam_deadline": session.exam_deadline.isoformat() if session.exam_deadline else None,
+        "expired_at": session.expired_at.isoformat() if session.expired_at else None,
         "items": items,
         # While grading is hidden the totals are omitted, not merely flagged: a
         # client must not be able to derive the score from the payload at all.
@@ -567,4 +920,10 @@ def assert_reveal_allowed(*, item: SessionItem, session: PracticeSession, before
     if before_submit:
         raise PurposeNotAllowed(message="验证/考试模式在提交前不提供答案或完整讲解")
     if session.hides_grading:
-        raise PurposeNotAllowed(message="验证尚未结束：请先结束本次验证，再查看答案与讲解")
+        raise PurposeNotAllowed(
+            message=(
+                "模拟考试尚未结束：交卷或到达服务器截止时间后才能查看答案与讲解"
+                if session.mode == SessionMode.MOCK_EXAM
+                else "验证尚未结束：请先结束本次验证，再查看答案与讲解"
+            )
+        )

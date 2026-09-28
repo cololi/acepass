@@ -35,7 +35,22 @@ class PracticeSession(BaseModel):
     #: For verification: whether the whole run may be revealed yet.
     revealed_at = models.DateTimeField(null=True, blank=True)
     finished_at = models.DateTimeField(null=True, blank=True)
-    exam_deadline = models.DateTimeField(null=True, blank=True, help_text="P2 模拟考试使用；P0 仅记录")
+    #: Server-owned clock of a mock exam (C05). Both instants are written exactly
+    #: once, inside the creation transaction, from ``timezone.now()`` — the
+    #: request's own wall clock is never read. ``exam_deadline`` is the frozen
+    #: end of the exam and :meth:`save` refuses to move it afterwards; the pair is
+    #: kept so the deadline stays derivable and auditable
+    #: (``exam_started_at + duration``) even if one field is ever lost.
+    exam_started_at = models.DateTimeField(
+        null=True, blank=True, help_text="模拟考试开始时间（服务器时钟，创建时写入一次）"
+    )
+    exam_deadline = models.DateTimeField(
+        null=True, blank=True, help_text="模拟考试截止时间（服务器派生的时长，创建时写入一次，之后不可移动）"
+    )
+    #: When the server *noticed* the deadline had passed and finished the run.
+    #: The end of the exam is ``exam_deadline`` (and ``finished_at``), not this
+    #: moment: this field only records how long the run stayed reconcilable.
+    expired_at = models.DateTimeField(null=True, blank=True)
     origin_task = models.ForeignKey(
         "learning.StudyTask", null=True, blank=True, on_delete=models.SET_NULL, related_name="sessions"
     )
@@ -50,6 +65,47 @@ class PracticeSession(BaseModel):
 
     def __str__(self) -> str:
         return f"session#{self.id} {self.mode}"
+
+    def save(self, *args, **kwargs):
+        """Enforce the one-way, server-owned exam lifecycle (C05).
+
+        Two invariants cannot be expressed as a column constraint because they
+        compare the new row with the stored one:
+
+        * ``exam_deadline`` is written once at creation and never moves. Every
+          endpoint is therefore unable to extend an exam, and a future careless
+          ``save()`` fails loudly instead of silently granting extra time.
+        * a finished run never returns to ``active``: "one-shot submit" means the
+          exam cannot be reopened by any path.
+
+        ``QuerySet.update()`` (used by the demo-reset command and by tests that
+        simulate legacy rows) bypasses this on purpose; the guard covers every
+        model-level write.
+        """
+        update_fields = kwargs.get("update_fields")
+        if not self._state.adding:
+            stored = (
+                PracticeSession.objects.filter(pk=self.pk)
+                .values("status", "exam_deadline")
+                .first()
+            )
+            if stored is not None:
+                if (
+                    (update_fields is None or "exam_deadline" in update_fields)
+                    and stored["exam_deadline"] is not None
+                    and self.exam_deadline is not None
+                    and stored["exam_deadline"] != self.exam_deadline
+                ):
+                    raise ValidationError(
+                        {"exam_deadline": "模拟考试截止时间由服务器在创建时写入一次，之后不可修改或延长（C05）"}
+                    )
+                if (
+                    (update_fields is None or "status" in update_fields)
+                    and stored["status"] != SessionStatus.ACTIVE
+                    and self.status == SessionStatus.ACTIVE
+                ):
+                    raise ValidationError({"status": "会话已结束，不能在结束之后重新开始（考试不可重开）"})
+        super().save(*args, **kwargs)
 
     @property
     def hides_grading(self) -> bool:

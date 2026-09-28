@@ -1,4 +1,4 @@
-"""Server-side purpose gate for answers that belong to a running verification.
+"""Server-side purpose gate for answers that belong to a running verification or mock exam.
 
 A verification run only means something if the answer cannot be obtained
 elsewhere while it is in progress. Hiding a button, or returning
@@ -6,6 +6,13 @@ elsewhere while it is in progress. Hiding a button, or returning
 contract (docs/03 §4.3): once a verification item has been presented, every
 other entry point that could reveal *this content* must refuse until the run is
 finished.
+
+A **mock exam** is covered by the same gate (C05): it too forbids any correctness
+feedback while it runs, and a parallel practice session on the same question
+would otherwise deliver the score — which is the answer. Unlike a verification an
+exam is bounded: every exam carries a server-owned deadline and is finished at it
+(:func:`apps.practice.services.sessions.expire_session_if_due`), so this coverage
+can never become permanent.
 
 The gate is deliberately conservative and content-based, not session-based:
 
@@ -24,13 +31,24 @@ from __future__ import annotations
 
 from apps.common.enums import SessionMode, SessionStatus
 from apps.common.errors import PurposeNotAllowed
-from apps.practice.models import SessionItem
+from apps.practice.models import PracticeSession, SessionItem
+
+#: Modes whose *presented* items make their content non-disclosable elsewhere
+#: until the run is over. Both hide their own grading while active
+#: (``PracticeSession.hides_grading``) and both forbid correctness feedback
+#: before they end.
+GATED_MODES = (SessionMode.VERIFICATION, SessionMode.MOCK_EXAM)
+
+
+def gate_mode_label(session: PracticeSession) -> str:
+    """How the refusal names the run that owns the content."""
+    return "模拟考试" if session.mode == SessionMode.MOCK_EXAM else "验证"
 
 
 def _active_verification_items(*, user, project=None):
     queryset = SessionItem.objects.filter(
         session__user=user,
-        session__mode=SessionMode.VERIFICATION,
+        session__mode__in=GATED_MODES,
         session__status=SessionStatus.ACTIVE,
         first_delivered_at__isnull=False,
     ).select_related("question_version__question")
@@ -125,32 +143,44 @@ def content_gate_blocks_item(*, item, content_map: dict[str, set[str]] | None = 
 
 
 def blocked_question_version_ids(*, user) -> set[str]:
-    """Every question version whose answers a running verification still hides.
+    """Every question version whose answers a running gated run still hides.
 
     Used by reports: an aggregate over a parallel practice attempt leaks the same
     number a direct field would, so the versions covered by a running
-    verification are excluded from report buckets exactly like the verification's
-    own attempts are.
+    verification or mock exam are excluded from report buckets exactly like that
+    run's own attempts are.
+
+    This is also the practice-side seam the practice report already goes through
+    (``apps.analytics.services.reports``), so it reconciles the user's overdue
+    mock exams before answering: a run the server has already ended must not keep
+    hiding its results from the report (C05). The sweep is idempotent and costs
+    one query when nothing is due; the report's own ACTIVE-mode exclusion is
+    evaluated after this call, so it sees the reconciled rows.
     """
+    from apps.practice.services import sessions as session_services
+
+    session_services.expire_due_mock_exams(user=user)
     return set(active_verification_content_map(user=user))
 
 
 def assert_content_not_in_active_verification(
     *, user, question_version, action: str, exclude_item_id=None
 ) -> None:
-    """Raise 403 when the requested content is part of a running verification."""
+    """Raise 403 when the requested content is part of a running gated run."""
     blocking = active_verification_for_content(
         user=user, question_version=question_version, exclude_item_id=exclude_item_id
     )
     if blocking is None:
         return
+    label = gate_mode_label(blocking.session)
     raise PurposeNotAllowed(
         message=(
-            f"该内容正在验证中（会话 {blocking.session_id}）：为避免泄露答案，"
-            f"验证结束前不能{action}。如只想练习，请先结束那次验证。"
+            f"该内容正在{label}中（会话 {blocking.session_id}）：为避免泄露答案，"
+            f"{label}结束前不能{action}。如只想练习，请先结束那次{label}。"
         ),
         details={
             "reason": "active_verification_content_gate",
+            "gated_mode": blocking.session.mode,
             "verification_session_id": str(blocking.session_id),
             "verification_session_item_id": str(blocking.id),
         },
@@ -180,6 +210,7 @@ def assert_grading_not_blocked(*, item: SessionItem, action: str) -> None:
 
 
 __all__ = [
+    "GATED_MODES",
     "active_verification_content_map",
     "active_verification_for_content",
     "active_verification_for_version",
@@ -188,4 +219,5 @@ __all__ = [
     "assert_item_not_in_active_verification",
     "blocked_question_version_ids",
     "content_gate_blocks_item",
+    "gate_mode_label",
 ]

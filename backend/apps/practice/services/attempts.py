@@ -196,13 +196,27 @@ def submit_attempt(
     client_active_ms: int | None = None,
     now=None,
 ) -> tuple[Attempt, GradeEvent]:
-    """Store the attempt and its initial grade event."""
+    """Store the attempt and its initial grade event.
+
+    Submission is the write path the exam deadline governs (C05): the session is
+    reconciled first, so an exam whose deadline has passed is already finished and
+    the late answer is refused with the deadline named — while everything the
+    learner submitted *before* the deadline stays graded and readable. Placed in
+    the service so every entry point shares one decision, not just one endpoint.
+    """
     item = _locked_session_item(session_item_id)
     if item is None:
         raise ScopeViolation(message="题项不存在或不在当前权限范围")
+    moment = now or timezone.now()
     session = item.session
     if str(session.user_id) != str(user.id):
         raise ScopeViolation(message="题项不存在或不在当前权限范围")
+    from apps.practice.services import sessions as session_services
+
+    # Reconcile before reading the status: an overdue exam must be refused as
+    # "the deadline passed" (409), not as a generic "session over" (400).
+    session = session_services.reconcile_item_session(item, now=moment)
+    session_services.assert_submission_open(session, now=moment)
     if session.status != SessionStatus.ACTIVE:
         raise InvalidInput(message="会话已结束，不能继续提交")
     existing = Attempt.objects.filter(session_item=item).first()
@@ -220,7 +234,6 @@ def submit_attempt(
 
     validate_answer_shape(item, raw_answer)
     attachment_ids = _validate_attachments(session.project, user, list(asset_ids or []))
-    moment = now or timezone.now()
     elapsed_ms = 0
     if item.first_delivered_at:
         elapsed_ms = max(0, int((moment - item.first_delivered_at).total_seconds() * 1000))
@@ -407,9 +420,14 @@ def confirm_grade(
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
     item = attempt.session_item
-    session = item.session
     if str(attempt.user_id) != str(user.id) and not user.is_staff:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
+    from apps.practice.services import sessions as session_services
+
+    # C05: reconcile the exam first. Once the deadline has passed the run is over,
+    # so a reviewer may decide its grades; while it is still running the gate below
+    # keeps the mutation (and therefore any later read) from leaking the result.
+    session = session_services.reconcile_item_session(item)
     # The hidden-run gate applies to the *mutation*, not only to the response:
     # re-scoring a live verification attempt would leak its result through later
     # reads even if this call returned nothing.

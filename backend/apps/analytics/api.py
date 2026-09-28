@@ -7,6 +7,7 @@ from typing import Any
 from ninja import Router, Schema
 
 from apps.analytics.models import RegradeRun, ReportSnapshot
+from apps.analytics.services import calibration as calibration_service
 from apps.analytics.services import cycles as cycle_service
 from apps.analytics.services import reports as report_service
 from apps.audit.services import idempotency, outbox
@@ -36,6 +37,14 @@ class ReportOut(Schema):
     #: lineage) is part of a running verification, so an aggregate over them would
     #: leak the very answer the verification is checking (B02).
     hidden_verification_content_attempts: int = 0
+    #: ``final`` only when every in-scope attempt is fully confirmed (C06).
+    result_status: str = "final"
+    #: Why the report is not final: reason codes, counts and affected ids.
+    incomplete_scope: dict[str, Any] = {}
+    #: Overall lower bound while partial, the final rate once complete.
+    aggregate: dict[str, Any] = {}
+    #: ``None`` whenever ``incomplete_scope`` is non-empty (C06).
+    final_result: dict[str, Any] | None = None
 
 
 class RegradeIn(Schema):
@@ -72,6 +81,19 @@ def practice_report(request, project_id: str, subject_id: str | None = None, sav
     return report_service.build_practice_report(
         user=request.user, project=project, subject=subject, save_snapshot=save_snapshot
     )
+
+
+@analytics_router.get("/projects/{project_id}/reports/calibration", auth=auth)
+def effect_calibration(request, project_id: str, subject_id: str | None = None):
+    """Effect calibration grouped by type/difficulty/time/exposure (C08).
+
+    Returned without a response schema on purpose: the payload is a nested
+    reporting structure whose shape is asserted by ``assert_no_causal_summary``
+    inside the service, and no single-number summary is part of it.
+    """
+    project = require_project(request.user, project_id)
+    subject = require_subject(request.user, project, subject_id) if subject_id else None
+    return calibration_service.build_effect_calibration(user=request.user, project=project, subject=subject)
 
 
 @analytics_router.get("/projects/{project_id}/reports/snapshots", auth=auth)
@@ -113,13 +135,18 @@ def cycle_analysis(request, project_id: str, subject_id: str, max_cycles: int = 
 def paper_coverage(request, project_id: str, subject_id: str):
     project = require_project(request.user, project_id)
     subject = require_subject(request.user, project, subject_id)
+    papers = report_service.paper_coverage(subject=subject)
     return {
         "subject_id": str(subject.id),
         "coverage_note": (
             "P0 只登记真实发生记录与完整性标记，不做年度占比统计；"
             "缺少预期场次时周期为 coverage_unknown，不冒充完整年度。"
         ),
-        "papers": report_service.paper_coverage(subject=subject),
+        "papers": papers,
+        # C06: a completion rate is final only when every paper has a confirmed
+        # complete revision; otherwise the rate is null and the blocking papers
+        # are named. `papers[*].coverage_rate` obeys the same rule per paper.
+        "completion": report_service.coverage_completion(subject=subject, papers=papers),
     }
 
 

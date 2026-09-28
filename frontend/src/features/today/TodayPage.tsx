@@ -111,6 +111,24 @@ export function TodayPage() {
 
       {todayQuery.isError ? <div className="notice danger">{describeError(todayQuery.error)}</div> : null}
 
+      {/* C05: the today page is one of the entry points to a timed mock exam; the
+          exam itself is started in the workbench, where the server clock and the
+          deadline are shown. */}
+      <div className="card" data-testid="today-mock-exam-entry">
+        <div className="row between">
+          <div>
+            <h2 style={{ margin: 0 }}>模拟考试（限时）</h2>
+            <p className="small muted" style={{ margin: '4px 0 0' }}>
+              计时由服务器负责：截止时间在创建时写入一次，刷新、断线重连或修改本机时间都不会延长；
+              考试进行中不显示分数、正误、答案与讲解，也不提供辅导。
+            </p>
+          </div>
+          <button className="btn" onClick={() => navigate('/practice?exam=1')}>
+            去开始模拟考试
+          </button>
+        </div>
+      </div>
+
       {!data?.plan ? (
         <div className="card empty-state">
           <p>今天还没有计划。</p>

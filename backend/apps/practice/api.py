@@ -34,12 +34,28 @@ _dispatch = outbox.after_commit_dispatch
 
 
 class SessionCreateIn(Schema):
+    """Create a session.
+
+    ``mode="mock_exam"`` starts a *timed* exam. Its length is either
+    ``duration_minutes`` (5–600, server-validated) or the sum of the published
+    spec's per-type seconds for the questions actually in the session; if neither
+    is available the request is refused, so an exam is never open-ended.
+
+    The deadline itself is ``exam_started_at + length``, computed on the server
+    from the server clock. A client-supplied ``exam_deadline``, ``deadline``,
+    ``now`` or ``started_at`` field is not part of this schema and is ignored:
+    no request can move, extend or shorten the deadline, and refreshing or
+    reconnecting cannot either.
+    """
+
     mode: str = SessionMode.PRACTICE
     subject_id: str
     question_ids: list[str] = []
     task_id: str | None = None
     exam_spec_version_id: str | None = None
     purpose: str = "practice"
+    #: Explicit mock-exam length in minutes; only meaningful for ``mock_exam``.
+    duration_minutes: int | None = None
 
 
 class SessionOut(Schema):
@@ -62,6 +78,13 @@ class SessionOut(Schema):
     #: Items whose grading is withheld because a *different* running verification
     #: covers the same content (empty unless the content gate applies).
     grading_withheld_session_item_ids: list[str] = []
+    #: C05: the server-owned exam clock, echoed on every snapshot so the client
+    #: renders the same deadline the server enforces.
+    server_time: str | None = None
+    exam_started_at: str | None = None
+    exam_deadline: str | None = None
+    #: Set when the server finished the exam because the deadline had passed.
+    expired_at: str | None = None
 
 
 class DraftIn(Schema):
@@ -231,6 +254,7 @@ def create_session(request, project_id: str, payload: SessionCreateIn):
         task=task,
         spec_version=spec,
         purpose=payload.purpose,
+        duration_minutes=payload.duration_minutes,
     )
     result = session_services.session_state(session, user=request.user)
     idempotency.record_result(
@@ -287,6 +311,9 @@ def finish_session(request, project_id: str, session_id: str):
 @practice_router.get("/projects/{project_id}/practice-sessions", auth=auth)
 def list_sessions(request, project_id: str, subject_id: str | None = None, limit: int = 20):
     project = require_project(request.user, project_id)
+    # C05: reconcile this user's overdue exams before the list is built, so the
+    # list cannot disagree with the detail view about a run that is already over.
+    session_services.expire_due_mock_exams(user=request.user, project=project)
     queryset = PracticeSession.objects.filter(project=project, user=request.user).order_by("-created_at")
     if subject_id:
         require_subject(request.user, project, subject_id)
@@ -310,6 +337,8 @@ def list_sessions(request, project_id: str, subject_id: str | None = None, limit
                 "item_count": session.items.count(),
                 "submitted_count": Attempt.objects.filter(session_item__session=session).count(),
                 "grading_hidden": session.hides_grading or withheld,
+                "exam_deadline": session.exam_deadline.isoformat() if session.exam_deadline else None,
+                "expired_at": session.expired_at.isoformat() if session.expired_at else None,
             }
         )
     return rows
@@ -329,6 +358,10 @@ def get_presentation(request, project_id: str, item_id: str):
 def put_draft(request, project_id: str, item_id: str, payload: DraftIn):
     project = require_project(request.user, project_id)
     item = _item_scope(request.user, project, item_id)
+    # C05: reconcile outside the draft transaction. The service refuses a draft on
+    # a finished session by raising, and a raise rolls its own atomic block back;
+    # the exam must still be recorded as finished at its deadline.
+    session_services.reconcile_item_session(item)
     item = session_services.save_draft(
         item=item, user=request.user, draft=payload.draft, draft_revision=payload.draft_revision
     )
@@ -351,6 +384,11 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
     """
     project = require_project(request.user, project_id)
     item = _item_scope(request.user, project, item_id)
+    # C05: reconcile before the submission transaction. A late answer is refused by
+    # raising, and that raise rolls the service's own atomic block back — including
+    # an expiry recorded inside it. Finishing the exam here keeps the refusal from
+    # leaving an overdue run looking active.
+    session_services.reconcile_item_session(item)
     key = idempotency_key(request)
     scope = f"items.submit:{item_id}"
     body = payload.model_dump(mode="json")
@@ -370,7 +408,7 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
     except AlreadySubmitted as exc:
         # A different key against an already-submitted item is still a conflict.
         raise AlreadySubmitted(details=exc.details) from exc
-    session = item.session
+    session = session_services.reconcile_item_session(item)
     hidden = session_services.delivery_hidden_for_item(item=item, user=request.user)
     result = {
         "session_item_id": str(item.id),
@@ -394,13 +432,19 @@ def submit(request, project_id: str, item_id: str, payload: SubmitIn):
 
 
 def _submission_receipt(*, item: SessionItem, user, fallback) -> tuple[int, dict[str, Any]]:
-    """Re-serialise a replayed submission against the current visibility gate."""
+    """Re-serialise a replayed submission against the current visibility gate.
+
+    A retry that arrives after the exam deadline therefore returns the *result*
+    of the in-time submission (the exam is finished, so its grades are readable),
+    never a cached body from before the deadline (C05: the auto-finish already
+    graded whatever was submitted in time).
+    """
     attempt = (
         Attempt.objects.filter(session_item=item).select_related("current_grade_event").first()
     )
     if attempt is None:  # the effect never landed; the stored body is all we have
         return fallback.status_code, fallback.body
-    session = item.session
+    session = session_services.reconcile_item_session(item)
     hidden = session_services.delivery_hidden_for_item(item=item, user=user)
     return 200, {
         "session_item_id": str(item.id),
@@ -422,7 +466,9 @@ def get_attempt(request, project_id: str, attempt_id: str):
     )
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
-    session = attempt.session_item.session
+    # C05: a read path touching an exam reconciles it first. Without this a tab
+    # opened after the deadline would still be told the score is withheld.
+    session = session_services.reconcile_item_session(attempt.session_item)
     # B02: an already stored grade is the same disclosure as a fresh one, so the
     # read path is gated too (a result written before the verification started
     # must not become a bypass).
@@ -461,13 +507,16 @@ def confirm_grade(request, project_id: str, attempt_id: str, payload: ConfirmGra
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
     item = attempt.session_item
+    # C05: once the deadline has passed the exam is over, so its grades may be
+    # decided; while it is still running the gate below keeps the mutation (and
+    # therefore every later read) from leaking the result.
+    session = session_services.reconcile_item_session(item)
     verification_gate.assert_grading_not_blocked(item=item, action="确认此题评分")
     key = idempotency_key(request)
     scope = f"attempts.confirm:{attempt_id}"
     body = payload.model_dump(mode="json")
     replay = idempotency.claim(request.user, scope, key, body)
     if replay is not None:
-        session = item.session
         hidden = session_services.delivery_hidden_for_item(item=item, user=request.user)
         if hidden:
             raise PurposeNotAllowed(
@@ -488,7 +537,7 @@ def confirm_grade(request, project_id: str, attempt_id: str, payload: ConfirmGra
         rubric_version_id=payload.rubric_version_id,
         comment=payload.comment,
     )
-    session = attempt.session_item.session
+    session = session_services.expire_session_if_due(session)
     result = session_services.grade_payload(grade, session=session)
     idempotency.record_result(
         request.user,
@@ -510,7 +559,9 @@ def confirm_grade(request, project_id: str, attempt_id: str, payload: ConfirmGra
 def reveal_item(request, project_id: str, item_id: str):
     project = require_project(request.user, project_id)
     item = _item_scope(request.user, project, item_id)
-    session = item.session
+    # C05: after the deadline the exam is over and its answers become readable;
+    # reconcile before deciding so a stale tab is not refused forever.
+    session = session_services.reconcile_item_session(item)
     already_submitted = Attempt.objects.filter(session_item=item).exists()
     session_services.assert_reveal_allowed(item=item, session=session, before_submit=not already_submitted)
     # The same content may be part of a *different* running verification (another
@@ -545,7 +596,9 @@ def reveal_attempt(request, project_id: str, attempt_id: str):
     if attempt is None:
         raise ScopeViolation(message="作答不存在或不在当前权限范围")
     item = attempt.session_item
-    session = item.session
+    # C05: the same reconciliation the item-reveal path does — the deadline, not a
+    # stale tab, decides whether the answer may be read.
+    session = session_services.reconcile_item_session(item)
     session_services.assert_reveal_allowed(item=item, session=session, before_submit=False)
     verification_gate.assert_item_not_in_active_verification(item=item, action="查看答案与解析")
     payload = session_services.reveal_payload(item=item, session=session)
@@ -783,6 +836,9 @@ def grading_queue(request, project_id: str, subject_id: str | None = None, limit
     from apps.common.scope import is_reviewer_of
 
     project = require_project(request.user, project_id)
+    # C05: reconcile this user's overdue exams before the queue is built. An exam
+    # the server has already closed must not keep its attempts out of the queue.
+    session_services.expire_due_mock_exams(user=request.user, project=project)
     content_map = verification_gate.active_verification_content_map(user=request.user)
     queryset = (
         Attempt.objects.filter(project=project)

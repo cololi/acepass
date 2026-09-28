@@ -2,19 +2,26 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   apiRequest,
+  bucketIsFinal,
   newIdempotencyKey,
+  percentOfFraction,
   type AiRunRow,
   type AiStatus,
+  type CoverageCompletionOut,
   type CycleAnalysisOut,
   type PaperOut,
   type PaperRevisionOut,
+  type ReportBucketOut,
   type ReportOut,
 } from '../../api/client'
 import { describeError, useScope, useToast } from '../../app/context'
+import { CalibrationPanel } from './CalibrationPanel'
 
 const BUCKET_LABELS: Record<string, string> = {
+  fully_graded: '已评完（每个评分点都已决定，可作能力证据）',
   fully_confirmed: '完整确认（可作为能力证据）',
   strict_independent: '严格独立正确',
+  partially_graded: '部分已确认（未确认部分只是下限）',
   partially_pending: '部分待确认',
   pending_review: '待人工评分',
   self_assessed: '自评确认（单列）',
@@ -67,6 +74,45 @@ function percentOf(share: string | null): string {
   const value = Number(share)
   if (!Number.isFinite(value)) return share
   return `${(value * 100).toFixed(1)}%`
+}
+
+/** A UUID is unreadable in a sentence; the full id stays in the tooltip. */
+function shortId(value: string): string {
+  return value.length > 8 ? value.slice(0, 8) : value
+}
+
+/**
+ * C06: one bucket's fraction, labelled honestly.
+ *
+ * A bucket whose marks are not all confirmed is a *lower bound*, not a rate: the
+ * cell says so in words and names how many marks are still missing, so the
+ * number can never be read as the finished score rate. Only buckets the server
+ * marks `partial_lower_bound` (or that still carry pending marks in an older
+ * payload) take this path.
+ */
+function BucketFraction({ bucket }: { bucket: ReportBucketOut }) {
+  if (!bucket.confirmed_fraction) {
+    return <span className="muted">—</span>
+  }
+  if (bucketIsFinal(bucket)) {
+    return (
+      <span>
+        {percentOf(bucket.confirmed_fraction)}
+        <span className="pill ok" style={{ marginLeft: 6 }}>
+          已全部确认
+        </span>
+      </span>
+    )
+  }
+  return (
+    <span>
+      已确认部分（下限）{percentOf(bucket.confirmed_fraction)}
+      <span className="pill warn" style={{ marginLeft: 6 }}>
+        下限
+      </span>
+      <span className="tiny muted"> 还有 {bucket.pending_max_score} 分未评，不是最终得分率</span>
+    </span>
+  )
 }
 
 function integerOrNull(value: string): number | null {
@@ -176,9 +222,11 @@ export function ReportsPage() {
   const coverageQuery = useQuery({
     queryKey: ['coverage', projectId, currentSubject?.id],
     queryFn: () =>
-      apiRequest<{ coverage_note: string; papers: Array<Record<string, unknown>> }>(
-        `/projects/${projectId}/papers/coverage?subject_id=${currentSubject?.id}`,
-      ),
+      apiRequest<{
+        coverage_note: string
+        papers: Array<Record<string, unknown>>
+        completion: CoverageCompletionOut
+      }>(`/projects/${projectId}/papers/coverage?subject_id=${currentSubject?.id}`),
     enabled: Boolean(projectId && currentSubject),
   })
 
@@ -283,8 +331,17 @@ export function ReportsPage() {
 
   if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
 
-  const report = reportQuery.data
+  // A failed read clears the report: a stale aggregate must never stay on screen
+  // while the server is saying it cannot be computed.
+  const report = reportQuery.isError ? null : reportQuery.data
   const cycle = cycleQuery.data
+  const coverageCompletion = coverageQuery.isError ? null : (coverageQuery.data?.completion ?? null)
+  const incompleteScope = report?.incomplete_scope ?? null
+  const aggregate = report?.aggregate ?? null
+  const finalResult = report?.final_result ?? null
+  const resultIncomplete =
+    report?.result_status === 'incomplete' || Boolean(incompleteScope?.is_incomplete)
+  const resultNoData = report?.result_status === 'no_data' || aggregate?.status === 'no_data'
 
   return (
     <>
@@ -304,6 +361,107 @@ export function ReportsPage() {
       {reportQuery.isLoading ? <div className="card empty-state">统计数据中…</div> : null}
       {reportQuery.isError ? <div className="notice danger">{describeError(reportQuery.error)}</div> : null}
 
+      {report && resultIncomplete ? (
+        <div
+          className="card"
+          data-testid="report-incomplete-banner"
+          style={{ borderColor: '#e0a800', background: '#fffdf5' }}
+        >
+          <h2 style={{ marginTop: 0, color: '#8a6100' }}>成绩未完成</h2>
+          <p className="small">
+            范围内有 <strong>{incompleteScope?.incomplete_attempts ?? 0}</strong> 次作答仍有未确认部分
+            {incompleteScope?.attempts_in_scope !== undefined
+              ? `（共 ${incompleteScope.attempts_in_scope} 次在范围内）`
+              : ''}
+            ：在确认之前，本报告不输出最终得分率、通过率或排名。
+            {finalResult === null ? '服务器已把 final_result 置为 null。' : ''}
+          </p>
+          <ul className="small">
+            {(incompleteScope?.reasons ?? []).map((reason) => (
+              <li key={reason.code} data-testid="report-incomplete-reason">
+                <strong>{reason.message}</strong>（{reason.attempt_count} 次）
+                {reason.question_ids.length ? (
+                  <span className="tiny muted">
+                    {' '}
+                    · 涉及题目：
+                    {reason.question_ids
+                      .slice(0, 5)
+                      .map((id) => shortId(id))
+                      .join('、')}
+                    {reason.question_ids.length > 5 ? ' 等' : ''}
+                  </span>
+                ) : null}
+                {reason.session_item_ids.length ? (
+                  <span className="tiny muted">
+                    {' '}
+                    · 题项：
+                    {reason.session_item_ids
+                      .slice(0, 5)
+                      .map((id) => shortId(id))
+                      .join('、')}
+                    {reason.session_item_ids.length > 5 ? ' 等' : ''}
+                  </span>
+                ) : null}
+                {reason.ids_truncated ? <span className="tiny muted">（列表已截断）</span> : null}
+              </li>
+            ))}
+          </ul>
+          {incompleteScope?.missing_note ? (
+            <p className="small muted" style={{ marginBottom: 0 }}>
+              {incompleteScope.missing_note}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* The lower bound must stay visible while the scope is incomplete: it is
+          the honest number, and hiding it would leave the banner without a value.
+          The final card keeps its own guard so it can never render for an
+          incomplete report even if the server ever sent both. */}
+      {report ? (
+        resultNoData ? (
+          <div className="card" data-testid="report-no-data">
+            <h2>没有可统计的作答</h2>
+            <p className="small muted" style={{ marginBottom: 0 }}>
+              {aggregate?.label ?? '服务器没有返回可统计的作答：不显示任何推算得分率、通过率或排名。'}
+            </p>
+          </div>
+        ) : finalResult && !resultIncomplete ? (
+          <div className="card" data-testid="report-final-result">
+            <h2>最终结果（范围内每一次作答都已确认）</h2>
+            <p className="small">
+              最终得分率 <strong>{percentOfFraction(finalResult.score_rate)}</strong> · 已确认{' '}
+              {finalResult.confirmed_score} / {finalResult.max_score} 分 · 覆盖 {finalResult.attempts} 次作答
+              {finalResult.includes_self_assessed_attempts
+                ? `（含 ${finalResult.includes_self_assessed_attempts} 次自评确认，单列展示）`
+                : ''}
+            </p>
+            <p className="tiny muted" style={{ marginBottom: 0 }}>
+              {finalResult.basis}
+            </p>
+          </div>
+        ) : aggregate || resultIncomplete ? (
+          <div className="card" data-testid="report-lower-bound">
+            <h2>已确认部分（下限）</h2>
+            <p className="small">
+              已确认部分（下限）<strong>{percentOfFraction(aggregate?.lower_bound ?? null)}</strong>
+              {aggregate ? `（已确认 ${aggregate.confirmed_score} / ${aggregate.max_score} 分）` : ''}；
+              还有 <strong>{aggregate?.unresolved_max_score ?? '—'}</strong> 分未评
+              {aggregate ? `（${aggregate.unresolved_attempts} 次作答）` : ''}。
+            </p>
+            <p className="small">
+              <strong>这不是最终得分率</strong>：未确认部分不计入，也不输出通过率或排名。
+            </p>
+            {aggregate?.label ? <p className="tiny muted">{aggregate.label}</p> : null}
+            {aggregate?.missing?.note ? (
+              <p className="tiny muted" style={{ marginBottom: 0 }}>
+                {aggregate.missing.note}
+              </p>
+            ) : null}
+          </div>
+        ) : null
+      ) : null}
+
       {report ? (
         <>
           <div className="card">
@@ -322,13 +480,18 @@ export function ReportsPage() {
                 </thead>
                 <tbody>
                   {Object.entries(report.totals).map(([key, bucket]) => (
-                    <tr key={key}>
+                    <tr
+                      key={key}
+                      data-testid={bucketIsFinal(bucket) ? undefined : 'report-partial-bucket'}
+                    >
                       <td>{BUCKET_LABELS[key] ?? key}</td>
                       <td>{bucket.attempts}</td>
                       <td>{bucket.confirmed_score}</td>
                       <td>{bucket.max_score}</td>
                       <td>{bucket.pending_max_score}</td>
-                      <td>{bucket.confirmed_fraction ?? '—'}</td>
+                      <td>
+                        <BucketFraction bucket={bucket} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -354,6 +517,7 @@ export function ReportsPage() {
                       <th>次数</th>
                       <th>确认分</th>
                       <th>待评</th>
+                      <th>确认比例</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -365,6 +529,9 @@ export function ReportsPage() {
                           {bucket.confirmed_score} / {bucket.max_score}
                         </td>
                         <td>{bucket.pending_max_score}</td>
+                        <td className="small">
+                          <BucketFraction bucket={bucket} />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -429,6 +596,8 @@ export function ReportsPage() {
           </div>
         </>
       ) : null}
+
+      <CalibrationPanel projectId={projectId} subjectId={currentSubject?.id ?? null} />
 
       <div className="card" data-testid="cycle-analysis">
         <h2>真实周期分析（近五年）</h2>
@@ -619,6 +788,34 @@ export function ReportsPage() {
       <div className="card">
         <h2>真实试卷覆盖登记</h2>
         <p className="small muted">{coverageQuery.data?.coverage_note ?? coverageQuery.data?.coverage_note}</p>
+        {coverageQuery.isError ? (
+          <div className="notice danger">{describeError(coverageQuery.error)}</div>
+        ) : null}
+        {coverageCompletion ? (
+          coverageCompletion.status === 'final' && coverageCompletion.final_result ? (
+            <div className="notice ok" data-testid="coverage-completion">
+              <strong>覆盖完整：</strong>完成率可作为最终值{' '}
+              {percentOfFraction(coverageCompletion.final_result.coverage_rate)}（
+              {coverageCompletion.final_result.papers_total} 份已登记试卷全部覆盖完整）。
+            </div>
+          ) : coverageCompletion.status === 'no_data' ? (
+            <div className="notice info" data-testid="coverage-completion">
+              {coverageCompletion.note}
+            </div>
+          ) : (
+            <div className="notice warn" data-testid="coverage-completion">
+              <strong>覆盖未完成：不输出完成率。</strong>
+              {coverageCompletion.incomplete_scope.blocked_paper_count} /{' '}
+              {coverageCompletion.incomplete_scope.papers_total} 份试卷的覆盖未确认完整
+              {coverageCompletion.lower_bound
+                ? `（已完成 {percentOfFraction(coverageCompletion.lower_bound)} 只是下限）`
+                : ''}
+              ：{(coverageCompletion.incomplete_scope.reasons ?? [])
+                .map((reason) => `${reason.message}（${reason.paper_count}）`)
+                .join('；') || '原因未提供'}
+            </div>
+          )
+        ) : null}
         {coverageQuery.data?.papers.length ? (
           <div className="table-scroll">
             <table className="data">
