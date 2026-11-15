@@ -361,3 +361,148 @@ class FollowUpStatus(models.TextChoices):
     PENDING = "pending", "待回答"
     ANSWERED = "answered", "已回答"
     SKIPPED = "skipped", "已跳过"
+
+
+# ---------------------------------------------------------------------------
+# M1 interaction redesign: node-level memory, learning sessions and coach turns
+# ---------------------------------------------------------------------------
+# These choices are additive. Nothing here changes an existing artefact: the
+# question-level memory card, practice evidence and knowledge state keep their
+# own vocabularies so that a recall event can never be mistaken for solving
+# evidence (docs/26 §10).
+
+
+class NodeCardStatus(models.TextChoices):
+    """Review state of one knowledge-node core-content card.
+
+    Only a ``confirmed`` card may serve as the key-point baseline of a recall
+    check or as the reading material of an encoding step; a ``draft`` — in
+    particular a model-generated candidate — is display-only.
+    """
+
+    DRAFT = "draft", "草稿"
+    CONFIRMED = "confirmed", "已确认"
+
+
+class NodeCardOrigin(models.TextChoices):
+    """Where a card revision came from. A model card always needs confirmation."""
+
+    MANUAL = "manual", "人工录入"
+    MODEL_CANDIDATE = "model_candidate", "模型草稿（需确认）"
+
+
+class NodeMemoryModality(models.TextChoices):
+    """What kind of content the memory state tracks.
+
+    v1 implements ``recall`` only (the core proposition of a knowledge point).
+    ``method`` is reserved for "when/how to apply it" recollections and must not
+    be written by the v1 services.
+    """
+
+    RECALL = "recall", "核心内容回忆"
+    METHOD = "method", "方法/适用条件（预留）"
+
+
+class RecallEventKind(models.TextChoices):
+    """The shape of one retrieval attempt on a knowledge point."""
+
+    FREE_RECALL = "free_recall", "自由回忆"
+    CUED_RECALL = "cued_recall", "线索回忆"
+    SELF_EXPLAIN = "self_explain", "自我解释"
+    QUIZ = "quiz", "记忆小测"
+
+
+class RecallEventSource(models.TextChoices):
+    """Who decided the coverage/rating of one recall event.
+
+    Only ``model_assisted_confirmed`` records that a model proposal existed *and*
+    the learner confirmed it; a model proposal alone is never recorded here.
+    """
+
+    SELF_REPORT = "self_report", "学习者自评"
+    DETERMINISTIC = "deterministic", "确定性规则"
+    MODEL_ASSISTED_CONFIRMED = "model_assisted_confirmed", "模型建议并经确认"
+
+
+class InteractionSessionMode(models.TextChoices):
+    """Why a learning session exists. All modes share one step state machine."""
+
+    DAILY = "daily", "日常学习"
+    NEW_LEARN = "new_learn", "新考点学习"
+    REPAIR = "repair", "修复"
+    EXAM_PREP = "exam_prep", "考前冲刺"
+    QUICK_RECALL = "quick_recall", "5 分钟回忆"
+
+
+class InteractionSessionStatus(models.TextChoices):
+    PLANNED = "planned", "已规划"
+    ACTIVE = "active", "进行中"
+    COMPLETED = "completed", "已完成"
+    ABANDONED = "abandoned", "已放弃"
+    EXPIRED = "expired", "已过期"
+
+
+class SessionStage(models.TextChoices):
+    """Fixed stage order of a session (docs/26 §6.2)."""
+
+    WARMUP = "warmup", "唤回"
+    ENCODE = "encode", "编码"
+    PRACTICE = "practice", "练习"
+    REPAIR = "repair", "修复"
+    TRANSFER = "transfer", "迁移"
+
+
+class SessionStepKind(models.TextChoices):
+    RECALL = "recall", "回忆"
+    ENCODE_READ = "encode_read", "读考点卡"
+    SELF_EXPLAIN = "self_explain", "自我解释"
+    PRACTICE = "practice", "练习"
+    REPAIR_BRIEF = "repair_brief", "最小讲解"
+    REPAIR_RETEST = "repair_retest", "再测"
+    TRANSFER = "transfer", "迁移"
+
+
+class SessionStepStatus(models.TextChoices):
+    PENDING = "pending", "待开始"
+    ACTIVE = "active", "进行中"
+    SUBMITTED = "submitted", "已提交"
+    COMPLETED = "completed", "已完成"
+    SKIPPED = "skipped", "已跳过"
+    EXPIRED = "expired", "已过期"
+
+
+class SessionStepOutcome(models.TextChoices):
+    """The factual result of a step, never a mastery claim."""
+
+    UNKNOWN = "unknown", "未判定"
+    RECALLED = "recalled", "回忆完整"
+    PARTIAL = "partial", "部分回忆"
+    NOT_RECALLED = "not_recalled", "未能回忆"
+    CORRECT = "correct", "答对"
+    PARTIALLY_CORRECT = "partially_correct", "部分正确"
+    INCORRECT = "incorrect", "答错"
+    PENDING_REVIEW = "pending_review", "待人工评分"
+    SKIPPED = "skipped", "已跳过"
+
+
+class CoachPurpose(models.TextChoices):
+    """The only purposes a node-level model coach may be asked for (docs/26 §7.1)."""
+
+    RECALL_CHECK = "recall_check", "回忆覆盖检查"
+    SELF_EXPLAIN_CHECK = "self_explain_check", "自我解释检查"
+    HINT = "hint", "提示"
+    MISCONCEPTION_PROBE = "misconception_probe", "错因追问"
+    ENCODE_BRIEFING = "encode_briefing", "考点卡草稿"
+    SESSION_REFLECTION = "session_reflection", "会话反思"
+
+
+class CoachTurnStatus(models.TextChoices):
+    QUEUED = "queued", "排队中"
+    SUCCEEDED = "succeeded", "成功"
+    FAILED = "failed", "失败"
+    UNAVAILABLE = "unavailable", "AI 不可用"
+
+
+class CoachTurnRole(models.TextChoices):
+    ASSISTANT = "assistant", "教练"
+    USER = "user", "学习者"

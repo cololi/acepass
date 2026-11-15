@@ -102,8 +102,8 @@ function uniqueValue(definition: { type: string; json: boolean; kind: string }, 
 }
 
 test('constraints: the schema carries the same constraint counts as the inventory', () => {
-  // 31 declared-model constraints + 2 auto-created M2M pair constraints.
-  assert.equal(UNIQUE_CONSTRAINTS.length, 33, '31 declared + 2 through-table pairs')
+  // 36 declared-model constraints (31 + the five M1 interaction tables) + 2 auto-created M2M pairs.
+  assert.equal(UNIQUE_CONSTRAINTS.length, 38, '36 declared + 2 through-table pairs')
   assert.equal(UNIQUE_CONSTRAINTS.filter((entry) => entry.partial).length, 3, 'inventory: 3 conditional')
   assert.equal(CHECK_CONSTRAINTS.length, 6, 'inventory: 6 check constraints')
 })

@@ -27,6 +27,7 @@ export type DispositionStatus = 'succeeded' | 'rejected'
 /** Rows an AI path may append/update. Every one of them is audit or candidate material. */
 export const AI_WRITE_TARGETS = [
   'llm_run',
+  'coach_turn',
   'import_candidate',
   'tag_suggestion',
   'answer_transcription',
@@ -89,6 +90,7 @@ export interface ValidationDisposition {
 }
 
 const BASE_WRITES: Record<AuditCapability, readonly AiWriteTarget[]> = {
+  memory_coach: ['llm_run', 'coach_turn'],
   extract_question: ['llm_run', 'import_candidate'],
   explain: ['llm_run', 'tutor_job', 'tutor_segment'],
   suggest_tags: ['llm_run', 'tag_suggestion'],
@@ -130,6 +132,10 @@ export function validationDisposition(
       return problems.length > 0
         ? disposition(capability, 'rejected', true, 'validation_problems')
         : disposition(capability, 'succeeded', true, 'candidate_stored')
+    case 'memory_coach':
+      return problems.length > 0
+        ? disposition(capability, 'rejected', false, 'validation_problems')
+        : disposition(capability, 'succeeded', true, 'coach_turn_stored')
     case 'explain':
       return problems.length > 0
         ? disposition(capability, 'rejected', false, 'validation_problems')

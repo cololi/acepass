@@ -206,14 +206,14 @@ test('reconcile: a scratch database exports, imports and reconciles', { timeout:
   const summary = result.summary!
   assert.equal(summary.ok, true)
   assert.equal(summary.database, DRILL_DB)
-  // 57 declared models + 2 auto-created M2M through tables = 59 archive tables.
-  assert.equal(summary.tables.schema, 59)
-  assert.equal(summary.tables.declaredModels, 57)
+  // 63 declared models + 2 auto-created M2M through tables = 65 archive tables (M1 added six).
+  assert.equal(summary.tables.schema, 65)
+  assert.equal(summary.tables.declaredModels, 63)
   assert.equal(summary.tables.autoCreated, 2)
-  assert.equal(summary.tables.exported, 59)
-  assert.equal(summary.tables.rowsEqual, 59, 'every table must agree on its row count')
-  assert.equal(summary.tables.digestEqual, 59, 'every table must agree on its row digest')
-  assert.equal(summary.tables.manifestDigestEqual, 59, 'every manifest digest must match its row file')
+  assert.equal(summary.tables.exported, 65)
+  assert.equal(summary.tables.rowsEqual, 65, 'every table must agree on its row count')
+  assert.equal(summary.tables.digestEqual, 65, 'every table must agree on its row digest')
+  assert.equal(summary.tables.manifestDigestEqual, 65, 'every manifest digest must match its row file')
   assert.ok(summary.tables.rows > 0, 'the seeded rows must be exported')
   assert.ok(summary.tables.nonEmpty > 0, 'the seeded tables must arrive non-empty')
   assert.equal(summary.statistics.equal, summary.statistics.total)
@@ -225,7 +225,7 @@ test('reconcile: a scratch database exports, imports and reconciles', { timeout:
   assert.equal(report.archive.source.engine, 'postgresql')
   assert.equal(report.archive.source.database, DRILL_DB)
   assert.equal(report.archive.missing_models.length, 0)
-  assert.equal(report.archive.tables, 59)
+  assert.equal(report.archive.tables, 65)
   assert.deepEqual(report.source.schema.missing_tables, [])
   assert.deepEqual(report.source.schema.missing_columns, [])
   assert.deepEqual(report.source.schema.auto_created_tables, [
@@ -267,8 +267,8 @@ test('reconcile: a manifest row count that lies exits non-zero', { timeout: 240_
     result.summary?.problems.some((problem: string) => problem.startsWith('accounts_user:')),
     `the summary must name the table, got ${JSON.stringify(result.summary?.problems)}`,
   )
-  assert.equal(result.summary?.tables.rowsEqual, 58)
-  assert.equal(result.summary?.tables.digestEqual, 59)
+  assert.equal(result.summary?.tables.rowsEqual, 64)
+  assert.equal(result.summary?.tables.digestEqual, 65)
   // The statistics still agree: only the count check failed.
   assert.deepEqual(result.summary?.statistics.differ, [])
 })
@@ -292,9 +292,9 @@ test('reconcile: a tampered row value exits non-zero', { timeout: 240_000 }, () 
     result.summary?.problems.some((problem: string) => problem.includes('archive digest mismatch: accounts_user')),
     `the summary must name the table, got ${JSON.stringify(result.summary?.problems)}`,
   )
-  assert.equal(result.summary?.tables.digestEqual, 59, 'the store matches the (tampered) files it read')
-  assert.equal(result.summary?.tables.manifestDigestEqual, 58, 'the manifest digest is the provenance check')
-  assert.equal(result.summary?.tables.rowsEqual, 59)
+  assert.equal(result.summary?.tables.digestEqual, 65, 'the store matches the (tampered) files it read')
+  assert.equal(result.summary?.tables.manifestDigestEqual, 64, 'the manifest digest is the provenance check')
+  assert.equal(result.summary?.tables.rowsEqual, 65)
 })
 
 test('reconcile: an internally consistent archive that changes a statistic exits non-zero', { timeout: 240_000 }, () => {
@@ -315,8 +315,8 @@ test('reconcile: an internally consistent archive that changes a statistic exits
 
   assert.equal(result.status, 1, 'a statistic mismatch must exit non-zero')
   assert.equal(result.summary?.ok, false)
-  assert.equal(result.summary?.tables.rowsEqual, 59, 'counts and digests are fine by construction')
-  assert.equal(result.summary?.tables.digestEqual, 59)
+  assert.equal(result.summary?.tables.rowsEqual, 65, 'counts and digests are fine by construction')
+  assert.equal(result.summary?.tables.digestEqual, 65)
   assert.ok(
     result.summary?.statistics.differ.includes('exposure_events'),
     `the summary must name the statistic, got ${JSON.stringify(result.summary?.statistics.differ)}`,

@@ -180,7 +180,7 @@ test('db backup: an online snapshot carries counts, digests and a checksum that 
     assert.equal(result.manifest.total_rows, 3)
     assert.equal(result.manifest.integrity.check, 'ok')
     assert.equal(result.manifest.integrity.foreign_key_violations, 0)
-    assert.equal(result.manifest.integrity.schema_version, 1)
+    assert.equal(result.manifest.integrity.schema_version, 2, 'M1 added six tables: the snapshot records schema version 2')
     assert.ok(existsSync(join(result.destDir, 'acepass.sqlite')))
     assert.ok(!existsSync(join(result.destDir, 'acepass.sqlite-wal')), 'the snapshot is a single file')
     assert.ok(!existsSync(join(result.destDir, 'acepass.sqlite-shm')))
@@ -213,7 +213,7 @@ test('db backup: a writer committing during the snapshot does not starve or tear
     assert.ok(snapshotRows <= after, `snapshot ${snapshotRows} cannot be ahead of the final store ${after}`)
     const verified = await verifyBackupDirectory(result.destDir)
     assert.equal(verified.inspection.foreign_key_violations, 0)
-    assert.equal(verified.inspection.schema_version, 1)
+    assert.equal(verified.inspection.schema_version, 2)
   } finally {
     rmSync(work, { recursive: true, force: true })
   }
@@ -238,7 +238,7 @@ test('db backup: rows committed to the WAL but not checkpointed are in the snaps
     } finally {
       snapshot.close()
     }
-    assert.equal(verified.inspection.schema_version, 1)
+    assert.equal(verified.inspection.schema_version, 2)
   } finally {
     rmSync(work, { recursive: true, force: true })
   }

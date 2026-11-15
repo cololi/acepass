@@ -34,7 +34,7 @@ from django.db.models.sql.query import Query  # noqa: E402
 
 OUR_APPS = {
     "accounts", "analytics", "audit", "exams", "ingestion", "knowledge",
-    "learning", "memory", "practice", "question_bank", "search", "tutoring",
+    "interaction", "learning", "memory", "practice", "question_bank", "search", "tutoring",
 }
 
 FIELD_TYPES = {
@@ -424,7 +424,7 @@ def main():
         " * re-runs the"
         " * generator and fails when this file has drifted from the models.\n"
         " */\n\n"
-        "export const SCHEMA_VERSION = 1\n\n"
+        "export const SCHEMA_VERSION = 2\n\n"
         "export interface ColumnDef {\n"
         "  name: string\n"
         "  field: string\n"

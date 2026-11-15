@@ -5,7 +5,7 @@
  * re-runs the * generator and fails when this file has drifted from the models.
  */
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 export interface ColumnDef {
   name: string
@@ -3989,6 +3989,484 @@ export const TABLES: TableDef[] = [
   ]
  },
  {
+  "name": "learning_interaction_session",
+  "app": "interaction",
+  "model": "InteractionSession",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "user_id",
+    "field": "user",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "project_id",
+    "field": "project",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "subject_id",
+    "field": "subject",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "syllabus_version_id",
+    "field": "syllabus_version",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "mode",
+    "field": "mode",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "status",
+    "field": "status",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "stage",
+    "field": "stage",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "plan_id",
+    "field": "plan",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "practice_session_id",
+    "field": "practice_session",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "budget_minutes",
+    "field": "budget_minutes",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "estimated_minutes",
+    "field": "estimated_minutes",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "started_at",
+    "field": "started_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "finished_at",
+    "field": "finished_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "summary",
+    "field": "summary",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "notes",
+    "field": "notes",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "rule_version",
+    "field": "rule_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "user_id",
+    "refTable": "accounts_user",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "project_id",
+    "refTable": "exams_project",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "subject_id",
+    "refTable": "exams_subject",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "syllabus_version_id",
+    "refTable": "exams_syllabus_version",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "plan_id",
+    "refTable": "learning_study_plan",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "practice_session_id",
+    "refTable": "practice_session",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   }
+  ]
+ },
+ {
+  "name": "learning_session_step",
+  "app": "interaction",
+  "model": "SessionStep",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "session_id",
+    "field": "session",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "ordinal",
+    "field": "ordinal",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "stage",
+    "field": "stage",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "kind",
+    "field": "kind",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "status",
+    "field": "status",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "node_id",
+    "field": "node",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "question_id",
+    "field": "question",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "session_item_id",
+    "field": "session_item",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "estimated_minutes",
+    "field": "estimated_minutes",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "hint_level",
+    "field": "hint_level",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "confidence_before",
+    "field": "confidence_before",
+    "type": "INTEGER",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "outcome",
+    "field": "outcome",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "payload",
+    "field": "payload",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "reason_codes",
+    "field": "reason_codes",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "deadline_at",
+    "field": "deadline_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "started_at",
+    "field": "started_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "finished_at",
+    "field": "finished_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "skipped_reason",
+    "field": "skipped_reason",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "session_id",
+    "refTable": "learning_interaction_session",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "node_id",
+    "refTable": "knowledge_node",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "question_id",
+    "refTable": "question_bank_question",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "session_item_id",
+    "refTable": "practice_session_item",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   }
+  ]
+ },
+ {
   "name": "knowledge_node",
   "app": "knowledge",
   "model": "KnowledgeNode",
@@ -4116,6 +4594,199 @@ export const TABLES: TableDef[] = [
     "refTable": "knowledge_node",
     "refColumn": "id",
     "onDelete": "CASCADE"
+   }
+  ]
+ },
+ {
+  "name": "knowledge_node_card",
+  "app": "knowledge",
+  "model": "KnowledgeNodeCard",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "node_id",
+    "field": "node",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "syllabus_version_id",
+    "field": "syllabus_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "revision",
+    "field": "revision",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "is_current",
+    "field": "is_current",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "bool",
+    "decimalPlaces": null
+   },
+   {
+    "name": "status",
+    "field": "status",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "origin",
+    "field": "origin",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "blocks",
+    "field": "blocks",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "key_points",
+    "field": "key_points",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "citations",
+    "field": "citations",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "source_note",
+    "field": "source_note",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "model_run_id",
+    "field": "model_run",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "confirmed_at",
+    "field": "confirmed_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "confirmed_by_id",
+    "field": "confirmed_by",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "node_id",
+    "refTable": "knowledge_node",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "syllabus_version_id",
+    "refTable": "exams_syllabus_version",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "model_run_id",
+    "refTable": "audit_llm_run",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "confirmed_by_id",
+    "refTable": "accounts_user",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
    }
   ]
  },
@@ -6345,6 +7016,738 @@ export const TABLES: TableDef[] = [
    {
     "column": "source_session_item_id",
     "refTable": "practice_session_item",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   }
+  ]
+ },
+ {
+  "name": "memory_node_state",
+  "app": "memory",
+  "model": "NodeMemoryState",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "user_id",
+    "field": "user",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "project_id",
+    "field": "project",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "syllabus_version_id",
+    "field": "syllabus_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "node_id",
+    "field": "node",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "modality",
+    "field": "modality",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "phase",
+    "field": "phase",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "stability",
+    "field": "stability",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "difficulty",
+    "field": "difficulty",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "due_at",
+    "field": "due_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "last_recall_at",
+    "field": "last_recall_at",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "reps",
+    "field": "reps",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "lapses",
+    "field": "lapses",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "learning_step",
+    "field": "learning_step",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "scheduler_version",
+    "field": "scheduler_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "params_version",
+    "field": "params_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "desired_retention",
+    "field": "desired_retention",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "is_suspended",
+    "field": "is_suspended",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "bool",
+    "decimalPlaces": null
+   },
+   {
+    "name": "suspended_reason",
+    "field": "suspended_reason",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "note",
+    "field": "note",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "user_id",
+    "refTable": "accounts_user",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "project_id",
+    "refTable": "exams_project",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "syllabus_version_id",
+    "refTable": "exams_syllabus_version",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "node_id",
+    "refTable": "knowledge_node",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   }
+  ]
+ },
+ {
+  "name": "memory_recall_event",
+  "app": "memory",
+  "model": "RecallEvent",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "memory_state_id",
+    "field": "memory_state",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "user_id",
+    "field": "user",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "project_id",
+    "field": "project",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "syllabus_version_id",
+    "field": "syllabus_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "node_id",
+    "field": "node",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "kind",
+    "field": "kind",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "rating",
+    "field": "rating",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "source",
+    "field": "source",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "is_spaced",
+    "field": "is_spaced",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "bool",
+    "decimalPlaces": null
+   },
+   {
+    "name": "early_review",
+    "field": "early_review",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "bool",
+    "decimalPlaces": null
+   },
+   {
+    "name": "coverage",
+    "field": "coverage",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "prompt_text",
+    "field": "prompt_text",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "answer_text",
+    "field": "answer_text",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "latency_ms",
+    "field": "latency_ms",
+    "type": "INTEGER",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "confidence_before",
+    "field": "confidence_before",
+    "type": "INTEGER",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "reviewed_at",
+    "field": "reviewed_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "elapsed_days",
+    "field": "elapsed_days",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "scheduled_days",
+    "field": "scheduled_days",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "interval_days",
+    "field": "interval_days",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "retrievability",
+    "field": "retrievability",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "is_lapse",
+    "field": "is_lapse",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "bool",
+    "decimalPlaces": null
+   },
+   {
+    "name": "phase_before",
+    "field": "phase_before",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "phase_after",
+    "field": "phase_after",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "stability_before",
+    "field": "stability_before",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "stability_after",
+    "field": "stability_after",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "difficulty_before",
+    "field": "difficulty_before",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "difficulty_after",
+    "field": "difficulty_after",
+    "type": "REAL",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "float",
+    "decimalPlaces": null
+   },
+   {
+    "name": "due_before",
+    "field": "due_before",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "due_after",
+    "field": "due_after",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "scheduler_version",
+    "field": "scheduler_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "params_version",
+    "field": "params_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "idempotency_key",
+    "field": "idempotency_key",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "session_id",
+    "field": "session",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "step_id",
+    "field": "step",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "question_id",
+    "field": "question",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "session_item_id",
+    "field": "session_item",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "model_run_id",
+    "field": "model_run",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "note",
+    "field": "note",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "memory_state_id",
+    "refTable": "memory_node_state",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "user_id",
+    "refTable": "accounts_user",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "project_id",
+    "refTable": "exams_project",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "syllabus_version_id",
+    "refTable": "exams_syllabus_version",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "node_id",
+    "refTable": "knowledge_node",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "session_id",
+    "refTable": "learning_interaction_session",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "step_id",
+    "refTable": "learning_session_step",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "question_id",
+    "refTable": "question_bank_question",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "session_item_id",
+    "refTable": "practice_session_item",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "model_run_id",
+    "refTable": "audit_llm_run",
     "refColumn": "id",
     "onDelete": "SET NULL"
    }
@@ -9615,6 +11018,261 @@ export const TABLES: TableDef[] = [
   ]
  },
  {
+  "name": "tutoring_coach_turn",
+  "app": "tutoring",
+  "model": "CoachTurn",
+  "columns": [
+   {
+    "name": "id",
+    "field": "id",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": true,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "created_at",
+    "field": "created_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "updated_at",
+    "field": "updated_at",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "datetime",
+    "decimalPlaces": null
+   },
+   {
+    "name": "thread_key",
+    "field": "thread_key",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "user_id",
+    "field": "user",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "project_id",
+    "field": "project",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "node_id",
+    "field": "node",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "session_id",
+    "field": "session",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "step_id",
+    "field": "step",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "purpose",
+    "field": "purpose",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "role",
+    "field": "role",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "ordinal",
+    "field": "ordinal",
+    "type": "INTEGER",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "int",
+    "decimalPlaces": null
+   },
+   {
+    "name": "status",
+    "field": "status",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "text",
+    "field": "text",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "structured",
+    "field": "structured",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "citations",
+    "field": "citations",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "missing_information",
+    "field": "missing_information",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": true,
+    "kind": "json",
+    "decimalPlaces": null
+   },
+   {
+    "name": "llm_run_id",
+    "field": "llm_run",
+    "type": "TEXT",
+    "notNull": false,
+    "primaryKey": false,
+    "json": false,
+    "kind": "uuid",
+    "decimalPlaces": null
+   },
+   {
+    "name": "prompt_version",
+    "field": "prompt_version",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "error_code",
+    "field": "error_code",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   },
+   {
+    "name": "error_message",
+    "field": "error_message",
+    "type": "TEXT",
+    "notNull": true,
+    "primaryKey": false,
+    "json": false,
+    "kind": "text",
+    "decimalPlaces": null
+   }
+  ],
+  "foreignKeys": [
+   {
+    "column": "user_id",
+    "refTable": "accounts_user",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "project_id",
+    "refTable": "exams_project",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "node_id",
+    "refTable": "knowledge_node",
+    "refColumn": "id",
+    "onDelete": "CASCADE"
+   },
+   {
+    "column": "session_id",
+    "refTable": "learning_interaction_session",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "step_id",
+    "refTable": "learning_session_step",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   },
+   {
+    "column": "llm_run_id",
+    "refTable": "audit_llm_run",
+    "refColumn": "id",
+    "onDelete": "SET NULL"
+   }
+  ]
+ },
+ {
   "name": "tutoring_job",
   "app": "tutoring",
   "model": "TutorJob",
@@ -10288,7 +11946,10 @@ export const CREATE_TABLES: string[] = [
  "CREATE TABLE IF NOT EXISTS \"ingestion_import_job_documents\" (\n  \"id\" INTEGER PRIMARY KEY AUTOINCREMENT,\n  \"importjob_id\" TEXT NOT NULL,\n  \"sourcedocument_id\" TEXT NOT NULL,\n  FOREIGN KEY (\"importjob_id\") REFERENCES \"ingestion_import_job\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"sourcedocument_id\") REFERENCES \"ingestion_source_document\" (\"id\") ON DELETE CASCADE,\n  CONSTRAINT \"ingestion_import_job_documents_importjob_id_sourcedocument_id_8ee42495_uniq\" UNIQUE (\"importjob_id\", \"sourcedocument_id\")\n)",
  "CREATE TABLE IF NOT EXISTS \"ingestion_source_document\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"owner_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"subject_id\" TEXT,\n  \"title\" TEXT NOT NULL,\n  \"document_type\" TEXT NOT NULL DEFAULT 'image',\n  \"role\" TEXT NOT NULL DEFAULT 'past_paper_page',\n  \"sensitivity\" TEXT NOT NULL DEFAULT 'public_to_owner',\n  \"asset_id\" TEXT,\n  \"raw_text\" TEXT NOT NULL,\n  \"page_texts\" TEXT NOT NULL,\n  \"checksum\" TEXT NOT NULL,\n  \"source_type\" TEXT NOT NULL DEFAULT 'user_paste',\n  \"source_note\" TEXT NOT NULL,\n  \"usage_scope\" TEXT NOT NULL,\n  \"page_count\" INTEGER NOT NULL DEFAULT 1,\n  CONSTRAINT \"json_page_texts\" CHECK (json_valid(\"page_texts\")),\n  FOREIGN KEY (\"owner_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"asset_id\") REFERENCES \"ingestion_asset\" (\"id\") ON DELETE RESTRICT\n)",
  "CREATE TABLE IF NOT EXISTS \"ingestion_source_region\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"document_id\" TEXT NOT NULL,\n  \"page_index\" INTEGER NOT NULL DEFAULT 1,\n  \"x\" REAL NOT NULL,\n  \"y\" REAL NOT NULL,\n  \"width\" REAL NOT NULL,\n  \"height\" REAL NOT NULL,\n  \"crop_asset_id\" TEXT,\n  \"role\" TEXT NOT NULL DEFAULT 'stem_crop',\n  \"text_span\" TEXT NOT NULL,\n  \"char_start\" INTEGER,\n  \"char_end\" INTEGER,\n  FOREIGN KEY (\"document_id\") REFERENCES \"ingestion_source_document\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"crop_asset_id\") REFERENCES \"ingestion_asset\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"region_bbox_positive\" CHECK ((\"ingestion_source_region\".\"x\" >= 0.0 AND \"ingestion_source_region\".\"y\" >= 0.0 AND \"ingestion_source_region\".\"width\" > 0.0 AND \"ingestion_source_region\".\"height\" > 0.0)),\n  CONSTRAINT \"region_bbox_inside_page\" CHECK ((\"ingestion_source_region\".\"x\" <= 1.0 AND \"ingestion_source_region\".\"y\" <= 1.0))\n)",
+ "CREATE TABLE IF NOT EXISTS \"learning_interaction_session\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"subject_id\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT,\n  \"mode\" TEXT NOT NULL DEFAULT 'daily',\n  \"status\" TEXT NOT NULL DEFAULT 'planned',\n  \"stage\" TEXT NOT NULL DEFAULT 'warmup',\n  \"plan_id\" TEXT,\n  \"practice_session_id\" TEXT,\n  \"budget_minutes\" INTEGER NOT NULL DEFAULT 0,\n  \"estimated_minutes\" INTEGER NOT NULL DEFAULT 0,\n  \"started_at\" TEXT,\n  \"finished_at\" TEXT,\n  \"summary\" TEXT NOT NULL,\n  \"notes\" TEXT NOT NULL,\n  \"rule_version\" TEXT NOT NULL DEFAULT 'm1',\n  CONSTRAINT \"json_summary\" CHECK (json_valid(\"summary\")),\n  CONSTRAINT \"json_notes\" CHECK (json_valid(\"notes\")),\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"plan_id\") REFERENCES \"learning_study_plan\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"practice_session_id\") REFERENCES \"practice_session\" (\"id\") ON DELETE SET NULL\n)",
+ "CREATE TABLE IF NOT EXISTS \"learning_session_step\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"session_id\" TEXT NOT NULL,\n  \"ordinal\" INTEGER NOT NULL,\n  \"stage\" TEXT NOT NULL,\n  \"kind\" TEXT NOT NULL,\n  \"status\" TEXT NOT NULL DEFAULT 'pending',\n  \"node_id\" TEXT,\n  \"question_id\" TEXT,\n  \"session_item_id\" TEXT,\n  \"estimated_minutes\" INTEGER NOT NULL DEFAULT 1,\n  \"hint_level\" INTEGER NOT NULL DEFAULT 0,\n  \"confidence_before\" INTEGER,\n  \"outcome\" TEXT NOT NULL DEFAULT 'unknown',\n  \"payload\" TEXT NOT NULL,\n  \"reason_codes\" TEXT NOT NULL,\n  \"deadline_at\" TEXT,\n  \"started_at\" TEXT,\n  \"finished_at\" TEXT,\n  \"skipped_reason\" TEXT NOT NULL,\n  CONSTRAINT \"json_payload\" CHECK (json_valid(\"payload\")),\n  CONSTRAINT \"json_reason_codes\" CHECK (json_valid(\"reason_codes\")),\n  FOREIGN KEY (\"session_id\") REFERENCES \"learning_interaction_session\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_step_ordinal_per_session\" UNIQUE (\"session_id\", \"ordinal\")\n)",
  "CREATE TABLE IF NOT EXISTS \"knowledge_node\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT NOT NULL,\n  \"parent_id\" TEXT,\n  \"kind\" TEXT NOT NULL DEFAULT 'point',\n  \"canonical_name\" TEXT NOT NULL,\n  \"aliases\" TEXT NOT NULL,\n  \"code\" TEXT NOT NULL,\n  \"is_unclassified\" INTEGER NOT NULL DEFAULT 0,\n  \"display_order\" INTEGER NOT NULL DEFAULT 0,\n  CONSTRAINT \"json_aliases\" CHECK (json_valid(\"aliases\")),\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"parent_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  CONSTRAINT \"uniq_node_name_in_parent\" UNIQUE (\"syllabus_version_id\", \"parent_id\", \"canonical_name\")\n)",
+ "CREATE TABLE IF NOT EXISTS \"knowledge_node_card\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"node_id\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT NOT NULL,\n  \"revision\" INTEGER NOT NULL DEFAULT 1,\n  \"is_current\" INTEGER NOT NULL DEFAULT 1,\n  \"status\" TEXT NOT NULL DEFAULT 'draft',\n  \"origin\" TEXT NOT NULL DEFAULT 'manual',\n  \"blocks\" TEXT NOT NULL,\n  \"key_points\" TEXT NOT NULL,\n  \"citations\" TEXT NOT NULL,\n  \"source_note\" TEXT NOT NULL,\n  \"model_run_id\" TEXT,\n  \"confirmed_at\" TEXT,\n  \"confirmed_by_id\" TEXT,\n  CONSTRAINT \"json_blocks\" CHECK (json_valid(\"blocks\")),\n  CONSTRAINT \"json_key_points\" CHECK (json_valid(\"key_points\")),\n  CONSTRAINT \"json_citations\" CHECK (json_valid(\"citations\")),\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"model_run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"confirmed_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_node_card_revision\" UNIQUE (\"node_id\", \"revision\")\n)",
  "CREATE TABLE IF NOT EXISTS \"knowledge_relation\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT NOT NULL,\n  \"from_node_id\" TEXT NOT NULL,\n  \"to_node_id\" TEXT NOT NULL,\n  \"relation_type\" TEXT NOT NULL DEFAULT 'prerequisite',\n  \"is_active\" INTEGER NOT NULL DEFAULT 1,\n  \"note\" TEXT NOT NULL,\n  \"created_by_id\" TEXT,\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"from_node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"to_node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"created_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_knowledge_relation_edge\" UNIQUE (\"from_node_id\", \"to_node_id\", \"relation_type\"),\n  CONSTRAINT \"knowledge_relation_no_self_loop\" CHECK (NOT (\"knowledge_relation\".\"from_node_id\" = (\"knowledge_relation\".\"to_node_id\")))\n)",
  "CREATE TABLE IF NOT EXISTS \"knowledge_question_mapping\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"question_version_id\" TEXT NOT NULL,\n  \"mapping_revision\" INTEGER NOT NULL DEFAULT 1,\n  \"node_id\" TEXT NOT NULL,\n  \"is_primary\" INTEGER NOT NULL DEFAULT 1,\n  \"score_weight\" TEXT NOT NULL DEFAULT 1.0000,\n  \"template_id\" TEXT,\n  \"note\" TEXT NOT NULL,\n  FOREIGN KEY (\"question_version_id\") REFERENCES \"question_bank_question_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE RESTRICT,\n  FOREIGN KEY (\"template_id\") REFERENCES \"knowledge_question_template\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_mapping_node_per_revision\" UNIQUE (\"question_version_id\", \"mapping_revision\", \"node_id\"),\n  CONSTRAINT \"mapping_weight_between_0_and_1\" CHECK ((CAST(\"knowledge_question_mapping\".\"score_weight\" AS NUMERIC) >= 0 AND CAST(\"knowledge_question_mapping\".\"score_weight\" AS NUMERIC) <= 1))\n)",
  "CREATE TABLE IF NOT EXISTS \"knowledge_question_template\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"subject_id\" TEXT NOT NULL,\n  \"name\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"review_status\" TEXT NOT NULL DEFAULT 'draft',\n  \"confirmed_by_id\" TEXT,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"confirmed_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_template_name_per_subject\" UNIQUE (\"subject_id\", \"name\")\n)",
@@ -10300,6 +11961,8 @@ export const CREATE_TABLES: string[] = [
  "CREATE TABLE IF NOT EXISTS \"learning_study_task\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"plan_id\" TEXT,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"subject_id\" TEXT NOT NULL,\n  \"task_kind\" TEXT NOT NULL,\n  \"status\" TEXT NOT NULL DEFAULT 'pending',\n  \"question_id\" TEXT,\n  \"knowledge_node_id\" TEXT,\n  \"pairing_id\" TEXT,\n  \"pairing_version\" INTEGER,\n  \"origin_session_item_id\" TEXT,\n  \"memory_card_id\" TEXT,\n  \"trigger_event\" TEXT NOT NULL,\n  \"delay_anchor_at\" TEXT,\n  \"not_before\" TEXT,\n  \"due_at\" TEXT,\n  \"estimated_minutes\" INTEGER NOT NULL DEFAULT 2,\n  \"estimated_minutes_source\" TEXT NOT NULL DEFAULT 'default_by_type',\n  \"reason_codes\" TEXT NOT NULL,\n  \"evidence_ids\" TEXT NOT NULL,\n  \"rule_version\" TEXT NOT NULL DEFAULT 'p0-1',\n  \"invalidated_reason\" TEXT NOT NULL,\n  \"started_at\" TEXT,\n  \"completed_at\" TEXT,\n  \"deficit_notice\" TEXT NOT NULL,\n  CONSTRAINT \"json_reason_codes\" CHECK (json_valid(\"reason_codes\")),\n  CONSTRAINT \"json_evidence_ids\" CHECK (json_valid(\"evidence_ids\")),\n  FOREIGN KEY (\"plan_id\") REFERENCES \"learning_study_plan\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"knowledge_node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"pairing_id\") REFERENCES \"knowledge_verification_pairing\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"origin_session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"memory_card_id\") REFERENCES \"memory_card\" (\"id\") ON DELETE SET NULL\n)",
  "CREATE TABLE IF NOT EXISTS \"memory_card\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"subject_id\" TEXT NOT NULL,\n  \"question_id\" TEXT NOT NULL,\n  \"knowledge_node_id\" TEXT,\n  \"phase\" TEXT NOT NULL DEFAULT 'new',\n  \"stability\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty\" REAL NOT NULL DEFAULT 0.0,\n  \"due_at\" TEXT,\n  \"last_reviewed_at\" TEXT,\n  \"reps\" INTEGER NOT NULL DEFAULT 0,\n  \"lapses\" INTEGER NOT NULL DEFAULT 0,\n  \"learning_step\" INTEGER NOT NULL DEFAULT 0,\n  \"scheduler_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"params_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"desired_retention\" REAL NOT NULL DEFAULT 0.9,\n  \"is_suspended\" INTEGER NOT NULL DEFAULT 0,\n  \"suspended_reason\" TEXT NOT NULL,\n  \"note\" TEXT NOT NULL,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"knowledge_node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_memory_card_per_question\" UNIQUE (\"user_id\", \"question_id\")\n)",
  "CREATE TABLE IF NOT EXISTS \"memory_review_log\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"card_id\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"rating\" TEXT NOT NULL,\n  \"reviewed_at\" TEXT NOT NULL,\n  \"elapsed_days\" REAL NOT NULL DEFAULT 0.0,\n  \"scheduled_days\" REAL NOT NULL DEFAULT 0.0,\n  \"interval_days\" REAL NOT NULL DEFAULT 0.0,\n  \"retrievability\" REAL NOT NULL DEFAULT 1.0,\n  \"is_lapse\" INTEGER NOT NULL DEFAULT 0,\n  \"phase_before\" TEXT NOT NULL,\n  \"phase_after\" TEXT NOT NULL,\n  \"stability_before\" REAL NOT NULL DEFAULT 0.0,\n  \"stability_after\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty_before\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty_after\" REAL NOT NULL DEFAULT 0.0,\n  \"due_before\" TEXT,\n  \"due_after\" TEXT,\n  \"scheduler_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"params_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"idempotency_key\" TEXT NOT NULL,\n  \"source_session_item_id\" TEXT,\n  \"note\" TEXT NOT NULL,\n  FOREIGN KEY (\"card_id\") REFERENCES \"memory_card\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"source_session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_memory_log_idempotency\" UNIQUE (\"card_id\", \"idempotency_key\")\n)",
+ "CREATE TABLE IF NOT EXISTS \"memory_node_state\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT NOT NULL,\n  \"node_id\" TEXT NOT NULL,\n  \"modality\" TEXT NOT NULL DEFAULT 'recall',\n  \"phase\" TEXT NOT NULL DEFAULT 'new',\n  \"stability\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty\" REAL NOT NULL DEFAULT 0.0,\n  \"due_at\" TEXT,\n  \"last_recall_at\" TEXT,\n  \"reps\" INTEGER NOT NULL DEFAULT 0,\n  \"lapses\" INTEGER NOT NULL DEFAULT 0,\n  \"learning_step\" INTEGER NOT NULL DEFAULT 0,\n  \"scheduler_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"params_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"desired_retention\" REAL NOT NULL DEFAULT 0.9,\n  \"is_suspended\" INTEGER NOT NULL DEFAULT 0,\n  \"suspended_reason\" TEXT NOT NULL,\n  \"note\" TEXT NOT NULL,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  CONSTRAINT \"uniq_node_memory_per_modality\" UNIQUE (\"user_id\", \"node_id\", \"modality\")\n)",
+ "CREATE TABLE IF NOT EXISTS \"memory_recall_event\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"memory_state_id\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"syllabus_version_id\" TEXT NOT NULL,\n  \"node_id\" TEXT NOT NULL,\n  \"kind\" TEXT NOT NULL,\n  \"rating\" TEXT NOT NULL,\n  \"source\" TEXT NOT NULL,\n  \"is_spaced\" INTEGER NOT NULL DEFAULT 1,\n  \"early_review\" INTEGER NOT NULL DEFAULT 0,\n  \"coverage\" TEXT NOT NULL,\n  \"prompt_text\" TEXT NOT NULL,\n  \"answer_text\" TEXT NOT NULL,\n  \"latency_ms\" INTEGER,\n  \"confidence_before\" INTEGER,\n  \"reviewed_at\" TEXT NOT NULL,\n  \"elapsed_days\" REAL NOT NULL DEFAULT 0.0,\n  \"scheduled_days\" REAL NOT NULL DEFAULT 0.0,\n  \"interval_days\" REAL NOT NULL DEFAULT 0.0,\n  \"retrievability\" REAL NOT NULL DEFAULT 1.0,\n  \"is_lapse\" INTEGER NOT NULL DEFAULT 0,\n  \"phase_before\" TEXT NOT NULL,\n  \"phase_after\" TEXT NOT NULL,\n  \"stability_before\" REAL NOT NULL DEFAULT 0.0,\n  \"stability_after\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty_before\" REAL NOT NULL DEFAULT 0.0,\n  \"difficulty_after\" REAL NOT NULL DEFAULT 0.0,\n  \"due_before\" TEXT,\n  \"due_after\" TEXT,\n  \"scheduler_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"params_version\" TEXT NOT NULL DEFAULT 'fsrs-4.5-default-v1',\n  \"idempotency_key\" TEXT NOT NULL,\n  \"session_id\" TEXT,\n  \"step_id\" TEXT,\n  \"question_id\" TEXT,\n  \"session_item_id\" TEXT,\n  \"model_run_id\" TEXT,\n  \"note\" TEXT NOT NULL,\n  CONSTRAINT \"json_coverage\" CHECK (json_valid(\"coverage\")),\n  FOREIGN KEY (\"memory_state_id\") REFERENCES \"memory_node_state\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"syllabus_version_id\") REFERENCES \"exams_syllabus_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"session_id\") REFERENCES \"learning_interaction_session\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"step_id\") REFERENCES \"learning_session_step\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"model_run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_recall_event_idempotency\" UNIQUE (\"memory_state_id\", \"idempotency_key\")\n)",
  "CREATE TABLE IF NOT EXISTS \"practice_answer_transcription\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"attempt_id\" TEXT NOT NULL,\n  \"asset_id\" TEXT NOT NULL,\n  \"origin\" TEXT NOT NULL DEFAULT 'model',\n  \"run_id\" TEXT,\n  \"status\" TEXT NOT NULL DEFAULT 'proposed',\n  \"raw_text\" TEXT NOT NULL,\n  \"confirmed_text\" TEXT NOT NULL,\n  \"confidence\" REAL,\n  \"doubts\" TEXT NOT NULL,\n  \"is_stub\" INTEGER NOT NULL DEFAULT 0,\n  \"decided_by_id\" TEXT,\n  \"decided_at\" TEXT,\n  \"note\" TEXT NOT NULL,\n  CONSTRAINT \"json_doubts\" CHECK (json_valid(\"doubts\")),\n  FOREIGN KEY (\"attempt_id\") REFERENCES \"practice_attempt\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"decided_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_transcription_per_asset\" UNIQUE (\"attempt_id\", \"asset_id\")\n)",
  "CREATE TABLE IF NOT EXISTS \"practice_attempt\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"session_item_id\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"raw_answer\" TEXT NOT NULL,\n  \"steps\" TEXT NOT NULL,\n  \"attachments\" TEXT NOT NULL,\n  \"confidence\" TEXT NOT NULL,\n  \"submitted_at\" TEXT NOT NULL,\n  \"elapsed_ms\" INTEGER NOT NULL DEFAULT 0,\n  \"client_active_ms\" INTEGER,\n  \"request_digest\" TEXT NOT NULL,\n  \"idempotency_key\" TEXT NOT NULL,\n  \"current_grade_event_id\" TEXT,\n  \"grading_revision\" INTEGER NOT NULL DEFAULT 0,\n  \"applied_regrade_generation\" INTEGER NOT NULL DEFAULT 0,\n  CONSTRAINT \"json_raw_answer\" CHECK (json_valid(\"raw_answer\")),\n  CONSTRAINT \"json_steps\" CHECK (json_valid(\"steps\")),\n  CONSTRAINT \"json_attachments\" CHECK (json_valid(\"attachments\")),\n  FOREIGN KEY (\"session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE RESTRICT,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE RESTRICT,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE RESTRICT,\n  FOREIGN KEY (\"current_grade_event_id\") REFERENCES \"practice_grade_event\" (\"id\") ON DELETE SET NULL\n)",
  "CREATE TABLE IF NOT EXISTS \"practice_diagnosis_follow_up\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"attempt_id\" TEXT NOT NULL,\n  \"question\" TEXT NOT NULL,\n  \"why\" TEXT NOT NULL,\n  \"evidence_kind\" TEXT NOT NULL,\n  \"status\" TEXT NOT NULL DEFAULT 'pending',\n  \"answer_text\" TEXT NOT NULL,\n  \"run_id\" TEXT,\n  \"answered_at\" TEXT,\n  FOREIGN KEY (\"attempt_id\") REFERENCES \"practice_attempt\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL\n)",
@@ -10318,6 +11981,7 @@ export const CREATE_TABLES: string[] = [
  "CREATE TABLE IF NOT EXISTS \"question_bank_question_version\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"question_id\" TEXT NOT NULL,\n  \"version\" INTEGER NOT NULL DEFAULT 1,\n  \"question_type\" TEXT NOT NULL,\n  \"content\" TEXT NOT NULL,\n  \"parent_material_version_id\" TEXT,\n  \"material_child_version_ids\" TEXT NOT NULL,\n  \"practice_max_score\" TEXT,\n  \"estimated_seconds\" INTEGER,\n  \"status\" TEXT NOT NULL DEFAULT 'draft',\n  \"revision_reason\" TEXT NOT NULL,\n  \"source_note\" TEXT NOT NULL,\n  \"created_by_id\" TEXT,\n  \"published_at\" TEXT,\n  \"withdrawn_at\" TEXT,\n  \"withdrawn_reason\" TEXT NOT NULL,\n  \"content_digest\" TEXT NOT NULL,\n  CONSTRAINT \"json_content\" CHECK (json_valid(\"content\")),\n  CONSTRAINT \"json_material_child_version_ids\" CHECK (json_valid(\"material_child_version_ids\")),\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"parent_material_version_id\") REFERENCES \"question_bank_question_version\" (\"id\") ON DELETE RESTRICT,\n  FOREIGN KEY (\"created_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_question_version\" UNIQUE (\"question_id\", \"version\")\n)",
  "CREATE TABLE IF NOT EXISTS \"question_bank_rubric_version\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"answer_key_version_id\" TEXT NOT NULL,\n  \"version\" INTEGER NOT NULL DEFAULT 1,\n  \"criteria\" TEXT NOT NULL,\n  \"total_score\" TEXT NOT NULL,\n  \"usage_note\" TEXT NOT NULL,\n  \"checked_by_id\" TEXT,\n  \"checked_at\" TEXT,\n  \"is_disputed\" INTEGER NOT NULL DEFAULT 0,\n  CONSTRAINT \"json_criteria\" CHECK (json_valid(\"criteria\")),\n  FOREIGN KEY (\"answer_key_version_id\") REFERENCES \"question_bank_answer_key_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"checked_by_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE SET NULL\n)",
  "CREATE TABLE IF NOT EXISTS \"search_document\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"subject_id\" TEXT NOT NULL,\n  \"question_id\" TEXT,\n  \"question_version_id\" TEXT,\n  \"knowledge_node_id\" TEXT,\n  \"kind\" TEXT NOT NULL,\n  \"text\" TEXT NOT NULL,\n  \"tokens\" TEXT NOT NULL,\n  \"term_frequencies\" TEXT NOT NULL,\n  \"doc_length\" INTEGER NOT NULL DEFAULT 0,\n  \"embedding\" TEXT,\n  \"embedding_model\" TEXT NOT NULL,\n  \"embedding_dim\" INTEGER,\n  \"embedding_updated_at\" TEXT,\n  \"source_revision\" TEXT NOT NULL,\n  \"is_searchable\" INTEGER NOT NULL DEFAULT 1,\n  \"exclusion_reason\" TEXT NOT NULL,\n  CONSTRAINT \"json_tokens\" CHECK (json_valid(\"tokens\")),\n  CONSTRAINT \"json_term_frequencies\" CHECK (json_valid(\"term_frequencies\")),\n  CONSTRAINT \"json_embedding\" CHECK (\"embedding\" IS NULL OR json_valid(\"embedding\")),\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"subject_id\") REFERENCES \"exams_subject\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"question_id\") REFERENCES \"question_bank_question\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"question_version_id\") REFERENCES \"question_bank_question_version\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"knowledge_node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE\n)",
+ "CREATE TABLE IF NOT EXISTS \"tutoring_coach_turn\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"thread_key\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"node_id\" TEXT NOT NULL,\n  \"session_id\" TEXT,\n  \"step_id\" TEXT,\n  \"purpose\" TEXT NOT NULL,\n  \"role\" TEXT NOT NULL DEFAULT 'assistant',\n  \"ordinal\" INTEGER NOT NULL DEFAULT 1,\n  \"status\" TEXT NOT NULL DEFAULT 'queued',\n  \"text\" TEXT NOT NULL,\n  \"structured\" TEXT NOT NULL,\n  \"citations\" TEXT NOT NULL,\n  \"missing_information\" TEXT NOT NULL,\n  \"llm_run_id\" TEXT,\n  \"prompt_version\" TEXT NOT NULL,\n  \"error_code\" TEXT NOT NULL,\n  \"error_message\" TEXT NOT NULL,\n  CONSTRAINT \"json_structured\" CHECK (json_valid(\"structured\")),\n  CONSTRAINT \"json_citations\" CHECK (json_valid(\"citations\")),\n  CONSTRAINT \"json_missing_information\" CHECK (json_valid(\"missing_information\")),\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"node_id\") REFERENCES \"knowledge_node\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"session_id\") REFERENCES \"learning_interaction_session\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"step_id\") REFERENCES \"learning_session_step\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"llm_run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL,\n  CONSTRAINT \"uniq_coach_turn_ordinal\" UNIQUE (\"thread_key\", \"ordinal\")\n)",
  "CREATE TABLE IF NOT EXISTS \"tutoring_job\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"tutor_session_id\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"purpose\" TEXT NOT NULL DEFAULT 'explanation',\n  \"status\" TEXT NOT NULL DEFAULT 'queued',\n  \"request_text\" TEXT NOT NULL,\n  \"result_blocks\" TEXT NOT NULL,\n  \"citations\" TEXT NOT NULL,\n  \"missing_information\" TEXT NOT NULL,\n  \"suggested_next\" TEXT NOT NULL,\n  \"error_code\" TEXT NOT NULL,\n  \"error_message\" TEXT NOT NULL,\n  \"llm_run_id\" TEXT,\n  \"input_fingerprint\" TEXT NOT NULL,\n  \"is_stale\" INTEGER NOT NULL DEFAULT 0,\n  \"reveals_answer\" INTEGER NOT NULL DEFAULT 0,\n  \"delivered_at\" TEXT,\n  \"finalized_at\" TEXT,\n  CONSTRAINT \"json_result_blocks\" CHECK (json_valid(\"result_blocks\")),\n  CONSTRAINT \"json_citations\" CHECK (json_valid(\"citations\")),\n  CONSTRAINT \"json_missing_information\" CHECK (json_valid(\"missing_information\")),\n  CONSTRAINT \"json_suggested_next\" CHECK (json_valid(\"suggested_next\")),\n  FOREIGN KEY (\"tutor_session_id\") REFERENCES \"tutoring_session\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"llm_run_id\") REFERENCES \"audit_llm_run\" (\"id\") ON DELETE SET NULL\n)",
  "CREATE TABLE IF NOT EXISTS \"tutoring_segment\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"job_id\" TEXT NOT NULL,\n  \"index\" INTEGER NOT NULL,\n  \"kind\" TEXT NOT NULL,\n  \"text\" TEXT NOT NULL,\n  \"items\" TEXT NOT NULL,\n  \"digest\" TEXT NOT NULL,\n  \"is_stale\" INTEGER NOT NULL DEFAULT 0,\n  \"stale_reason\" TEXT NOT NULL,\n  CONSTRAINT \"json_items\" CHECK (json_valid(\"items\")),\n  FOREIGN KEY (\"job_id\") REFERENCES \"tutoring_job\" (\"id\") ON DELETE CASCADE,\n  CONSTRAINT \"uniq_tutor_segment_index\" UNIQUE (\"job_id\", \"index\")\n)",
  "CREATE TABLE IF NOT EXISTS \"tutoring_session\" (\n  \"id\" TEXT PRIMARY KEY,\n  \"created_at\" TEXT NOT NULL,\n  \"updated_at\" TEXT NOT NULL,\n  \"user_id\" TEXT NOT NULL,\n  \"project_id\" TEXT NOT NULL,\n  \"practice_session_id\" TEXT NOT NULL,\n  \"session_item_id\" TEXT NOT NULL,\n  \"attempt_id\" TEXT,\n  \"purpose\" TEXT NOT NULL DEFAULT 'explanation',\n  \"question_version_id\" TEXT,\n  \"answer_key_version_id\" TEXT,\n  \"rubric_version_id\" TEXT,\n  \"prompt_version\" TEXT NOT NULL DEFAULT 'p0-explain-v1',\n  FOREIGN KEY (\"user_id\") REFERENCES \"accounts_user\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"project_id\") REFERENCES \"exams_project\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"practice_session_id\") REFERENCES \"practice_session\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"session_item_id\") REFERENCES \"practice_session_item\" (\"id\") ON DELETE CASCADE,\n  FOREIGN KEY (\"attempt_id\") REFERENCES \"practice_attempt\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"question_version_id\") REFERENCES \"question_bank_question_version\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"answer_key_version_id\") REFERENCES \"question_bank_answer_key_version\" (\"id\") ON DELETE SET NULL,\n  FOREIGN KEY (\"rubric_version_id\") REFERENCES \"question_bank_rubric_version\" (\"id\") ON DELETE SET NULL\n)",
@@ -10435,9 +12099,34 @@ export const CREATE_INDEXES: string[] = [
  "CREATE INDEX IF NOT EXISTS \"ingestion_source_region_created_at_idx\" ON \"ingestion_source_region\" (\"created_at\")",
  "CREATE INDEX IF NOT EXISTS \"ingestion_source_region_document_id_idx\" ON \"ingestion_source_region\" (\"document_id\")",
  "CREATE INDEX IF NOT EXISTS \"ingestion_source_region_crop_asset_id_idx\" ON \"ingestion_source_region\" (\"crop_asset_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_created_at_idx\" ON \"learning_interaction_session\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_user_id_idx\" ON \"learning_interaction_session\" (\"user_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_project_id_idx\" ON \"learning_interaction_session\" (\"project_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_subject_id_idx\" ON \"learning_interaction_session\" (\"subject_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_syllabus_version_id_idx\" ON \"learning_interaction_session\" (\"syllabus_version_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_plan_id_idx\" ON \"learning_interaction_session\" (\"plan_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_interaction_session_practice_session_id_idx\" ON \"learning_interaction_session\" (\"practice_session_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_in_user_id_eecf6a_idx\" ON \"learning_interaction_session\" (\"user_id\", \"project_id\", \"status\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_in_user_id_8ffeff_idx\" ON \"learning_interaction_session\" (\"user_id\", \"project_id\", \"created_at\" DESC)",
+ "CREATE INDEX IF NOT EXISTS \"learning_in_user_id_941045_idx\" ON \"learning_interaction_session\" (\"user_id\", \"subject_id\", \"status\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_session_step_created_at_idx\" ON \"learning_session_step\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_session_step_session_id_idx\" ON \"learning_session_step\" (\"session_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_session_step_node_id_idx\" ON \"learning_session_step\" (\"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_session_step_question_id_idx\" ON \"learning_session_step\" (\"question_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_session_step_session_item_id_idx\" ON \"learning_session_step\" (\"session_item_id\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_se_session_47439c_idx\" ON \"learning_session_step\" (\"session_id\", \"status\")",
+ "CREATE INDEX IF NOT EXISTS \"learning_se_session_32a6fb_idx\" ON \"learning_session_step\" (\"session_id\", \"kind\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_node_created_at_idx\" ON \"knowledge_node\" (\"created_at\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_node_syllabus_version_id_idx\" ON \"knowledge_node\" (\"syllabus_version_id\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_node_parent_id_idx\" ON \"knowledge_node\" (\"parent_id\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_created_at_idx\" ON \"knowledge_node_card\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_node_id_idx\" ON \"knowledge_node_card\" (\"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_syllabus_version_id_idx\" ON \"knowledge_node_card\" (\"syllabus_version_id\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_is_current_idx\" ON \"knowledge_node_card\" (\"is_current\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_model_run_id_idx\" ON \"knowledge_node_card\" (\"model_run_id\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_node_card_confirmed_by_id_idx\" ON \"knowledge_node_card\" (\"confirmed_by_id\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_n_node_id_f50d08_idx\" ON \"knowledge_node_card\" (\"node_id\", \"is_current\")",
+ "CREATE INDEX IF NOT EXISTS \"knowledge_n_syllabu_a6701b_idx\" ON \"knowledge_node_card\" (\"syllabus_version_id\", \"status\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_relation_created_at_idx\" ON \"knowledge_relation\" (\"created_at\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_relation_syllabus_version_id_idx\" ON \"knowledge_relation\" (\"syllabus_version_id\")",
  "CREATE INDEX IF NOT EXISTS \"knowledge_relation_from_node_id_idx\" ON \"knowledge_relation\" (\"from_node_id\")",
@@ -10518,6 +12207,29 @@ export const CREATE_INDEXES: string[] = [
  "CREATE INDEX IF NOT EXISTS \"memory_review_log_source_session_item_id_idx\" ON \"memory_review_log\" (\"source_session_item_id\")",
  "CREATE INDEX IF NOT EXISTS \"memory_revi_card_id_233873_idx\" ON \"memory_review_log\" (\"card_id\", \"reviewed_at\" DESC)",
  "CREATE INDEX IF NOT EXISTS \"memory_revi_user_id_39c94f_idx\" ON \"memory_review_log\" (\"user_id\", \"reviewed_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_created_at_idx\" ON \"memory_node_state\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_user_id_idx\" ON \"memory_node_state\" (\"user_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_project_id_idx\" ON \"memory_node_state\" (\"project_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_syllabus_version_id_idx\" ON \"memory_node_state\" (\"syllabus_version_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_node_id_idx\" ON \"memory_node_state\" (\"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_state_due_at_idx\" ON \"memory_node_state\" (\"due_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_user_id_0f1417_idx\" ON \"memory_node_state\" (\"user_id\", \"project_id\", \"due_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_node_user_id_279725_idx\" ON \"memory_node_state\" (\"user_id\", \"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_created_at_idx\" ON \"memory_recall_event\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_memory_state_id_idx\" ON \"memory_recall_event\" (\"memory_state_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_user_id_idx\" ON \"memory_recall_event\" (\"user_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_project_id_idx\" ON \"memory_recall_event\" (\"project_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_syllabus_version_id_idx\" ON \"memory_recall_event\" (\"syllabus_version_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_node_id_idx\" ON \"memory_recall_event\" (\"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_reviewed_at_idx\" ON \"memory_recall_event\" (\"reviewed_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_session_id_idx\" ON \"memory_recall_event\" (\"session_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_step_id_idx\" ON \"memory_recall_event\" (\"step_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_question_id_idx\" ON \"memory_recall_event\" (\"question_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_session_item_id_idx\" ON \"memory_recall_event\" (\"session_item_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_recall_event_model_run_id_idx\" ON \"memory_recall_event\" (\"model_run_id\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_reca_user_id_817ccb_idx\" ON \"memory_recall_event\" (\"user_id\", \"node_id\", \"reviewed_at\" DESC)",
+ "CREATE INDEX IF NOT EXISTS \"memory_reca_user_id_a20b17_idx\" ON \"memory_recall_event\" (\"user_id\", \"reviewed_at\")",
+ "CREATE INDEX IF NOT EXISTS \"memory_reca_session_0a56e1_idx\" ON \"memory_recall_event\" (\"session_id\", \"step_id\")",
  "CREATE INDEX IF NOT EXISTS \"practice_answer_transcription_created_at_idx\" ON \"practice_answer_transcription\" (\"created_at\")",
  "CREATE INDEX IF NOT EXISTS \"practice_answer_transcription_attempt_id_idx\" ON \"practice_answer_transcription\" (\"attempt_id\")",
  "CREATE INDEX IF NOT EXISTS \"practice_answer_transcription_run_id_idx\" ON \"practice_answer_transcription\" (\"run_id\")",
@@ -10635,6 +12347,16 @@ export const CREATE_INDEXES: string[] = [
  "CREATE INDEX IF NOT EXISTS \"search_document_kind_idx\" ON \"search_document\" (\"kind\")",
  "CREATE INDEX IF NOT EXISTS \"search_document_is_searchable_idx\" ON \"search_document\" (\"is_searchable\")",
  "CREATE INDEX IF NOT EXISTS \"search_doc_scope_idx\" ON \"search_document\" (\"project_id\", \"subject_id\", \"is_searchable\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_created_at_idx\" ON \"tutoring_coach_turn\" (\"created_at\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_thread_key_idx\" ON \"tutoring_coach_turn\" (\"thread_key\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_user_id_idx\" ON \"tutoring_coach_turn\" (\"user_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_project_id_idx\" ON \"tutoring_coach_turn\" (\"project_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_node_id_idx\" ON \"tutoring_coach_turn\" (\"node_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_session_id_idx\" ON \"tutoring_coach_turn\" (\"session_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_step_id_idx\" ON \"tutoring_coach_turn\" (\"step_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_coach_turn_llm_run_id_idx\" ON \"tutoring_coach_turn\" (\"llm_run_id\")",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_co_thread__3864d4_idx\" ON \"tutoring_coach_turn\" (\"thread_key\", \"ordinal\" DESC)",
+ "CREATE INDEX IF NOT EXISTS \"tutoring_co_user_id_d966bd_idx\" ON \"tutoring_coach_turn\" (\"user_id\", \"node_id\", \"created_at\" DESC)",
  "CREATE INDEX IF NOT EXISTS \"tutoring_job_created_at_idx\" ON \"tutoring_job\" (\"created_at\")",
  "CREATE INDEX IF NOT EXISTS \"tutoring_job_tutor_session_id_idx\" ON \"tutoring_job\" (\"tutor_session_id\")",
  "CREATE INDEX IF NOT EXISTS \"tutoring_job_user_id_idx\" ON \"tutoring_job\" (\"user_id\")",
@@ -10789,12 +12511,30 @@ export const UNIQUE_CONSTRAINTS: UniqueConstraintDef[] = [
   "partial": false
  },
  {
+  "table": "learning_session_step",
+  "name": "uniq_step_ordinal_per_session",
+  "columns": [
+   "session_id",
+   "ordinal"
+  ],
+  "partial": false
+ },
+ {
   "table": "knowledge_node",
   "name": "uniq_node_name_in_parent",
   "columns": [
    "syllabus_version_id",
    "parent_id",
    "canonical_name"
+  ],
+  "partial": false
+ },
+ {
+  "table": "knowledge_node_card",
+  "name": "uniq_node_card_revision",
+  "columns": [
+   "node_id",
+   "revision"
   ],
   "partial": false
  },
@@ -10884,6 +12624,25 @@ export const UNIQUE_CONSTRAINTS: UniqueConstraintDef[] = [
   "name": "uniq_memory_log_idempotency",
   "columns": [
    "card_id",
+   "idempotency_key"
+  ],
+  "partial": false
+ },
+ {
+  "table": "memory_node_state",
+  "name": "uniq_node_memory_per_modality",
+  "columns": [
+   "user_id",
+   "node_id",
+   "modality"
+  ],
+  "partial": false
+ },
+ {
+  "table": "memory_recall_event",
+  "name": "uniq_recall_event_idempotency",
+  "columns": [
+   "memory_state_id",
    "idempotency_key"
   ],
   "partial": false
@@ -10980,6 +12739,15 @@ export const UNIQUE_CONSTRAINTS: UniqueConstraintDef[] = [
    "kind"
   ],
   "partial": true
+ },
+ {
+  "table": "tutoring_coach_turn",
+  "name": "uniq_coach_turn_ordinal",
+  "columns": [
+   "thread_key",
+   "ordinal"
+  ],
+  "partial": false
  },
  {
   "table": "tutoring_segment",

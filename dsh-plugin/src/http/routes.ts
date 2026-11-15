@@ -71,6 +71,7 @@ import { memoryRoutes } from './memory_routes.ts'
 import { searchRoutes } from './search_routes.ts'
 import { tutorRoutes } from './tutor_routes.ts'
 import { practiceAiRoutes } from './practice_ai_routes.ts'
+import { studyflowRoutes } from './studyflow_routes.ts'
 
 const PREFIX = '/api/acepass'
 
@@ -188,6 +189,7 @@ export function acepassRoutes(deps: IngestionRouteDeps = {}): Route[] {
     ...searchRoutes(),
     ...tutorRoutes(deps),
     ...practiceAiRoutes(deps),
+    ...studyflowRoutes(deps),
     {
       method: 'GET',
       pattern: `${PREFIX}/auth/me`,

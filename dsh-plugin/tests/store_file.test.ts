@@ -66,7 +66,7 @@ test('store file: opening is idempotent and keeps the schema version', () => {
       const tables = handle.db
         .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
         .get() as { n: number }
-      assert.equal(tables.n, 60, '59 business tables + the schema-version table')
+      assert.equal(tables.n, 66, '65 business tables + the schema-version table')
     } finally {
       handle.close()
     }

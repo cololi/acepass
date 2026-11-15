@@ -211,6 +211,7 @@ def model_counts() -> dict:
         "audit",
         "exams",
         "ingestion",
+        "interaction",
         "knowledge",
         "learning",
         "memory",

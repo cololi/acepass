@@ -27,6 +27,9 @@ function page<T extends Record<string, unknown>, K extends keyof T & string>(
   return lazy(async () => ({ default: (await loader())[name] as unknown as ComponentType }))
 }
 
+const StudyDeskPage = page(() => import('../features/study/StudyDeskPage'), 'StudyDeskPage')
+const SessionRunnerPage = page(() => import('../features/study/SessionRunnerPage'), 'SessionRunnerPage')
+const NodeDetailPage = page(() => import('../features/study/NodeDetailPage'), 'NodeDetailPage')
 const TodayPage = page(() => import('../features/today/TodayPage'), 'TodayPage')
 const QuestionBankPage = page(() => import('../features/questions/QuestionBankPage'), 'QuestionBankPage')
 const ImportsPage = page(() => import('../features/imports/ImportsPage'), 'ImportsPage')
@@ -95,8 +98,11 @@ export function AppShell() {
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>
             项目
           </NavLink>
+          <NavLink to="/study" onClick={() => setMenuOpen(false)}>
+            学习
+          </NavLink>
           <NavLink to="/today" onClick={() => setMenuOpen(false)}>
-            今日学习
+            今日计划
           </NavLink>
           <NavLink to="/practice" onClick={() => setMenuOpen(false)}>
             刷题
@@ -166,6 +172,9 @@ export function AppShell() {
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/study" element={<StudyDeskPage />} />
+              <Route path="/study/sessions/:sessionId" element={<SessionRunnerPage />} />
+              <Route path="/study/nodes/:nodeId" element={<NodeDetailPage />} />
               <Route path="/today" element={<TodayPage />} />
               <Route path="/practice" element={<PracticePage />} />
               <Route path="/questions" element={<QuestionBankPage />} />

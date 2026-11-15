@@ -12,6 +12,7 @@
  * The record intentionally has no timestamps: the store assigns `id`/`created_at`/`updated_at`, and
  * this layer must not read a clock.
  */
+import type { CoachPromptVersion } from './coach_prompts.ts'
 import { pySlice } from './pyvalue.ts'
 import { PROMPT_VERSIONS, type PromptVersion } from './prompts.ts'
 
@@ -28,10 +29,12 @@ export const LLM_RUN_STATUS_LABELS: Record<LlmRunStatus, string> = {
   timeout: '超时',
 }
 
-export type AuditCapability = keyof typeof PROMPT_VERSIONS
+export type AuditCapability = keyof typeof PROMPT_VERSIONS | 'memory_coach'
+export type AuditPromptVersion = PromptVersion | CoachPromptVersion
 
 /** `AUDIT_EXCERPT_LIMITS` mirrors the per-call-site slice of `call.raw_text`. */
 export const AUDIT_EXCERPT_LIMITS: Record<AuditCapability, number> = {
+  memory_coach: 4000,
   extract_question: 4000, // ingestion/services/extraction.py
   explain: 4000, // tutoring/services/core.py
   suggest_tags: 2000, // knowledge/services/suggestions.py
@@ -93,7 +96,7 @@ export interface LlmRunRecord {
   provider: string
   model_identifier: string
   capability: AuditCapability
-  prompt_version: PromptVersion
+  prompt_version: AuditPromptVersion
   status: LlmRunStatus
   request_summary: Record<string, unknown>
   input_snapshot: Record<string, unknown>
@@ -119,7 +122,7 @@ export interface LlmRunSeed {
   provider: string
   model_identifier?: string
   capability: AuditCapability
-  prompt_version: PromptVersion
+  prompt_version: AuditPromptVersion
   request_summary?: Record<string, unknown>
   input_snapshot?: Record<string, unknown>
   retrieval_source_ids?: string[]

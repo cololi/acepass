@@ -100,6 +100,7 @@ LOCAL_APPS = [
     "apps.learning",
     "apps.analytics",
     "apps.memory",
+    "apps.interaction",
     "apps.search",
 ]
 

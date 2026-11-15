@@ -7,7 +7,13 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.common.enums import KnowledgeNodeKind, KnowledgeRelationType, SuggestionStatus
+from apps.common.enums import (
+    KnowledgeNodeKind,
+    KnowledgeRelationType,
+    NodeCardOrigin,
+    NodeCardStatus,
+    SuggestionStatus,
+)
 from apps.common.models import BaseModel
 
 
@@ -306,3 +312,59 @@ class TagSuggestion(BaseModel):
 
     def __str__(self) -> str:
         return f"tag-suggestion {self.question_version_id} ({self.status})"
+
+
+class KnowledgeNodeCard(BaseModel):
+    """One revision of a knowledge point's core-content card (M1 interaction redesign).
+
+    The card is the *declarative* content of a knowledge point — key points,
+    trigger conditions, formulas/rules and common confusions. It is deliberately
+    separate from question content: questions stay the evidence of solving
+    ability, while a card is the basis of active recall.
+
+    Rules that the service layer enforces (docs/26 §3.1):
+
+    * revisions are append-only; exactly one revision per node is ``is_current``;
+    * only a ``confirmed`` card may be the key-point baseline of a recall check;
+    * a ``model_candidate`` card is a proposal and must be confirmed by the
+      learner before it can be used — a model never writes a confirmed card.
+    """
+
+    node = models.ForeignKey(KnowledgeNode, on_delete=models.CASCADE, related_name="cards")
+    syllabus_version = models.ForeignKey(
+        "exams.SyllabusVersion", on_delete=models.CASCADE, related_name="node_cards"
+    )
+    revision = models.PositiveIntegerField(default=1)
+    is_current = models.BooleanField(default=True, db_index=True)
+    status = models.CharField(max_length=16, choices=NodeCardStatus.choices, default=NodeCardStatus.DRAFT)
+    origin = models.CharField(max_length=16, choices=NodeCardOrigin.choices, default=NodeCardOrigin.MANUAL)
+    #: Display blocks, same shape as question content blocks (text/math/list only).
+    blocks = models.JSONField(default=list, blank=True)
+    #: ``[{"id": "kp1", "text": "...", "required": true}]``; recall coverage is computed on required points.
+    key_points = models.JSONField(default=list, blank=True)
+    #: Allowed citation ids: knowledge_node:{id}, question_version:{id}, answer_key_version:{id}, ...
+    citations = models.JSONField(default=list, blank=True)
+    source_note = models.CharField(max_length=500, blank=True)
+    model_run = models.ForeignKey(
+        "audit.LLMRun", null=True, blank=True, on_delete=models.SET_NULL, related_name="node_cards"
+    )
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    confirmed_by = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="confirmed_node_cards"
+    )
+
+    class Meta:
+        db_table = "knowledge_node_card"
+        constraints = [
+            models.UniqueConstraint(fields=["node", "revision"], name="uniq_node_card_revision"),
+        ]
+        indexes = [
+            models.Index(fields=["node", "is_current"]),
+            models.Index(fields=["syllabus_version", "status"]),
+        ]
+        ordering = ["node", "-revision"]
+        verbose_name = "考点内容卡"
+        verbose_name_plural = "考点内容卡"
+
+    def __str__(self) -> str:
+        return f"card:{self.node_id}@{self.revision}:{self.status}"

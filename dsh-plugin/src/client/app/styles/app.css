@@ -1174,3 +1174,45 @@ html[data-acepass-standalone] body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* M1 memory-driven learning: confined to the DSH panel. */
+.acepass-root .study-desk,
+.acepass-root .study-node,
+.acepass-root .study-runner { min-width: 0; }
+.acepass-root .study-list-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--ap-hairline); }
+.acepass-root .study-list-row:last-child { border-bottom: 0; }
+.acepass-root .study-list-row > div { min-width: 0; overflow-wrap: anywhere; }
+.acepass-root .study-list-row .btn { flex-shrink: 0; }
+.acepass-root .study-memory-ring { width: 120px; height: 120px; border: 8px solid var(--ap-accent); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px auto; }
+.acepass-root .study-memory-ring strong { font-size: 24px; }
+.acepass-root .runner-layout { display: grid; grid-template-columns: 165px minmax(0, 1fr) minmax(230px, 0.65fr); align-items: start; gap: 14px; }
+.acepass-root .runner-center,
+.acepass-root .runner-dock { min-width: 0; }
+.acepass-root .runner-step-link { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; color: var(--ap-text); background: transparent; border: 1px solid var(--ap-border); border-radius: var(--ap-radius-sm); padding: 8px; margin: 8px 0; cursor: pointer; }
+.acepass-root .runner-step-link.row-selected { background: var(--ap-selected); border-color: var(--ap-accent); }
+.acepass-root .runner-step-link:disabled { opacity: 0.6; cursor: wait; }
+.acepass-root .runner-prompt { font-size: 20px; line-height: 1.6; white-space: pre-wrap; }
+.acepass-root .runner-recall-input { min-height: 190px; }
+.acepass-root .runner-dock > summary { cursor: pointer; padding: 8px 0; font-weight: 600; }
+.acepass-root .study-answer { border: 0; margin: 10px 0; padding: 0; min-width: 0; }
+.acepass-root .study-answer legend { color: var(--ap-text-2); margin-bottom: 10px; }
+.acepass-root .coach-turns { max-height: 440px; overflow: auto; margin: 12px 0; }
+.acepass-root .coach-turn { border-bottom: 1px solid var(--ap-hairline); padding: 10px 0; overflow-wrap: anywhere; }
+.acepass-root .study-prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+.acepass-root .study-fields { margin: 10px 0; }
+.acepass-root .study-fields > div { margin-bottom: 8px; }
+.acepass-root .study-fields dt { font-weight: 600; color: var(--ap-text-2); }
+.acepass-root .study-fields dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+.acepass-root .study-node details { margin: 12px 0; }
+.acepass-root .study-node summary { cursor: pointer; }
+@media (max-width: 980px) {
+  .acepass-root .runner-layout { grid-template-columns: minmax(0, 1fr); }
+  .acepass-root .stage-rail { display: flex; flex-wrap: wrap; gap: 12px; }
+  .acepass-root .stage-rail > div { flex: 1 1 140px; }
+  .acepass-root .runner-dock { border-top: 1px solid var(--ap-border); }
+}
+@media (max-width: 720px) {
+  .acepass-root .study-list-row { flex-wrap: wrap; }
+  .acepass-root .study-runner .page-title .sub,
+  .acepass-root .stage-rail .runner-step-link > .small { display: none; }
+}

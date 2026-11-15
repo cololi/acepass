@@ -12,6 +12,7 @@
 | [02 技术架构](02-architecture.md) | 模块化单体、异步发件箱、私有存储、部署拓扑 |
 | [03 领域与 API](03-domain-and-api.md) | 数据契约：项目/科目/题目/答案/证据/暴露的字段与不变量 |
 | [04 实施计划](04-implementation-plan.md) · [05 验收规格](05-acceptance.md) | 交付顺序与可判定的验收条件 |
+| [26 交互学习逻辑重新设计](26-memory-interaction-redesign.md) | 记忆驱动 · 考频定值 · 模型为念：对象模型、算法、会话状态机、教练协议与接口契约 |
 
 ## 2. 状态与交付记录
 
@@ -20,6 +21,7 @@
 | [实现状态](implementation-status.md) | **实际执行了什么、没执行什么**（最权威的状态文件） |
 | [验收结果](acceptance-results.md) | 测试与门禁的实际输出、数字与命令 |
 | [交付日志](CHANGELOG.md) | 历轮交付的逐条摘要（按时间倒序） |
+| [27 M1 记忆驱动交互交付](27-memory-interaction-delivery.md) | 本轮实际交付、schema 变更、新增测试与门禁结果、未验证边界 |
 | [17 走向 100% 的计划](17-remaining-plan-to-completion.md) | 剩余批次划分、判据与外部阻塞项 |
 
 ## 3. 各轮评审与修复（按时间顺序）

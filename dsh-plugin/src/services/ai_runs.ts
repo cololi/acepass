@@ -17,6 +17,7 @@ import {
   markSucceeded,
   newLlmRun,
   type AuditCapability,
+  type AuditPromptVersion,
   type LlmRunRecord,
 } from '../ai/audit.ts'
 import { insertRow, updateRow } from '../store/repository.ts'
@@ -88,6 +89,16 @@ export interface AuditedRunHandle {
 export function beginAuditedRun(
   db: DatabaseSync,
   request: CapabilityRequest,
+  context: RunContext,
+  now: Instant,
+): AuditedRunHandle {
+  return beginAuditedRunOf(db, { ...request, capability: request.capability as AuditCapability, promptVersion: request.promptVersion as AuditPromptVersion }, context, now)
+}
+
+/** Audit labels may be broader than transport capabilities. */
+export function beginAuditedRunOf(
+  db: DatabaseSync,
+  request: { capability: AuditCapability; promptVersion: AuditPromptVersion; system: string; prompt: string },
   context: RunContext,
   now: Instant,
 ): AuditedRunHandle {
@@ -215,6 +226,7 @@ export async function runCapability(
 }
 
 const AUDIT_CAPABILITIES: ReadonlySet<string> = new Set([
+  'memory_coach',
   'extract_question',
   'transcribe_handwriting',
   'suggest_tags',

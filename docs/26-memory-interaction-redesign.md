@@ -373,7 +373,7 @@ score = 100 · V̂ · (1 + 0.8·risk + 0.5·gap)
 | `memory_node_state` | user, project, syllabus_version, node, modality, phase, stability, difficulty, due_at, last_recall_at, reps, lapses, learning_step, scheduler_version, params_version, desired_retention | unique(user, node, modality)；index(user, project, due_at) |
 | `memory_recall_event` | 记忆状态, user, node, kind, rating, source, is_spaced, coverage JSON, prompt_text, answer_text, latency_ms, confidence_before, notes, session, step, question, session_item, model_run, idempotency_key, before/after 状态 | unique(memory_state, idempotency_key)；index(user, node, reviewed_at) |
 | `learning_interaction_session` | user, project, subject, mode, status, stage, plan, practice_session, budget_minutes, estimated_minutes, started_at, finished_at, summary JSON, notes JSON, rule_version, revision | index(user, project, status, -started_at) |
-| `learning_session_step` | session, ordinal, stage, kind, status, node, question, session_item, recall_event, estimated_minutes, hint_level, confidence_before, outcome, payload JSON, reason_codes JSON, deadline_at, started_at, finished_at | unique(session, ordinal) |
+| `learning_session_step` | session, ordinal, stage, kind, status, node, question, session_item, estimated_minutes, hint_level, confidence_before, outcome, payload JSON, reason_codes JSON, deadline_at, started_at, finished_at | unique(session, ordinal)；回忆事件通过 `memory_recall_event.step` 反向关联 |
 | `tutoring_coach_turn` | thread_key, user, project, node, session, step, purpose, role, ordinal, status, text, structured JSON, citations JSON, missing_information JSON, llm_run, prompt_version, error_code/message | unique(thread_key, ordinal)；index(thread_key, -ordinal) |
 
 **不加**考频快照表：考频由真实试卷实时计算（数据量小、口径唯一、避免缓存漂移）。
@@ -393,6 +393,7 @@ POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/recall     {text, c
 POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/recall/confirm {rating?, confirm_coverage?}
 POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/answer     {answer, confidence?}
 POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/hint       {level}
+POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/complete
 POST   /projects/{p}/learning-sessions/{sid}/steps/{ordinal}/skip       {reason}
 POST   /projects/{p}/learning-sessions/{sid}/finish
 GET    /projects/{p}/knowledge-nodes/{node_id}/memory
@@ -405,6 +406,7 @@ POST   /projects/{p}/knowledge-nodes/{node_id}/recall                   会话�
 GET    /projects/{p}/knowledge-nodes/{node_id}/coach?purpose=
 POST   /projects/{p}/knowledge-nodes/{node_id}/coach                    {purpose, message?, step_id?}
 GET    /projects/{p}/subjects/{subject_id}/frequency
+GET    /projects/{p}/ai-coach-status
 ```
 
 所有读接口返回「可解释事实」：样本量、口径版本、排除项、原因码；错误信封沿用
@@ -436,6 +438,8 @@ GET    /projects/{p}/subjects/{subject_id}/frequency
 | M10 | 记忆与能力互不写入 | 计数断言（recall 不写 evidence；练习不写 recall） |
 
 ### 10.2 验收判据（本轮）
+
+> 实施记录与实测数字见 [27 交付](27-memory-interaction-delivery.md)。schema 版本由 1 升为 2（新增 6 张表；`schema.generated.ts` 由 Django 模型重新生成）。
 
 - 后端：新增单测/HTTP 测试全绿；**既有测试一条不改**（除 schema 表的计数与新表注册）。
 - 静态：`npm run typecheck`、`npm run build` 通过；Django `manage.py check`、
@@ -471,6 +475,9 @@ GET    /projects/{p}/subjects/{subject_id}/frequency
 | B3 HTTP | 20 条路由、幂等、门禁、错误信封 | HTTP 黑盒测试 |
 | B4 客户端 | 学习台、会话执行页、考点详情、导航、API 模块 | tsc + build + 单条冒烟 |
 | B5 文档与门禁 | 交付文档、README/状态更新、全量测试 | `npm test`、既有门禁 |
+
+**本轮实际交付**：B1—B4 已全部落地（schema + 领域纯函数 + 服务层 + 20 余条 HTTP 路由 + 三个客户端页面），
+逐项实测数字、门禁结果与未验证边界见 [27 交付](27-memory-interaction-delivery.md)。
 
 **未验证（不写成已完成）**：真实模型输出质量与费用；真实跨日记忆效果；真实考试材料；
 DSH Desktop 重启后的肉眼交互（需用户重启）；Playwright 新流程的完整浏览器验收。

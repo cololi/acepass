@@ -83,10 +83,11 @@ test('schema: every Django model has a table', () => {
   const store = freshStore()
   try {
     const created = new Set(tableNames(store.db))
-    // 57 declared models + 2 Django auto-created M2M through tables (docs/dsh-migration/08 §6).
-    assert.equal(TABLES.length, 59, '57 declared models + 2 through tables')
+    // 63 declared models + 2 Django auto-created M2M through tables (docs/dsh-migration/08 §6).
+    // The 63 include the six M1 interaction tables (docs/26 §9.1).
+    assert.equal(TABLES.length, 65, '63 declared models + 2 through tables')
     for (const table of TABLES) assert.ok(created.has(table.name), `missing table ${table.name}`)
-    assert.equal(schemaVersionOf(store.db), 1)
+    assert.equal(schemaVersionOf(store.db), 2, 'M1 added six tables: schema version 2')
   } finally {
     store.close()
   }

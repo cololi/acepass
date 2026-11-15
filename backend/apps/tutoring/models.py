@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from django.db import models
 
-from apps.common.enums import TutorPurpose, TutorRequestStatus
+from apps.common.enums import (
+    CoachPurpose,
+    CoachTurnRole,
+    CoachTurnStatus,
+    TutorPurpose,
+    TutorRequestStatus,
+)
 from apps.common.models import BaseModel
 
 
@@ -148,3 +154,70 @@ class TutorTurn(BaseModel):
         ordering = ["created_at"]
         verbose_name = "辅导对话"
         verbose_name_plural = "辅导对话"
+
+
+class CoachTurn(BaseModel):
+    """One node-anchored coach exchange (M1 interaction redesign).
+
+    Unlike :class:`TutorJob`, a coach turn is not bound to a practice session
+    item: it is bound to a knowledge point and optionally to one step of an
+    interaction session. It exists so that recall checks, self-explanation
+    checks, hint ladders and misconception probes have a real conversation log
+    rather than a one-shot job.
+
+    Safety rules (docs/26 §7):
+
+    * a model reply is stored only after structured validation; a rejected
+      reply is stored with ``status=failed`` and never as content;
+    * ``structured`` is the validated object, ``text`` is its rendered form for
+      the transcript — neither may ever carry a score or a mastery claim;
+    * citations are restricted to the ids supplied to the call.
+    """
+
+    #: Stable thread id: f"{session_id or 'ad_hoc'}:{node_id}:{purpose}".
+    thread_key = models.CharField(max_length=160, db_index=True)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="coach_turns")
+    project = models.ForeignKey("exams.ExamProject", on_delete=models.CASCADE, related_name="coach_turns")
+    node = models.ForeignKey("knowledge.KnowledgeNode", on_delete=models.CASCADE, related_name="coach_turns")
+    session = models.ForeignKey(
+        "interaction.InteractionSession",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="coach_turns",
+    )
+    step = models.ForeignKey(
+        "interaction.SessionStep", null=True, blank=True, on_delete=models.SET_NULL, related_name="coach_turns"
+    )
+    purpose = models.CharField(max_length=24, choices=CoachPurpose.choices)
+    role = models.CharField(max_length=12, choices=CoachTurnRole.choices, default=CoachTurnRole.ASSISTANT)
+    ordinal = models.PositiveIntegerField(default=1)
+    status = models.CharField(max_length=16, choices=CoachTurnStatus.choices, default=CoachTurnStatus.QUEUED)
+    #: The learner's question / the assistant's rendered reply; never raw model text.
+    text = models.TextField(blank=True)
+    #: Validated structured content (purpose-specific schema).
+    structured = models.JSONField(default=dict, blank=True)
+    citations = models.JSONField(default=list, blank=True)
+    missing_information = models.JSONField(default=list, blank=True)
+    llm_run = models.ForeignKey(
+        "audit.LLMRun", null=True, blank=True, on_delete=models.SET_NULL, related_name="coach_turns"
+    )
+    prompt_version = models.CharField(max_length=40, blank=True)
+    error_code = models.CharField(max_length=80, blank=True)
+    error_message = models.CharField(max_length=500, blank=True)
+
+    class Meta:
+        db_table = "tutoring_coach_turn"
+        constraints = [
+            models.UniqueConstraint(fields=["thread_key", "ordinal"], name="uniq_coach_turn_ordinal"),
+        ]
+        indexes = [
+            models.Index(fields=["thread_key", "-ordinal"]),
+            models.Index(fields=["user", "node", "-created_at"]),
+        ]
+        ordering = ["thread_key", "ordinal"]
+        verbose_name = "考点教练对话"
+        verbose_name_plural = "考点教练对话"
+
+    def __str__(self) -> str:
+        return f"coach:{self.purpose}:{self.role}:{self.status}"
