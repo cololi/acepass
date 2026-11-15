@@ -12,10 +12,13 @@
 *.pdf binary
 *.zip binary
 
-# 语言统计：文档不参与代码行数，锁文件与黄金夹具视为生成物。
+# 语言统计：文档不参与代码行数；生成物（黄金夹具、生成的 CSS/schema、锁文件）
+# 不计入语言占比，避免 1.1 万行的 schema.generated.ts 把 TypeScript 撑成主语言。
 docs/** linguist-documentation
 *.md linguist-documentation
 frontend/package-lock.json linguist-generated
+backend/requirements/lock.txt linguist-generated
 dsh-plugin/tests/golden/** linguist-generated
 dsh-plugin/tests/fixtures/** linguist-generated
-backend/requirements/lock.txt linguist-generated
+dsh-plugin/src/client/generated/** linguist-generated
+dsh-plugin/src/store/*.generated.ts linguist-generated
