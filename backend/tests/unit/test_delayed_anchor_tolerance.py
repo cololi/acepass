@@ -83,3 +83,17 @@ def test_a_real_later_event_pushes_the_deadline(monkeypatch):
     assert status["satisfied"] is False, status
     assert "延迟验证需等待" in status["reason"]
     assert status["recomputed_not_before"] == (observed + timedelta(hours=24)).isoformat()
+
+
+def test_an_unresolvable_anchor_does_not_push_the_deadline(monkeypatch):
+    """No event found is "unknown", never "a new event at this very second"."""
+    anchor = timezone.now() - timedelta(hours=30)
+    task = _delayed_task(anchor, not_before=anchor + timedelta(hours=24))
+    # ``_anchor_for`` could not find anything and fell back to "now".
+    monkeypatch.setattr(pairing_services, "_anchor_for", lambda **kwargs: (kwargs["before"], "current_event"))
+
+    status = pairing_services.delayed_interval_status(task=task, now=anchor + timedelta(hours=24, minutes=2))
+
+    assert status["satisfied"] is True, status
+    assert status["recomputed_not_before"] is None
+    assert status["not_before"] == (anchor + timedelta(hours=24)).isoformat()

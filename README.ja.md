@@ -149,7 +149,7 @@ npx tsc -b && npx vite build     # 型チェック + 本番ビルド
 npx playwright test              # 実ブラウザ：デスクトップ + モバイル
 ```
 
-直近の完全な記録：バックエンド **509 passed**、ruff/check/makemigrations クリーン、ブラウザ本体スイート **78 passed**、
+直近の完全な記録：バックエンド **508 passed**、ruff/check/makemigrations クリーン、ブラウザ本体スイート **78 passed**、
 stub 専用 **8 passed**、アーカイブ済み反例 3 群もそのまま通過。数値と規定の詳細は
 [実装状況](docs/implementation-status.md) と [受け入れ結果](docs/acceptance-results.md) にあります。
 

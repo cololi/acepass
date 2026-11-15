@@ -149,7 +149,7 @@ npx tsc -b && npx vite build     # type check + production build
 npx playwright test              # real browsers: desktop + mobile
 ```
 
-Latest full record: backend **509 passed**, ruff/check/makemigrations clean, browser main suite **78 passed**,
+Latest full record: backend **508 passed**, ruff/check/makemigrations clean, browser main suite **78 passed**,
 stub-only run **8 passed**, three archived counterexample groups still passing. Numbers and per-rule details:
 [implementation status](docs/implementation-status.md) and [acceptance results](docs/acceptance-results.md).
 

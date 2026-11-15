@@ -361,6 +361,15 @@ def delayed_interval_status(*, task: StudyTask, now=None) -> dict:
         node_id=task.knowledge_node_id,
         before=moment,
     )
+    if source == "current_event":
+        # ``_anchor_for`` falls back to "the current instant" when it finds no
+        # completed learning event for this node. That fallback is right when a
+        # task is being *created* (the trigger is the event), but wrong here:
+        # "no anchor found" would read as "a brand-new training event happened
+        # this very second", push the deadline a full interval out on every
+        # check and make the task unstartable forever. The frozen deadline stays
+        # authoritative unless a real later event says otherwise.
+        anchor = None
     # Only a learning event that happened *after the task was created* moves the
     # deadline. The stored anchor is the creation-time anchor, so re-deriving it
     # from the same rows the task was built from changes nothing — while a manual
