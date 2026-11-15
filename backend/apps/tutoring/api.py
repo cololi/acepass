@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.db.models import Count, OuterRef, Subquery
 from django.http import StreamingHttpResponse
 from ninja import Schema
 
@@ -276,14 +277,25 @@ def get_job(request, project_id: str, job_id: str):
 @tutor_router.get("/projects/{project_id}/tutor-sessions", auth=auth)
 def list_tutor_sessions(request, project_id: str, session_item_id: str | None = None, limit: int = 20):
     project = require_project(request.user, project_id)
-    queryset = TutorSession.objects.filter(project=project, user=request.user).order_by("-created_at")
+    # Three per-row queries (count, exists, first-status) became one annotation
+    # each, so the cost no longer grows with the number of returned sessions.
+    # `last_job_status` keeps ``order_by("-created_at").first()`` semantics by
+    # using the same ordering inside the subquery.
+    latest_status = Subquery(
+        TutorJob.objects.filter(tutor_session=OuterRef("pk")).order_by("-created_at").values("status")[:1]
+    )
+    queryset = (
+        TutorSession.objects.filter(project=project, user=request.user)
+        .annotate(job_count=Count("jobs"), last_job_status=latest_status)
+        .order_by("-created_at")
+    )
     if session_item_id:
         queryset = queryset.filter(session_item_id=session_item_id)
     return [
         {
             **_session_out(session),
-            "job_count": session.jobs.count(),
-            "last_job_status": session.jobs.order_by("-created_at").first().status if session.jobs.exists() else None,
+            "job_count": session.job_count,
+            "last_job_status": session.last_job_status,
         }
         for session in queryset[: max(1, min(limit, 50))]
     ]

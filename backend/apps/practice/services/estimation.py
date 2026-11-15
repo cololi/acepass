@@ -29,7 +29,9 @@ from django.db.models import Max
 
 from ai.prompts import registry as prompts
 from ai.providers import base as providers
+from ai.validators import response_text
 from apps.audit.models import LLMRun
+from apps.audit.services import llm_runs
 from apps.common.enums import GradeEventKind, GradeMethod, GradeStatus, LlmRunStatus
 from apps.common.errors import InvalidInput, PurposeNotAllowed
 from apps.practice.models import Attempt, GradeEvent
@@ -41,19 +43,6 @@ from apps.practice.services import verification_gate
 ESTIMATE_CAPABILITY = "estimate_grade"
 
 
-def _strip_code_fence(text: str) -> str:
-    cleaned = (text or "").strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[-1]
-        if cleaned.endswith("```"):
-            cleaned = cleaned[:-3]
-    return cleaned.strip()
-
-
-def _blocks_text(blocks: Any) -> str:
-    return transcription_services.blocks_text(blocks)
-
-
 def _learner_answer_text(attempt: Attempt) -> str:
     """Only textual answers are sent — never the photos themselves.
 
@@ -62,10 +51,6 @@ def _learner_answer_text(attempt: Attempt) -> str:
     the model is never asked to score text it read approximately.
     """
     return transcription_services.learner_answer_text(attempt)
-
-
-def _model_identifier(provider: providers.BaseProvider) -> str:
-    return getattr(provider, "text_model", "") or ""
 
 
 def rubric_criteria(rubric) -> list[dict[str, Any]]:
@@ -91,7 +76,7 @@ def rubric_criteria(rubric) -> list[dict[str, Any]]:
 def _new_run(*, attempt: Attempt, provider, request_summary: dict, input_snapshot: dict) -> LLMRun:
     return LLMRun.objects.create(
         provider=provider.name,
-        model_identifier=_model_identifier(provider),
+        model_identifier=llm_runs.model_identifier(provider),
         capability=ESTIMATE_CAPABILITY,
         prompt_version=prompts.ESTIMATE_GRADE_PROMPT_VERSION,
         status=LlmRunStatus.FAILED,
@@ -101,27 +86,6 @@ def _new_run(*, attempt: Attempt, provider, request_summary: dict, input_snapsho
         user=attempt.user,
         project_id=attempt.project_id,
     )
-
-
-def _record_call(run: LLMRun, call: providers.AiCallResult) -> None:
-    run.prompt_tokens = call.prompt_tokens
-    run.completion_tokens = call.completion_tokens
-    run.cost_cents = call.cost_cents
-    run.cost_known = call.cost_known
-    run.attempts = call.attempts
-    run.latency_ms = call.latency_ms
-    run.is_stub = call.is_stub
-    run.raw_response_excerpt = (call.raw_text or "")[:4000]
-    run.model_identifier = call.model or run.model_identifier
-    run.provider = call.provider or run.provider
-
-
-def _record_failure(run: LLMRun, status: str, exc: Exception) -> None:
-    run.status = status
-    run.error_code = getattr(exc, "code", "ai_error")
-    run.error_message = str(exc)[:500]
-    run.cost_known = False
-    run.save()
 
 
 def estimate_grade(*, attempt: Attempt, actor) -> GradeEvent:
@@ -176,7 +140,7 @@ def estimate_grade(*, attempt: Attempt, actor) -> GradeEvent:
     learner_answer = _learner_answer_text(attempt)
     prompt = prompts.build_estimate_prompt(
         question_type=item.question_version.question_type,
-        stem_text=_blocks_text((item.question_version.content or {}).get("blocks")),
+        stem_text=transcription_services.blocks_text((item.question_version.content or {}).get("blocks")),
         rubric_criteria=criteria,
         learner_answer_text=learner_answer,
         transcription_note=transcription_services.transcription_note_for(attempt),
@@ -215,16 +179,16 @@ def estimate_grade(*, attempt: Attempt, actor) -> GradeEvent:
             ),
         )
     except providers.AiUnavailable as exc:
-        _record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
+        llm_runs.record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
         raise
     except providers.AiError as exc:
-        _record_failure(
+        llm_runs.record_failure(
             run, LlmRunStatus.TIMEOUT if isinstance(exc, providers.AiTimeout) else LlmRunStatus.FAILED, exc
         )
         raise
-    _record_call(run, call)
+    llm_runs.record_call(run, call)
     try:
-        parsed = json.loads(_strip_code_fence(call.raw_text))
+        parsed = json.loads(response_text.strip_code_fence(call.raw_text))
     except json.JSONDecodeError as exc:
         run.status = LlmRunStatus.REJECTED
         run.error_code = providers.AiInvalidOutput.code

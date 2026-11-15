@@ -33,10 +33,12 @@ from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 
 from ai.prompts import registry as prompts
 from ai.providers import base as providers
+from ai.validators import response_text
 from apps.audit.models import LLMRun
 from apps.common.answers import sum_blank_scores, validate_answer_payload
 from apps.common.content import blank_ids, content_digest, option_ids
@@ -72,19 +74,6 @@ def _problem(code: str, message: str, path: str = "", severity: str = BLOCKING, 
     return {"code": code, "message": message, "path": path, "severity": severity, **extra}
 
 
-def _blocks_text(blocks: Any) -> str:
-    """Plain text of a block list (text and math only). Never touches answers."""
-    parts: list[str] = []
-    for block in blocks or []:
-        if not isinstance(block, dict):
-            continue
-        if block.get("kind") == "text":
-            parts.append(str(block.get("text", "")))
-        elif block.get("kind") == "math":
-            parts.append(f"${block.get('latex', '')}$")
-    return " ".join(part for part in parts if part)
-
-
 def _normalized_text(value: Any) -> str:
     import re
 
@@ -94,13 +83,17 @@ def _normalized_text(value: Any) -> str:
 def version_texts(version: QuestionVersion) -> tuple[str, list[str], str]:
     """Stem, option texts and material text of a source version — never answers."""
     content = version.content or {}
-    stem = _blocks_text(content.get("blocks"))
-    options = [_blocks_text(option.get("blocks")) for option in (content.get("options") or []) if isinstance(option, dict)]
+    stem = response_text.blocks_to_text(content.get("blocks"))
+    options = [
+        response_text.blocks_to_text(option.get("blocks"))
+        for option in (content.get("options") or [])
+        if isinstance(option, dict)
+    ]
     material = ""
     if version.parent_material_version_id:
         parent = QuestionVersion.objects.filter(id=version.parent_material_version_id).first()
         if parent is not None:
-            material = _blocks_text((parent.content or {}).get("blocks"))
+            material = response_text.blocks_to_text((parent.content or {}).get("blocks"))
     elif version.question_type == QuestionType.MATERIAL:
         material = stem
     return stem, [text for text in options if text], material
@@ -337,8 +330,10 @@ def _duplicate_problems(
             other_digest = content_digest(other)
         except (TypeError, ValueError):  # pragma: no cover - defensive
             continue
-        if other_digest == digest and _normalized_text(_blocks_text(other.get("blocks"))) == _normalized_text(
-            _blocks_text(content.get("blocks"))
+        if (
+            other_digest == digest
+            and _normalized_text(response_text.blocks_to_text(other.get("blocks")))
+            == _normalized_text(response_text.blocks_to_text(content.get("blocks")))
         ):
             problems.append(
                 _problem(
@@ -458,7 +453,7 @@ def independent_checks(
             )
     problems.extend(official_past_rule_problems(subject=subject))
     stem, _options, _material = version_texts(source_version)
-    variant_stem = _normalized_text(_blocks_text(content.get("blocks")))
+    variant_stem = _normalized_text(response_text.blocks_to_text(content.get("blocks")))
     if stem and variant_stem and _normalized_text(stem) == variant_stem:
         problems.append(
             _problem(
@@ -671,7 +666,14 @@ def variant_candidate_summary(candidate: ImportCandidate) -> dict:
 
 
 def variant_job_summary(job: ImportJob) -> dict:
-    candidates = list(job.candidates.order_by("created_at"))
+    # ``variant_jobs`` prefetches the candidates in one ordered query
+    # (``ImportCandidate`` reads were one query per job, D16). The single-job
+    # callers — ``propose_variants`` returning the batch it just wrote — have no
+    # prefetched attribute and keep reading the ordered related manager, so both
+    # paths serialise the same candidate rows in the same ``created_at`` order.
+    candidates = getattr(job, "variant_candidates", None)
+    if candidates is None:
+        candidates = list(job.candidates.order_by("created_at"))
     return {
         "job_id": str(job.id),
         "project_id": str(job.project_id),
@@ -697,7 +699,14 @@ def variant_jobs(*, project, user=None, limit: int = 20) -> list[dict]:
     if user is not None:
         queryset = queryset.filter(created_by=user)
     bounded = max(1, min(int(limit), 50))
-    return [variant_job_summary(job) for job in queryset.order_by("-created_at")[:bounded]]
+    jobs = queryset.order_by("-created_at")[:bounded].prefetch_related(
+        Prefetch(
+            "candidates",
+            queryset=ImportCandidate.objects.order_by("created_at"),
+            to_attr="variant_candidates",
+        )
+    )
+    return [variant_job_summary(job) for job in jobs]
 
 
 def propose_variants(

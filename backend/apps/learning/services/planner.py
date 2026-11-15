@@ -332,9 +332,15 @@ def weakly_known_candidates(*, user, project, limit: int = 20) -> list[dict]:
 def undiagnosed_candidates(*, user, project, limit: int = 20) -> list[dict]:
     """Nodes with no state yet, paired with an eligible question."""
     rows: list[dict] = []
-    diagnosed = set(
-        LearnerKnowledgeState.objects.filter(user=user, project=project).values_list("node_id", flat=True)
-    )
+    # The queryset yields UUID objects, while ``mapping.node_id`` is stringified below. Comparing a
+    # UUID against a ``str`` is always False, which silently turned every node with an existing state
+    # back into an "undiagnosed" candidate (B10 W3). Normalise once, on the way in.
+    diagnosed = {
+        str(node_id)
+        for node_id in LearnerKnowledgeState.objects.filter(user=user, project=project).values_list(
+            "node_id", flat=True
+        )
+    }
     mappings = (
         QuestionKnowledge.objects.filter(
             question_version__status="published",
@@ -628,7 +634,9 @@ def plan_payload(plan: StudyPlan | None, *, now=None) -> dict:
     if plan is None:
         return {"plan": None, "tasks": [], "notes": ["今日还没有计划：可点击“生成今日计划”"]}
     moment = now or timezone.now()
-    rows = list(plan.tasks.select_related("question", "knowledge_node", "subject").order_by("created_at"))
+    rows = list(
+        plan.tasks.select_related("question", "knowledge_node", "subject", "review_task").order_by("created_at")
+    )
     # C03: a task created before its question was sealed must not be *shown* as
     # part of today's plan either — the plan payload is the surface the learner
     # reads, so the resolver decides here too (the candidates above never build

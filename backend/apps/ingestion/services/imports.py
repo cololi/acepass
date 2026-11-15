@@ -18,13 +18,42 @@ import hashlib
 from dataclasses import dataclass
 
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 
 from apps.common.enums import AssetRole, ImportJobStatus, QuestionType, SourceKind
 from apps.common.errors import InvalidInput
-from apps.ingestion.models import ImportCandidate, ImportJob, SourceDocument
+from apps.ingestion.models import ImportCandidate, ImportJob, SourceDocument, SourceRegion
 from apps.ingestion.services import core as ingestion
 from apps.ingestion.services import layout, pdf_text, text_parser
+
+#: ``to_attr`` names used to hand a prefetched collection to the summaries below.
+#: They exist so the list endpoint can batch what the detail endpoint still loads
+#: lazily, without the summaries having to care which caller it is.
+PREFETCHED_REGIONS_ATTR = "prefetched_source_regions"
+PREFETCHED_CHILDREN_ATTR = "prefetched_child_candidates"
+
+
+def candidate_prefetch() -> list[Prefetch]:
+    """Prefetch the two collections ``candidate_summary`` walks.
+
+    The child order is spelled out because the summary asks for
+    ``child_candidates.order_by("created_at")``, which is *not* the model's
+    default ordering (``job``, then ``created_at``): children may belong to a
+    different job than their parent.
+    """
+    return [
+        Prefetch(
+            "source_regions",
+            queryset=SourceRegion.objects.select_related("document"),
+            to_attr=PREFETCHED_REGIONS_ATTR,
+        ),
+        Prefetch(
+            "child_candidates",
+            queryset=ImportCandidate.objects.order_by("created_at"),
+            to_attr=PREFETCHED_CHILDREN_ATTR,
+        ),
+    ]
 
 
 @transaction.atomic
@@ -206,7 +235,9 @@ def retry_job(job: ImportJob, *, actor) -> ImportJob:
 
 
 def job_summary(job: ImportJob) -> dict:
-    candidates = job.candidates.all()
+    # One query for the statuses instead of `count()` plus two full scans of the
+    # same related manager. A prefetched relation costs nothing here.
+    statuses = [candidate.status for candidate in job.candidates.all()]
     return {
         "id": str(job.id),
         "project_id": str(job.project_id),
@@ -224,16 +255,22 @@ def job_summary(job: ImportJob) -> dict:
         # P2 batch 1: per-page layout diagnosis (multi-column, grid, formula,
         # scanned) so the proofreading UI can point at the pages that need a human.
         "page_diagnostics": job.page_diagnostics or [],
-        "candidate_count": candidates.count(),
-        "candidate_status_counts": {
-            status: sum(1 for candidate in candidates if candidate.status == status)
-            for status in {candidate.status for candidate in candidates}
-        },
+        "candidate_count": len(statuses),
+        "candidate_status_counts": {status: statuses.count(status) for status in set(statuses)},
         "created_at": job.created_at.isoformat(),
     }
 
 
 def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = True) -> dict:
+    # The list endpoint prefetches both collections (see ``candidate_prefetch``);
+    # the detail endpoint has no prefetch and falls back to the lazy managers.
+    # Either way the values and their order are identical.
+    regions = getattr(candidate, PREFETCHED_REGIONS_ATTR, None)
+    if regions is None:
+        regions = candidate.source_regions.select_related("document")
+    children = getattr(candidate, PREFETCHED_CHILDREN_ATTR, None)
+    if children is None:
+        children = candidate.child_candidates.order_by("created_at")
     return {
         "id": str(candidate.id),
         "job_id": str(candidate.job_id),
@@ -263,7 +300,7 @@ def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = Tru
                 "document_title": region.document.title,
                 "document_type": region.document.document_type,
             }
-            for region in candidate.source_regions.select_related("document")
+            for region in regions
         ],
         "publication_question_id": str(candidate.publication_question_id) if candidate.publication_question_id else None,
         "publication_version_id": str(candidate.publication_version_id) if candidate.publication_version_id else None,
@@ -273,7 +310,7 @@ def candidate_summary(candidate: ImportCandidate, *, include_payload: bool = Tru
         # Material hierarchy parsed from the source, and the paper position this
         # candidate occupies (P1-01).
         "parent_candidate_id": str(candidate.parent_candidate_id) if candidate.parent_candidate_id else None,
-        "child_candidate_ids": [str(child.id) for child in candidate.child_candidates.order_by("created_at")],
+        "child_candidate_ids": [str(child.id) for child in children],
         "source_position_key": candidate.source_position_key,
         "paper_revision_id": str(candidate.paper_revision_id) if candidate.paper_revision_id else None,
         # How an answer page was matched onto this candidate: a proposal that a

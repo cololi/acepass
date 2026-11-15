@@ -27,7 +27,9 @@ from django.utils import timezone
 
 from ai.prompts import registry as prompts
 from ai.providers import base as providers
+from ai.validators import response_text
 from apps.audit.models import ContentRevision, LLMRun
+from apps.audit.services import llm_runs
 from apps.common.enums import LlmRunStatus, QuestionType, TranscriptionStatus
 from apps.common.errors import DependencyUnavailable, InvalidInput, ScopeViolation, TranscriptionRequired
 from apps.ingestion.services.access import asset_scope
@@ -91,15 +93,6 @@ def learner_answer_text(attempt: Attempt) -> str:
     if confirmed:
         parts.append("【学习者已确认的手写转写】\n" + confirmed)
     return "\n".join(parts)
-
-
-def _strip_code_fence(text: str) -> str:
-    cleaned = (text or "").strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[-1]
-        if cleaned.endswith("```"):
-            cleaned = cleaned[:-3]
-    return cleaned.strip()
 
 
 def _model_identifier(provider: providers.BaseProvider, capability: str) -> str:
@@ -259,19 +252,6 @@ def _new_run(*, attempt: Attempt, provider, request_summary: dict, input_snapsho
     )
 
 
-def _record_call(run: LLMRun, call: providers.AiCallResult) -> None:
-    run.prompt_tokens = call.prompt_tokens
-    run.completion_tokens = call.completion_tokens
-    run.cost_cents = call.cost_cents
-    run.cost_known = call.cost_known
-    run.attempts = call.attempts
-    run.latency_ms = call.latency_ms
-    run.is_stub = call.is_stub
-    run.raw_response_excerpt = (call.raw_text or "")[:4000]
-    run.model_identifier = call.model or run.model_identifier
-    run.provider = call.provider or run.provider
-
-
 def _read_asset_bytes(asset) -> bytes:
     storage = get_storage()
     if not storage.exists(asset.object_key):
@@ -356,16 +336,16 @@ def request_transcription(*, attempt: Attempt, asset_id: str, actor) -> AnswerTr
             ),
         )
     except providers.AiUnavailable as exc:
-        _record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
+        llm_runs.record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
         raise
     except providers.AiError as exc:
-        _record_failure(
+        llm_runs.record_failure(
             run, LlmRunStatus.TIMEOUT if isinstance(exc, providers.AiTimeout) else LlmRunStatus.FAILED, exc
         )
         raise
-    _record_call(run, call)
+    llm_runs.record_call(run, call)
     try:
-        parsed = json.loads(_strip_code_fence(call.raw_text))
+        parsed = json.loads(response_text.strip_code_fence(call.raw_text))
     except json.JSONDecodeError as exc:
         run.status = LlmRunStatus.REJECTED
         run.error_code = providers.AiInvalidOutput.code
@@ -377,14 +357,6 @@ def request_transcription(*, attempt: Attempt, asset_id: str, actor) -> AnswerTr
     run.status = LlmRunStatus.SUCCEEDED
     run.save()
     return _store_proposal(attempt=attempt, asset_id=asset_id, clean=clean, call=call, run=run)
-
-
-def _record_failure(run: LLMRun, status: str, exc: Exception) -> None:
-    run.status = status
-    run.error_code = getattr(exc, "code", "ai_error")
-    run.error_message = str(exc)[:500]
-    run.cost_known = False
-    run.save()
 
 
 @transaction.atomic

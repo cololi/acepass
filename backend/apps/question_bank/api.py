@@ -22,7 +22,14 @@ from apps.common.errors import InvalidInput, ScopeViolation
 from apps.common.scope import require_project, require_subject
 from apps.knowledge.models import QuestionKnowledge
 from apps.question_bank import services
-from apps.question_bank.models import AnswerKeyVersion, Question, QuestionFamily, QuestionVersion, RubricVersion
+from apps.question_bank.models import (
+    AnswerKeyVersion,
+    Question,
+    QuestionFamily,
+    QuestionSourceLink,
+    QuestionVersion,
+    RubricVersion,
+)
 from apps.question_bank.services import families as family_services
 from apps.question_bank.services import sealing
 
@@ -558,8 +565,22 @@ def list_source_regions(request, project_id: str, question_id: str):
     if question is None:
         raise ScopeViolation(message="题目不存在或不属于该项目")
     rows = []
-    for version in question.versions.all():
-        for link in version.source_links.select_related("region"):
+    # One query for the links of every version instead of one query per version
+    # (D17). The outer order is still the versions' own ``Meta.ordering``
+    # (``question, -version``). ``QuestionSourceLink`` has no ``Meta.ordering``, so
+    # the old per-version read returned rows in the plan's join-key order — which
+    # was measured to be ``region_id`` on a fixture whose region UUIDs run against
+    # insertion order, including a same-region tie. The prefetch states that order
+    # instead of leaving it to the planner, so the bytes stay the same.
+    versions = question.versions.all().prefetch_related(
+        Prefetch(
+            "source_links",
+            queryset=QuestionSourceLink.objects.select_related("region").order_by("region_id"),
+            to_attr="region_links",
+        )
+    )
+    for version in versions:
+        for link in version.region_links:
             region = link.region
             rows.append(
                 {

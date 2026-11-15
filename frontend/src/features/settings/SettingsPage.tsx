@@ -361,8 +361,8 @@ function AiStatusPanel({ projectId }: { projectId: string | null }) {
       provider：{statusQuery.data.provider} · {statusQuery.data.configured ? (statusQuery.data.is_stub ? '测试/演示 stub' : '真实 provider') : '未配置'}
       <div>{statusQuery.data.message}</div>
       <p className="tiny" style={{ marginBottom: 0 }}>
-        配置方式：设置环境变量 ACEPASS_AI_PROVIDER=openai_compatible、ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、
-        ACEPASS_AI_TEXT_MODEL / ACEPASS_AI_VISION_MODEL 后重启 API 与 Worker。测试 stub 只在显式测试/演示模式下启用。
+        AcePass 通过 DSH 的模型服务执行 AI 能力（讲解、诊断、估分等）。未配置时接口会如实返回未配置，
+        不会用测试 stub 冒充结果；在 DSH 中选择或登录可用模型后重试即可。
       </p>
     </div>
   )

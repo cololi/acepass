@@ -28,7 +28,9 @@ from django.utils import timezone
 
 from ai.prompts import registry as prompts
 from ai.providers import base as providers
+from ai.validators import response_text
 from apps.audit.models import LLMRun
+from apps.audit.services import llm_runs
 from apps.common.enums import FollowUpStatus, LlmRunStatus, QuestionType
 from apps.common.errors import InvalidInput, PurposeNotAllowed, ScopeViolation
 from apps.practice.models import Attempt, DiagnosisFollowUp, ErrorDiagnosis
@@ -40,19 +42,6 @@ from apps.practice.services import verification_gate
 DIAGNOSE_CAPABILITY = "diagnose"
 
 _NO_CAUSE_NOTE = "模型没有给出有证据支持的原因，系统没有替你猜一个原因；可补充解题过程后再试。"
-
-
-def _strip_code_fence(text: str) -> str:
-    cleaned = (text or "").strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[-1]
-        if cleaned.endswith("```"):
-            cleaned = cleaned[:-3]
-    return cleaned.strip()
-
-
-def _model_identifier(provider: providers.BaseProvider) -> str:
-    return getattr(provider, "text_model", "") or ""
 
 
 def checked_answer(item):
@@ -119,7 +108,7 @@ def _graded_parts(attempt: Attempt) -> list[dict[str, Any]]:
 def _new_run(*, attempt: Attempt, provider, request_summary: dict, input_snapshot: dict) -> LLMRun:
     return LLMRun.objects.create(
         provider=provider.name,
-        model_identifier=_model_identifier(provider),
+        model_identifier=llm_runs.model_identifier(provider),
         capability=DIAGNOSE_CAPABILITY,
         prompt_version=prompts.DIAGNOSE_PROMPT_VERSION,
         status=LlmRunStatus.FAILED,
@@ -129,27 +118,6 @@ def _new_run(*, attempt: Attempt, provider, request_summary: dict, input_snapsho
         user=attempt.user,
         project_id=attempt.project_id,
     )
-
-
-def _record_call(run: LLMRun, call: providers.AiCallResult) -> None:
-    run.prompt_tokens = call.prompt_tokens
-    run.completion_tokens = call.completion_tokens
-    run.cost_cents = call.cost_cents
-    run.cost_known = call.cost_known
-    run.attempts = call.attempts
-    run.latency_ms = call.latency_ms
-    run.is_stub = call.is_stub
-    run.raw_response_excerpt = (call.raw_text or "")[:4000]
-    run.model_identifier = call.model or run.model_identifier
-    run.provider = call.provider or run.provider
-
-
-def _record_failure(run: LLMRun, status: str, exc: Exception) -> None:
-    run.status = status
-    run.error_code = getattr(exc, "code", "ai_error")
-    run.error_message = str(exc)[:500]
-    run.cost_known = False
-    run.save()
 
 
 def diagnosis_payload(diagnosis: ErrorDiagnosis) -> dict[str, Any]:
@@ -254,16 +222,16 @@ def propose_diagnosis(*, attempt: Attempt, actor, learner_note: str = "") -> dic
             ),
         )
     except providers.AiUnavailable as exc:
-        _record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
+        llm_runs.record_failure(run, LlmRunStatus.UNAVAILABLE, exc)
         raise
     except providers.AiError as exc:
-        _record_failure(
+        llm_runs.record_failure(
             run, LlmRunStatus.TIMEOUT if isinstance(exc, providers.AiTimeout) else LlmRunStatus.FAILED, exc
         )
         raise
-    _record_call(run, call)
+    llm_runs.record_call(run, call)
     try:
-        parsed = json.loads(_strip_code_fence(call.raw_text))
+        parsed = json.loads(response_text.strip_code_fence(call.raw_text))
     except json.JSONDecodeError as exc:
         run.status = LlmRunStatus.REJECTED
         run.error_code = providers.AiInvalidOutput.code

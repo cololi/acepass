@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -374,35 +374,68 @@ export function KnowledgePage() {
     onError: (err) => setTagError(describeError(err)),
   })
 
-  if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
-  if (!currentSubject) return <div className="card empty-state">请先选择科目。</div>
-
+  /* ------------------------------------------------- derived query snapshots */
+  // Everything here is derived from query data only, so it stays pure. It is
+  // computed *before* the early returns because it feeds the hooks below, and it
+  // is memoized: this page re-renders on every keystroke in its editors, and the
+  // unmemoized version re-indexed the node list, re-labelled every ancestor path,
+  // re-sorted the tag suggestions and ran `states.find` once per node each time.
   const nodes = mapQuery.data?.nodes ?? []
-  const states = statesQuery.data?.states ?? []
   const publishedSyllabus = syllabusQuery.data?.find((syllabus) => syllabus.status === 'published') ?? null
   const editableNodes = editableNodesQuery.data ?? []
-  const editableNodeMap = nodeMapOf(editableNodes)
   const outlineSyllabus =
     syllabusQuery.data?.find((syllabus) => syllabus.id === outlineSyllabusId) ?? publishedSyllabus ?? syllabusQuery.data?.[0] ?? null
   const outlineTargetId = outlineSyllabus?.id ?? ''
+
+  /** `editableNodes` indexed once per snapshot, instead of `nodeMapOf` per render. */
+  const editableNodeMap = useMemo(() => nodeMapOf(editableNodesQuery.data ?? []), [editableNodesQuery.data])
+  /**
+   * Learning state per node id, built once per snapshot. First match wins: that
+   * is what the `states.find(...)` it replaces returned, so an id that appears
+   * twice must not be overwritten by the later row.
+   */
+  const stateByNodeId = useMemo(() => {
+    const byId = new Map<string, KnowledgeStateRow>()
+    for (const row of statesQuery.data?.states ?? []) {
+      if (!byId.has(row.node_id)) byId.set(row.node_id, row)
+    }
+    return byId
+  }, [statesQuery.data])
+  /** The `a / b / c` ancestor path of every editable node, once per snapshot. */
+  const pathLabelByNodeId = useMemo(() => {
+    const labels = new Map<string, string>()
+    for (const node of editableNodesQuery.data ?? []) labels.set(node.id, nodePathLabel(node, editableNodeMap))
+    return labels
+  }, [editableNodesQuery.data, editableNodeMap])
   const editingNode = editingNodeId ? (editableNodeMap.get(editingNodeId) ?? null) : null
   // Every node of the same syllabus stays selectable, including the ones the
   // backend must refuse: a cycle is a real user mistake, and the server's
   // explanation ("环") is what the reviewer needs to read, not a silent gap in
   // the list. Impossible choices are labelled instead of hidden.
-  const moveOptions = editingNode
-    ? editableNodes
-        .filter((node) => node.syllabus_version_id === editingNode.syllabus_version_id)
-        .map((node) => {
-          const isSelf = node.id === editingNode.id
-          const isDescendant = !isSelf && ancestorIdsOf(node, editableNodeMap).includes(editingNode.id)
-          return {
-            node,
-            invalidNote: isSelf ? '（当前考点自身，不能作为上级）' : isDescendant ? '（自己的子节点，会形成环）' : '',
-          }
-        })
-    : []
-  const selectedState = states.find((state) => state.node_id === selectedNodeId) ?? null
+  const moveOptions = useMemo<Array<{ node: KnowledgeNode; label: string; invalidNote: string }>>(() => {
+    if (!editingNode) return []
+    return (editableNodesQuery.data ?? [])
+      .filter((node) => node.syllabus_version_id === editingNode.syllabus_version_id)
+      .map((node) => {
+        const isSelf = node.id === editingNode.id
+        const isDescendant = !isSelf && ancestorIdsOf(node, editableNodeMap).includes(editingNode.id)
+        return {
+          node,
+          label: pathLabelByNodeId.get(node.id) ?? node.canonical_name,
+          invalidNote: isSelf ? '（当前考点自身，不能作为上级）' : isDescendant ? '（自己的子节点，会形成环）' : '',
+        }
+      })
+  }, [editingNode, editableNodeMap, pathLabelByNodeId, editableNodesQuery.data])
+  /** Newest suggestion first, sorted once per snapshot rather than per render. */
+  const tagSuggestions = useMemo(
+    () => [...(tagSuggestionsQuery.data ?? [])].sort((a, b) => (a.created_at < b.created_at ? 1 : -1)),
+    [tagSuggestionsQuery.data],
+  )
+
+  if (!currentProject) return <div className="card empty-state">请先选择项目。</div>
+  if (!currentSubject) return <div className="card empty-state">请先选择科目。</div>
+
+  const selectedState = selectedNodeId ? (stateByNodeId.get(selectedNodeId) ?? null) : null
 
   const relationEdges = relationsQuery.data?.edges ?? []
   const relationFromNode = editableNodeMap.get(relationForm.from_node_id) ?? null
@@ -418,9 +451,6 @@ export function KnowledgePage() {
   )
   const prerequisitePreview = prerequisitesQuery.data ?? null
 
-  const tagSuggestions = [...(tagSuggestionsQuery.data ?? [])].sort((a, b) =>
-    a.created_at < b.created_at ? 1 : -1,
-  )
   const currentTagSuggestion = tagSuggestions[0] ?? null
   const chosenTagNames = currentTagSuggestion ? (selectedTagNames[currentTagSuggestion.id] ?? []) : []
   const toggleTagName = (suggestionId: string, name: string) => {
@@ -492,7 +522,7 @@ export function KnowledgePage() {
                       question_count: number
                       evidence: { summary: string; best_summary: string; independent_correct_count: number; needs_review: boolean }
                     }
-                    const state = states.find((item) => item.node_id === node.id)
+                    const state = stateByNodeId.get(node.id)
                     const summary = state?.summary ?? node.evidence.summary
                     const editableNode = editableNodeMap.get(node.id)
                     return (
@@ -574,7 +604,7 @@ export function KnowledgePage() {
                                       <option value="">顶层（无上级）</option>
                                       {moveOptions.map((option) => (
                                         <option key={option.node.id} value={option.node.id}>
-                                          {nodePathLabel(option.node, editableNodeMap)}
+                                          {option.label}
                                           {option.invalidNote}
                                         </option>
                                       ))}
@@ -830,7 +860,7 @@ export function KnowledgePage() {
               <option value="">请选择</option>
               {editableNodes.map((node) => (
                 <option key={node.id} value={node.id}>
-                  {nodePathLabel(node, editableNodeMap)}
+                  {pathLabelByNodeId.get(node.id) ?? node.canonical_name}
                 </option>
               ))}
             </select>
@@ -850,7 +880,7 @@ export function KnowledgePage() {
               <option value="">请选择</option>
               {editableNodes.map((node) => (
                 <option key={node.id} value={node.id}>
-                  {nodePathLabel(node, editableNodeMap)}
+                  {pathLabelByNodeId.get(node.id) ?? node.canonical_name}
                 </option>
               ))}
             </select>

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { ApiError, apiRequest, ensureCsrf, type ProjectOut, type SubjectOut, type UserOut } from '../api/client'
 
 /* ------------------------------------------------------------------ toasts */
@@ -151,6 +151,32 @@ export function ScopeProvider({ children }: { children: React.ReactNode }) {
   const [projectId, setProjectId] = useState<string | null>(() => window.localStorage.getItem(PROJECT_STORAGE))
   const [subjectId, setSubjectId] = useState<string | null>(() => window.localStorage.getItem(SUBJECT_STORAGE))
   const [loading, setLoading] = useState(false)
+  /**
+   * Bumped by `selectProject` so that re-selecting the project that is already
+   * selected still refreshes its subjects. The `projectId` effect below is the
+   * single owner of that fetch; this counter only tells it to run again, which
+   * is what keeps "one owner" from turning a re-select into a silent no-op.
+   */
+  const [subjectsEpoch, setSubjectsEpoch] = useState(0)
+  /**
+   * The project whose subjects the state currently belongs to, readable from a
+   * promise continuation. A ref, because a `useCallback` would otherwise capture
+   * whatever project happened to be selected when it was created.
+   */
+  const selectedProjectId = useRef<string | null>(projectId)
+  /**
+   * Generation of the newest subjects request; only the newest one may write
+   * state. Without it a slow reply for a project the learner has already left
+   * could overwrite the list of the project they are actually looking at — the
+   * previous guard only covered the failure path, so obsolete *successes* landed.
+   */
+  const subjectsRequest = useRef(0)
+
+  // Declared before the fetch effect so the ref is already current when a
+  // request for the new project starts.
+  useEffect(() => {
+    selectedProjectId.current = projectId
+  }, [projectId])
 
   const loadProjects = useCallback(async () => {
     if (!user) {
@@ -184,39 +210,56 @@ export function ScopeProvider({ children }: { children: React.ReactNode }) {
     else window.localStorage.removeItem(SUBJECT_STORAGE)
   }, [subjectId])
 
-  /** Fetch the current project's subjects and adopt a valid selection. */
+  /**
+   * Fetch one project's subjects and adopt a valid selection — the only writer of
+   * `subjects` / `subjectId`.
+   *
+   * A call is superseded as soon as a newer one starts, or as soon as the
+   * selection moves to another project; a superseded reply is returned to the
+   * caller but never written to state. A failure clears the list and the
+   * selection exactly like the previous effect-level handler did, and never
+   * rejects, which is the contract `reloadSubjects` and `reload` rely on.
+   */
   const fetchSubjects = useCallback(
     async (forProjectId: string | null, options: { keepCurrent?: boolean } = {}): Promise<SubjectOut[]> => {
       const keepCurrent = options.keepCurrent ?? true
+      const generation = subjectsRequest.current + 1
+      subjectsRequest.current = generation
+      const isCurrent = () =>
+        generation === subjectsRequest.current && forProjectId === selectedProjectId.current
       if (!forProjectId) {
+        if (generation === subjectsRequest.current) {
+          setSubjects([])
+          setSubjectId(null)
+        }
+        return []
+      }
+      try {
+        const list = await apiRequest<SubjectOut[]>(`/projects/${forProjectId}/subjects`)
+        if (!isCurrent()) return list
+        setSubjects(list)
+        setSubjectId((current) =>
+          keepCurrent && current && list.some((subject) => subject.id === current)
+            ? current
+            : (list[0]?.id ?? null),
+        )
+        return list
+      } catch {
+        if (!isCurrent()) return []
         setSubjects([])
         setSubjectId(null)
         return []
       }
-      const list = await apiRequest<SubjectOut[]>(`/projects/${forProjectId}/subjects`)
-      setSubjects(list)
-      setSubjectId((current) =>
-        keepCurrent && current && list.some((subject) => subject.id === current)
-          ? current
-          : (list[0]?.id ?? null),
-      )
-      return list
     },
     [],
   )
 
   useEffect(() => {
-    let cancelled = false
-    void fetchSubjects(projectId).catch(() => {
-      if (!cancelled) {
-        setSubjects([])
-        setSubjectId(null)
-      }
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [projectId, fetchSubjects])
+    // The single owner of the subjects fetch. `selectProject` only moves the
+    // selection, so a project change is exactly one GET — previously the
+    // selector and this effect both fetched, and the two replies raced.
+    void fetchSubjects(projectId)
+  }, [projectId, subjectsEpoch, fetchSubjects])
 
   const reloadSubjects = useCallback(async () => {
     try {
@@ -231,17 +274,15 @@ export function ScopeProvider({ children }: { children: React.ReactNode }) {
     await reloadSubjects()
   }, [loadProjects, reloadSubjects])
 
-  const selectProject = useCallback(
-    (next: string) => {
-      setProjectId(next)
-      // Subjects belong to a project: clear immediately, then load that
-      // project's list. A stale subject id from another project must never be
-      // used to create a session.
-      setSubjectId(null)
-      void fetchSubjects(next, { keepCurrent: false })
-    },
-    [fetchSubjects],
-  )
+  const selectProject = useCallback((next: string) => {
+    // Subjects belong to a project: clear the selection immediately, so a stale
+    // subject id from another project can never be used to create a session
+    // while the new list loads. The projectId effect then does the one fetch;
+    // the epoch bump makes re-selecting the current project refresh too.
+    setSubjectId(null)
+    setProjectId(next)
+    setSubjectsEpoch((value) => value + 1)
+  }, [])
 
   const value = useMemo<ScopeContextValue>(
     () => ({

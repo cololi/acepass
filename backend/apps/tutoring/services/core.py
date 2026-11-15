@@ -24,6 +24,7 @@ from django.utils import timezone
 
 from ai.prompts import registry as prompts
 from ai.providers import base as providers
+from ai.validators import response_text
 from apps.audit.models import LLMRun
 from apps.audit.services.outbox import enqueue
 from apps.common.content import normalize_content
@@ -623,7 +624,7 @@ def run_job(*, job: TutorJob, prompt: str, citations: list[str], purpose: str, c
         return job
 
     try:
-        parsed = json.loads(_strip_code_fence(call.raw_text))
+        parsed = json.loads(response_text.strip_code_fence(call.raw_text))
     except json.JSONDecodeError:
         _record_failure(
             run, LlmRunStatus.REJECTED, providers.AiInvalidOutput("invalid JSON"), call=call, claim=claim
@@ -742,15 +743,6 @@ def _record_failure(
             run.cost_known = False
             run.cost_cents = None
         run.save()
-
-
-def _strip_code_fence(text: str) -> str:
-    cleaned = (text or "").strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[-1]
-        if cleaned.endswith("```"):
-            cleaned = cleaned[: -3]
-    return cleaned.strip()
 
 
 def job_payload(job: TutorJob, *, include_content: bool = True) -> dict[str, Any]:

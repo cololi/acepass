@@ -130,6 +130,66 @@ function emptyAnswer(questionType: string, presentation: PresentationOut | null)
   }
 }
 
+/**
+ * The mock-exam countdown, and nothing else.
+ *
+ * The clock object is server-anchored (`createExamClock`): a reading is
+ * `exam_deadline − server_time − monotonic elapsed`, so neither a device clock
+ * change nor a refresh can move it. Keeping the half-second cadence *here* is
+ * what makes it cheap — a tick repaints this one label instead of re-running the
+ * practice page, its sealed-id set and its exam pool.
+ *
+ * `onDeadline` is called at most once per clock, on the single transition where
+ * the server-anchored reading reaches zero. That is the only moment the page has
+ * to re-render (to leave `examLive`) and run its reconciliation refetch. The
+ * interval is cleared at that transition and never starts for a session that is
+ * no longer live, so a finished exam holds no timer.
+ */
+function ExamCountdown({
+  clock,
+  live,
+  onDeadline,
+}: {
+  clock: ExamClock | null
+  live: boolean
+  onDeadline: () => void
+}) {
+  // A repaint counter: the label is read from the clock, this only re-renders it.
+  const [, setTick] = useState(0)
+  // The clock instance this countdown already reported, so a re-render (or a
+  // StrictMode double effect) cannot report the same deadline twice.
+  const reportedFor = useRef<ExamClock | null>(null)
+  // A countdown needs the deadline *and* the server's own "now" to be anchored.
+  const counting = Boolean(
+    live && clock && clock.deadlineMs !== null && clock.serverTimeMs !== null,
+  )
+
+  useEffect(() => {
+    if (!counting || !clock) return
+    const timer = window.setInterval(() => {
+      const remaining = clock.remainingMs()
+      if (remaining === null || remaining > 0) {
+        setTick((value) => value + 1)
+        return
+      }
+      // Reached: the reading is clamped at 00:00.0 from here on, so there is
+      // nothing left to repaint — stop and hand the single transition up.
+      window.clearInterval(timer)
+      if (reportedFor.current === clock) return
+      reportedFor.current = clock
+      onDeadline()
+    }, 500)
+    return () => window.clearInterval(timer)
+  }, [counting, clock, onDeadline])
+
+  const label = counting && clock ? formatRemaining(clock.remainingMs(), true) : null
+  return live
+    ? label
+      ? `剩余 ${label}`
+      : '剩余时间：未收到服务器时间，不估算'
+    : '考试已结束'
+}
+
 export function PracticePage() {
   const { currentProject, projects, currentSubject, subjects, selectProject, selectSubject } = useScope()
   const toast = useToast()
@@ -156,8 +216,14 @@ export function PracticePage() {
   const [examValidation, setExamValidation] = useState<string | null>(null)
   // A 409 from a late submission: the server's own sentence plus the deadline.
   const [examRefusal, setExamRefusal] = useState<ExamDeadlineRefusal | null>(null)
-  // Re-render for the countdown; the clock itself is server-anchored.
-  const [, setClockTick] = useState(0)
+  // The countdown ticks inside `ExamCountdown`, not here, so the half-second
+  // cadence repaints one label instead of this page. This counter is the single
+  // signal the countdown sends back: it fires once, when the server-anchored
+  // reading reaches zero, which is the only moment this page must re-render.
+  const [, signalExamDeadline] = useState(0)
+  const handleExamDeadline = useCallback(() => {
+    signalExamDeadline((value) => value + 1)
+  }, [])
   const examReconciledFor = useRef<string | null>(null)
   const examCardRef = useRef<HTMLDivElement | null>(null)
 
@@ -206,11 +272,10 @@ export function PracticePage() {
     () => (session && session.mode === 'mock_exam' ? createExamClock(session) : null),
     [session],
   )
-  useEffect(() => {
-    if (!examClock || examClock.deadlineMs === null || examClock.serverTimeMs === null) return
-    const timer = window.setInterval(() => setClockTick((value) => value + 1), 500)
-    return () => window.clearInterval(timer)
-  }, [examClock])
+  // Read on every render, never ticked here: `remainingMs()` is the server's own
+  // deadline against a monotonic clock, so a render always sees the truth. The
+  // `ExamCountdown` below owns the repaint cadence and wakes this page exactly
+  // once, at the deadline transition.
   const remainingMs = examClock ? examClock.remainingMs() : null
   const deadlineReached = remainingMs !== null && remainingMs <= 0
   const examFinished = Boolean(
@@ -233,7 +298,6 @@ export function PracticePage() {
       session &&
       (examRefusal || session.expired_at || (!examLive && deadlineReached)),
   )
-  const examRemainingLabel = formatRemaining(remainingMs, true)
   const examDeadlineText = deadlineLabel(session?.exam_deadline ?? null)
 
   useEffect(() => {
@@ -821,11 +885,7 @@ export function PracticePage() {
           <div className="row between">
             <span className="pill warn">模拟考试 · 计时以服务器为准</span>
             <strong data-testid="mock-exam-remaining">
-              {examLive
-                ? examRemainingLabel
-                  ? `剩余 ${examRemainingLabel}`
-                  : '剩余时间：未收到服务器时间，不估算'
-                : '考试已结束'}
+              <ExamCountdown clock={examClock} live={examLive} onDeadline={handleExamDeadline} />
             </strong>
           </div>
           <p className="small muted" style={{ marginBottom: 6 }}>

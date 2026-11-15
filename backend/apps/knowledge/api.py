@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.db.models import Count, Q
 from django.utils import timezone
 from ninja import Schema
 
@@ -122,8 +123,40 @@ def _node_out(node: KnowledgeNode) -> dict:
         "aliases": node.aliases or [],
         "is_unclassified": node.is_unclassified,
         "display_order": node.display_order,
-        "question_count": node.question_mappings.filter(is_primary=True).count(),
+        "question_count": _primary_question_count(node),
     }
+
+
+#: Annotation name used to carry the per-node primary-mapping count through a
+#: list query. Kept private so it cannot collide with a model field.
+_PRIMARY_COUNT_ATTR = "primary_question_count_annotation"
+
+
+def _with_primary_question_counts(queryset):
+    """Count primary mappings in the same query instead of one COUNT per node.
+
+    ``list_nodes`` and ``knowledge_map`` used to call ``.count()`` inside the
+    per-node serializer, i.e. one query per returned node. This annotation
+    returns the identical number — the filter is the same ``is_primary=True`` —
+    but costs nothing per row.
+    """
+    return queryset.annotate(
+        **{
+            _PRIMARY_COUNT_ATTR: Count(
+                "question_mappings",
+                filter=Q(question_mappings__is_primary=True),
+                distinct=True,
+            )
+        }
+    )
+
+
+def _primary_question_count(node: KnowledgeNode) -> int:
+    annotated = getattr(node, _PRIMARY_COUNT_ATTR, None)
+    if annotated is not None:
+        return annotated
+    # Single-object callers (node creation, detail views) fall back to the query.
+    return node.question_mappings.filter(is_primary=True).count()
 
 
 def _pairing_out(pairing: VerificationPairing) -> dict:
@@ -151,8 +184,8 @@ def _pairing_out(pairing: VerificationPairing) -> dict:
 @knowledge_router.get("/projects/{project_id}/knowledge-nodes", auth=auth, response=list[NodeOut])
 def list_nodes(request, project_id: str, syllabus_version_id: str | None = None, subject_id: str | None = None):
     project = require_project(request.user, project_id)
-    queryset = KnowledgeNode.objects.filter(syllabus_version__subject__project=project).select_related(
-        "syllabus_version"
+    queryset = _with_primary_question_counts(
+        KnowledgeNode.objects.filter(syllabus_version__subject__project=project).select_related("syllabus_version")
     )
     if syllabus_version_id:
         queryset = queryset.filter(syllabus_version_id=syllabus_version_id)
@@ -337,9 +370,9 @@ def knowledge_map(request, project_id: str, subject_id: str, syllabus_version_id
     if syllabus_version_id:
         syllabi = syllabi.filter(id=syllabus_version_id)
     nodes = list(
-        KnowledgeNode.objects.filter(syllabus_version__in=syllabi)
-        .select_related("syllabus_version")
-        .order_by("display_order", "canonical_name")
+        _with_primary_question_counts(
+            KnowledgeNode.objects.filter(syllabus_version__in=syllabi).select_related("syllabus_version")
+        ).order_by("display_order", "canonical_name")
     )
     states = {
         str(state.node_id): state
@@ -357,7 +390,7 @@ def knowledge_map(request, project_id: str, subject_id: str, syllabus_version_id
                 "is_unclassified": node.is_unclassified,
                 "syllabus_version_id": str(node.syllabus_version_id),
                 "syllabus_is_user_provisional": node.syllabus_version.is_user_provisional,
-                "question_count": node.question_mappings.filter(is_primary=True).count(),
+                "question_count": _primary_question_count(node),
                 "evidence": {
                     "summary": state.summary if state else "undiagnosed",
                     "best_summary": state.best_summary if state else "undiagnosed",

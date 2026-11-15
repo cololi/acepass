@@ -614,7 +614,13 @@ def create_pdf_import(
 @ingestion_router.get("/projects/{project_id}/imports", auth=auth, response=list[ImportJobOut])
 def list_imports(request, project_id: str, status: str | None = None, limit: int = 20):
     project = require_project(request.user, project_id)
-    queryset = ImportJob.objects.filter(project=project, created_by=request.user).order_by("-created_at")
+    queryset = (
+        ImportJob.objects.filter(project=project, created_by=request.user)
+        # `job_summary` reads both collections; without the prefetch that is one
+        # query per row for documents plus one for the candidate count/statuses.
+        .prefetch_related("documents", "candidates")
+        .order_by("-created_at")
+    )
     if status:
         queryset = queryset.filter(status=status)
     return [import_services.job_summary(job) for job in queryset[: max(1, min(limit, 100))]]
@@ -658,7 +664,9 @@ def list_candidates(request, project_id: str, job_id: str | None = None, status:
         queryset = queryset.filter(status=status)
     return [
         import_services.candidate_summary(candidate)
-        for candidate in queryset.select_related("job")[: max(1, min(limit, 100))]
+        for candidate in queryset.select_related("job").prefetch_related(
+            *import_services.candidate_prefetch()
+        )[: max(1, min(limit, 100))]
     ]
 
 

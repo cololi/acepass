@@ -790,9 +790,18 @@ def session_state(session: PracticeSession, *, user, include_stems: bool = False
     items = []
     withheld_item_ids: list[str] = []
     for item in session.items.select_related(
-        "question_version__question", "answer_key_version", "rubric_version"
+        "question_version__question",
+        "answer_key_version",
+        "rubric_version",
+        # The item's single attempt and that attempt's current grade travel with
+        # the item row. Reading them back one item at a time was the session
+        # detail N+1 (D01): two extra queries per graded item, on the snapshot
+        # every practice screen reloads. ``SessionItem.attempt`` is a reverse
+        # one-to-one, so the join cannot duplicate an item row and the item
+        # order (``ordinal``) is unchanged; a missing attempt stays ``None``.
+        "attempt__current_grade_event",
     ).order_by("ordinal"):
-        attempt = Attempt.objects.filter(session_item=item).first()
+        attempt = getattr(item, "attempt", None)
         # A verification item covers itself: only *another* covering item withholds
         # this row's grading, which is what `content_gate_blocks_item` checks.
         withheld = verification_gate.content_gate_blocks_item(item=item, content_map=content_map)
