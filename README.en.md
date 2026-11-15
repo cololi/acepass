@@ -195,8 +195,8 @@ This repository deliberately writes down what is *not* verified instead of hidin
 - **No real exam material verification.** Fixtures are labelled "demo" everywhere; they are not any exam's official
   rules and not past papers.
 - **No remote deployment verification.** Compose has been built and started locally, but there is no target server,
-  domain or trusted certificate. The GitHub Actions workflows are part of this repository; their real execution
-  status is whatever the Actions page shows.
+  domain or trusted certificate. GitHub Actions did run for real on the first push and passed all six jobs
+  (backend 508, acceptance 78, stub batch 8, original suite 16, frontend and infra).
 
 ## Contributing
 

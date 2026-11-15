@@ -1,5 +1,13 @@
 # AcePass 实施状态
 
+> **2026-11-15 首次推送后 GitHub Actions 实际执行通过（此前一直是"未验证"）。**
+> 六个 job 全绿：`backend`（真实 PostgreSQL，**508 passed**）、`frontend`（tsc + vite build）、
+> `infra`（Compose 校验、nginx 模板渲染、代理组件、真实全栈 HTTPS/CSRF 登录、恢复脚本反例）、
+> `browser-acceptance`（**78 passed**）、`browser-stub`（stub provider 专跑 **8 passed**）、
+> `browser-original`（**16 passed**）。第一次执行暴露并修掉两件事，都已写进下面的记录：
+> ① 延迟验证锚点的两处误判（毫秒时钟偏差、锚点不可解析）；② `@stub` 用例被混在普通验收批里跑，
+> 现在分成独立 job 并指定 `ACEPASS_AI_PROVIDER=stub`、`ACEPASS_RUNTIME_MODE=demo`。
+
 > **最新：延迟验证锚点的两处误判修复（2026-11-15，首次推送 GitHub 后由 CI 暴露）。**
 > 现象：`test_task_purpose_fixes_verification_mode_server_side` 在本地通过、在 CI 上
 > `1 failed / 500 passed`（400 + `延迟验证需等待`）。查下来是 `delayed_interval_status`
