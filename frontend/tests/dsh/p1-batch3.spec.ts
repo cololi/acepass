@@ -233,6 +233,9 @@ test.describe('P1 batch 3 stub-provider run', () => {
   })
 
   test('@stub validated segments stream, and reconnecting does not call the model again', async ({ page }) => {
+    // The app writes the selected project a request after the list renders;
+    // sample it once and this races on slower machines. Wait for the value.
+    await page.waitForFunction(() => window.localStorage.getItem('acepass.currentProject') !== null)
     const projectId = await page.evaluate(() => window.localStorage.getItem('acepass.currentProject'))
     expect(projectId, '验收前提：页面必须已选定项目').toBeTruthy()
     await openWorkbench(page, '大题')

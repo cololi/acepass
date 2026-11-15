@@ -233,6 +233,11 @@ test.describe('P1 batch 3 stub-provider run', () => {
   })
 
   test('@stub validated segments stream, and reconnecting does not call the model again', async ({ page }) => {
+    // `login` resolves when the project list is rendered; the app writes the
+    // selected project to localStorage a request later. Sampling once here was a
+    // race that failed roughly every other CI run ("页面必须已选定项目"), so wait
+    // for the value instead of reading it at one instant.
+    await page.waitForFunction(() => window.localStorage.getItem('acepass.currentProject') !== null)
     const projectId = await page.evaluate(() => window.localStorage.getItem('acepass.currentProject'))
     expect(projectId, '验收前提：页面必须已选定项目').toBeTruthy()
     await openWorkbench(page, '大题')
