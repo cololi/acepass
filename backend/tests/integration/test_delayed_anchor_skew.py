@@ -25,6 +25,7 @@ from django.utils import timezone
 from apps.common.enums import ExposureKind, ExposurePurpose
 from apps.learning.models import StudyTask
 from apps.learning.services import pairing as pairing_services
+from apps.learning.services.anchors import latest_learning_anchor
 from apps.practice.models import Attempt, ExposureEvent
 from tests.integration.test_learning_loop import answer_for, make_pairing
 from tests.integration.test_practice_flow import present, start_session, submit
@@ -76,7 +77,36 @@ def test_same_action_skew_does_not_move_the_deadline(caller, project_a, subject_
     # candidate anchor — the point is that it must not count as a new event.
     _reveal_at(project_a, attempt, anchor + timedelta(milliseconds=400))
 
-    status = pairing_services.delayed_interval_status(task=task, now=anchor + timedelta(minutes=10))
+    moment = max(anchor + timedelta(minutes=10), timezone.now())
+    probe, probe_source = latest_learning_anchor(
+        user=attempt.user, project=project_a, node_id=task.knowledge_node_id, before=moment
+    )
+    assert probe is not None, {
+        "why": "the fixture must leave a learning event the task's node can anchor on",
+        "probe_source": probe_source,
+        "node_id": str(task.knowledge_node_id),
+        "stored_anchor": anchor.isoformat(),
+        "attempt_submitted_at": attempt.submitted_at.isoformat(),
+        "moment": moment.isoformat(),
+        "attempts_on_node": Attempt.objects.filter(
+            user=attempt.user,
+            project_id=project_a,
+            submitted_at__lte=moment,
+            session_item__question_version__knowledge_mappings__node_id=task.knowledge_node_id,
+        ).count(),
+        "attempts": [
+            (row.submitted_at.isoformat(), str(row.id))
+            for row in Attempt.objects.filter(user=attempt.user, project_id=project_a)
+        ],
+        "mapped_nodes": [
+            str(row)
+            for row in attempt.session_item.question_version.knowledge_mappings.values_list(
+                "node_id", flat=True
+            )
+        ],
+    }
+
+    status = pairing_services.delayed_interval_status(task=task, now=moment)
     assert status["satisfied"] is True, status
     assert status["reason"] == ""
     assert status["recomputed_not_before"] is None, "同一动作的毫秒级偏差不得顺延截止时间"
