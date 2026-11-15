@@ -48,3 +48,6 @@ infra/docker/certs/
 
 # Documentation assets are committed; keep the raw capture working dirs out
 dsh-plugin/var/
+
+# TypeScript incremental build info
+*.tsbuildinfo
