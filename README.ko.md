@@ -149,7 +149,7 @@ npx tsc -b && npx vite build     # 타입 검사 + 프로덕션 빌드
 npx playwright test              # 실제 브라우저: 데스크톱 + 모바일
 ```
 
-최근 전체 기록: 백엔드 **503 passed**, ruff/check/makemigrations 깨끗함, 브라우저 본체 스위트 **78 passed**,
+최근 전체 기록: 백엔드 **509 passed**, ruff/check/makemigrations 깨끗함, 브라우저 본체 스위트 **78 passed**,
 stub 전용 **8 passed**, 보관된 반례 3개 그룹도 그대로 통과. 수치와 규정별 세부는
 [구현 상태](docs/implementation-status.md)와 [인수 결과](docs/acceptance-results.md)에 있습니다.
 
