@@ -1,0 +1,1585 @@
+{
+ "cases": [
+  {
+   "case": "A01",
+   "op": "AI_STATUS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/ai-status"
+   },
+   "response": {
+    "capabilities": {
+     "diagnose": false,
+     "embed": false,
+     "estimate_grade": false,
+     "explain": false,
+     "extract_question": false,
+     "propose_variant": false,
+     "suggest_tags": false,
+     "transcribe_handwriting": false
+    },
+    "configured": false,
+    "is_stub": false,
+    "max_retries": 2,
+    "message": "AI 未配置：可正常使用手动录题、作答、判分与复习；图片识别和按需讲解需配置 provider。",
+    "p0_capabilities": [
+     "extract_question",
+     "explain"
+    ],
+    "provider": "none",
+    "total_timeout_seconds": 90
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "no provider: configured=false and the honest message"
+  },
+  {
+   "case": "A02",
+   "op": "AI_RUNS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/ai-runs?limit=20"
+   },
+   "response": [],
+   "row_delta": {},
+   "status": 200,
+   "title": "no runs yet: an empty list"
+  },
+  {
+   "case": "A03",
+   "op": "AI_STATUS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/ai-status"
+   },
+   "response": {
+    "capabilities": {
+     "diagnose": false,
+     "embed": false,
+     "estimate_grade": false,
+     "explain": false,
+     "extract_question": false,
+     "propose_variant": false,
+     "suggest_tags": false,
+     "transcribe_handwriting": false
+    },
+    "configured": false,
+    "is_stub": false,
+    "max_retries": 2,
+    "message": "AI 未配置：可正常使用手动录题、作答、判分与复习；图片识别和按需讲解需配置 provider。",
+    "p0_capabilities": [
+     "extract_question",
+     "explain"
+    ],
+    "provider": "none",
+    "total_timeout_seconds": 90
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "another project of the same owner is still in scope"
+  },
+  {
+   "case": "A04",
+   "op": "AI_STATUS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/ai-status"
+   },
+   "response": {
+    "capabilities": {
+     "diagnose": false,
+     "embed": false,
+     "estimate_grade": false,
+     "explain": false,
+     "extract_question": false,
+     "propose_variant": false,
+     "suggest_tags": false,
+     "transcribe_handwriting": false
+    },
+    "configured": false,
+    "is_stub": false,
+    "max_retries": 2,
+    "message": "AI 未配置：可正常使用手动录题、作答、判分与复习；图片识别和按需讲解需配置 provider。",
+    "p0_capabilities": [
+     "extract_question",
+     "explain"
+    ],
+    "provider": "none",
+    "total_timeout_seconds": 90
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "a foreign project id is a 404"
+  },
+  {
+   "case": "A05",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "op": "AI_STATUS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/FOREIGN_PROJECT/ai-status"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a project owned by someone else is a 404"
+  },
+  {
+   "case": "T01",
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-tutor-session-1",
+    "json_body": {
+     "purpose": "explanation",
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "answer_key_version_id": "ANSWER",
+    "attempt_id": "ATTEMPT",
+    "created_at": "<now>",
+    "prompt_version": "p0-explain-v1",
+    "purpose": "explanation",
+    "question_version_id": "VERSION",
+    "session_item_id": "ITEM",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "tutoring_session": 1
+   },
+   "status": 201,
+   "title": "open a tutoring thread for one item"
+  },
+  {
+   "case": "T02",
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-tutor-session-1",
+    "json_body": {
+     "purpose": "explanation",
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "answer_key_version_id": "ANSWER",
+    "attempt_id": "ATTEMPT",
+    "created_at": "<now>",
+    "prompt_version": "p0-explain-v1",
+    "purpose": "explanation",
+    "question_version_id": "VERSION",
+    "session_item_id": "ITEM",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "the same key replays the stored response"
+  },
+  {
+   "case": "T03",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "tutor_sessions.create:ITEM"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-tutor-session-1",
+    "json_body": {
+     "purpose": "hint",
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "tutor_sessions.create:ITEM"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "a different body with the same key is a conflict"
+  },
+  {
+   "case": "T04",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "no Idempotency-Key at all"
+  },
+  {
+   "case": "T05",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题项不存在或不在当前权限范围"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/OTHER_PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题项不存在或不在当前权限范围"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "an item outside the project is a 404"
+  },
+  {
+   "case": "T06",
+   "op": "TUTOR_MESSAGES",
+   "request": {
+    "idempotency_key": "probe-tutor-message-1",
+    "json_body": {
+     "user_question": "请针对我的作答讲解。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions/TUTOR_SESSION_1/messages"
+   },
+   "response": {
+    "citations": [],
+    "delivered_at": null,
+    "error_code": "ai_not_configured",
+    "error_message": "未配置 AI 能力（ACEPASS_AI_PROVIDER=none）",
+    "is_stale": false,
+    "is_stub": false,
+    "missing_information": [],
+    "model": "",
+    "prompt_version": "p0-explain-v1",
+    "provider": "none",
+    "purpose": "explanation",
+    "result_blocks": [],
+    "reveals_answer": true,
+    "segment_count": 0,
+    "session_item_id": "ITEM",
+    "status": "unavailable",
+    "suggested_next": [],
+    "tutor_job_id": "TUTOR_JOB_UNAVAILABLE",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "audit_outbox_event": 1,
+    "tutoring_job": 1,
+    "tutoring_turn": 1
+   },
+   "status": 201,
+   "title": "no provider: 201 with an unavailable job and ai_not_configured"
+  },
+  {
+   "case": "T07",
+   "op": "TUTOR_MESSAGES",
+   "request": {
+    "idempotency_key": "probe-tutor-message-1",
+    "json_body": {
+     "user_question": "请针对我的作答讲解。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions/TUTOR_SESSION_1/messages"
+   },
+   "response": {
+    "citations": [],
+    "delivered_at": null,
+    "error_code": "ai_not_configured",
+    "error_message": "未配置 AI 能力（ACEPASS_AI_PROVIDER=none）",
+    "is_stale": false,
+    "is_stub": false,
+    "missing_information": [],
+    "model": "",
+    "prompt_version": "p0-explain-v1",
+    "provider": "none",
+    "purpose": "explanation",
+    "result_blocks": [],
+    "reveals_answer": true,
+    "segment_count": 0,
+    "session_item_id": "ITEM",
+    "status": "unavailable",
+    "suggested_next": [],
+    "tutor_job_id": "TUTOR_JOB_UNAVAILABLE",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "a replay returns the same job"
+  },
+  {
+   "case": "T08",
+   "op": "TUTOR_JOBS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_UNAVAILABLE"
+   },
+   "response": {
+    "citations": [],
+    "delivered_at": null,
+    "error_code": "ai_not_configured",
+    "error_message": "未配置 AI 能力（ACEPASS_AI_PROVIDER=none）",
+    "is_stale": false,
+    "is_stub": false,
+    "missing_information": [],
+    "model": "",
+    "prompt_version": "p0-explain-v1",
+    "provider": "none",
+    "purpose": "explanation",
+    "result_blocks": [],
+    "reveals_answer": true,
+    "segment_count": 0,
+    "session_item_id": "ITEM",
+    "status": "unavailable",
+    "suggested_next": [],
+    "tutor_job_id": "TUTOR_JOB_UNAVAILABLE",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the job read answers the same state"
+  },
+  {
+   "case": "T09",
+   "op": "TUTOR_SEGMENTS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_UNAVAILABLE/segments"
+   },
+   "response": {
+    "is_stale": false,
+    "segment_count": 0,
+    "segments": [],
+    "stale_reason": "",
+    "status": "unavailable",
+    "tutor_job_id": "TUTOR_JOB_UNAVAILABLE"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "an unavailable job has an empty transcript"
+  },
+  {
+   "case": "T10",
+   "op": "TUTOR_STREAM",
+   "request": {
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_UNAVAILABLE/stream"
+   },
+   "response": {
+    "cache_control": "no-cache",
+    "content_type": "text/event-stream",
+    "data": [
+     {
+      "citation_count": 0,
+      "finalized": false,
+      "is_stale": false,
+      "is_stub": false,
+      "last_event_id": null,
+      "segment_count": 0,
+      "status": "unavailable",
+      "tutor_job_id": "TUTOR_JOB_UNAVAILABLE"
+     },
+     {
+      "citation_count": 0,
+      "is_stale": false,
+      "last_event_id": null,
+      "segment_count": 0,
+      "status": "unavailable",
+      "tutor_job_id": "TUTOR_JOB_UNAVAILABLE"
+     }
+    ],
+    "events": [
+     "status",
+     "done"
+    ],
+    "raw_frame_count": 2
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the SSE for an unavailable job: no segment is invented"
+  },
+  {
+   "case": "T11",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "辅导任务不存在或不在当前权限范围"
+   },
+   "op": "TUTOR_JOBS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/tutor-jobs/TUTOR_JOB_UNAVAILABLE"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "辅导任务不存在或不在当前权限范围"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a job outside the project is a 404"
+  },
+  {
+   "case": "P01",
+   "op": "TRANSCRIPTIONS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/transcriptions"
+   },
+   "response": {
+    "attachment_asset_ids": [
+     "ASSET"
+    ],
+    "attempt_id": "ATTEMPT",
+    "gate_open": false,
+    "pending_asset_ids": [
+     "ASSET"
+    ],
+    "transcription_required": true,
+    "transcriptions": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the photo still blocks grading"
+  },
+  {
+   "case": "P02",
+   "error_envelope": {
+    "code": "transcription_required",
+    "details": {
+     "asset_ids": [
+      "ASSET"
+     ]
+    },
+    "message": "该作答含手写照片且尚未确认转写，请先确认或修改转写文本"
+   },
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": "probe-estimate-gate",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "error": {
+     "code": "transcription_required",
+     "details": {
+      "asset_ids": [
+       "ASSET"
+      ]
+     },
+     "message": "该作答含手写照片且尚未确认转写，请先确认或修改转写文本"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "estimation is refused before any provider call"
+  },
+  {
+   "case": "P03",
+   "error_envelope": {
+    "code": "transcription_required",
+    "details": {
+     "asset_ids": [
+      "ASSET"
+     ]
+    },
+    "message": "该作答含手写照片且尚未确认转写，请先确认或修改转写文本"
+   },
+   "op": "AI_DIAGNOSIS",
+   "request": {
+    "idempotency_key": "probe-diagnosis-gate",
+    "json_body": {
+     "learner_note": ""
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-diagnosis"
+   },
+   "response": {
+    "error": {
+     "code": "transcription_required",
+     "details": {
+      "asset_ids": [
+       "ASSET"
+      ]
+     },
+     "message": "该作答含手写照片且尚未确认转写，请先确认或修改转写文本"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "diagnosis is refused by the same gate"
+  },
+  {
+   "case": "P04",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {
+     "error_code": "ai_not_configured"
+    },
+    "message": "手写转写需要配置 AI 能力：provider 不支持能力：transcribe_handwriting（需要视觉模型）"
+   },
+   "op": "TRANSCRIPTIONS",
+   "request": {
+    "idempotency_key": "probe-transcribe-novision",
+    "json_body": {
+     "asset_id": "ASSET"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/transcriptions"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {
+      "error_code": "ai_not_configured"
+     },
+     "message": "手写转写需要配置 AI 能力：provider 不支持能力：transcribe_handwriting（需要视觉模型）"
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 503,
+   "title": "no vision model: an explicit 503"
+  },
+  {
+   "case": "P05",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "asset_id": "REF_016",
+     "attachment_asset_ids": [
+      "ASSET"
+     ]
+    },
+    "message": "该图片不属于本次作答，不能录入转写"
+   },
+   "op": "TRANSCRIPTIONS",
+   "request": {
+    "idempotency_key": "probe-transcribe-foreign-asset",
+    "json_body": {
+     "asset_id": "REF_016",
+     "text": "任意"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/transcriptions"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "asset_id": "REF_016",
+      "attachment_asset_ids": [
+       "ASSET"
+      ]
+     },
+     "message": "该图片不属于本次作答，不能录入转写"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a foreign asset id is a 400"
+  },
+  {
+   "case": "P06",
+   "op": "TRANSCRIPTIONS",
+   "request": {
+    "idempotency_key": "probe-transcribe-manual",
+    "json_body": {
+     "asset_id": "ASSET",
+     "text": "我写的是：5 × 4 = 20，所以共有 20 个。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/transcriptions"
+   },
+   "response": {
+    "asset_id": "ASSET",
+    "attempt_id": "ATTEMPT",
+    "confidence": null,
+    "confirmed_text": "我写的是：5 × 4 = 20，所以共有 20 个。",
+    "decided_at": "<now>",
+    "doubts": [],
+    "is_confirmed": true,
+    "is_stub": false,
+    "llm_run_id": null,
+    "note": "学习者人工录入转写（未使用视觉模型）",
+    "origin": "manual",
+    "prompt_version": "",
+    "raw_text": "我写的是：5 × 4 = 20，所以共有 20 个。",
+    "status": "confirmed",
+    "transcription_id": "TRANSCRIPTION_MANUAL"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_answer_transcription": 1
+   },
+   "status": 201,
+   "title": "the manual path records what the learner wrote"
+  },
+  {
+   "case": "P07",
+   "op": "TRANSCRIPTIONS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/transcriptions"
+   },
+   "response": {
+    "attachment_asset_ids": [
+     "ASSET"
+    ],
+    "attempt_id": "ATTEMPT",
+    "gate_open": true,
+    "pending_asset_ids": [],
+    "transcription_required": false,
+    "transcriptions": [
+     {
+      "asset_id": "ASSET",
+      "attempt_id": "ATTEMPT",
+      "confidence": null,
+      "confirmed_text": "我写的是：5 × 4 = 20，所以共有 20 个。",
+      "decided_at": "<now>",
+      "doubts": [],
+      "is_confirmed": true,
+      "is_stub": false,
+      "llm_run_id": null,
+      "note": "学习者人工录入转写（未使用视觉模型）",
+      "origin": "manual",
+      "prompt_version": "",
+      "raw_text": "我写的是：5 × 4 = 20，所以共有 20 个。",
+      "status": "confirmed",
+      "transcription_id": "TRANSCRIPTION_MANUAL"
+     }
+    ]
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the gate is open now"
+  },
+  {
+   "case": "P08",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {
+     "error_code": "ai_not_configured"
+    },
+    "message": "AI 估分需要配置 AI 能力：provider 不支持能力：estimate_grade"
+   },
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": "probe-estimate-nomodel",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {
+      "error_code": "ai_not_configured"
+     },
+     "message": "AI 估分需要配置 AI 能力：provider 不支持能力：estimate_grade"
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 503,
+   "title": "no provider: the estimate is an explicit 503, no event"
+  },
+  {
+   "case": "P09",
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "attempt_id": "ATTEMPT",
+    "confirmed_total_unchanged": true,
+    "estimate": null,
+    "has_estimate": false,
+    "is_inert": true,
+    "message": "还没有 AI 估分：正式分数只由人工确认产生，估分不会自动成为成绩。"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the estimate state is an explicit empty state"
+  },
+  {
+   "case": "P10",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {
+     "error_code": "ai_not_configured"
+    },
+    "message": "AI 诊断需要配置 AI 能力：provider 不支持能力：diagnose"
+   },
+   "op": "AI_DIAGNOSIS",
+   "request": {
+    "idempotency_key": "probe-diagnosis-nomodel",
+    "json_body": {
+     "learner_note": "我直接写了答案。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-diagnosis"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {
+      "error_code": "ai_not_configured"
+     },
+     "message": "AI 诊断需要配置 AI 能力：provider 不支持能力：diagnose"
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 503,
+   "title": "no provider: the diagnosis is an explicit 503"
+  },
+  {
+   "case": "T12",
+   "op": "TUTOR_MESSAGES",
+   "request": {
+    "idempotency_key": "probe-tutor-message-2",
+    "json_body": {
+     "user_question": "请讲解。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions/TUTOR_SESSION_1/messages"
+   },
+   "response": {
+    "citations": [
+     "question_version:VERSION"
+    ],
+    "delivered_at": "<now>",
+    "error_code": "",
+    "error_message": "",
+    "is_stale": false,
+    "is_stub": true,
+    "missing_information": [],
+    "model": "probe-text-model",
+    "prompt_version": "p0-explain-v1",
+    "provider": "probe-scripted",
+    "purpose": "explanation",
+    "result_blocks": [
+     {
+      "kind": "text",
+      "text": "5 × 4 = 20，所以共有 20 个。"
+     },
+     {
+      "kind": "math",
+      "latex": "5 \\times 4 = 20"
+     }
+    ],
+    "reveals_answer": true,
+    "segment_count": 2,
+    "session_item_id": "ITEM",
+    "status": "succeeded",
+    "suggested_next": [
+     "再做一道同类题"
+    ],
+    "tutor_job_id": "TUTOR_JOB_SUCCEEDED",
+    "tutor_session_id": "TUTOR_SESSION_1"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "audit_outbox_event": 1,
+    "tutoring_job": 1,
+    "tutoring_segment": 2,
+    "tutoring_turn": 2
+   },
+   "status": 201,
+   "title": "a validated explanation is stored and delivered"
+  },
+  {
+   "case": "T13",
+   "op": "TUTOR_SEGMENTS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_SUCCEEDED/segments"
+   },
+   "response": {
+    "is_stale": false,
+    "segment_count": 2,
+    "segments": [
+     {
+      "digest": "1f714e9d6e56557a68aa28d2f5dad4508aefbe6758a16395944b873026b56c98",
+      "index": 0,
+      "is_stale": false,
+      "items": [],
+      "kind": "text",
+      "text": "5 × 4 = 20，所以共有 20 个。"
+     },
+     {
+      "digest": "1c89fb9e047f8c148f3a8484537ed2324a25dcd118be5e2d9fa9a63ec1cf2600",
+      "index": 1,
+      "is_stale": false,
+      "items": [],
+      "kind": "math",
+      "text": "5 \\times 4 = 20"
+     }
+    ],
+    "stale_reason": "",
+    "status": "succeeded",
+    "tutor_job_id": "TUTOR_JOB_SUCCEEDED"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the transcript mirrors the validated blocks"
+  },
+  {
+   "case": "T14",
+   "op": "TUTOR_STREAM",
+   "request": {
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_SUCCEEDED/stream"
+   },
+   "response": {
+    "cache_control": "no-cache",
+    "content_type": "text/event-stream",
+    "data": [
+     {
+      "citation_count": 1,
+      "finalized": true,
+      "is_stale": false,
+      "is_stub": true,
+      "last_event_id": null,
+      "segment_count": 2,
+      "status": "succeeded",
+      "tutor_job_id": "TUTOR_JOB_SUCCEEDED"
+     },
+     {
+      "digest": "1f714e9d6e56557a68aa28d2f5dad4508aefbe6758a16395944b873026b56c98",
+      "index": 0,
+      "is_stale": false,
+      "items": [],
+      "kind": "text",
+      "text": "5 × 4 = 20，所以共有 20 个。"
+     },
+     {
+      "digest": "1c89fb9e047f8c148f3a8484537ed2324a25dcd118be5e2d9fa9a63ec1cf2600",
+      "index": 1,
+      "is_stale": false,
+      "items": [],
+      "kind": "math",
+      "text": "5 \\times 4 = 20"
+     },
+     {
+      "citation_count": 1,
+      "is_stale": false,
+      "last_event_id": 1,
+      "segment_count": 2,
+      "status": "succeeded",
+      "tutor_job_id": "TUTOR_JOB_SUCCEEDED"
+     }
+    ],
+    "events": [
+     "status",
+     "segment",
+     "segment",
+     "done"
+    ],
+    "raw_frame_count": 4
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the SSE replays the validated segments"
+  },
+  {
+   "case": "T15",
+   "op": "TUTOR_STREAM",
+   "request": {
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/tutor-jobs/TUTOR_JOB_SUCCEEDED/stream?after=1"
+   },
+   "response": {
+    "cache_control": "no-cache",
+    "content_type": "text/event-stream",
+    "data": [
+     {
+      "citation_count": 1,
+      "finalized": true,
+      "is_stale": false,
+      "is_stub": true,
+      "last_event_id": 1,
+      "segment_count": 2,
+      "status": "succeeded",
+      "tutor_job_id": "TUTOR_JOB_SUCCEEDED"
+     },
+     {
+      "citation_count": 1,
+      "is_stale": false,
+      "last_event_id": 1,
+      "segment_count": 2,
+      "status": "succeeded",
+      "tutor_job_id": "TUTOR_JOB_SUCCEEDED"
+     }
+    ],
+    "events": [
+     "status",
+     "done"
+    ],
+    "raw_frame_count": 2
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "a reconnect with after=1 resumes after that index"
+  },
+  {
+   "case": "P11",
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": "probe-estimate-ok",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "attempt_id": "ATTEMPT",
+    "confirmed_score": null,
+    "confirmed_total_unchanged": true,
+    "created_at": "<now>",
+    "criteria": [
+     {
+      "criterion_id": "c1",
+      "estimated_score": "1.00",
+      "max_score": "1.00",
+      "method": "ai_estimated",
+      "missing_evidence": [],
+      "rationale": "列式正确",
+      "status": "estimated"
+     },
+     {
+      "criterion_id": "c2",
+      "estimated_score": "0.50",
+      "max_score": "1.00",
+      "method": "ai_estimated",
+      "missing_evidence": [
+       "缺少单位"
+      ],
+      "rationale": "结论不完整",
+      "status": "estimated"
+     }
+    ],
+    "estimated_score": "1.50",
+    "grade_event_id": "REF_019",
+    "is_fully_confirmed": false,
+    "is_inert": true,
+    "is_stub": true,
+    "kind": "ai_estimate",
+    "max_score": "2.00",
+    "method": "ai_estimated",
+    "model": "probe-text-model",
+    "overall_note": "参考估计：结论不完整",
+    "pending_max_score": "2.00",
+    "prompt_version": "p1-estimate-grade-v1",
+    "provider": "probe-scripted",
+    "rubric_revision": "RUBRIC",
+    "rubric_version_id": "RUBRIC",
+    "status": "estimated"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "practice_grade_event": 1
+   },
+   "status": 200,
+   "title": "a validated estimate is stored inert"
+  },
+  {
+   "case": "P12",
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "attempt_id": "ATTEMPT",
+    "confirmed_total_unchanged": true,
+    "estimate": {
+     "attempt_id": "ATTEMPT",
+     "confirmed_score": null,
+     "confirmed_total_unchanged": true,
+     "created_at": "<now>",
+     "criteria": [
+      {
+       "criterion_id": "c1",
+       "estimated_score": "1.00",
+       "max_score": "1.00",
+       "method": "ai_estimated",
+       "missing_evidence": [],
+       "rationale": "列式正确",
+       "status": "estimated"
+      },
+      {
+       "criterion_id": "c2",
+       "estimated_score": "0.50",
+       "max_score": "1.00",
+       "method": "ai_estimated",
+       "missing_evidence": [
+        "缺少单位"
+       ],
+       "rationale": "结论不完整",
+       "status": "estimated"
+      }
+     ],
+     "estimated_score": "1.50",
+     "grade_event_id": "REF_019",
+     "is_fully_confirmed": false,
+     "is_inert": true,
+     "is_stub": true,
+     "kind": "ai_estimate",
+     "max_score": "2.00",
+     "method": "ai_estimated",
+     "model": "probe-text-model",
+     "overall_note": "参考估计：结论不完整",
+     "pending_max_score": "2.00",
+     "prompt_version": "p1-estimate-grade-v1",
+     "provider": "probe-scripted",
+     "rubric_revision": "RUBRIC",
+     "rubric_version_id": "RUBRIC",
+     "status": "estimated"
+    },
+    "has_estimate": true,
+    "is_inert": true,
+    "message": "AI 估分仅供参考，未进入正式分数；正式分数以人工确认为准。"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the estimate state exposes the latest one"
+  },
+  {
+   "case": "P13",
+   "op": "AI_DIAGNOSIS",
+   "request": {
+    "idempotency_key": "probe-diagnosis-ok",
+    "json_body": {
+     "learner_note": "我当时先算乘法。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/ai-diagnosis"
+   },
+   "response": {
+    "attempt_id": "ATTEMPT",
+    "causes": [
+     {
+      "attempt_id": "ATTEMPT",
+      "created_at": "<now>",
+      "diagnosis_id": "REF_020",
+      "error_type": "incomplete_reasoning",
+      "evidence": [
+       "只写了第一步"
+      ],
+      "llm_run_id": "REF_021",
+      "note": "我当时先算乘法。",
+      "origin": "model",
+      "status": "proposed"
+     }
+    ],
+    "follow_up_questions": [
+     {
+      "answer_text": "",
+      "answered_at": null,
+      "attempt_id": "ATTEMPT",
+      "evidence_kind": "process",
+      "follow_up_id": "FOLLOW_UP",
+      "llm_run_id": "REF_021",
+      "question": "你当时为什么停在第一步？",
+      "status": "pending",
+      "why": "确认推理是否中断"
+     }
+    ],
+    "is_stub": true,
+    "knowledge_state_changed": false,
+    "llm_run_id": "REF_021",
+    "missing_information": [
+     "草稿过程"
+    ],
+    "note": "",
+    "origin": "model",
+    "prompt_version": "p1-diagnose-v1",
+    "recorded": true,
+    "requested_by": "OWNER",
+    "scores_changed": false,
+    "status": "proposed"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "practice_diagnosis_follow_up": 1,
+    "practice_error_diagnosis": 1
+   },
+   "status": 200,
+   "title": "a validated diagnosis stores candidates and a follow-up"
+  },
+  {
+   "case": "P14",
+   "op": "DIAGNOSIS_FOLLOW_UP",
+   "request": {
+    "idempotency_key": "probe-follow-up-answer",
+    "json_body": {
+     "text": "因为我以为只要写算式。"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/diagnosis-follow-ups/FOLLOW_UP/answer"
+   },
+   "response": {
+    "answer_text": "因为我以为只要写算式。",
+    "answered_at": "<now>",
+    "attempt_id": "ATTEMPT",
+    "evidence_kind": "process",
+    "follow_up_id": "FOLLOW_UP",
+    "llm_run_id": "REF_021",
+    "question": "你当时为什么停在第一步？",
+    "status": "answered",
+    "why": "确认推理是否中断"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "answering the follow-up records process evidence"
+  },
+  {
+   "case": "P15",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "status": "answered"
+    },
+    "message": "该追问已经处理过"
+   },
+   "op": "DIAGNOSIS_FOLLOW_UP",
+   "request": {
+    "idempotency_key": "probe-follow-up-answer-2",
+    "json_body": {
+     "text": "再答一次"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/diagnosis-follow-ups/FOLLOW_UP/answer"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "status": "answered"
+     },
+     "message": "该追问已经处理过"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a second answer is refused"
+  },
+  {
+   "case": "P16",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "status": "answered"
+    },
+    "message": "该追问已经处理过"
+   },
+   "op": "DIAGNOSIS_FOLLOW_UP",
+   "request": {
+    "idempotency_key": "probe-follow-up-skip",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/diagnosis-follow-ups/FOLLOW_UP/skip"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "status": "answered"
+     },
+     "message": "该追问已经处理过"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a settled follow-up cannot be skipped"
+  },
+  {
+   "case": "P17",
+   "op": "DIAGNOSIS_HUMAN",
+   "request": {
+    "idempotency_key": "probe-diagnosis-human",
+    "json_body": {
+     "error_type": "concept_gap",
+     "note": "概念没掌握",
+     "status": "confirmed"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/diagnosis"
+   },
+   "response": {
+    "attempt_id": "ATTEMPT",
+    "error_type": "concept_gap",
+    "id": "REF_024",
+    "note": "概念没掌握",
+    "origin": "user",
+    "status": "confirmed"
+   },
+   "row_delta": {
+    "practice_error_diagnosis": 1
+   },
+   "status": 200,
+   "title": "the human decision route appends a cause"
+  },
+  {
+   "case": "A06",
+   "op": "AI_RUNS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/ai-runs?limit=50"
+   },
+   "response": [
+    {
+     "attempts": 1,
+     "capability": "diagnose",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "created_at": "<now>",
+     "error_code": "",
+     "id": "REF_021",
+     "is_stub": true,
+     "latency_ms": 3,
+     "model": "probe-text-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p1-diagnose-v1",
+     "provider": "probe-scripted",
+     "status": "succeeded"
+    },
+    {
+     "attempts": 1,
+     "capability": "estimate_grade",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "created_at": "<now>",
+     "error_code": "",
+     "id": "REF_025",
+     "is_stub": true,
+     "latency_ms": 3,
+     "model": "probe-text-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p1-estimate-grade-v1",
+     "provider": "probe-scripted",
+     "status": "succeeded"
+    },
+    {
+     "attempts": 1,
+     "capability": "explain",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "created_at": "<now>",
+     "error_code": "",
+     "id": "REF_026",
+     "is_stub": true,
+     "latency_ms": 3,
+     "model": "probe-text-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p0-explain-v1",
+     "provider": "probe-scripted",
+     "status": "succeeded"
+    },
+    {
+     "attempts": 1,
+     "capability": "diagnose",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "created_at": "<now>",
+     "error_code": "ai_not_configured",
+     "id": "REF_027",
+     "is_stub": false,
+     "latency_ms": null,
+     "model": "",
+     "prompt_tokens": null,
+     "prompt_version": "p1-diagnose-v1",
+     "provider": "none",
+     "status": "unavailable"
+    },
+    {
+     "attempts": 1,
+     "capability": "estimate_grade",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "created_at": "<now>",
+     "error_code": "ai_not_configured",
+     "id": "REF_028",
+     "is_stub": false,
+     "latency_ms": null,
+     "model": "",
+     "prompt_tokens": null,
+     "prompt_version": "p1-estimate-grade-v1",
+     "provider": "none",
+     "status": "unavailable"
+    },
+    {
+     "attempts": 1,
+     "capability": "transcribe_handwriting",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "created_at": "<now>",
+     "error_code": "ai_not_configured",
+     "id": "REF_029",
+     "is_stub": false,
+     "latency_ms": null,
+     "model": "",
+     "prompt_tokens": null,
+     "prompt_version": "p1-transcribe-v1",
+     "provider": "none",
+     "status": "unavailable"
+    },
+    {
+     "attempts": 1,
+     "capability": "explain",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "created_at": "<now>",
+     "error_code": "ai_not_configured",
+     "id": "REF_030",
+     "is_stub": false,
+     "latency_ms": null,
+     "model": "",
+     "prompt_tokens": null,
+     "prompt_version": "p0-explain-v1",
+     "provider": "none",
+     "status": "unavailable"
+    }
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "the run rows of every capability, newest first"
+  },
+  {
+   "case": "G01",
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "会话已结束；如需辅导请新建练习会话"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-gate-finished",
+    "json_body": {
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "会话已结束；如需辅导请新建练习会话"
+    }
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "a finished session refuses tutoring"
+  },
+  {
+   "case": "G02",
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "验证/考试模式不提供提示、讲解或诊断；如需辅导请先结束本次验证，再新建练习会话。"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-gate-verification",
+    "json_body": {
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "验证/考试模式不提供提示、讲解或诊断；如需辅导请先结束本次验证，再新建练习会话。"
+    }
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "a verification session refuses tutoring"
+  },
+  {
+   "case": "G03",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "辅导用途无效"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-gate-purpose",
+    "json_body": {
+     "purpose": "chat",
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "辅导用途无效"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "an invalid purpose is a 400"
+  },
+  {
+   "case": "G04",
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "该题项按计划不提供辅导（例如延迟验证题）"
+   },
+   "op": "TUTOR_SESSIONS",
+   "request": {
+    "idempotency_key": "probe-gate-not-allowed",
+    "json_body": {
+     "session_item_id": "ITEM"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tutor-sessions"
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "该题项按计划不提供辅导（例如延迟验证题）"
+    }
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "an item planned without tutoring is refused"
+  },
+  {
+   "case": "G05",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "作答不存在或不在当前权限范围"
+   },
+   "op": "AI_ESTIMATE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/attempts/ATTEMPT/ai-estimate"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "作答不存在或不在当前权限范围"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a foreign project cannot read the estimate"
+  }
+ ],
+ "environment": {
+  "database": "postgresql (throw-away test database)",
+  "django_settings": "config.settings.test",
+  "providers": "none = the shipped NullProvider; scripted = an in-process test double with is_stub=True (never shipped, R-INV 4)",
+  "routes": "real Ninja router via django.test.Client"
+ },
+ "generated_by": "dsh-plugin/scripts/probe_b8_tutor.py",
+ "schema_version": 1
+}

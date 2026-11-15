@@ -1,0 +1,5037 @@
+{
+ "cases": [
+  {
+   "case": "P01",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 41,
+     "id": "ASSET_P01",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "page-01.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 136,
+     "width": 43
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 41,
+      "id": "ASSET_P01",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "page-01.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 136,
+      "width": 43
+     }
+    ],
+    "exposure_events": [],
+    "response_size_bytes_equals_stored": true,
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": [],
+    "upload_sha256_equals_asset_checksum": true
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 136,
+      "content_type": "image/png",
+      "filename": "page-01.png",
+      "sha256": "a4a8ea8231657361b333e90035c14c504241af5c55a52eccfa9ee8c9ba422774"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "a4a8ea8231657361b333e90035c14c504241af5c55a52eccfa9ee8c9ba422774",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P01",
+    "height": 41,
+    "id": "ASSET_P01",
+    "original_filename": "page-01.png",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 136,
+    "width": 43
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "默认 role 上传 PNG：201 与 AssetOut 全字段"
+  },
+  {
+   "case": "P02",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 52,
+     "id": "ASSET_P02",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "answer-02.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "answer_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 166,
+     "width": 55
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 52,
+      "id": "ASSET_P02",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "answer-02.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "answer_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 166,
+      "width": 55
+     }
+    ],
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 166,
+      "content_type": "image/png",
+      "filename": "answer-02.png",
+      "sha256": "ea3014e86f696708118cd9c2912c6251221e21caf4102adab751d2c4dbddae36"
+     },
+     "role": "answer_page"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "ea3014e86f696708118cd9c2912c6251221e21caf4102adab751d2c4dbddae36",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P02",
+    "height": 52,
+    "id": "ASSET_P02",
+    "original_filename": "answer-02.png",
+    "project_id": "PROJECT_A",
+    "role": "answer_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 166,
+    "width": 55
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "role=answer_page：O01 仍写 public_to_owner"
+  },
+  {
+   "case": "P03",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 51,
+     "id": "ASSET_P03",
+     "object_key_shape": {
+      "namespace": "region",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "crop-03.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "stem_crop",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 146,
+     "width": 43
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 51,
+      "id": "ASSET_P03",
+      "object_key_shape": {
+       "namespace": "region",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "crop-03.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "stem_crop",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 146,
+      "width": 43
+     }
+    ],
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 146,
+      "content_type": "image/png",
+      "filename": "crop-03.png",
+      "sha256": "9218afbc45d327f1aa8da5d7f59c0e7219fbf1b955d600576de7c96f787f290f"
+     },
+     "role": "stem_crop"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "9218afbc45d327f1aa8da5d7f59c0e7219fbf1b955d600576de7c96f787f290f",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P03",
+    "height": 51,
+    "id": "ASSET_P03",
+    "original_filename": "crop-03.png",
+    "project_id": "PROJECT_A",
+    "role": "stem_crop",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 146,
+    "width": 43
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "role=stem_crop 的对象键命名空间"
+  },
+  {
+   "case": "P04",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "上传内容为空"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 0,
+      "content_type": "image/png",
+      "filename": "empty.png",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "上传内容为空"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "空文件"
+  },
+  {
+   "case": "P05",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "role": "bogus_role"
+    },
+    "message": "资产角色无效"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 145,
+      "content_type": "image/png",
+      "filename": "bad-role.png",
+      "sha256": "d17677d5173c43dcd5efd48a92be28f20da68c111e90154133511eff977cd131"
+     },
+     "role": "bogus_role"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "role": "bogus_role"
+     },
+     "message": "资产角色无效"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "role 不在枚举内"
+  },
+  {
+   "case": "P06",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "图片内容无法解析，文件可能损坏或不是真实图片"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 337,
+      "content_type": "image/jpeg",
+      "filename": "broken.jpg",
+      "sha256": "b673faa23f1f0deb3f1649abf99f6abd9d60dec5c9c888efe6f1fbd4d5f8195f"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "图片内容无法解析，文件可能损坏或不是真实图片"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "损坏字节（截断 JPEG）"
+  },
+  {
+   "case": "P07",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "content_type": "image/gif"
+    },
+    "message": "仅支持 JPEG/PNG/WebP 图片"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 67,
+      "content_type": "image/gif",
+      "filename": "anim.gif",
+      "sha256": "7fc56616f58f40b9d26d6be4c7087248a312103e5a7919172dc0888795f285af"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "content_type": "image/gif"
+     },
+     "message": "仅支持 JPEG/PNG/WebP 图片"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "GIF：MIME 不在 allowlist"
+  },
+  {
+   "case": "P08",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "content_type": "image/bmp"
+    },
+    "message": "仅支持 JPEG/PNG/WebP 图片"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 1254,
+      "content_type": "image/bmp",
+      "filename": "plain.bmp",
+      "sha256": "b678d5097c354c1edcae828570ae1179230f7615abe30a9ecf2a9cd00ec720fd"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "content_type": "image/bmp"
+     },
+     "message": "仅支持 JPEG/PNG/WebP 图片"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "BMP：MIME 不在 allowlist"
+  },
+  {
+   "case": "P09",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/jpeg",
+     "height": 46,
+     "id": "ASSET_P09",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".jpg",
+      "token_len": 32
+     },
+     "original_filename": "mismatch.jpg",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 157,
+     "width": 54
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/jpeg",
+      "height": 46,
+      "id": "ASSET_P09",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".jpg",
+       "token_len": 32
+      },
+      "original_filename": "mismatch.jpg",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 157,
+      "width": 54
+     }
+    ],
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": [],
+    "stored_is_png": true,
+    "stored_magic_hex": "89504e470d0a1a0a",
+    "stored_suffix_follows_declared_mime": true
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 157,
+      "content_type": "image/jpeg",
+      "filename": "mismatch.jpg",
+      "sha256": "4f1f2d272917ebf88c03540cacf1152bd510d2f2ce16d38fe26fb7653c340aa6"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "4f1f2d272917ebf88c03540cacf1152bd510d2f2ce16d38fe26fb7653c340aa6",
+    "content_type": "image/jpeg",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P09",
+    "height": 46,
+    "id": "ASSET_P09",
+    "original_filename": "mismatch.jpg",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 157,
+    "width": 54
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "PNG 字节声明为 image/jpeg：MIME 与真实格式不一致"
+  },
+  {
+   "case": "P10",
+   "checks": {
+    "asset": {
+     "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+     "content_type": "text/plain",
+     "height": null,
+     "id": "ASSET_P10",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".bin",
+      "token_len": 32
+     },
+     "original_filename": "note.txt",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 29,
+     "width": null
+    },
+    "assets": [
+     {
+      "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+      "content_type": "text/plain",
+      "height": null,
+      "id": "ASSET_P10",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".bin",
+       "token_len": 32
+      },
+      "original_filename": "note.txt",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 29,
+      "width": null
+     }
+    ],
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 29,
+      "content_type": "text/plain",
+      "filename": "note.txt",
+      "sha256": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+    "content_type": "text/plain",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P10",
+    "height": null,
+    "id": "ASSET_P10",
+    "original_filename": "note.txt",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 29,
+    "width": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "text/plain 非图片字节"
+  },
+  {
+   "case": "P11",
+   "checks": {
+    "uploaded_bytes": 10847106
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "图片超过大小上限 10 MiB"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 10847106,
+      "content_type": "image/png",
+      "filename": "big.png",
+      "sha256": "34ab4527a2a67b21daaa26b8032f52b5cd299a10b3f8732189e22eec00630f3e"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "图片超过大小上限 10 MiB"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "超过 10 MiB 的 PNG"
+  },
+  {
+   "case": "P12",
+   "checks": {
+    "pixels": 30000000,
+    "uploaded_bytes": 99686
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "图片像素超过上限，请先裁剪或压缩"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 99686,
+      "content_type": "image/png",
+      "filename": "huge.png",
+      "sha256": "c382fe73a3482fd5aa3b3e9c6743e68a5d63fa1f23138b62184b8ea143c9ac01"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "图片像素超过上限，请先裁剪或压缩"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "6000×5000 超像素 PNG"
+  },
+  {
+   "case": "P13",
+   "checks": {
+    "requested_name_length": 304,
+    "stored_name_length": 255,
+    "stored_name_prefix": "长长长长长长长长长长长长"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 159,
+      "content_type": "image/png",
+      "filename": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长.png",
+      "sha256": "0249d25339eec42e5cf26cc801c2cf217c63880cf4096bc6619d81dda872ff8e"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "0249d25339eec42e5cf26cc801c2cf217c63880cf4096bc6619d81dda872ff8e",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/REF_011",
+    "height": 47,
+    "id": "REF_011",
+    "original_filename": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长.png",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 159,
+    "width": 44
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "超长文件名截断到 255"
+  },
+  {
+   "case": "P14",
+   "checks": {
+    "stored_name_equals_request": true
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 164,
+      "content_type": "image/png",
+      "filename": "试卷 \"第一页\" 副本.png",
+      "sha256": "ca881bb322b84eb9639075d257009212aeb3a9510c6c95ec6372a8ed631f3ad2"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "ca881bb322b84eb9639075d257009212aeb3a9510c6c95ec6372a8ed631f3ad2",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/REF_012",
+    "height": 50,
+    "id": "REF_012",
+    "original_filename": "试卷 \"第一页\" 副本.png",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 164,
+    "width": 56
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "中文与引号文件名原样保留"
+  },
+  {
+   "case": "P15",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "file",
+        "file"
+       ],
+       "msg": "Field required",
+       "type": "missing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "file",
+         "file"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "缺少 file 字段（Ninja 400 形状）"
+  },
+  {
+   "case": "P16",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "file",
+        "file"
+       ],
+       "msg": "Field required",
+       "type": "missing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "file",
+         "file"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "JSON body 打到 multipart 端点"
+  },
+  {
+   "case": "P17",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 158,
+      "content_type": "image/png",
+      "filename": "foreign.png",
+      "sha256": "abb407f8bd0d69f8d9194ea610c27d289e99da1862fa5bef5a7a354ed93f88b7"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_B/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "外来项目的 asset 上传"
+  },
+  {
+   "case": "P18",
+   "checks": {},
+   "error_envelope": {
+    "code": "unauthorized",
+    "details": {},
+    "message": "请先登录"
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 160,
+      "content_type": "image/png",
+      "filename": "anon.png",
+      "sha256": "bf9f163c48b35a29cbe0af0070f0255e44c753497f0699c7b08fd2d066002ab3"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "unauthorized",
+     "details": {},
+     "message": "请先登录"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 401,
+   "title": "匿名上传"
+  },
+  {
+   "case": "P19",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 41,
+     "id": "ASSET_P19",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "page-01-again.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 136,
+     "width": 43
+    },
+    "assets_sharing_this_checksum": 2,
+    "checksum_equals_p01": true,
+    "object_key_equals_p01": false,
+    "row_delta": {
+     "ingestion_asset": 1
+    }
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 136,
+      "content_type": "image/png",
+      "filename": "page-01-again.png",
+      "sha256": "a4a8ea8231657361b333e90035c14c504241af5c55a52eccfa9ee8c9ba422774"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "a4a8ea8231657361b333e90035c14c504241af5c55a52eccfa9ee8c9ba422774",
+    "content_type": "image/png",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P19",
+    "height": 41,
+    "id": "ASSET_P19",
+    "original_filename": "page-01-again.png",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 136,
+    "width": 43
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "同一份字节第二次上传：不去重"
+  },
+  {
+   "case": "P20",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/jpeg",
+     "height": 80,
+     "id": "ASSET_P20",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".jpg",
+      "token_len": 32
+     },
+     "original_filename": "rotated.jpg",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 789,
+     "width": 120
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/jpeg",
+      "height": 80,
+      "id": "ASSET_P20",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".jpg",
+       "token_len": 32
+      },
+      "original_filename": "rotated.jpg",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 789,
+      "width": 120
+     }
+    ],
+    "exposure_events": [],
+    "original_pixel_size": [
+     120,
+     80
+    ],
+    "row_delta": {
+     "ingestion_asset": 1
+    },
+    "source_documents": [],
+    "stored_has_exif_marker": false,
+    "upload_sha256_equals_asset_checksum": false
+   },
+   "kind": "case",
+   "op": "O01",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 825,
+      "content_type": "image/jpeg",
+      "filename": "rotated.jpg",
+      "sha256": "2c2d21781aa9c7291ba87d74ba4b45097bf7cdcc19fe0e86eae5bc734ee32993"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/assets",
+    "query": {}
+   },
+   "response": {
+    "checksum": "2b51b6b0d81b93e5bb71b9de3c233dfaed29a0af86e8385272d0deb587ad7723",
+    "content_type": "image/jpeg",
+    "download_url": "/api/v1/projects/PROJECT_A/assets/ASSET_P20",
+    "height": 80,
+    "id": "ASSET_P20",
+    "original_filename": "rotated.jpg",
+    "project_id": "PROJECT_A",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "size_bytes": 789,
+    "width": 120
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "role",
+    "sensitivity",
+    "content_type",
+    "size_bytes",
+    "width",
+    "height",
+    "checksum",
+    "original_filename",
+    "download_url"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "带 EXIF Orientation=6 的 JPEG"
+  },
+  {
+   "body_bytes": 136,
+   "body_hex16": "89504e470d0a1a0a0000000d49484452",
+   "body_sha256": "a4a8ea8231657361b333e90035c14c504241af5c55a52eccfa9ee8c9ba422774",
+   "case": "P21",
+   "checks": {
+    "body_starts_with_png_magic": true,
+    "content_disposition_kind": "inline",
+    "stored_sha256_matches_body": true
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_P01",
+    "query": {}
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "inline; filename=\"ASSET_P01\"",
+    "Content-Type": "image/png",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "public_to_owner 图片下载：200 与四个 header"
+  },
+  {
+   "case": "P22",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "文件不存在或不属于当前项目"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/REF_028",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "文件不存在或不属于当前项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "asset 不存在"
+  },
+  {
+   "case": "P23",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_B/assets/ASSET_P01",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "外来项目路径下载本人 asset"
+  },
+  {
+   "case": "P24",
+   "checks": {
+    "asset_exists_in_db": true,
+    "assets": [],
+    "exposure_events": [],
+    "row_delta": {},
+    "source_documents": [],
+    "stored_bytes_present": false
+   },
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "对象不存在或不在当前权限范围"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_MISSING_BYTES",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "对象不存在或不在当前权限范围"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "磁盘缺字节（asset 行仍在）"
+  },
+  {
+   "body_bytes": 151,
+   "body_hex16": "89504e470d0a1a0a0000000d49484452",
+   "body_sha256": "6c14cd0838cf0f77ac2c0eda58568f8e7e633db748a5b4ebe6df2698a991d1ad",
+   "case": "P25",
+   "checks": {
+    "assets": [],
+    "exposure_events": [
+     {
+      "content_lineage": null,
+      "detail": {
+       "asset_id": "ASSET_ANSWER",
+       "role": "answer_page",
+       "server_time": "<now>"
+      },
+      "family": null,
+      "id": "EXPOSURE_01",
+      "kind": "answer_delivered",
+      "project": "PROJECT_A",
+      "purpose": "practice",
+      "question": "QUESTION_PRACTICE",
+      "question_version": "VERSION_PRACTICE",
+      "reveals_answer": true,
+      "server_time": "<now>",
+      "session_item": "ITEM_PRACTICE",
+      "source": "asset_download",
+      "user": "USER_OWNER"
+     }
+    ],
+    "row_delta": {
+     "practice_exposure_event": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_ANSWER",
+    "query": {
+     "session_item_id": "ITEM_PRACTICE"
+    }
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "inline; filename=\"ASSET_ANSWER\"",
+    "Content-Type": "image/png",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "contains_answers + practice session_item：200 且写 exposure"
+  },
+  {
+   "case": "P26",
+   "checks": {
+    "assets": [],
+    "exposure_events": [],
+    "row_delta": {},
+    "source_documents": []
+   },
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "当前会话模式在提交前不允许查看含答案的来源文件"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_ANSWER",
+    "query": {
+     "session_item_id": "ITEM_VERIFICATION"
+    }
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "当前会话模式在提交前不允许查看含答案的来源文件"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "verification 活动会话的 session_item"
+  },
+  {
+   "case": "P27",
+   "checks": {
+    "assets": [],
+    "exposure_events": [],
+    "row_delta": {},
+    "source_documents": []
+   },
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "存在未结束的验证/考试会话，暂不能查看含答案的来源文件"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_ANSWER",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "存在未结束的验证/考试会话，暂不能查看含答案的来源文件"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "无 session，但项目有未结束的 verification"
+  },
+  {
+   "case": "P28",
+   "checks": {
+    "assets": [],
+    "exposure_events": [],
+    "row_delta": {},
+    "source_documents": []
+   },
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "存在未结束的验证/考试会话，暂不能查看可能包含答案的来源文件；请先结束验证"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_EDITORIAL",
+    "query": {
+     "purpose": "editorial"
+    }
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "存在未结束的验证/考试会话，暂不能查看可能包含答案的来源文件；请先结束验证"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "purpose=editorial 且有未结束 verification"
+  },
+  {
+   "body_bytes": 151,
+   "body_hex16": "89504e470d0a1a0a0000000d49484452",
+   "body_sha256": "592f719b6a82ec40150c84c696eef776a1322bfe064024ae598867b82d928310",
+   "case": "P29",
+   "checks": {
+    "assets": [],
+    "exposure_events": [
+     {
+      "content_lineage": null,
+      "detail": {
+       "asset_id": "ASSET_EDITORIAL",
+       "role": "answer_page",
+       "server_time": "<now>"
+      },
+      "family": null,
+      "id": "EXPOSURE_02",
+      "kind": "answer_delivered",
+      "project": "PROJECT_A",
+      "purpose": "editorial",
+      "question": null,
+      "question_version": null,
+      "reveals_answer": true,
+      "server_time": "<now>",
+      "session_item": null,
+      "source": "asset_download",
+      "user": "USER_OWNER"
+     }
+    ],
+    "row_delta": {
+     "practice_exposure_event": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_EDITORIAL",
+    "query": {
+     "purpose": "editorial"
+    }
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "inline; filename=\"ASSET_EDITORIAL\"",
+    "Content-Type": "image/png",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "purpose=editorial 且无 verification：200"
+  },
+  {
+   "case": "P30",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题项不存在或不属于该项目"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_ANSWER",
+    "query": {
+     "session_item_id": "ITEM_OTHER"
+    }
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题项不存在或不属于该项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "session_item 属于别的用户"
+  },
+  {
+   "body_bytes": 151,
+   "body_hex16": "89504e470d0a1a0a0000000d49484452",
+   "body_sha256": "6c14cd0838cf0f77ac2c0eda58568f8e7e633db748a5b4ebe6df2698a991d1ad",
+   "case": "P31",
+   "checks": {
+    "assets": [],
+    "exposure_events": [
+     {
+      "content_lineage": null,
+      "detail": {
+       "asset_id": "ASSET_ANSWER",
+       "role": "answer_page",
+       "server_time": "<now>"
+      },
+      "family": null,
+      "id": "EXPOSURE_03",
+      "kind": "answer_delivered",
+      "project": "PROJECT_A",
+      "purpose": "practice",
+      "question": "QUESTION_PRACTICE",
+      "question_version": "VERSION_PRACTICE",
+      "reveals_answer": true,
+      "server_time": "<now>",
+      "session_item": "ITEM_PRACTICE",
+      "source": "asset_download",
+      "user": "USER_OWNER"
+     }
+    ],
+    "row_delta": {
+     "practice_exposure_event": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_ANSWER",
+    "query": {
+     "purpose": "bogus_purpose",
+     "session_item_id": "ITEM_PRACTICE"
+    }
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "inline; filename=\"ASSET_ANSWER\"",
+    "Content-Type": "image/png",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "purpose 非法值：exposure 回落到 practice"
+  },
+  {
+   "case": "P32",
+   "checks": {},
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {},
+    "message": "该文件仅限内部审核使用"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_INTERNAL",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "该文件仅限内部审核使用"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "internal_review 资产 + 非 staff"
+  },
+  {
+   "case": "P33",
+   "checks": {},
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "读取原页/答案文件",
+     "asset_id": "ASSET_SEALED_CROP",
+     "question_id": "QUESTION_SEAL_A",
+     "reason": "sealed_question_policy"
+    },
+    "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_SEALED_CROP",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "读取原页/答案文件",
+      "asset_id": "ASSET_SEALED_CROP",
+      "question_id": "QUESTION_SEAL_A",
+      "reason": "sealed_question_policy"
+     },
+     "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "封存关联①：crop region 的 crop_asset"
+  },
+  {
+   "case": "P34",
+   "checks": {},
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "读取原页/答案文件",
+     "asset_id": "ASSET_SEALED_PAGE",
+     "question_id": "QUESTION_SEAL_A",
+     "reason": "sealed_question_policy"
+    },
+    "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_SEALED_PAGE",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "读取原页/答案文件",
+      "asset_id": "ASSET_SEALED_PAGE",
+      "question_id": "QUESTION_SEAL_A",
+      "reason": "sealed_question_policy"
+     },
+     "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "封存关联②：整页 document.asset"
+  },
+  {
+   "case": "P35",
+   "checks": {},
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "读取原页/答案文件",
+     "asset_id": "ASSET_SEALED_KEY",
+     "question_id": "QUESTION_SEAL_A",
+     "reason": "sealed_question_policy"
+    },
+    "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_SEALED_KEY",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "读取原页/答案文件",
+      "asset_id": "ASSET_SEALED_KEY",
+      "question_id": "QUESTION_SEAL_A",
+      "reason": "sealed_question_policy"
+     },
+     "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "封存关联③：AnswerKeyVersion.source_region 的 crop_asset"
+  },
+  {
+   "case": "P36",
+   "checks": {},
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "读取原页/答案文件",
+     "asset_id": "ASSET_SEALED_BLOCK",
+     "question_id": "QUESTION_SEAL_A",
+     "reason": "sealed_question_policy"
+    },
+    "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_SEALED_BLOCK",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "读取原页/答案文件",
+      "asset_id": "ASSET_SEALED_BLOCK",
+      "question_id": "QUESTION_SEAL_A",
+      "reason": "sealed_question_policy"
+     },
+     "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "封存关联④：封存题版本的 image block"
+  },
+  {
+   "case": "P37",
+   "checks": {
+    "reported_question": "QUESTION_SEAL_A",
+    "reported_question_is_the_lower_id": true
+   },
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "读取原页/答案文件",
+     "asset_id": "ASSET_SEALED_TWO",
+     "question_id": "QUESTION_SEAL_A",
+     "reason": "sealed_question_policy"
+    },
+    "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_SEALED_TWO",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "读取原页/答案文件",
+      "asset_id": "ASSET_SEALED_TWO",
+      "question_id": "QUESTION_SEAL_A",
+      "reason": "sealed_question_policy"
+     },
+     "message": "该文件包含已封存题目的原始内容（题目 封存甲）：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览，因此不能读取原页或答案文件。"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 403,
+   "title": "多道封存题：报哪一道（按 question id 排序的第一道）"
+  },
+  {
+   "body_bytes": 162,
+   "body_hex16": "89504e470d0a1a0a0000000d49484452",
+   "body_sha256": "7c5b2062aab24cec33f08144dcc40297c14c8a02a2773a20e734d941017851d4",
+   "case": "P38",
+   "checks": {
+    "content_disposition_kind": "inline"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_UNRELATED",
+    "query": {}
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "inline; filename=\"ASSET_UNRELATED\"",
+    "Content-Type": "image/png",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "与封存题完全无关的用户附件：200"
+  },
+  {
+   "body_bytes": 29,
+   "body_hex16": "6e6f7420616e20696d6167652c206a75",
+   "body_sha256": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+   "case": "P39",
+   "checks": {
+    "body_equals_uploaded_text": true,
+    "content_disposition_kind": "attachment"
+   },
+   "kind": "case",
+   "op": "O02",
+   "request": {
+    "form": {},
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/assets/ASSET_P10",
+    "query": {}
+   },
+   "response": null,
+   "response_field_order": null,
+   "response_headers": {
+    "Cache-Control": "private, no-store",
+    "Content-Disposition": "attachment; filename=\"ASSET_P10\"",
+    "Content-Type": "text/plain",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 200,
+   "title": "非图片 asset 的 disposition 是 attachment"
+  },
+  {
+   "case": "P40",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 52,
+     "id": "ASSET_OF_DOCUMENT_P40",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "source-40.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 167,
+     "width": 46
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 52,
+      "id": "ASSET_OF_DOCUMENT_P40",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "source-40.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 167,
+      "width": 46
+     }
+    ],
+    "document": {
+     "asset": "ASSET_OF_DOCUMENT_P40",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P40",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "source_note_length": 9,
+     "source_type": "user_upload",
+     "subject": "SUBJECT_A1",
+     "title": "B3 来源标题",
+     "usage_scope_length": 4
+    },
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1,
+     "ingestion_source_document": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P40",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P40",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 9,
+      "source_type": "user_upload",
+      "subject": "SUBJECT_A1",
+      "title": "B3 来源标题",
+      "usage_scope_length": 4
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 167,
+      "content_type": "image/png",
+      "filename": "source-40.png",
+      "sha256": "5ddaf19c03850ddd8ead3a36e31d1a9afaa9a2c0de951cf29a5d49eeb6daf689"
+     },
+     "source_note": "2025 真题扫描",
+     "subject_id": "SUBJECT_A1",
+     "title": "B3 来源标题",
+     "usage_scope": "内部校对"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "asset_id": "ASSET_OF_DOCUMENT_P40",
+    "checksum": "5ddaf19c03850ddd8ead3a36e31d1a9afaa9a2c0de951cf29a5d49eeb6daf689",
+    "document_type": "image",
+    "id": "DOCUMENT_P40",
+    "project_id": "PROJECT_A",
+    "raw_text_preview": "",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "source_note": "2025 真题扫描",
+    "source_type": "user_upload",
+    "subject_id": "SUBJECT_A1",
+    "title": "B3 来源标题",
+    "usage_scope": "内部校对"
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "title",
+    "document_type",
+    "role",
+    "sensitivity",
+    "source_type",
+    "source_note",
+    "usage_scope",
+    "checksum",
+    "asset_id",
+    "raw_text_preview"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "正常图片来源：201 与 Document 全字段"
+  },
+  {
+   "case": "P41",
+   "checks": {
+    "asset": {
+     "checksum": "<reencoded>",
+     "content_type": "image/png",
+     "height": 52,
+     "id": "ASSET_OF_DOCUMENT_P41",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".png",
+      "token_len": 32
+     },
+     "original_filename": "source-41.png",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "answer_page",
+     "sensitivity": "contains_answers",
+     "size_bytes": 166,
+     "width": 47
+    },
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 52,
+      "id": "ASSET_OF_DOCUMENT_P41",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "source-41.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "answer_page",
+      "sensitivity": "contains_answers",
+      "size_bytes": 166,
+      "width": 47
+     }
+    ],
+    "document": {
+     "asset": "ASSET_OF_DOCUMENT_P41",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P41",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "answer_page",
+     "sensitivity": "contains_answers",
+     "source_note_length": 0,
+     "source_type": "user_upload",
+     "subject": null,
+     "title": "",
+     "usage_scope_length": 0
+    },
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1,
+     "ingestion_source_document": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P41",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P41",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "answer_page",
+      "sensitivity": "contains_answers",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 166,
+      "content_type": "image/png",
+      "filename": "source-41.png",
+      "sha256": "cee8f5feffd09c42dbdcf0e8c8433206462ec0d05371ebf7dc1eaa3b270aa715"
+     },
+     "role": "answer_page"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "asset_id": "ASSET_OF_DOCUMENT_P41",
+    "checksum": "cee8f5feffd09c42dbdcf0e8c8433206462ec0d05371ebf7dc1eaa3b270aa715",
+    "document_type": "image",
+    "id": "DOCUMENT_P41",
+    "project_id": "PROJECT_A",
+    "raw_text_preview": "",
+    "role": "answer_page",
+    "sensitivity": "contains_answers",
+    "source_note": "",
+    "source_type": "user_upload",
+    "subject_id": null,
+    "title": "",
+    "usage_scope": ""
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "title",
+    "document_type",
+    "role",
+    "sensitivity",
+    "source_type",
+    "source_note",
+    "usage_scope",
+    "checksum",
+    "asset_id",
+    "raw_text_preview"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "role=answer_page 时 sensitivity=contains_answers"
+  },
+  {
+   "case": "P42",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "来源角色无效"
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 152,
+      "content_type": "image/png",
+      "filename": "source-42.png",
+      "sha256": "55b78781345686b14cd987085025a936e7eec6fe96faeb344fc88974caf9fb7b"
+     },
+     "role": "answer_crop_typo"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "来源角色无效"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "role 非法：来源角色无效"
+  },
+  {
+   "case": "P43",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "上传内容为空"
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 0,
+      "content_type": "image/png",
+      "filename": "source-43.png",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "上传内容为空"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "空文件"
+  },
+  {
+   "case": "P44",
+   "checks": {
+    "asset": {
+     "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+     "content_type": "text/plain",
+     "height": null,
+     "id": "ASSET_OF_DOCUMENT_P44",
+     "object_key_shape": {
+      "namespace": "source",
+      "prefix_len": 2,
+      "segments": 5,
+      "suffix": ".bin",
+      "token_len": 32
+     },
+     "original_filename": "source-44.txt",
+     "owner": "USER_OWNER",
+     "project": "PROJECT_A",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "size_bytes": 29,
+     "width": null
+    },
+    "assets": [
+     {
+      "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+      "content_type": "text/plain",
+      "height": null,
+      "id": "ASSET_OF_DOCUMENT_P44",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".bin",
+       "token_len": 32
+      },
+      "original_filename": "source-44.txt",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 29,
+      "width": null
+     }
+    ],
+    "document": {
+     "asset": "ASSET_OF_DOCUMENT_P44",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P44",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "source_note_length": 0,
+     "source_type": "user_upload",
+     "subject": null,
+     "title": "",
+     "usage_scope_length": 0
+    },
+    "exposure_events": [],
+    "row_delta": {
+     "ingestion_asset": 1,
+     "ingestion_source_document": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P44",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P44",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 29,
+      "content_type": "text/plain",
+      "filename": "source-44.txt",
+      "sha256": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "asset_id": "ASSET_OF_DOCUMENT_P44",
+    "checksum": "a2158e2585397dce4cbc06dc40f2b9784115a0fe259955ef80b230a298eb6592",
+    "document_type": "image",
+    "id": "DOCUMENT_P44",
+    "project_id": "PROJECT_A",
+    "raw_text_preview": "",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "source_note": "",
+    "source_type": "user_upload",
+    "subject_id": null,
+    "title": "",
+    "usage_scope": ""
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "title",
+    "document_type",
+    "role",
+    "sensitivity",
+    "source_type",
+    "source_note",
+    "usage_scope",
+    "checksum",
+    "asset_id",
+    "raw_text_preview"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "非图片 MIME（text/plain）现状"
+  },
+  {
+   "case": "P45",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "content_type": "image/gif"
+    },
+    "message": "仅支持 JPEG/PNG/WebP 图片"
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 67,
+      "content_type": "image/gif",
+      "filename": "source-45.gif",
+      "sha256": "7fc56616f58f40b9d26d6be4c7087248a312103e5a7919172dc0888795f285af"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "content_type": "image/gif"
+     },
+     "message": "仅支持 JPEG/PNG/WebP 图片"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "GIF：store_asset 的图片 MIME allowlist"
+  },
+  {
+   "case": "P46",
+   "checks": {
+    "requested_lengths": {
+     "source_note": 600,
+     "title": 400,
+     "usage_scope": 300
+    },
+    "stored_lengths": {
+     "source_note": 500,
+     "title": 300,
+     "usage_scope": 200
+    }
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 164,
+      "content_type": "image/png",
+      "filename": "source-46.png",
+      "sha256": "10f53bde5ed931e0038e67948b3a58f4423bbd12a89746c10b592ba19879612e"
+     },
+     "source_note": {
+      "length": 600,
+      "prefix": "注注注注注注注注注注注注注注注注注注注注"
+     },
+     "title": {
+      "length": 400,
+      "prefix": "题题题题题题题题题题题题题题题题题题题题"
+     },
+     "usage_scope": {
+      "length": 300,
+      "prefix": "用用用用用用用用用用用用用用用用用用用用"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "asset_id": "REF_051",
+    "checksum": "10f53bde5ed931e0038e67948b3a58f4423bbd12a89746c10b592ba19879612e",
+    "document_type": "image",
+    "id": "REF_050",
+    "project_id": "PROJECT_A",
+    "raw_text_preview": "",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "source_note": "注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注注",
+    "source_type": "user_upload",
+    "subject_id": null,
+    "title": "题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题",
+    "usage_scope": "用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用用"
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "title",
+    "document_type",
+    "role",
+    "sensitivity",
+    "source_type",
+    "source_note",
+    "usage_scope",
+    "checksum",
+    "asset_id",
+    "raw_text_preview"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "title/source_note/usage_scope 的 300/500/200 截断"
+  },
+  {
+   "case": "P47",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "科目不存在或不属于该项目"
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 151,
+      "content_type": "image/png",
+      "filename": "source-47.png",
+      "sha256": "a8b8fcbd86b4a50a6c0d5fe5a1305bf7d1ae49890e1b2f2736b77db0b028afea"
+     },
+     "subject_id": "SUBJECT_B1"
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "科目不存在或不属于该项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "跨项目 subject_id"
+  },
+  {
+   "case": "P48",
+   "checks": {},
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 165,
+      "content_type": "image/png",
+      "filename": "source-48.png",
+      "sha256": "4eb9dab35305e75d1e7abdcd49dc89d7809b1518016d321f0e17552818c48144"
+     },
+     "subject_id": ""
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "asset_id": "REF_053",
+    "checksum": "4eb9dab35305e75d1e7abdcd49dc89d7809b1518016d321f0e17552818c48144",
+    "document_type": "image",
+    "id": "REF_052",
+    "project_id": "PROJECT_A",
+    "raw_text_preview": "",
+    "role": "past_paper_page",
+    "sensitivity": "public_to_owner",
+    "source_note": "",
+    "source_type": "user_upload",
+    "subject_id": null,
+    "title": "",
+    "usage_scope": ""
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "title",
+    "document_type",
+    "role",
+    "sensitivity",
+    "source_type",
+    "source_note",
+    "usage_scope",
+    "checksum",
+    "asset_id",
+    "raw_text_preview"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "subject_id 为空串 → null"
+  },
+  {
+   "case": "P49",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "kind": "case",
+   "op": "O05",
+   "request": {
+    "form": {
+     "file": {
+      "bytes": 136,
+      "content_type": "image/png",
+      "filename": "source-49.png",
+      "sha256": "b2a46fcfc0e4bfd1398e0c205324a6654889f7e0a94be962285c61f14fee32c3"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_B/source-documents/image",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 404,
+   "title": "外来项目上传图片来源"
+  },
+  {
+   "case": "P50",
+   "checks": {
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 43,
+      "id": "ASSET_OF_DOCUMENT_P50",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "import-50.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 154,
+      "width": 52
+     }
+    ],
+    "candidate": {
+     "draft_payload": {
+      "answer_payload": {},
+      "answer_status_known": false,
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": ""
+        }
+       ]
+      },
+      "display_label": "",
+      "needs_manual_structure": true,
+      "question_type": "single_choice"
+     },
+     "extractor_version": "manual-image-v1",
+     "id": "CANDIDATE_P50",
+     "is_stub_output": false,
+     "job": "JOB_P50",
+     "review_issues": [
+      {
+       "code": "too_few_options",
+       "severity": "blocking"
+      },
+      {
+       "code": "answer_unknown",
+       "severity": "blocking"
+      },
+      {
+       "code": "subject_missing",
+       "severity": "blocking"
+      }
+     ],
+     "revision": 1,
+     "source_regions": [
+      {
+       "crop_asset": null,
+       "document": "DOCUMENT_P50",
+       "height": 1.0,
+       "page_index": 1,
+       "role": "past_paper_page",
+       "width": 1.0,
+       "x": 0.0,
+       "y": 0.0
+      }
+     ],
+     "status": "draft"
+    },
+    "document": {
+     "asset": "ASSET_OF_DOCUMENT_P50",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P50",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "past_paper_page",
+     "sensitivity": "public_to_owner",
+     "source_note_length": 0,
+     "source_type": "user_upload",
+     "subject": null,
+     "title": "",
+     "usage_scope_length": 0
+    },
+    "exposure_events": [],
+    "idempotency_record": {
+     "idempotency_key": "b3-img-single",
+     "resource_id": "JOB_P50",
+     "resource_type": "import_job",
+     "response_body_keys": [
+      "attempts",
+      "candidate_count",
+      "candidate_status_counts",
+      "created_at",
+      "document_ids",
+      "duplicate_of_job_id",
+      "extractor_version",
+      "id",
+      "input_kind",
+      "last_error",
+      "max_attempts",
+      "page_diagnostics",
+      "problems",
+      "progress_percent",
+      "project_id",
+      "status",
+      "subject_id"
+     ],
+     "response_body_resource_id": "JOB_P50",
+     "route_scope": "imports.create_images:PROJECT_A",
+     "status_code": 201
+    },
+    "job": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P50"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P50",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": null
+    },
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P50",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P50",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 154,
+      "content_type": "image/png",
+      "filename": "import-50.png",
+      "sha256": "12f069a5c0ad6aa58992d25831d489221bbe0a233850da3209ba0d9e66424874"
+     }
+    },
+    "idempotency_key": "b3-img-single",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P50"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P50",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "单张图片导入（AI_PROVIDER=none，manual 路径）"
+  },
+  {
+   "case": "P51",
+   "checks": {
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 40,
+      "id": "ASSET_OF_DOCUMENT_P51_1",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "import-51a.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 148,
+      "width": 48
+     },
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 45,
+      "id": "ASSET_OF_DOCUMENT_P51_2",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "import-51b.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 156,
+      "width": 56
+     }
+    ],
+    "candidates": [
+     {
+      "draft_payload": {
+       "answer_payload": {},
+       "answer_status_known": false,
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": ""
+         }
+        ]
+       },
+       "display_label": "",
+       "needs_manual_structure": true,
+       "question_type": "single_choice"
+      },
+      "extractor_version": "manual-image-v1",
+      "id": "CANDIDATE_P51_1",
+      "is_stub_output": false,
+      "job": "JOB_P51",
+      "review_issues": [
+       {
+        "code": "too_few_options",
+        "severity": "blocking"
+       },
+       {
+        "code": "answer_unknown",
+        "severity": "blocking"
+       },
+       {
+        "code": "subject_missing",
+        "severity": "blocking"
+       },
+       {
+        "code": "duplicate_candidate",
+        "severity": "warning"
+       }
+      ],
+      "revision": 1,
+      "source_regions": [
+       {
+        "crop_asset": null,
+        "document": "DOCUMENT_P51_1",
+        "height": 1.0,
+        "page_index": 1,
+        "role": "past_paper_page",
+        "width": 1.0,
+        "x": 0.0,
+        "y": 0.0
+       }
+      ],
+      "status": "draft"
+     },
+     {
+      "draft_payload": {
+       "answer_payload": {},
+       "answer_status_known": false,
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": ""
+         }
+        ]
+       },
+       "display_label": "",
+       "needs_manual_structure": true,
+       "question_type": "single_choice"
+      },
+      "extractor_version": "manual-image-v1",
+      "id": "CANDIDATE_P51_2",
+      "is_stub_output": false,
+      "job": "JOB_P51",
+      "review_issues": [
+       {
+        "code": "too_few_options",
+        "severity": "blocking"
+       },
+       {
+        "code": "answer_unknown",
+        "severity": "blocking"
+       },
+       {
+        "code": "subject_missing",
+        "severity": "blocking"
+       },
+       {
+        "code": "duplicate_candidate",
+        "severity": "warning"
+       }
+      ],
+      "revision": 1,
+      "source_regions": [
+       {
+        "crop_asset": null,
+        "document": "DOCUMENT_P51_2",
+        "height": 1.0,
+        "page_index": 1,
+        "role": "past_paper_page",
+        "width": 1.0,
+        "x": 0.0,
+        "y": 0.0
+       }
+      ],
+      "status": "draft"
+     }
+    ],
+    "exposure_events": [],
+    "job": {
+     "candidate_count": 2,
+     "candidate_statuses": [
+      "draft",
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P51_1",
+      "DOCUMENT_P51_2"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P51",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": null
+    },
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 2,
+     "ingestion_import_candidate": 2,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 2,
+     "ingestion_source_region": 2
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P51_1",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P51_1",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "",
+      "usage_scope_length": 0
+     },
+     {
+      "asset": "ASSET_OF_DOCUMENT_P51_2",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P51_2",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": [
+      {
+       "bytes": 148,
+       "content_type": "image/png",
+       "filename": "import-51a.png",
+       "sha256": "84103e608520c3b0f43f872ea6e1b86d6c29f4021b4aab1bd33303e4828a9f50"
+      },
+      {
+       "bytes": 156,
+       "content_type": "image/png",
+       "filename": "import-51b.png",
+       "sha256": "85cedafa396a872fe8f03ac72fc27ea13308327aaa46d676bc5d2ddf6f42859f"
+      }
+     ]
+    },
+    "idempotency_key": "b3-img-two",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 2,
+    "candidate_status_counts": {
+     "draft": 2
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P51_1",
+     "DOCUMENT_P51_2"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P51",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "两张图片导入"
+  },
+  {
+   "case": "P52",
+   "checks": {
+    "assets": [],
+    "duplicate_document": {
+     "asset": "ASSET_OF_DOCUMENT_P41",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P41",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "answer_page",
+     "sensitivity": "contains_answers",
+     "source_note_length": 0,
+     "source_type": "user_upload",
+     "subject": null,
+     "title": "",
+     "usage_scope_length": 0
+    },
+    "exposure_events": [],
+    "job": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P41"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P52",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      },
+      {
+       "code": "duplicate_source_file",
+       "message": "其中 1 张图片与已有来源文件完全相同，已复用原来源而未新增（避免同一试卷重复统计）。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": "SUBJECT_A1"
+    },
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_region": 1
+    },
+    "source_documents": []
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 166,
+      "content_type": "image/png",
+      "filename": "dup-52.png",
+      "sha256": "cee8f5feffd09c42dbdcf0e8c8433206462ec0d05371ebf7dc1eaa3b270aa715"
+     },
+     "role": "answer_page",
+     "subject_id": "SUBJECT_A1"
+    },
+    "idempotency_key": "b3-img-duplicate",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P41"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P52",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     },
+     {
+      "code": "duplicate_source_file",
+      "message": "其中 1 张图片与已有来源文件完全相同，已复用原来源而未新增（避免同一试卷重复统计）。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": "SUBJECT_A1"
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "与已有 document 完全重复：复用 duplicates，不新建 document"
+  },
+  {
+   "case": "P53",
+   "checks": {
+    "imported_document_is_a_second_copy": true,
+    "job": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P53"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P53",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": null
+    },
+    "raw_sha256": "878c1371b4e41c33415497fd53235acbba6963860681f01ed70a34b8fdfdfc0f",
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    },
+    "tagged_document_raw_checksum_differs": true
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 190,
+      "content_type": "image/png",
+      "filename": "tagged-53.png",
+      "sha256": "878c1371b4e41c33415497fd53235acbba6963860681f01ed70a34b8fdfdfc0f"
+     }
+    },
+    "idempotency_key": "b3-img-original-bytes",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P53"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P53",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "同一份原始字节再走 O08：未命中重复（document 存的是重编码 checksum）"
+  },
+  {
+   "case": "P54",
+   "checks": {
+    "imported_document_is_new": true,
+    "job": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P54"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P54",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      },
+      {
+       "code": "duplicate_source_file",
+       "message": "其中 1 张图片与已有来源文件完全相同，已复用原来源而未新增（避免同一试卷重复统计）。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": null
+    },
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    }
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": [
+      {
+       "bytes": 154,
+       "content_type": "image/png",
+       "filename": "mixed-new-54.png",
+       "sha256": "378d5a3163b7ffcfd5cefa9cedb8b59e10f2b26fcd69146ca7b2f4a8753a3647"
+      },
+      {
+       "bytes": 166,
+       "content_type": "image/png",
+       "filename": "mixed-old-54.png",
+       "sha256": "cee8f5feffd09c42dbdcf0e8c8433206462ec0d05371ebf7dc1eaa3b270aa715"
+      }
+     ]
+    },
+    "idempotency_key": "b3-img-mixed",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P54"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P54",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     },
+     {
+      "code": "duplicate_source_file",
+      "message": "其中 1 张图片与已有来源文件完全相同，已复用原来源而未新增（避免同一试卷重复统计）。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "新旧混合：只导入新的"
+  },
+  {
+   "case": "P55",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "file",
+        "files"
+       ],
+       "msg": "Field required",
+       "type": "missing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": []
+    },
+    "idempotency_key": "b3-img-empty",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "file",
+         "files"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "files 为空列表"
+  },
+  {
+   "case": "P56",
+   "checks": {
+    "idempotency_record": null,
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "图片内容无法解析，文件可能损坏或不是真实图片"
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": [
+      {
+       "bytes": 152,
+       "content_type": "image/png",
+       "filename": "good-56.png",
+       "sha256": "34187fb2b094b0b9a5df77b49f832d550159c8921af241515780a1aeab8d226e"
+      },
+      {
+       "bytes": 337,
+       "content_type": "image/jpeg",
+       "filename": "broken-56.jpg",
+       "sha256": "b673faa23f1f0deb3f1649abf99f6abd9d60dec5c9c888efe6f1fbd4d5f8195f"
+      }
+     ]
+    },
+    "idempotency_key": "b3-img-broken",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "图片内容无法解析，文件可能损坏或不是真实图片"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 400,
+   "title": "其中一张损坏：claim 前校验，零写入"
+  },
+  {
+   "case": "P57",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 155,
+      "content_type": "image/png",
+      "filename": "nokey-57.png",
+      "sha256": "02a660688bd4e5d45b7b29a4e57f60030ee2e56ce74ef8527da7a6686e981035"
+     }
+    },
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 409,
+   "title": "缺少 Idempotency-Key"
+  },
+  {
+   "case": "P58",
+   "checks": {
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    }
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 138,
+      "content_type": "image/png",
+      "filename": "replay-58.png",
+      "sha256": "66c6bdb10cc82b002291b087f6139133a5d550dd480d3e5689951af897944c9e"
+     }
+    },
+    "idempotency_key": "b3-img-replay",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P58"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P58",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "同键同载荷第一次"
+  },
+  {
+   "case": "P59",
+   "checks": {
+    "job_id_in_replay": "JOB_P58",
+    "replay_body_equals_first": true,
+    "row_delta": {}
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 138,
+      "content_type": "image/png",
+      "filename": "replay-58.png",
+      "sha256": "66c6bdb10cc82b002291b087f6139133a5d550dd480d3e5689951af897944c9e"
+     }
+    },
+    "idempotency_key": "b3-img-replay",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P58"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P58",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "同键同载荷重放：返回存储结果，零写入"
+  },
+  {
+   "case": "P60",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "imports.create_images:PROJECT_A"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 125,
+      "content_type": "image/png",
+      "filename": "other-60.png",
+      "sha256": "31fb3fb32e492ca4627b7121809c96db77dd8256a566ad707a6fe005d4004a8f"
+     }
+    },
+    "idempotency_key": "b3-img-replay",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "imports.create_images:PROJECT_A"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 409,
+   "title": "同键不同 checksums"
+  },
+  {
+   "case": "P61",
+   "checks": {
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    }
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 145,
+      "content_type": "image/png",
+      "filename": "title-61.png",
+      "sha256": "fe2dcb7673cf249f50190727a9bb8576739363e41fa62e8dc9c335f608b7587d"
+     },
+     "title": "标题甲"
+    },
+    "idempotency_key": "b3-img-title",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P61"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P61",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "title 不参与指纹：换 title 前的第一次"
+  },
+  {
+   "case": "P62",
+   "checks": {
+    "replay_body_equals_first": true,
+    "row_delta": {}
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 145,
+      "content_type": "image/png",
+      "filename": "title-61.png",
+      "sha256": "fe2dcb7673cf249f50190727a9bb8576739363e41fa62e8dc9c335f608b7587d"
+     },
+     "title": "标题乙"
+    },
+    "idempotency_key": "b3-img-title",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P61"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P61",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "同键同图、仅 title 不同：仍然 replay"
+  },
+  {
+   "case": "P63",
+   "checks": {
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 50,
+      "id": "ASSET_OF_DOCUMENT_P63",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "answer-63.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "answer_page",
+      "sensitivity": "contains_answers",
+      "size_bytes": 163,
+      "width": 46
+     }
+    ],
+    "document": {
+     "asset": "ASSET_OF_DOCUMENT_P63",
+     "checksum": "<reencoded>",
+     "checksum_matches_asset_checksum": true,
+     "document_type": "image",
+     "id": "DOCUMENT_P63",
+     "project": "PROJECT_A",
+     "raw_text_preview": "",
+     "role": "answer_page",
+     "sensitivity": "contains_answers",
+     "source_note_length": 0,
+     "source_type": "user_upload",
+     "subject": "SUBJECT_A1",
+     "title": "",
+     "usage_scope_length": 0
+    },
+    "exposure_events": [],
+    "job": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P63"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "manual-image-v1",
+     "id": "JOB_P63",
+     "input_kind": "image_manual",
+     "problems": [
+      {
+       "code": "manual_structure_required",
+       "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": "SUBJECT_A1"
+    },
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P63",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P63",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "answer_page",
+      "sensitivity": "contains_answers",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": "SUBJECT_A1",
+      "title": "",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 163,
+      "content_type": "image/png",
+      "filename": "answer-63.png",
+      "sha256": "3ed9a3ec7c50857feb69eae7da2199ae965e4c45b75fdde4e3a12dc95faaafbb"
+     },
+     "role": "answer_page",
+     "subject_id": "SUBJECT_A1"
+    },
+    "idempotency_key": "b3-img-answer",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P63"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "manual-image-v1",
+    "id": "JOB_P63",
+    "input_kind": "image_manual",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "manual_structure_required",
+      "message": "图片已保存为私有来源；未配置视觉模型，请在校对页对照原图录入题干与答案。配置可用的视觉 provider 后，同一入口会自动改为模型识别 + 人工校对。",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": "SUBJECT_A1"
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "role=answer_page 的 sensitivity"
+  },
+  {
+   "case": "P64",
+   "checks": {
+    "assets": [
+     {
+      "checksum": "<reencoded>",
+      "content_type": "image/png",
+      "height": 50,
+      "id": "ASSET_OF_DOCUMENT_P64",
+      "object_key_shape": {
+       "namespace": "source",
+       "prefix_len": 2,
+       "segments": 5,
+       "suffix": ".png",
+       "token_len": 32
+      },
+      "original_filename": "vision-64.png",
+      "owner": "USER_OWNER",
+      "project": "PROJECT_A",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "size_bytes": 163,
+      "width": 54
+     }
+    ],
+    "candidate_after_dispatch": {
+     "draft_payload": {
+      "answer_payload": {},
+      "answer_status_known": false,
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "【stub 识别】此处应由真实视觉模型输出题干结构。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "display_label": "stub-1",
+      "doubts": [
+       "stub 输出仅供联调，不能作为正式内容"
+      ],
+      "needs_manual_structure": true,
+      "question_type": "single_choice"
+     },
+     "extractor_version": "vision-v1",
+     "id": "CANDIDATE_P64",
+     "is_stub_output": true,
+     "job": "JOB_P64",
+     "review_issues": [
+      {
+       "code": "answer_unknown",
+       "severity": "blocking"
+      },
+      {
+       "code": "subject_missing",
+       "severity": "blocking"
+      }
+     ],
+     "revision": 2,
+     "source_regions": [
+      {
+       "crop_asset": null,
+       "document": "DOCUMENT_P64",
+       "height": 1.0,
+       "page_index": 1,
+       "role": "past_paper_page",
+       "width": 1.0,
+       "x": 0.0,
+       "y": 0.0
+      }
+     ],
+     "status": "draft"
+    },
+    "exposure_events": [],
+    "job_after_dispatch": {
+     "candidate_count": 1,
+     "candidate_statuses": [
+      "draft"
+     ],
+     "document_ids": [
+      "DOCUMENT_P64"
+     ],
+     "duplicate_of": null,
+     "extractor_version": "vision-v1",
+     "id": "JOB_P64",
+     "input_kind": "image_ai",
+     "problems": [
+      {
+       "code": "vision_extraction_queued",
+       "message": "图片已保存为私有来源，已排入视觉识别任务；识别结果仍需人工对照原图校对后才能发布。（当前为测试/演示 stub，输出不代表真实模型识别，必须完整人工核对）",
+       "severity": "warning"
+      },
+      {
+       "code": "vision_extracted_stub",
+       "message": "当前为测试/演示 stub 输出，不代表真实模型识别，必须完整人工核对。",
+       "severity": "warning"
+      }
+     ],
+     "progress_percent": 0,
+     "status": "awaiting_review",
+     "subject": null
+    },
+    "llm_runs_after_dispatch": [
+     {
+      "capability": "extract_question",
+      "is_stub": true,
+      "project": "PROJECT_A",
+      "prompt_version": "p0-extract-v1",
+      "provider": "stub",
+      "request_summary_keys": [
+       "capability",
+       "document_id"
+      ],
+      "status": "succeeded",
+      "user": "USER_OWNER",
+      "validation_result_keys": [
+       "accepted",
+       "problems"
+      ]
+     }
+    ],
+    "outbox_after_dispatch": [
+     {
+      "attempts": 0,
+      "dedupe_key": "extract-candidate:CANDIDATE_P64",
+      "payload": {
+       "candidate_id": "CANDIDATE_P64",
+       "document_id": "DOCUMENT_P64",
+       "import_job_id": "JOB_P64"
+      },
+      "status": "processed",
+      "topic": "ingestion.extract_candidate"
+     }
+    ],
+    "row_delta": {
+     "audit_idempotency_record": 1,
+     "audit_llm_run": 1,
+     "audit_outbox_event": 1,
+     "ingestion_asset": 1,
+     "ingestion_import_candidate": 1,
+     "ingestion_import_job": 1,
+     "ingestion_source_document": 1,
+     "ingestion_source_region": 1
+    },
+    "source_documents": [
+     {
+      "asset": "ASSET_OF_DOCUMENT_P64",
+      "checksum": "<reencoded>",
+      "checksum_matches_asset_checksum": true,
+      "document_type": "image",
+      "id": "DOCUMENT_P64",
+      "project": "PROJECT_A",
+      "raw_text_preview": "",
+      "role": "past_paper_page",
+      "sensitivity": "public_to_owner",
+      "source_note_length": 0,
+      "source_type": "user_upload",
+      "subject": null,
+      "title": "视觉导入",
+      "usage_scope_length": 0
+     }
+    ]
+   },
+   "kind": "case",
+   "op": "O08",
+   "request": {
+    "form": {
+     "files": {
+      "bytes": 163,
+      "content_type": "image/png",
+      "filename": "vision-64.png",
+      "sha256": "92763018bd55204b8e75a32f053c4d4a4e5256244b9f83d74fc824419a1d7acc"
+     },
+     "title": "视觉导入"
+    },
+    "idempotency_key": "b3-img-vision",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/imports/images",
+    "query": {}
+   },
+   "response": {
+    "attempts": 0,
+    "candidate_count": 1,
+    "candidate_status_counts": {
+     "draft": 1
+    },
+    "created_at": "<now>",
+    "document_ids": [
+     "DOCUMENT_P64"
+    ],
+    "duplicate_of_job_id": null,
+    "extractor_version": "vision-v1",
+    "id": "JOB_P64",
+    "input_kind": "image_ai",
+    "last_error": "",
+    "max_attempts": 3,
+    "page_diagnostics": [],
+    "problems": [
+     {
+      "code": "vision_extraction_queued",
+      "message": "图片已保存为私有来源，已排入视觉识别任务；识别结果仍需人工对照原图校对后才能发布。（当前为测试/演示 stub，输出不代表真实模型识别，必须完整人工核对）",
+      "severity": "warning"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "PROJECT_A",
+    "status": "awaiting_review",
+    "subject_id": null
+   },
+   "response_field_order": [
+    "id",
+    "project_id",
+    "subject_id",
+    "status",
+    "input_kind",
+    "progress_percent",
+    "problems",
+    "attempts",
+    "max_attempts",
+    "last_error",
+    "extractor_version",
+    "duplicate_of_job_id",
+    "document_ids",
+    "candidate_count",
+    "candidate_status_counts",
+    "page_diagnostics",
+    "created_at"
+   ],
+   "response_headers": {
+    "Cache-Control": null,
+    "Content-Disposition": null,
+    "Content-Type": "application/json; charset=utf-8",
+    "X-Content-Type-Options": "nosniff"
+   },
+   "status": 201,
+   "title": "stub 视觉分支（B5）：image_ai + 排队 + outbox + LLMRun"
+  }
+ ],
+ "fixtures": {
+  "ai_provider": {
+   "O08 manual cases": "none",
+   "P64 vision case": "stub"
+  },
+  "fixed_question_ids": {
+   "QUESTION_PRACTICE": "11111111-1111-4111-8111-111111111111",
+   "QUESTION_SEAL_A": "22222222-2222-4222-8222-222222222222",
+   "QUESTION_SEAL_B": "33333333-3333-4333-8333-333333333333"
+  },
+  "image_fixtures": {
+   "bmp": "20x20 BMP",
+   "gif": "20x20 GIF87a",
+   "jpeg_exif6": "120x80 JPEG with EXIF Orientation=6",
+   "jpeg_truncated": "60x40 JPEG cut at 50% of its bytes",
+   "png_big": "1900x1900 RGB from random.Random(20260301), >10 MiB",
+   "png_huge": "6000x5000 solid PNG (30,000,000 pixels)",
+   "solid_png(tag)": "deterministic solid-colour PNG derived from zlib.crc32(tag)",
+   "tagged_png()": "52x44 PNG with a tEXt chunk (re-encoding strips it)",
+   "text_bytes": "plain UTF-8 text"
+  },
+  "projects": {
+   "PROJECT_A": "owner",
+   "PROJECT_B": "other"
+  },
+  "sessions": {
+   "SESSION_OTHER": {
+    "items": [
+     "ITEM_OTHER"
+    ],
+    "mode": "practice",
+    "owner": "USER_OTHER"
+   },
+   "SESSION_PRACTICE": {
+    "items": [
+     "ITEM_PRACTICE"
+    ],
+    "mode": "practice",
+    "status": "active"
+   },
+   "SESSION_VERIFICATION": {
+    "items": [
+     "ITEM_VERIFICATION"
+    ],
+    "mode": "verification",
+    "status": "active until P28, finished before P29"
+   }
+  },
+  "subjects": [
+   "SUBJECT_A1",
+   "SUBJECT_B1"
+  ]
+ },
+ "symbol_count": 92,
+ "symbol_names": [
+  "ASSET_ANSWER",
+  "ASSET_EDITORIAL",
+  "ASSET_INTERNAL",
+  "ASSET_MISSING_BYTES",
+  "ASSET_OF_DOCUMENT_P40",
+  "ASSET_OF_DOCUMENT_P41",
+  "ASSET_OF_DOCUMENT_P44",
+  "ASSET_OF_DOCUMENT_P50",
+  "ASSET_OF_DOCUMENT_P51_1",
+  "ASSET_OF_DOCUMENT_P51_2",
+  "ASSET_OF_DOCUMENT_P53",
+  "ASSET_OF_DOCUMENT_P54",
+  "ASSET_OF_DOCUMENT_P58",
+  "ASSET_OF_DOCUMENT_P61",
+  "ASSET_OF_DOCUMENT_P63",
+  "ASSET_OF_DOCUMENT_P64",
+  "ASSET_P01",
+  "ASSET_P02",
+  "ASSET_P03",
+  "ASSET_P09",
+  "ASSET_P10",
+  "ASSET_P19",
+  "ASSET_P20",
+  "ASSET_SEALED_BLOCK",
+  "ASSET_SEALED_CROP",
+  "ASSET_SEALED_KEY",
+  "ASSET_SEALED_PAGE",
+  "ASSET_SEALED_TWO",
+  "ASSET_UNRELATED",
+  "CANDIDATE_P50",
+  "CANDIDATE_P51_1",
+  "CANDIDATE_P51_2",
+  "CANDIDATE_P52",
+  "CANDIDATE_P53",
+  "CANDIDATE_P54",
+  "CANDIDATE_P58",
+  "CANDIDATE_P61",
+  "CANDIDATE_P63",
+  "CANDIDATE_P64",
+  "DOCUMENT_P40",
+  "DOCUMENT_P41",
+  "DOCUMENT_P44",
+  "DOCUMENT_P50",
+  "DOCUMENT_P51_1",
+  "DOCUMENT_P51_2",
+  "DOCUMENT_P53",
+  "DOCUMENT_P54",
+  "DOCUMENT_P58",
+  "DOCUMENT_P61",
+  "DOCUMENT_P63",
+  "DOCUMENT_P64",
+  "DOCUMENT_SEALED_PAGE",
+  "DOCUMENT_TAGGED",
+  "DOCUMENT_WHOLE_PAGE",
+  "EXPOSURE_01",
+  "EXPOSURE_02",
+  "EXPOSURE_03",
+  "ITEM_OTHER",
+  "ITEM_PRACTICE",
+  "ITEM_VERIFICATION",
+  "JOB_P50",
+  "JOB_P51",
+  "JOB_P52",
+  "JOB_P53",
+  "JOB_P54",
+  "JOB_P58",
+  "JOB_P61",
+  "JOB_P63",
+  "JOB_P64",
+  "PROJECT_A",
+  "PROJECT_B",
+  "QUESTION_PRACTICE",
+  "QUESTION_SEAL_A",
+  "QUESTION_SEAL_B",
+  "REF_011",
+  "REF_012",
+  "REF_028",
+  "REF_050",
+  "REF_051",
+  "REF_052",
+  "REF_053",
+  "REGION_CROP",
+  "SESSION_OTHER",
+  "SESSION_PRACTICE",
+  "SESSION_VERIFICATION",
+  "SUBJECT_A1",
+  "SUBJECT_B1",
+  "USER_OTHER",
+  "USER_OWNER",
+  "VERSION_PRACTICE",
+  "VERSION_SEAL_A",
+  "VERSION_SEAL_B"
+ ]
+}

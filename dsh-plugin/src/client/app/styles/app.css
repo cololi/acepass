@@ -1,0 +1,1176 @@
+/*
+ * AcePass visual layer — aligned with the DeepSeek Harness design language.
+ *
+ * Rules of this file:
+ *  1. Everything is scoped to `.acepass-root`. The stylesheet is injected into the
+ *     DSH document once the panel mounts, so an unscoped selector (`body`, `a`,
+ *     `main`, `input`) would repaint the whole Harness shell.
+ *  2. Colours resolve from the shell's `--dsw-*` tokens, so light / dark / system
+ *     (and any third-party DSH theme) apply without the panel managing a palette.
+ *     The `--ap-palette-*` block is only the standalone (Vite dev app) fallback,
+ *     switched by `html[data-acepass-theme]` written by `app/theme.tsx`.
+ *  3. Typography follows the shell: `--dsw-font-family`, `--ds-font-family-code`
+ *     and the user's `--dsh-content-font-size` setting.
+ */
+
+/* ---------------------------------------------------------------- palette */
+:root {
+  /* Standalone fallback palette (light). Inside DSH these are never read. */
+  --ap-palette-bg: #ffffff;
+  --ap-palette-surface: #ffffff;
+  --ap-palette-surface-2: #f9fafb;
+  --ap-palette-surface-3: #f1f3f5;
+  --ap-palette-text: #0f1115;
+  --ap-palette-text-2: #45474c;
+  --ap-palette-text-3: #6b7078;
+  --ap-palette-border: #e3e6ea;
+  --ap-palette-border-strong: #cfd3d9;
+  --ap-palette-hairline: #eef0f3;
+  --ap-palette-hover: #f3f4f6;
+  --ap-palette-active: #e8eaee;
+  --ap-palette-selected: #eef3ff;
+  --ap-palette-nav-active: #ebeef2;
+  --ap-palette-chip: #f1f3f5;
+  --ap-palette-code-bg: #f7f8fa;
+  --ap-palette-accent: #4176e6;
+  --ap-palette-accent-strong: #2f63d6;
+  --ap-palette-on-fill: #ffffff;
+  --ap-palette-ok: #16a34a;
+  --ap-palette-warn: #dd8629;
+  --ap-palette-danger: #dc2626;
+  --ap-palette-mask: rgba(12, 14, 18, 0.45);
+}
+
+:root[data-acepass-theme='dark'] {
+  --ap-palette-bg: #151517;
+  --ap-palette-surface: #232324;
+  --ap-palette-surface-2: #2c2c2e;
+  --ap-palette-surface-3: #353638;
+  --ap-palette-text: #f5f6f7;
+  --ap-palette-text-2: #c6c9cf;
+  --ap-palette-text-3: #9aa0a8;
+  --ap-palette-border: #3a3b3f;
+  --ap-palette-border-strong: #4a4c51;
+  --ap-palette-hairline: #2a2b2e;
+  --ap-palette-hover: #2a2b2e;
+  --ap-palette-active: #333438;
+  --ap-palette-selected: #263148;
+  --ap-palette-nav-active: #333438;
+  --ap-palette-chip: #2e2f32;
+  --ap-palette-code-bg: #1b1b1d;
+  --ap-palette-accent: #6ea3ff;
+  --ap-palette-accent-strong: #8ab5ff;
+  --ap-palette-on-fill: #101114;
+  --ap-palette-ok: #4ade80;
+  --ap-palette-warn: #f59e0b;
+  --ap-palette-danger: #f25a5a;
+  --ap-palette-mask: rgba(0, 0, 0, 0.6);
+}
+
+/* ---------------------------------------------------------------- tokens */
+.acepass-root {
+  /* Surfaces */
+  --ap-bg: var(--dsw-alias-bg-base, var(--ap-palette-bg));
+  --ap-surface: var(--dsw-alias-bg-layer-1, var(--ap-palette-surface));
+  --ap-surface-2: var(--dsw-alias-bg-layer-2, var(--ap-palette-surface-2));
+  --ap-surface-3: var(--dsw-alias-bg-layer-3, var(--ap-palette-surface-3));
+  --ap-card: var(--dsw-alias-settings-card-fill, var(--ap-palette-surface));
+  --ap-card-stroke: var(--dsw-alias-settings-card-stroke, var(--ap-palette-border));
+  --ap-toolbar: var(--dsw-alias-bg-module-platform, var(--ap-palette-surface-2));
+  --ap-chip: var(--dsw-alias-markdown-tag, var(--ap-palette-chip));
+  --ap-code-bg: var(--dsw-alias-markdown-code-block, var(--ap-palette-code-bg));
+
+  /* Borders */
+  --ap-hairline: var(--dsw-alias-border-l1, var(--ap-palette-hairline));
+  --ap-border: var(--dsw-alias-border-l2, var(--ap-palette-border));
+  --ap-border-strong: var(--dsw-alias-border-l3, var(--ap-palette-border-strong));
+
+  /* Text */
+  --ap-text: var(--dsw-alias-label-primary, var(--ap-palette-text));
+  --ap-text-2: var(--dsw-alias-label-secondary, var(--ap-palette-text-2));
+  --ap-text-3: var(--dsw-alias-label-tertiary, var(--ap-palette-text-3));
+
+  /* Interaction */
+  --ap-hover: var(--dsw-alias-interactive-bg-hover, var(--ap-palette-hover));
+  --ap-active: var(--dsw-alias-interactive-bg-active, var(--ap-palette-active));
+  --ap-selected: var(--dsw-alias-interactive-bg-hover-accent, var(--ap-palette-selected));
+  --ap-nav-active: var(--dsw-specific-sidebar-nav-item-active, var(--ap-palette-nav-active));
+
+  /* Brand + state */
+  --ap-accent: var(--dsw-alias-link, var(--ap-palette-accent));
+  --ap-accent-strong: var(--dsw-alias-state-business-primary, var(--ap-palette-accent));
+  --ap-fill: var(--dsw-alias-button-primary-fill, var(--dsw-alias-brand-primary, var(--ap-palette-text)));
+  --ap-fill-hover: var(--dsw-alias-button-primary-hover, var(--ap-palette-accent-strong));
+  --ap-on-fill: var(--dsw-alias-label-primary-foreground, var(--ap-palette-on-fill));
+  --ap-ok: var(--dsw-alias-state-success-primary, var(--ap-palette-ok));
+  --ap-warn: var(--dsw-alias-state-warn-primary, var(--ap-palette-warn));
+  --ap-danger: var(--dsw-alias-state-error-primary, var(--ap-palette-danger));
+  --ap-ok-soft: color-mix(in srgb, var(--ap-ok) 13%, transparent);
+  --ap-warn-soft: color-mix(in srgb, var(--ap-warn) 13%, transparent);
+  --ap-danger-soft: color-mix(in srgb, var(--ap-danger) 11%, transparent);
+  --ap-info-soft: color-mix(in srgb, var(--ap-accent) 12%, transparent);
+  --ap-ok-text: color-mix(in srgb, var(--ap-ok) 72%, var(--ap-text));
+  --ap-warn-text: color-mix(in srgb, var(--ap-warn) 68%, var(--ap-text));
+  --ap-danger-text: color-mix(in srgb, var(--ap-danger) 76%, var(--ap-text));
+  --ap-info-text: color-mix(in srgb, var(--ap-accent) 72%, var(--ap-text));
+
+  /* Geometry + type */
+  --ap-radius: var(--dsw-radius-md, 12px);
+  --ap-radius-sm: var(--dsw-radius-sm, 8px);
+  --ap-radius-xs: var(--dsw-radius-xs, 4px);
+  --ap-shadow: var(--dsw-elevation-panel, 0 2px 8px rgba(16, 24, 40, 0.06));
+  --ap-shadow-lg: var(--dsw-elevation-prominent, 0 12px 32px rgba(16, 24, 40, 0.18));
+  --ap-mask: var(--dsw-alias-bg-mask-1, var(--ap-palette-mask));
+  --ap-font: var(--dsw-font-family, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif);
+  --ap-code-font: var(--ds-font-family-code, 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas, Menlo, 'PingFang SC', monospace);
+  --ap-font-size: var(--dsh-content-font-size, 14px);
+  --ap-line: 1.65;
+  --ap-transition: 0.15s var(--ds-ease-in-out, ease-in-out);
+
+  /* Shell */
+  height: 100%;
+  min-height: 100%;
+  overflow: auto;
+  background: var(--ap-bg);
+  color: var(--ap-text);
+  font-family: var(--ap-font);
+  font-size: var(--ap-font-size);
+  line-height: var(--ap-line);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.acepass-root *,
+.acepass-root *::before,
+.acepass-root *::after {
+  box-sizing: border-box;
+}
+
+/* Standalone document reset — never touches the DSH shell. */
+html[data-acepass-standalone],
+html[data-acepass-standalone] body,
+html[data-acepass-standalone] #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html[data-acepass-standalone] body {
+  background: var(--ap-palette-bg);
+}
+
+/* ---------------------------------------------------------------- layout */
+.acepass-root .app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.acepass-root .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-height: 48px;
+  padding: 8px 16px;
+  background: color-mix(in srgb, var(--ap-bg) 92%, transparent);
+  backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--ap-hairline);
+}
+
+.acepass-root .topbar .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ap-text);
+  white-space: nowrap;
+}
+
+.acepass-root .topbar .brand::before {
+  content: 'A';
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--ap-fill);
+  color: var(--ap-on-fill);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.acepass-root .topbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.acepass-root .topbar nav a {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 7px;
+  color: var(--ap-text-2);
+  font-size: max(13px, calc(var(--ap-font-size) - 1px));
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--ap-transition), color var(--ap-transition);
+}
+
+.acepass-root .topbar nav a:hover {
+  background: var(--ap-hover);
+  color: var(--ap-text);
+}
+
+.acepass-root .topbar nav a.active {
+  background: var(--ap-nav-active);
+  color: var(--ap-text);
+  font-weight: 500;
+}
+
+.acepass-root .topbar .spacer {
+  flex: 1 1 auto;
+}
+
+.acepass-root .topbar .user {
+  color: var(--ap-text-3);
+  font-size: 12.5px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acepass-root .menu-toggle {
+  display: none;
+}
+
+.acepass-root .context-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 7px 16px;
+  background: var(--ap-toolbar);
+  border-bottom: 1px solid var(--ap-hairline);
+  color: var(--ap-text-2);
+  font-size: 12.5px;
+}
+
+.acepass-root .context-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.acepass-root .context-field > span {
+  color: var(--ap-text-3);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.acepass-root .context-field select {
+  width: auto;
+  min-width: 150px;
+  height: 28px;
+  padding: 2px 26px 2px 8px;
+  font-size: 12.5px;
+  background-color: var(--ap-surface);
+}
+
+.acepass-root .context-strip .chip {
+  background: var(--ap-chip);
+  color: var(--ap-text-2);
+  border: 1px solid var(--ap-hairline);
+}
+
+.acepass-root .context-strip .spacer {
+  flex: 1 1 auto;
+}
+
+.acepass-root .context-strip .tiny {
+  color: var(--ap-text-3);
+}
+
+.acepass-root main {
+  flex: 1;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px 20px 56px;
+}
+
+.acepass-root .page-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: baseline;
+  margin: 2px 0 16px;
+}
+
+.acepass-root .page-title h1 {
+  margin: 0;
+  font-size: max(19px, calc(var(--ap-font-size) + 5px));
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.acepass-root .page-title .sub {
+  color: var(--ap-text-3);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------- surfaces */
+.acepass-root .card {
+  background: var(--ap-card);
+  border: 1px solid var(--ap-card-stroke);
+  border-radius: var(--ap-radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.acepass-root .card h2,
+.acepass-root .card h3 {
+  margin: 0 0 10px;
+  font-size: max(15px, calc(var(--ap-font-size) + 1px));
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.acepass-root .card h3 {
+  margin-top: 16px;
+  font-size: max(14px, var(--ap-font-size));
+  color: var(--ap-text);
+}
+
+.acepass-root .card > h2:first-child,
+.acepass-root .card > h3:first-child {
+  margin-top: 0;
+}
+
+.acepass-root .card p {
+  margin: 0 0 10px;
+}
+
+.acepass-root .card p:last-child {
+  margin-bottom: 0;
+}
+
+.acepass-root .grid {
+  display: grid;
+  gap: 14px;
+}
+
+.acepass-root .grid.two {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.acepass-root .grid.three {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.acepass-root .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.acepass-root .row.between {
+  justify-content: space-between;
+}
+
+.acepass-root .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.acepass-root .muted {
+  color: var(--ap-text-2);
+}
+
+.acepass-root .small {
+  font-size: max(13px, calc(var(--ap-font-size) - 1px));
+}
+
+.acepass-root .tiny {
+  font-size: max(12px, calc(var(--ap-font-size) - 2px));
+  line-height: 1.55;
+}
+
+.acepass-root .nowrap {
+  white-space: nowrap;
+}
+
+.acepass-root .spacer {
+  flex: 1 1 auto;
+}
+
+/* Utility surfaces used by feature pages instead of inline hex colours. */
+.acepass-root .surface-subtle {
+  background: color-mix(in srgb, var(--ap-surface-2) 70%, transparent);
+}
+
+.acepass-root .surface-raised {
+  background: var(--ap-surface);
+}
+
+.acepass-root .row-selected {
+  background: var(--ap-selected);
+}
+
+.acepass-root .divider-top {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ap-hairline);
+}
+
+.acepass-root .code-block {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--ap-code-bg);
+  border: 1px solid var(--ap-hairline);
+  border-radius: var(--ap-radius-sm);
+  padding: 10px 12px;
+  color: var(--ap-text-2);
+  font-family: var(--ap-code-font);
+  font-size: max(12px, calc(var(--ap-font-size) - 2px));
+  line-height: 1.6;
+}
+
+.acepass-root .thumb {
+  object-fit: cover;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+}
+
+.acepass-root .warn-panel {
+  border-color: color-mix(in srgb, var(--ap-warn) 42%, var(--ap-border));
+  background: color-mix(in srgb, var(--ap-warn-soft) 62%, var(--ap-card));
+}
+
+.acepass-root .warn-panel h2 {
+  color: var(--ap-warn-text);
+}
+
+/* ---------------------------------------------------------------- controls */
+.acepass-root .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 12px;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  font-family: inherit;
+  font-size: var(--ap-font-size);
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--ap-transition), border-color var(--ap-transition), color var(--ap-transition),
+    opacity var(--ap-transition);
+}
+
+.acepass-root .btn:hover:not(:disabled) {
+  background: var(--ap-hover);
+  border-color: var(--ap-border-strong);
+}
+
+.acepass-root .btn:active:not(:disabled) {
+  background: var(--ap-active);
+}
+
+.acepass-root .btn.primary {
+  background: var(--ap-fill);
+  border-color: transparent;
+  color: var(--ap-on-fill);
+  font-weight: 500;
+}
+
+.acepass-root .btn.primary:hover:not(:disabled) {
+  background: var(--ap-fill-hover);
+  border-color: transparent;
+}
+
+.acepass-root .btn.danger {
+  border-color: color-mix(in srgb, var(--ap-danger) 38%, var(--ap-border));
+  background: var(--ap-danger-soft);
+  color: var(--ap-danger-text);
+}
+
+.acepass-root .btn.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ap-danger) 18%, transparent);
+}
+
+.acepass-root .btn.ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ap-text-2);
+}
+
+.acepass-root .btn.ghost:hover:not(:disabled) {
+  background: var(--ap-hover);
+  color: var(--ap-text);
+}
+
+.acepass-root .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.acepass-root .btn.small {
+  min-height: 26px;
+  padding: 2px 9px;
+  font-size: max(12.5px, calc(var(--ap-font-size) - 2px));
+}
+
+.acepass-root input,
+.acepass-root select,
+.acepass-root textarea {
+  width: 100%;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  font-family: inherit;
+  font-size: var(--ap-font-size);
+  line-height: 1.5;
+  transition: border-color var(--ap-transition), box-shadow var(--ap-transition);
+}
+
+.acepass-root input:hover,
+.acepass-root select:hover,
+.acepass-root textarea:hover {
+  border-color: var(--ap-border-strong);
+}
+
+.acepass-root input:focus,
+.acepass-root select:focus,
+.acepass-root textarea:focus {
+  outline: none;
+  border-color: var(--ap-accent-strong);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ap-accent-strong) 22%, transparent);
+}
+
+.acepass-root input::placeholder,
+.acepass-root textarea::placeholder {
+  color: var(--ap-text-3);
+}
+
+.acepass-root input[type='checkbox'],
+.acepass-root input[type='radio'] {
+  width: auto;
+  min-height: 0;
+  accent-color: var(--ap-accent-strong);
+}
+
+.acepass-root select option {
+  background: var(--ap-surface);
+  color: var(--ap-text);
+}
+
+.acepass-root textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.acepass-root label.field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.acepass-root label.field > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--ap-text-2);
+  font-size: max(12.5px, calc(var(--ap-font-size) - 2px));
+}
+
+.acepass-root .inline-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acepass-root .inline-field > input {
+  flex: 1;
+  min-width: 0;
+}
+
+.acepass-root a {
+  color: var(--ap-accent);
+  text-decoration: none;
+}
+
+.acepass-root a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.acepass-root :focus-visible {
+  outline-style: solid;
+  outline-color: var(--dsw-focus-ring-color, var(--ap-accent-strong));
+  outline-width: var(--dsw-focus-ring-width, 2px);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- feedback */
+.acepass-root .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--ap-info-soft);
+  color: var(--ap-info-text);
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.acepass-root .pill.ok {
+  background: var(--ap-ok-soft);
+  color: var(--ap-ok-text);
+}
+
+.acepass-root .pill.warn {
+  background: var(--ap-warn-soft);
+  color: var(--ap-warn-text);
+}
+
+.acepass-root .pill.danger {
+  background: var(--ap-danger-soft);
+  color: var(--ap-danger-text);
+}
+
+.acepass-root .pill.neutral {
+  background: var(--ap-chip);
+  color: var(--ap-text-2);
+}
+
+.acepass-root .notice {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--ap-radius-sm);
+  font-size: max(13px, calc(var(--ap-font-size) - 1px));
+  line-height: 1.6;
+}
+
+.acepass-root .notice.info {
+  background: var(--ap-info-soft);
+  border-color: color-mix(in srgb, var(--ap-accent) 30%, transparent);
+  color: var(--ap-info-text);
+}
+
+.acepass-root .notice.ok {
+  background: var(--ap-ok-soft);
+  border-color: color-mix(in srgb, var(--ap-ok) 30%, transparent);
+  color: var(--ap-ok-text);
+}
+
+.acepass-root .notice.warn {
+  background: var(--ap-warn-soft);
+  border-color: color-mix(in srgb, var(--ap-warn) 34%, transparent);
+  color: var(--ap-warn-text);
+}
+
+.acepass-root .notice.danger {
+  background: var(--ap-danger-soft);
+  border-color: color-mix(in srgb, var(--ap-danger) 32%, transparent);
+  color: var(--ap-danger-text);
+}
+
+.acepass-root .banner {
+  padding: 6px 16px;
+  background: var(--ap-warn-soft);
+  border-bottom: 1px solid color-mix(in srgb, var(--ap-warn) 30%, transparent);
+  color: var(--ap-warn-text);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------- tables */
+.acepass-root .table-scroll {
+  overflow-x: auto;
+  border-radius: var(--ap-radius-sm);
+}
+
+.acepass-root table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: max(13px, calc(var(--ap-font-size) - 1px));
+}
+
+.acepass-root table.data th,
+.acepass-root table.data td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ap-hairline);
+  text-align: left;
+  vertical-align: top;
+}
+
+.acepass-root table.data th {
+  color: var(--ap-text-3);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.acepass-root table.data tr:last-child td {
+  border-bottom: 0;
+}
+
+.acepass-root table.data tbody tr:hover {
+  background: var(--ap-hover);
+}
+
+.acepass-root table.data tbody tr.row-selected:hover {
+  background: var(--ap-selected);
+}
+
+/* ---------------------------------------------------------------- content */
+.acepass-root .blocks p {
+  margin: 0 0 8px;
+}
+
+.acepass-root .blocks p:last-child {
+  margin-bottom: 0;
+}
+
+.acepass-root .block-image img {
+  display: block;
+  max-width: 100%;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+}
+
+.acepass-root .image-missing {
+  padding: 12px;
+  border: 1px dashed var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  color: var(--ap-text-3);
+  font-size: 13px;
+}
+
+.acepass-root .block-table {
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.acepass-root .block-table table {
+  border-collapse: collapse;
+  margin: 4px 0;
+}
+
+.acepass-root .block-table td {
+  padding: 5px 9px;
+  border: 1px solid var(--ap-border);
+  font-size: max(13px, calc(var(--ap-font-size) - 1px));
+}
+
+.acepass-root .block-table figcaption {
+  color: var(--ap-text-3);
+  font-size: 12px;
+}
+
+.acepass-root .math {
+  font-size: 1.02em;
+}
+
+.acepass-root pre {
+  max-width: 100%;
+  overflow: auto;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ap-hairline);
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-code-bg);
+  color: var(--ap-text-2);
+  font-family: var(--ap-code-font);
+  font-size: max(12px, calc(var(--ap-font-size) - 2px));
+  line-height: 1.6;
+}
+
+.acepass-root code {
+  font-family: var(--ap-code-font);
+  font-size: 0.94em;
+}
+
+.acepass-root :not(pre) > code {
+  padding: 1px 5px;
+  border-radius: var(--ap-radius-xs);
+  background: var(--ap-chip);
+  color: var(--ap-text);
+}
+
+.acepass-root img {
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------- practice */
+.acepass-root .workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.acepass-root .option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.acepass-root .option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-surface);
+  transition: border-color var(--ap-transition), background var(--ap-transition);
+}
+
+.acepass-root .option:hover {
+  border-color: var(--ap-border-strong);
+  background: var(--ap-hover);
+}
+
+.acepass-root .option.selected {
+  border-color: var(--ap-accent-strong);
+  background: color-mix(in srgb, var(--ap-accent-strong) 9%, var(--ap-surface));
+}
+
+.acepass-root .option input {
+  width: auto;
+  margin-top: 4px;
+}
+
+.acepass-root .item-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acepass-root .item-nav button {
+  min-width: 34px;
+  text-align: center;
+}
+
+.acepass-root .item-nav button.current {
+  border-color: var(--ap-accent-strong);
+  color: var(--ap-accent-strong);
+  font-weight: 600;
+}
+
+.acepass-root .item-nav button.submitted::after {
+  content: '✓';
+  margin-left: 4px;
+  color: var(--ap-ok);
+}
+
+.acepass-root .blank-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 140px) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.acepass-root .attachment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.acepass-root .attachment-list img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+}
+
+.acepass-root .grade-box {
+  padding: 10px 12px;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-sm);
+  background: var(--ap-surface-2);
+}
+
+.acepass-root .grade-part {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--ap-border);
+}
+
+.acepass-root .grade-part:last-child {
+  border-bottom: 0;
+}
+
+.acepass-root .timer {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- states */
+.acepass-root .empty-state {
+  padding: 28px 14px;
+  color: var(--ap-text-3);
+  text-align: center;
+}
+
+.acepass-root .route-loading {
+  animation: acepass-route-loading 1.2s ease-in-out infinite;
+}
+
+@keyframes acepass-route-loading {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.acepass-root .login-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.acepass-root .login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 22px;
+  border: 1px solid var(--ap-card-stroke);
+  border-radius: var(--ap-radius);
+  background: var(--ap-card);
+}
+
+.acepass-root .login-card h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+/* ---------------------------------------------------------------- overlays */
+.acepass-root .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--ap-mask);
+  backdrop-filter: blur(2px);
+}
+
+.acepass-root .modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid var(--ap-border-strong);
+  border-radius: var(--dsw-radius-lg, 16px);
+  background: var(--ap-surface-2);
+  color: var(--ap-text);
+  box-shadow: var(--ap-shadow-lg);
+}
+
+.acepass-root .modal h2 {
+  margin-top: 0;
+  font-size: 17px;
+}
+
+.acepass-root .toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 60;
+  max-width: 90vw;
+  padding: 9px 16px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--dsw-alias-toast-bg, var(--ap-text));
+  color: var(--dsw-alias-toast-label, var(--ap-bg));
+  box-shadow: var(--ap-shadow);
+  font-size: 13px;
+}
+
+.acepass-root .toast.error {
+  background: var(--ap-danger);
+  color: #fff;
+}
+
+.acepass-root .toast.ok {
+  background: var(--ap-ok);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------- theme switch */
+.acepass-root .theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--ap-hairline);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ap-surface-2) 70%, transparent);
+}
+
+.acepass-root .theme-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 2px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ap-text-3);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background var(--ap-transition), color var(--ap-transition);
+}
+
+.acepass-root .theme-switch button:hover {
+  color: var(--ap-text);
+  background: var(--ap-hover);
+}
+
+.acepass-root .theme-switch button[aria-pressed='true'] {
+  background: var(--ap-surface);
+  border-color: var(--ap-border);
+  color: var(--ap-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.acepass-root .theme-switch svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+/* ---------------------------------------------------------------- responsive */
+@media (max-width: 1180px) {
+  .acepass-root main {
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 980px) {
+  .acepass-root .workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .acepass-root .grid.two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .acepass-root .menu-toggle {
+    display: inline-flex;
+  }
+
+  .acepass-root .topbar nav {
+    display: none;
+    order: 10;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ap-hairline);
+  }
+
+  .acepass-root .topbar nav.nav-open {
+    display: flex;
+  }
+
+  .acepass-root .context-strip .tiny {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .acepass-root .context-field {
+    flex: 1 1 100%;
+  }
+
+  .acepass-root .context-field select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .acepass-root .context-strip {
+    padding: 8px 12px;
+  }
+
+  .acepass-root .topbar {
+    padding: 8px 12px;
+  }
+
+  .acepass-root .topbar .user {
+    display: none;
+  }
+
+  .acepass-root .theme-switch .theme-switch-label {
+    display: none;
+  }
+
+  .acepass-root .theme-switch button {
+    padding: 2px 7px;
+  }
+
+  .acepass-root main {
+    padding: 14px 12px 40px;
+  }
+
+  .acepass-root .card {
+    padding: 13px;
+  }
+
+  .acepass-root .grid.three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .acepass-root .blank-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acepass-root .route-loading {
+    animation: none;
+  }
+
+  .acepass-root * {
+    transition-duration: 0.01ms !important;
+  }
+}

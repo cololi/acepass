@@ -1,0 +1,1296 @@
+{
+ "cases": [
+  {
+   "id": "SETUP-1",
+   "payload": {
+    "confirmed_score": "0",
+    "created_at": "<time>",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": null,
+    "grading_hidden": false,
+    "grading_withheld_session_item_ids": [],
+    "items": [
+     {
+      "attempt": null,
+      "attempt_id": null,
+      "can_reveal": true,
+      "display_label": "单选",
+      "draft_revision": 0,
+      "first_delivered_at": null,
+      "grading_withheld": false,
+      "has_draft": false,
+      "max_score": "2.00",
+      "ordinal": 1,
+      "purpose": "practice",
+      "question_id": "REF_005",
+      "question_type": "single_choice",
+      "session_item_id": "REF_007",
+      "tutoring_allowed": true
+     }
+    ],
+    "mode": "practice",
+    "pending_max_score": "0",
+    "policy_version": "p0-1",
+    "project_id": "PROJECT",
+    "revealed_at": null,
+    "score_hidden_reason": null,
+    "score_visible": true,
+    "server_time": "<time>",
+    "session_id": "REF_006",
+    "status": "active",
+    "subject_id": "SUBJECT"
+   },
+   "request": {
+    "idempotency_key": "probe-session-practice-0",
+    "json_body": {
+     "mode": "practice",
+     "question_ids": [
+      "REF_005"
+     ],
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/practice-sessions"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_session_item": 1
+   },
+   "status": 201,
+   "title": "create a practice session (fixture setup)"
+  },
+  {
+   "id": "P01",
+   "payload": {
+    "assets": [],
+    "draft": {},
+    "draft_revision": 0,
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "first_delivered_at": "<time>",
+    "first_delivery": true,
+    "grading_hidden": false,
+    "max_score": "2.00",
+    "mode": "practice",
+    "ordinal": 1,
+    "purpose": "practice",
+    "server_time": "<time>",
+    "session_id": "SESSION",
+    "session_item_id": "ITEM",
+    "status": "active",
+    "stem": {
+     "blank_ids": [],
+     "blanks": [],
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "题目 单选：1+1 等于几？"
+      }
+     ],
+     "material": null,
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "1"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "2"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      }
+     ],
+     "question_type": "single_choice",
+     "question_version_id": "SINGLE"
+    },
+    "tutoring_allowed": true
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/presentation"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "presentation carries draft/clock/tutoring"
+  },
+  {
+   "id": "P02",
+   "payload": {
+    "answer_key_version_id": "REF_008",
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "answer_source_type": "user_authored",
+    "answer_verification_status": "checked",
+    "check_basis": "探针依据",
+    "confidence_note": "",
+    "explanation_blocks": [
+     {
+      "kind": "text",
+      "text": "因为 1+1=2。"
+     }
+    ],
+    "exposure_recorded": true,
+    "question_version_id": "SINGLE",
+    "rubric": null
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/reveal"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "reveal before submit returns the trusted answer"
+  },
+  {
+   "id": "SETUP-2",
+   "payload": {
+    "confirmed_score": null,
+    "created_at": "<time>",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": null,
+    "grading_hidden": true,
+    "grading_withheld_session_item_ids": [],
+    "items": [
+     {
+      "attempt": null,
+      "attempt_id": null,
+      "can_reveal": false,
+      "display_label": "单选",
+      "draft_revision": 0,
+      "first_delivered_at": null,
+      "grading_withheld": false,
+      "has_draft": false,
+      "max_score": "2.00",
+      "ordinal": 1,
+      "purpose": "practice",
+      "question_id": "REF_005",
+      "question_type": "single_choice",
+      "session_item_id": "REF_010",
+      "tutoring_allowed": false
+     }
+    ],
+    "mode": "verification",
+    "pending_max_score": null,
+    "policy_version": "p0-1",
+    "project_id": "PROJECT",
+    "revealed_at": null,
+    "score_hidden_reason": "验证进行中：结束本次验证后才会显示分数与正误。",
+    "score_visible": false,
+    "server_time": "<time>",
+    "session_id": "REF_009",
+    "status": "active",
+    "subject_id": "SUBJECT"
+   },
+   "request": {
+    "idempotency_key": "probe-session-verification-3",
+    "json_body": {
+     "mode": "verification",
+     "question_ids": [
+      "REF_005"
+     ],
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/practice-sessions"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_session_item": 1
+   },
+   "status": 201,
+   "title": "create a verification session (fixture setup)"
+  },
+  {
+   "id": "P03",
+   "payload": {
+    "assets": [],
+    "draft": {},
+    "draft_revision": 0,
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "first_delivered_at": "<time>",
+    "first_delivery": true,
+    "grading_hidden": true,
+    "max_score": "2.00",
+    "mode": "verification",
+    "ordinal": 1,
+    "purpose": "practice",
+    "server_time": "<time>",
+    "session_id": "REF_009",
+    "session_item_id": "REF_010",
+    "status": "active",
+    "stem": {
+     "blank_ids": [],
+     "blanks": [],
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "题目 单选：1+1 等于几？"
+      }
+     ],
+     "material": null,
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "1"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "2"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      }
+     ],
+     "question_type": "single_choice",
+     "question_version_id": "SINGLE"
+    },
+    "tutoring_allowed": false
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_010/presentation"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "reveal before submit on a verification is refused"
+  },
+  {
+   "id": "P04",
+   "payload": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {},
+     "message": "验证/考试模式在提交前不提供答案或完整讲解"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_010/reveal"
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "verification reveal is 403 purpose_not_allowed"
+  },
+  {
+   "id": "P05",
+   "payload": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "gated_mode": "verification",
+      "reason": "active_verification_content_gate",
+      "verification_session_id": "REF_009",
+      "verification_session_item_id": "REF_010"
+     },
+     "message": "该内容正在验证中（会话 REF_009）：为避免泄露答案，验证结束前不能查看答案与解析。如只想练习，请先结束那次验证。"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/reveal"
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "a practice item covered by a running verification cannot reveal"
+  },
+  {
+   "id": "P05b",
+   "payload": {
+    "confirmed_score": "0",
+    "created_at": "<time>",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": "<time>",
+    "grading_hidden": false,
+    "grading_withheld_session_item_ids": [],
+    "items": [
+     {
+      "attempt": null,
+      "attempt_id": null,
+      "can_reveal": true,
+      "display_label": "单选",
+      "draft_revision": 0,
+      "first_delivered_at": "<time>",
+      "grading_withheld": false,
+      "has_draft": false,
+      "max_score": "2.00",
+      "ordinal": 1,
+      "purpose": "practice",
+      "question_id": "REF_005",
+      "question_type": "single_choice",
+      "session_item_id": "REF_010",
+      "tutoring_allowed": false
+     }
+    ],
+    "mode": "verification",
+    "pending_max_score": "0",
+    "policy_version": "p0-1",
+    "project_id": "PROJECT",
+    "revealed_at": "<time>",
+    "score_hidden_reason": null,
+    "score_visible": true,
+    "server_time": "<time>",
+    "session_id": "REF_009",
+    "status": "finished",
+    "subject_id": "SUBJECT"
+   },
+   "request": {
+    "idempotency_key": "probe-finish-verification",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/practice-sessions/REF_009/finish"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 1
+   },
+   "status": 200,
+   "title": "finishing the verification lifts the content gate"
+  },
+  {
+   "id": "P06",
+   "payload": {
+    "draft_revision": 1,
+    "draft_updated_at": "<time>",
+    "saved": true,
+    "session_item_id": "ITEM"
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "draft": {
+      "answer": {
+       "selected_option_id": "opt_b"
+      },
+      "asset_ids": [],
+      "draft_version": 2
+     },
+     "draft_revision": 0
+    },
+    "method": "PUT",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/draft"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "draft save increments the revision"
+  },
+  {
+   "id": "P07",
+   "payload": {
+    "error": {
+     "code": "version_conflict",
+     "details": {
+      "actual": 1,
+      "expected": 0
+     },
+     "message": "草稿已在其他标签页更新，请刷新后再编辑"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "draft": {
+      "answer": {},
+      "asset_ids": [],
+      "draft_version": 2
+     },
+     "draft_revision": 0
+    },
+    "method": "PUT",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/draft"
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "a stale draft revision conflicts"
+  },
+  {
+   "id": "P08",
+   "payload": {
+    "attempt_id": "REF_013",
+    "grade": {
+     "comment": "",
+     "confirmed_score": "2.00",
+     "estimated_score": null,
+     "grade_event_id": "REF_014",
+     "grader_is_self": false,
+     "grading_revision": 1,
+     "is_correct": true,
+     "is_fully_confirmed": true,
+     "max_score": "2.00",
+     "method": "deterministic",
+     "parts": [
+      {
+       "detail": {
+        "outcome": "correct"
+       },
+       "max_score": "2.00",
+       "method": "deterministic",
+       "part_id": "choice",
+       "score": "2.00",
+       "status": "confirmed"
+      }
+     ],
+     "pending_max_score": "0",
+     "rule_snapshot": {
+      "answer_rule": {},
+      "max_score": "2.00",
+      "question_type": "single_choice",
+      "spec_rule": {},
+      "spec_version_id": null
+     },
+     "rule_version": "p0-1",
+     "status": "confirmed",
+     "superseded": false
+    },
+    "grading_revision": 1,
+    "receipt_only": false,
+    "session_item_id": "ITEM",
+    "submitted_at": "<time>"
+   },
+   "request": {
+    "idempotency_key": "probe-submit-1",
+    "json_body": {
+     "answer": {
+      "selected_option_id": "opt_b",
+      "type": "single_choice"
+     },
+     "asset_ids": [
+      "ASSET"
+     ]
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/submit"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 2,
+    "practice_attempt": 1,
+    "practice_grade_event": 1
+   },
+   "status": 200,
+   "title": "submit with a photo stores the attachment"
+  },
+  {
+   "id": "P09",
+   "payload": {
+    "attachments": [
+     "ASSET"
+    ],
+    "attempt_id": "ATTEMPT",
+    "confidence": "",
+    "elapsed_ms": 119,
+    "grade": {
+     "comment": "",
+     "confirmed_score": "2.00",
+     "estimated_score": null,
+     "grade_event_id": "REF_014",
+     "grader_is_self": false,
+     "grading_revision": 1,
+     "is_correct": true,
+     "is_fully_confirmed": true,
+     "max_score": "2.00",
+     "method": "deterministic",
+     "parts": [
+      {
+       "detail": {
+        "outcome": "correct"
+       },
+       "max_score": "2.00",
+       "method": "deterministic",
+       "part_id": "choice",
+       "score": "2.00",
+       "status": "confirmed"
+      }
+     ],
+     "pending_max_score": "0.00",
+     "rule_snapshot": {
+      "answer_rule": {},
+      "max_score": "2.00",
+      "question_type": "single_choice",
+      "spec_rule": {},
+      "spec_version_id": null
+     },
+     "rule_version": "p0-1",
+     "status": "confirmed",
+     "superseded": false
+    },
+    "grading_revision": 1,
+    "raw_answer": {
+     "selected_option_id": "opt_b",
+     "type": "single_choice"
+    },
+    "receipt_only": false,
+    "session_item_id": "ITEM",
+    "steps": [],
+    "submitted_at": "<time>"
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "attempt detail exposes the attachment and the score"
+  },
+  {
+   "id": "P10",
+   "payload": {
+    "answer_key_version_id": "REF_008",
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "answer_source_type": "user_authored",
+    "answer_verification_status": "checked",
+    "check_basis": "探针依据",
+    "confidence_note": "",
+    "explanation_blocks": [
+     {
+      "kind": "text",
+      "text": "因为 1+1=2。"
+     }
+    ],
+    "exposure_recorded": true,
+    "question_version_id": "SINGLE",
+    "rubric": null
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/ATTEMPT/reveal"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "reveal after submit uses the attempt route"
+  },
+  {
+   "id": "P11",
+   "payload": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "该题项已提交，作答不可编辑；如需重做请新建题项"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "draft": {
+      "answer": {},
+      "asset_ids": [],
+      "draft_version": 2
+     },
+     "draft_revision": 2
+    },
+    "method": "PUT",
+    "path": "/api/v1/projects/PROJECT/session-items/ITEM/draft"
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "draft after submit is refused"
+  },
+  {
+   "id": "SETUP-3",
+   "payload": {
+    "confirmed_score": "0",
+    "created_at": "<time>",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": null,
+    "grading_hidden": false,
+    "grading_withheld_session_item_ids": [],
+    "items": [
+     {
+      "attempt": null,
+      "attempt_id": null,
+      "can_reveal": true,
+      "display_label": "单选",
+      "draft_revision": 0,
+      "first_delivered_at": null,
+      "grading_withheld": false,
+      "has_draft": false,
+      "max_score": "2.00",
+      "ordinal": 1,
+      "purpose": "practice",
+      "question_id": "REF_005",
+      "question_type": "single_choice",
+      "session_item_id": "REF_016",
+      "tutoring_allowed": true
+     }
+    ],
+    "mode": "practice",
+    "pending_max_score": "0",
+    "policy_version": "p0-1",
+    "project_id": "PROJECT",
+    "revealed_at": null,
+    "score_hidden_reason": null,
+    "score_visible": true,
+    "server_time": "<time>",
+    "session_id": "REF_015",
+    "status": "active",
+    "subject_id": "SUBJECT"
+   },
+   "request": {
+    "idempotency_key": "probe-session-practice-14",
+    "json_body": {
+     "mode": "practice",
+     "question_ids": [
+      "REF_005"
+     ],
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/practice-sessions"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_session_item": 1
+   },
+   "status": 201,
+   "title": "create a practice session (fixture setup)"
+  },
+  {
+   "id": "P12",
+   "payload": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "附件不存在或不属于当前项目"
+    }
+   },
+   "request": {
+    "idempotency_key": "probe-submit-foreign",
+    "json_body": {
+     "answer": {
+      "selected_option_id": "opt_b",
+      "type": "single_choice"
+     },
+     "asset_ids": [
+      "FOREIGN_ASSET"
+     ]
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_016/submit"
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "an attachment from another project is a 404"
+  },
+  {
+   "id": "SETUP-4",
+   "payload": {
+    "confirmed_score": "0",
+    "created_at": "<time>",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": null,
+    "grading_hidden": false,
+    "grading_withheld_session_item_ids": [],
+    "items": [
+     {
+      "attempt": null,
+      "attempt_id": null,
+      "can_reveal": true,
+      "display_label": "大题",
+      "draft_revision": 0,
+      "first_delivered_at": null,
+      "grading_withheld": false,
+      "has_draft": false,
+      "max_score": "10.00",
+      "ordinal": 1,
+      "purpose": "practice",
+      "question_id": "REF_017",
+      "question_type": "constructed_response",
+      "session_item_id": "REF_019",
+      "tutoring_allowed": true
+     }
+    ],
+    "mode": "practice",
+    "pending_max_score": "0",
+    "policy_version": "p0-1",
+    "project_id": "PROJECT",
+    "revealed_at": null,
+    "score_hidden_reason": null,
+    "score_visible": true,
+    "server_time": "<time>",
+    "session_id": "REF_018",
+    "status": "active",
+    "subject_id": "SUBJECT"
+   },
+   "request": {
+    "idempotency_key": "probe-session-practice-16",
+    "json_body": {
+     "mode": "practice",
+     "question_ids": [
+      "REF_017"
+     ],
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/practice-sessions"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_session_item": 1
+   },
+   "status": 201,
+   "title": "create a practice session (fixture setup)"
+  },
+  {
+   "id": "P13",
+   "payload": {
+    "assets": [],
+    "draft": {},
+    "draft_revision": 0,
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "first_delivered_at": "<time>",
+    "first_delivery": true,
+    "grading_hidden": false,
+    "max_score": "10.00",
+    "mode": "practice",
+    "ordinal": 1,
+    "purpose": "practice",
+    "server_time": "<time>",
+    "session_id": "REF_018",
+    "session_item_id": "REF_019",
+    "status": "active",
+    "stem": {
+     "blank_ids": [],
+     "blanks": [],
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "写出推导过程。"
+      }
+     ],
+     "material": null,
+     "options": [],
+     "question_type": "constructed_response",
+     "question_version_id": "CR"
+    },
+    "tutoring_allowed": true
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_019/presentation"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "present the constructed response"
+  },
+  {
+   "id": "P14",
+   "payload": {
+    "attempt_id": "REF_020",
+    "grade": {
+     "comment": "大题需逐评分点人工确认",
+     "confirmed_score": null,
+     "estimated_score": null,
+     "grade_event_id": "REF_021",
+     "grader_is_self": false,
+     "grading_revision": 1,
+     "is_correct": false,
+     "is_fully_confirmed": false,
+     "max_score": "10.00",
+     "method": "deterministic",
+     "parts": [
+      {
+       "detail": {
+        "required": true,
+        "text": "正确列出已知条件"
+       },
+       "max_score": "4",
+       "method": null,
+       "part_id": "c1",
+       "score": null,
+       "status": "pending_review"
+      },
+      {
+       "detail": {
+        "required": true,
+        "text": "推导过程正确"
+       },
+       "max_score": "3",
+       "method": null,
+       "part_id": "c2",
+       "score": null,
+       "status": "pending_review"
+      },
+      {
+       "detail": {
+        "required": true,
+        "text": "结论正确"
+       },
+       "max_score": "3",
+       "method": null,
+       "part_id": "c3",
+       "score": null,
+       "status": "pending_review"
+      }
+     ],
+     "pending_max_score": "10",
+     "rule_snapshot": {
+      "answer_rule": {},
+      "max_score": "10.00",
+      "question_type": "constructed_response",
+      "spec_rule": {},
+      "spec_version_id": null
+     },
+     "rule_version": "p0-1",
+     "status": "pending_review",
+     "superseded": false
+    },
+    "grading_revision": 1,
+    "receipt_only": false,
+    "session_item_id": "REF_019",
+    "submitted_at": "<time>"
+   },
+   "request": {
+    "idempotency_key": "probe-submit-cr",
+    "json_body": {
+     "answer": {
+      "text": "5 × 4 = 20",
+      "type": "constructed_response"
+     }
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_019/submit"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 2,
+    "practice_attempt": 1,
+    "practice_grade_event": 1
+   },
+   "status": 200,
+   "title": "constructed response submits to pending review"
+  },
+  {
+   "id": "P15",
+   "payload": [
+    {
+     "attachments": [],
+     "attempt_id": "CR_ATTEMPT",
+     "can_review_as_other": false,
+     "confidence": "",
+     "confirmed_score": null,
+     "display_label": "大题",
+     "elapsed_ms": 11,
+     "grading_revision": 1,
+     "is_own_attempt": true,
+     "parts": [
+      {
+       "detail": {
+        "required": true,
+        "text": "正确列出已知条件"
+       },
+       "max_score": "4",
+       "method": null,
+       "part_id": "c1",
+       "score": null,
+       "status": "pending_review"
+      },
+      {
+       "detail": {
+        "required": true,
+        "text": "推导过程正确"
+       },
+       "max_score": "3",
+       "method": null,
+       "part_id": "c2",
+       "score": null,
+       "status": "pending_review"
+      },
+      {
+       "detail": {
+        "required": true,
+        "text": "结论正确"
+       },
+       "max_score": "3",
+       "method": null,
+       "part_id": "c3",
+       "score": null,
+       "status": "pending_review"
+      }
+     ],
+     "pending_max_score": "10.00",
+     "question_id": "REF_017",
+     "question_type": "constructed_response",
+     "raw_answer": {
+      "text": "5 × 4 = 20",
+      "type": "constructed_response"
+     },
+     "rubric": {
+      "criteria": [
+       {
+        "criterion_id": "c1",
+        "max_score": "4",
+        "required": true,
+        "text": "正确列出已知条件"
+       },
+       {
+        "criterion_id": "c2",
+        "max_score": "3",
+        "required": true,
+        "text": "推导过程正确"
+       },
+       {
+        "criterion_id": "c3",
+        "max_score": "3",
+        "required": true,
+        "text": "结论正确"
+       }
+      ],
+      "rubric_version_id": "REF_022",
+      "total_score": "10.00"
+     },
+     "session_item_id": "REF_019",
+     "steps": [],
+     "subject_id": "SUBJECT",
+     "submitted_at": "<time>"
+    }
+   ],
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/grading-queue"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "grading queue lists the pending attempt with its rubric"
+  },
+  {
+   "id": "P16",
+   "payload": {
+    "comment": "",
+    "confirmed_score": "6",
+    "estimated_score": null,
+    "grade_event_id": "REF_023",
+    "grader_is_self": true,
+    "grading_revision": 2,
+    "is_correct": false,
+    "is_fully_confirmed": true,
+    "max_score": "10.00",
+    "method": "self_confirmed",
+    "parts": [
+     {
+      "detail": {
+       "comment": "",
+       "text": "正确列出已知条件"
+      },
+      "max_score": "4",
+      "method": "self_confirmed",
+      "part_id": "c1",
+      "score": "0",
+      "status": "confirmed"
+     },
+     {
+      "detail": {
+       "comment": "",
+       "text": "推导过程正确"
+      },
+      "max_score": "3",
+      "method": "self_confirmed",
+      "part_id": "c2",
+      "score": "3",
+      "status": "confirmed"
+     },
+     {
+      "detail": {
+       "comment": "",
+       "text": "结论正确"
+      },
+      "max_score": "3",
+      "method": "self_confirmed",
+      "part_id": "c3",
+      "score": "3",
+      "status": "confirmed"
+     }
+    ],
+    "pending_max_score": "0",
+    "rule_snapshot": {
+     "answer_rule": {},
+     "max_score": "10.00",
+     "question_type": "constructed_response",
+     "spec_rule": {},
+     "spec_version_id": null
+    },
+    "rule_version": "p0-1",
+    "status": "confirmed",
+    "superseded": false
+   },
+   "request": {
+    "idempotency_key": "probe-confirm-1",
+    "json_body": {
+     "expected_grading_revision": 1,
+     "parts": [
+      {
+       "part_id": "c1",
+       "score": "0"
+      },
+      {
+       "part_id": "c2",
+       "score": "3"
+      },
+      {
+       "part_id": "c3",
+       "score": "3"
+      }
+     ],
+     "rubric_version_id": "REF_022"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/CR_ATTEMPT/confirm-grade"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 2,
+    "practice_grade_event": 1
+   },
+   "status": 200,
+   "title": "confirm-grade 8/10 is fully confirmed and not correct"
+  },
+  {
+   "id": "P17",
+   "payload": {
+    "grade": {
+     "comment": "",
+     "confirmed_score": "6.00",
+     "estimated_score": null,
+     "grade_event_id": "REF_023",
+     "grader_is_self": true,
+     "grading_revision": 2,
+     "is_correct": false,
+     "is_fully_confirmed": true,
+     "max_score": "10.00",
+     "method": "self_confirmed",
+     "parts": [
+      {
+       "detail": {
+        "comment": "",
+        "text": "正确列出已知条件"
+       },
+       "max_score": "4",
+       "method": "self_confirmed",
+       "part_id": "c1",
+       "score": "0",
+       "status": "confirmed"
+      },
+      {
+       "detail": {
+        "comment": "",
+        "text": "推导过程正确"
+       },
+       "max_score": "3",
+       "method": "self_confirmed",
+       "part_id": "c2",
+       "score": "3",
+       "status": "confirmed"
+      },
+      {
+       "detail": {
+        "comment": "",
+        "text": "结论正确"
+       },
+       "max_score": "3",
+       "method": "self_confirmed",
+       "part_id": "c3",
+       "score": "3",
+       "status": "confirmed"
+      }
+     ],
+     "pending_max_score": "0.00",
+     "rule_snapshot": {
+      "answer_rule": {},
+      "max_score": "10.00",
+      "question_type": "constructed_response",
+      "spec_rule": {},
+      "spec_version_id": null
+     },
+     "rule_version": "p0-1",
+     "status": "confirmed",
+     "superseded": false
+    }
+   },
+   "request": {
+    "idempotency_key": "probe-confirm-1",
+    "json_body": {
+     "expected_grading_revision": 1,
+     "parts": [
+      {
+       "part_id": "c1",
+       "score": "0"
+      },
+      {
+       "part_id": "c2",
+       "score": "3"
+      },
+      {
+       "part_id": "c3",
+       "score": "3"
+      }
+     ],
+     "rubric_version_id": "REF_022"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/CR_ATTEMPT/confirm-grade"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "the same confirm key replays without a second grade event"
+  },
+  {
+   "id": "P18",
+   "payload": {
+    "error": {
+     "code": "version_conflict",
+     "details": {
+      "actual": 2,
+      "expected": 1
+     },
+     "message": "版本已过期，请重新加载"
+    }
+   },
+   "request": {
+    "idempotency_key": "probe-confirm-2",
+    "json_body": {
+     "expected_grading_revision": 1,
+     "parts": [
+      {
+       "part_id": "c1",
+       "score": "4"
+      }
+     ]
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/attempts/CR_ATTEMPT/confirm-grade"
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "a stale grading revision conflicts"
+  },
+  {
+   "id": "P19",
+   "payload": [],
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/grading-queue"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "a live verification attempt stays out of the grading queue"
+  },
+  {
+   "id": "P20",
+   "payload": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "作答不存在或不在当前权限范围"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/attempts/ATTEMPT"
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "an attempt of another project is a 404"
+  },
+  {
+   "id": "P21",
+   "payload": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "作答不存在或不在当前权限范围"
+    }
+   },
+   "request": {
+    "idempotency_key": "probe-confirm-foreign",
+    "json_body": {
+     "expected_grading_revision": 1,
+     "parts": []
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/OTHER_PROJECT/attempts/CR_ATTEMPT/confirm-grade"
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a foreign attempt cannot be confirmed"
+  },
+  {
+   "id": "P22",
+   "payload": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题项不存在或不在当前权限范围"
+    }
+   },
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/session-items/REF_024/reveal"
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "reveal of an unknown item is a 404"
+  }
+ ],
+ "database": "postgresql (throw-away test database)"
+}

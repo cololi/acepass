@@ -1,0 +1,2989 @@
+{
+ "cases": [
+  {
+   "case": "PLAN-01",
+   "op": "PLAN",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/study-plans/today"
+   },
+   "response": {
+    "backlog": [
+     {
+      "overdue_tasks": 1,
+      "project_id": "PROJECT_A",
+      "project_name": "B8 探针项目A"
+     }
+    ],
+    "notes": [
+     "今日还没有计划：可点击“生成今日计划”"
+    ],
+    "plan": null,
+    "progress_notes": [],
+    "tasks": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "今日计划：还没有计划时是显式空状态"
+  },
+  {
+   "case": "PLAN-02",
+   "op": "PLAN",
+   "request": {
+    "idempotency_key": "plan-generate-1",
+    "json_body": {
+     "refresh": false
+    },
+    "method": "POST",
+    "path": "/api/v1/study-plans/today/generate"
+   },
+   "response": {
+    "backlog": [
+     {
+      "overdue_tasks": 1,
+      "project_id": "PROJECT_A",
+      "project_name": "B8 探针项目A"
+     }
+    ],
+    "notes": [
+     "未指定项目比例：按进行中项目等分",
+     "B8 探针项目B：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目B：仍有 41 分钟未分配（没有能完整容纳的合格题目）",
+     "B8 探针项目A：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目A：仍有 39 分钟未分配（没有能完整容纳的合格题目）"
+    ],
+    "plan": {
+     "allocated_minutes": 10,
+     "allocation": [
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_B",
+       "project_name": "B8 探针项目B"
+      },
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_A",
+       "project_name": "B8 探针项目A"
+      }
+     ],
+     "daily_budget_minutes": 90,
+     "generated_at": "<now>",
+     "plan_date": "<now>",
+     "plan_id": "REF_010",
+     "revision": 1,
+     "rotation_offset": 1,
+     "rule_version": "p0-1",
+     "timezone": "Asia/Shanghai"
+    },
+    "progress_notes": [],
+    "tasks": [
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_at": "<now>",
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "pairing_version": 1,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_DUE",
+      "task_kind": "delayed_verification"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_B",
+      "knowledge_node_name": "专业考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_011",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_012",
+      "task_kind": "general_practice"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_013",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_014",
+      "task_kind": "general_practice"
+     }
+    ]
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 1,
+    "learning_study_plan": 1,
+    "learning_study_task": 4
+   },
+   "status": 200,
+   "title": "今日计划：生成（幂等键）"
+  },
+  {
+   "case": "PLAN-03",
+   "op": "PLAN",
+   "plan_keys": [
+    "allocated_minutes",
+    "allocation",
+    "daily_budget_minutes",
+    "generated_at",
+    "plan_date",
+    "plan_id",
+    "revision",
+    "rotation_offset",
+    "rule_version",
+    "timezone"
+   ],
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/study-plans/today"
+   },
+   "response": {
+    "backlog": [
+     {
+      "overdue_tasks": 1,
+      "project_id": "PROJECT_A",
+      "project_name": "B8 探针项目A"
+     }
+    ],
+    "notes": [
+     "未指定项目比例：按进行中项目等分",
+     "B8 探针项目B：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目B：仍有 41 分钟未分配（没有能完整容纳的合格题目）",
+     "B8 探针项目A：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目A：仍有 39 分钟未分配（没有能完整容纳的合格题目）",
+     "计划核对：<now>，未开始任务 5 个，延迟锚点顺延 0 个"
+    ],
+    "plan": {
+     "allocated_minutes": 10,
+     "allocation": [
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_B",
+       "project_name": "B8 探针项目B"
+      },
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_A",
+       "project_name": "B8 探针项目A"
+      }
+     ],
+     "daily_budget_minutes": 90,
+     "generated_at": "<now>",
+     "plan_date": "<now>",
+     "plan_id": "REF_010",
+     "revision": 1,
+     "rotation_offset": 1,
+     "rule_version": "p0-1",
+     "timezone": "Asia/Shanghai"
+    },
+    "progress_notes": [],
+    "tasks": [
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_at": "<now>",
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "pairing_version": 1,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_DUE",
+      "task_kind": "delayed_verification"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_B",
+      "knowledge_node_name": "专业考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_011",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_012",
+      "task_kind": "general_practice"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_013",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_014",
+      "task_kind": "general_practice"
+     }
+    ]
+   },
+   "row_delta": {},
+   "status": 200,
+   "task_count": 5,
+   "task_keys": [
+    "available_now",
+    "deficit_notice",
+    "delay_anchor_at",
+    "delay_hours",
+    "due_at",
+    "estimated_minutes",
+    "evidence_ids",
+    "knowledge_node_id",
+    "knowledge_node_name",
+    "not_before",
+    "pairing_version",
+    "project_id",
+    "question_id",
+    "question_label",
+    "reason_codes",
+    "status",
+    "subject_id",
+    "task_id",
+    "task_kind"
+   ],
+   "title": "今日计划：GET 形状（plan/tasks/notes/backlog/progress_notes）"
+  },
+  {
+   "case": "PLAN-04",
+   "op": "PLAN",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/study-plans/today"
+   },
+   "response": {
+    "backlog": [
+     {
+      "overdue_tasks": 1,
+      "project_id": "PROJECT_A",
+      "project_name": "B8 探针项目A"
+     }
+    ],
+    "notes": [
+     "未指定项目比例：按进行中项目等分",
+     "B8 探针项目B：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目B：仍有 41 分钟未分配（没有能完整容纳的合格题目）",
+     "B8 探针项目A：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目A：仍有 39 分钟未分配（没有能完整容纳的合格题目）",
+     "计划核对：<now>，未开始任务 5 个，延迟锚点顺延 0 个"
+    ],
+    "plan": {
+     "allocated_minutes": 10,
+     "allocation": [
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_B",
+       "project_name": "B8 探针项目B"
+      },
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_A",
+       "project_name": "B8 探针项目A"
+      }
+     ],
+     "daily_budget_minutes": 90,
+     "generated_at": "<now>",
+     "plan_date": "<now>",
+     "plan_id": "REF_010",
+     "revision": 1,
+     "rotation_offset": 1,
+     "rule_version": "p0-1",
+     "timezone": "Asia/Shanghai"
+    },
+    "progress_notes": [],
+    "tasks": [
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_at": "<now>",
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "pairing_version": 1,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_DUE",
+      "task_kind": "delayed_verification"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_B",
+      "knowledge_node_name": "专业考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_011",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_012",
+      "task_kind": "general_practice"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_013",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_014",
+      "task_kind": "general_practice"
+     }
+    ]
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "今日计划：GET 不改变计划（重复读取）"
+  },
+  {
+   "case": "TASK-01",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/review-tasks"
+   },
+   "response": {
+    "now": "<now>",
+    "rows": [
+     {
+      "anchor_source": "teaching_exposure",
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_now": true,
+      "interval_reason": "",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_DUE",
+      "was_started": false
+     },
+     {
+      "anchor_source": "teaching_exposure",
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_now": false,
+      "interval_reason": "延迟验证需等待：还需约 24.00 小时（锚点 teaching_exposure）",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_WAITING",
+      "was_started": false
+     }
+    ]
+   },
+   "row_delta": {},
+   "row_keys": [
+    "anchor_source",
+    "deficit_notice",
+    "delay_anchor_at",
+    "delay_hours",
+    "due_now",
+    "interval_reason",
+    "knowledge_node_name",
+    "not_before",
+    "question_id",
+    "question_label",
+    "reason_codes",
+    "status",
+    "subject_id",
+    "task_id",
+    "was_started"
+   ],
+   "rows_due": [
+    true,
+    false
+   ],
+   "status": 200,
+   "title": "复习队列：到期与未到期的真实间隔状态"
+  },
+  {
+   "case": "TASK-02",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/review-tasks?only_due=true"
+   },
+   "response": {
+    "now": "<now>",
+    "rows": [
+     {
+      "anchor_source": "teaching_exposure",
+      "deficit_notice": "",
+      "delay_anchor_at": "<now>",
+      "delay_hours": 24,
+      "due_now": true,
+      "interval_reason": "",
+      "knowledge_node_name": "三角形考点",
+      "not_before": "<now>",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "due_delayed_verification",
+       "due_delayed_verification",
+       "delay_24h"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "TASK_DUE",
+      "was_started": false
+     }
+    ]
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "复习队列：only_due=true 只返回可开始的"
+  },
+  {
+   "case": "TASK-03",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/REF_015/review-tasks"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "复习队列：未知项目是 404"
+  },
+  {
+   "case": "TASK-04",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/study-tasks/TASK_DUE"
+   },
+   "response": {
+    "deficit_notice": "",
+    "delay_anchor_at": "<now>",
+    "delay_hours": 24,
+    "estimated_minutes": 2,
+    "evidence_ids": [],
+    "knowledge_node_name": "三角形考点",
+    "memory_card_id": null,
+    "not_before": "<now>",
+    "origin_session_item_id": null,
+    "pairing_id": null,
+    "pairing_version": 1,
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "question_label": "判断A",
+    "reason_codes": [
+     "due_delayed_verification",
+     "due_delayed_verification",
+     "delay_24h"
+    ],
+    "status": "pending",
+    "subject_id": "SUBJECT_A",
+    "task_id": "TASK_DUE",
+    "task_kind": "delayed_verification",
+    "trigger_event": "attempt_graded"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "任务详情：完整字段"
+  },
+  {
+   "case": "TASK-05",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_DUE/start"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "开始任务：缺少幂等键 409"
+  },
+  {
+   "case": "TASK-06",
+   "hint_keys": [
+    "purpose",
+    "question_ids",
+    "subject_id",
+    "task_id"
+   ],
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "start-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_DUE/start"
+   },
+   "response": {
+    "create_session_hint": {
+     "purpose": "delayed_verification",
+     "question_ids": [
+      "QUESTION_A"
+     ],
+     "subject_id": "SUBJECT_A",
+     "task_id": "TASK_DUE"
+    },
+    "delay_status": {
+     "anchor_source": "teaching_exposure",
+     "not_before": "<now>",
+     "reason": "",
+     "recomputed_not_before": null,
+     "required": true,
+     "satisfied": true,
+     "stored_not_before": "<now>"
+    },
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "status": "in_progress",
+    "subject_id": "SUBJECT_A",
+    "task_id": "TASK_DUE"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1
+   },
+   "status": 200,
+   "title": "开始任务：到期任务 200 + create_session_hint"
+  },
+  {
+   "case": "TASK-07",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "start-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_DUE/start"
+   },
+   "response": {
+    "create_session_hint": {
+     "purpose": "delayed_verification",
+     "question_ids": [
+      "QUESTION_A"
+     ],
+     "subject_id": "SUBJECT_A",
+     "task_id": "TASK_DUE"
+    },
+    "delay_status": {
+     "anchor_source": "teaching_exposure",
+     "not_before": "<now>",
+     "reason": "",
+     "recomputed_not_before": null,
+     "required": true,
+     "satisfied": true,
+     "stored_not_before": "<now>"
+    },
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "status": "in_progress",
+    "subject_id": "SUBJECT_A",
+    "task_id": "TASK_DUE"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "开始任务：同键重放同一响应"
+  },
+  {
+   "case": "TASK-08",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "not_before": "<now>"
+    },
+    "message": "延迟验证需等待：还需约 24.00 小时（锚点 teaching_exposure）"
+   },
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "start-waiting",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/start"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "not_before": "<now>"
+     },
+     "message": "延迟验证需等待：还需约 24.00 小时（锚点 teaching_exposure）"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "开始任务：未到期 400 并给出还差多久"
+  },
+  {
+   "case": "TASK-09",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "defer-1",
+    "json_body": {
+     "reason": "user"
+    },
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/defer"
+   },
+   "response": {
+    "reason_codes": [
+     "due_delayed_verification",
+     "delay_24h",
+     "deferred:user"
+    ],
+    "status": "deferred",
+    "task_id": "TASK_WAITING"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1
+   },
+   "status": 200,
+   "title": "顺延任务：写入 deferred:reason"
+  },
+  {
+   "case": "TASK-10",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "tasks.defer:TASK_WAITING"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "defer-1",
+    "json_body": {
+     "reason": "later"
+    },
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/defer"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "tasks.defer:TASK_WAITING"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "顺延任务：同键不同载荷 409"
+  },
+  {
+   "case": "TASK-11",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "skip-1",
+    "json_body": {
+     "reason": "不做了"
+    },
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/skip"
+   },
+   "response": {
+    "status": "skipped",
+    "task_id": "TASK_WAITING"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1
+   },
+   "status": 200,
+   "title": "跳过任务：status=skipped"
+  },
+  {
+   "case": "TASK-12",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "complete-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/complete"
+   },
+   "response": {
+    "note": "未产生作答，因此不计入任何能力证据",
+    "status": "completed",
+    "task_id": "TASK_WAITING"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "完成任务：未产生作答的显式说明"
+  },
+  {
+   "case": "TASK-13",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "complete-2",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/study-tasks/TASK_WAITING/complete"
+   },
+   "response": {
+    "status": "completed",
+    "task_id": "TASK_WAITING"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "完成任务：重复调用不重复写入"
+  },
+  {
+   "case": "TASK-14",
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": "reconcile-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/study-tasks/TASK_DUE/reconcile-delay"
+   },
+   "response": {
+    "delay_status": {
+     "anchor_source": "teaching_exposure",
+     "not_before": "<now>",
+     "reason": "",
+     "recomputed_not_before": null,
+     "required": true,
+     "satisfied": true,
+     "stored_not_before": "<now>"
+    },
+    "reconciled_tasks": 0,
+    "task_id": "TASK_DUE"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "重算间隔：只影响未开始的到期任务"
+  },
+  {
+   "case": "TASK-15",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "任务不存在或不在当前权限范围"
+   },
+   "op": "TASKS",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/study-tasks/REF_015"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "任务不存在或不在当前权限范围"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "任务详情：未知任务是 404"
+  },
+  {
+   "card_keys": [
+    "card_id",
+    "desired_retention",
+    "difficulty",
+    "due_at",
+    "is_suspended",
+    "knowledge_node_id",
+    "knowledge_node_name",
+    "lapses",
+    "last_reviewed_at",
+    "learning_step",
+    "params_version",
+    "phase",
+    "project_id",
+    "question_id",
+    "question_label",
+    "reps",
+    "retrievability",
+    "scheduler_version",
+    "stability",
+    "stem_excerpt",
+    "subject_id",
+    "suspended_reason"
+   ],
+   "case": "MEM-01",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "card-create-1",
+    "json_body": {
+     "question_id": "QUESTION_A"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "desired_retention": 0.9,
+    "difficulty": 0.0,
+    "due_at": "<now>",
+    "is_suspended": false,
+    "knowledge_node_id": "NODE_A",
+    "knowledge_node_name": "三角形考点",
+    "lapses": 0,
+    "last_reviewed_at": null,
+    "learning_step": 0,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "new",
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "question_label": "判断A",
+    "reps": 0,
+    "retrievability": null,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 0.0,
+    "stem_excerpt": "验收判断：三角形内角和为 180 度。",
+    "subject_id": "SUBJECT_A",
+    "suspended_reason": ""
+   },
+   "row_delta": {
+    "memory_card": 1
+   },
+   "status": 201,
+   "title": "记忆卡：首次创建 201"
+  },
+  {
+   "case": "MEM-02",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "card-create-2",
+    "json_body": {
+     "question_id": "QUESTION_A"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "desired_retention": 0.9,
+    "difficulty": 0.0,
+    "due_at": "<now>",
+    "is_suspended": false,
+    "knowledge_node_id": "NODE_A",
+    "knowledge_node_name": "三角形考点",
+    "lapses": 0,
+    "last_reviewed_at": null,
+    "learning_step": 0,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "new",
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "question_label": "判断A",
+    "reps": 0,
+    "retrievability": null,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 0.0,
+    "stem_excerpt": "验收判断：三角形内角和为 180 度。",
+    "subject_id": "SUBJECT_A",
+    "suspended_reason": ""
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "记忆卡：重复创建返回同一张卡（200）"
+  },
+  {
+   "case": "MEM-03",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards"
+   },
+   "response": [
+    {
+     "card_id": "REF_016",
+     "desired_retention": 0.9,
+     "difficulty": 0.0,
+     "due_at": "<now>",
+     "is_suspended": false,
+     "knowledge_node_id": "NODE_A",
+     "knowledge_node_name": "三角形考点",
+     "lapses": 0,
+     "last_reviewed_at": null,
+     "learning_step": 0,
+     "params_version": "fsrs-4.5-default-v1",
+     "phase": "new",
+     "project_id": "PROJECT_A",
+     "question_id": "QUESTION_A",
+     "question_label": "判断A",
+     "reps": 0,
+     "retrievability": null,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "stability": 0.0,
+     "stem_excerpt": "验收判断：三角形内角和为 180 度。",
+     "subject_id": "SUBJECT_A",
+     "suspended_reason": ""
+    }
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "记忆卡：列表（到期优先）"
+  },
+  {
+   "case": "MEM-04",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "review-1",
+    "json_body": {
+     "rating": "good"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "difficulty": 5.1618,
+    "due_at": "<now>",
+    "elapsed_days": 0.0,
+    "interval_days": 0.006944444444444444,
+    "is_lapse": false,
+    "lapses": 0,
+    "log_id": "REF_017",
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "learning",
+    "phase_before": "new",
+    "rating": "good",
+    "reps": 1,
+    "retrievability": 1.0,
+    "reviewed_at": "<now>",
+    "scheduled_days": 0.0,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 3.7145
+   },
+   "review_keys": [
+    "card_id",
+    "difficulty",
+    "due_at",
+    "elapsed_days",
+    "interval_days",
+    "is_lapse",
+    "lapses",
+    "log_id",
+    "params_version",
+    "phase",
+    "phase_before",
+    "rating",
+    "reps",
+    "retrievability",
+    "reviewed_at",
+    "scheduled_days",
+    "scheduler_version",
+    "stability"
+   ],
+   "row_delta": {
+    "memory_review_log": 1
+   },
+   "status": 200,
+   "title": "复习记忆卡：good 排期并写一条日志"
+  },
+  {
+   "case": "MEM-05",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "review-1",
+    "json_body": {
+     "rating": "good"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "difficulty": 5.1618,
+    "due_at": "<now>",
+    "elapsed_days": 0.0,
+    "interval_days": 0.006944444444444444,
+    "is_lapse": false,
+    "lapses": 0,
+    "log_id": "REF_017",
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "learning",
+    "phase_before": "new",
+    "rating": "good",
+    "reps": 1,
+    "retrievability": 1.0,
+    "reviewed_at": "<now>",
+    "scheduled_days": 0.0,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 3.7145
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "复习记忆卡：同键重放同一条日志"
+  },
+  {
+   "case": "MEM-06",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "card_id": "REF_016",
+     "rating": "again",
+     "stored_rating": "good"
+    },
+    "message": "相同幂等键使用了不同的评级"
+   },
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "review-1",
+    "json_body": {
+     "rating": "again"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "card_id": "REF_016",
+      "rating": "again",
+      "stored_rating": "good"
+     },
+     "message": "相同幂等键使用了不同的评级"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "复习记忆卡：同键不同评级 409"
+  },
+  {
+   "case": "MEM-07",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "rating": "good"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "复习记忆卡：缺少幂等键 400"
+  },
+  {
+   "case": "MEM-08",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "allowed": [
+      "again",
+      "hard",
+      "good",
+      "easy"
+     ]
+    },
+    "message": "未知的记忆评级：'perfect'"
+   },
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "review-bad",
+    "json_body": {
+     "rating": "perfect"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "allowed": [
+       "again",
+       "hard",
+       "good",
+       "easy"
+      ]
+     },
+     "message": "未知的记忆评级：'perfect'"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "复习记忆卡：未知评级 400"
+  },
+  {
+   "case": "MEM-09",
+   "log_keys": [],
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/logs"
+   },
+   "response": [
+    {
+     "card_id": "REF_016",
+     "difficulty_after": 5.1618,
+     "difficulty_before": 0.0,
+     "due_after": "<now>",
+     "due_before": "<now>",
+     "elapsed_days": 0.0,
+     "interval_days": 0.006944444444444444,
+     "is_lapse": false,
+     "log_id": "REF_017",
+     "note": "",
+     "params_version": "fsrs-4.5-default-v1",
+     "phase_after": "learning",
+     "phase_before": "new",
+     "rating": "good",
+     "retrievability": 1.0,
+     "reviewed_at": "<now>",
+     "scheduled_days": 0.0,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "source_session_item_id": null,
+     "stability_after": 3.7145,
+     "stability_before": 0.0
+    }
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "复习日志：最新在前"
+  },
+  {
+   "case": "MEM-10",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "rebuild-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/rebuild"
+   },
+   "response": {
+    "compared_fields": [
+     "phase",
+     "stability",
+     "difficulty",
+     "reps",
+     "lapses",
+     "learning_step",
+     "due_at",
+     "last_reviewed_at",
+     "scheduler_version",
+     "params_version"
+    ],
+    "differing_fields": [],
+    "log_count": 1,
+    "matches": true,
+    "rebuilt": {
+     "difficulty": 5.1618,
+     "due_at": "<now>",
+     "lapses": 0,
+     "last_reviewed_at": "<now>",
+     "learning_step": 1,
+     "params_version": "fsrs-4.5-default-v1",
+     "phase": "learning",
+     "reps": 1,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "stability": 3.7145
+    },
+    "stored": {
+     "difficulty": 5.1618,
+     "due_at": "<now>",
+     "lapses": 0,
+     "last_reviewed_at": "<now>",
+     "learning_step": 1,
+     "params_version": "fsrs-4.5-default-v1",
+     "phase": "learning",
+     "reps": 1,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "stability": 3.7145
+    },
+    "unknown_params_versions": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "重放校验：一致"
+  },
+  {
+   "case": "MEM-11",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "rebuild-2",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/rebuild"
+   },
+   "response": {
+    "compared_fields": [
+     "phase",
+     "stability",
+     "difficulty",
+     "reps",
+     "lapses",
+     "learning_step",
+     "due_at",
+     "last_reviewed_at",
+     "scheduler_version",
+     "params_version"
+    ],
+    "differing_fields": [
+     "due_at"
+    ],
+    "log_count": 1,
+    "matches": false,
+    "rebuilt": {
+     "difficulty": 5.1618,
+     "due_at": "<now>",
+     "lapses": 0,
+     "last_reviewed_at": "<now>",
+     "learning_step": 1,
+     "params_version": "fsrs-4.5-default-v1",
+     "phase": "learning",
+     "reps": 1,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "stability": 3.7145
+    },
+    "stored": {
+     "difficulty": 5.1618,
+     "due_at": "<now>",
+     "lapses": 0,
+     "last_reviewed_at": "<now>",
+     "learning_step": 1,
+     "params_version": "fsrs-4.5-default-v1",
+     "phase": "learning",
+     "reps": 1,
+     "scheduler_version": "fsrs-4.5-default-v1",
+     "stability": 3.7145
+    },
+    "unknown_params_versions": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "重放校验：手改卡片行被检出不一致"
+  },
+  {
+   "case": "MEM-12",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "suspend-1",
+    "json_body": {
+     "reason": "换教材，先停"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/suspend"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "desired_retention": 0.9,
+    "difficulty": 5.1618,
+    "due_at": "<now>",
+    "is_suspended": true,
+    "knowledge_node_id": "NODE_A",
+    "knowledge_node_name": "三角形考点",
+    "lapses": 0,
+    "last_reviewed_at": "<now>",
+    "learning_step": 1,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "learning",
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "question_label": "判断A",
+    "reps": 1,
+    "retrievability": 1.0,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 3.7145,
+    "stem_excerpt": "验收判断：三角形内角和为 180 度。",
+    "subject_id": "SUBJECT_A",
+    "suspended_reason": "换教材，先停"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "暂停记忆卡：排期保留"
+  },
+  {
+   "case": "MEM-13",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards"
+   },
+   "response": [],
+   "row_delta": {},
+   "status": 200,
+   "title": "暂停后列表默认不返回"
+  },
+  {
+   "case": "MEM-14",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "卡片已暂停，恢复后才能复习"
+   },
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "review-suspended",
+    "json_body": {
+     "rating": "good"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/review"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "卡片已暂停，恢复后才能复习"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "暂停后复习 400"
+  },
+  {
+   "case": "MEM-15",
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "resume-1",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_016/resume"
+   },
+   "response": {
+    "card_id": "REF_016",
+    "desired_retention": 0.9,
+    "difficulty": 5.1618,
+    "due_at": "<now>",
+    "is_suspended": false,
+    "knowledge_node_id": "NODE_A",
+    "knowledge_node_name": "三角形考点",
+    "lapses": 0,
+    "last_reviewed_at": "<now>",
+    "learning_step": 1,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "learning",
+    "project_id": "PROJECT_A",
+    "question_id": "QUESTION_A",
+    "question_label": "判断A",
+    "reps": 1,
+    "retrievability": 1.0,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 3.7145,
+    "stem_excerpt": "验收判断：三角形内角和为 180 度。",
+    "subject_id": "SUBJECT_A",
+    "suspended_reason": ""
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "恢复记忆卡：不重设到期"
+  },
+  {
+   "case": "MEM-16",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "记忆卡不存在或不属于该项目"
+   },
+   "op": "MEMORY",
+   "request": {
+    "idempotency_key": "resume-missing",
+    "json_body": null,
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/memory-cards/REF_015/resume"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "记忆卡不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "记忆卡：未知卡 404"
+  },
+  {
+   "case": "SEARCH-01",
+   "op": "SEARCH",
+   "reindex_keys": [
+    "documents_in_index",
+    "documents_total",
+    "embedding_model",
+    "embedding_unavailable_reason",
+    "embeddings",
+    "excluded",
+    "indexed",
+    "project_id",
+    "subject_id",
+    "tokenizer_version"
+   ],
+   "request": {
+    "idempotency_key": "reindex-1",
+    "json_body": {
+     "subject_id": "SUBJECT_A"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/search/reindex"
+   },
+   "response": {
+    "documents_in_index": 2,
+    "documents_total": 2,
+    "embedding_model": null,
+    "embedding_unavailable_reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+    "embeddings": 0,
+    "excluded": 0,
+    "indexed": 2,
+    "project_id": "PROJECT_A",
+    "subject_id": "SUBJECT_A",
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "search_document": 2
+   },
+   "status": 200,
+   "title": "重建索引：收录题目版本与考点"
+  },
+  {
+   "case": "SEARCH-02",
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": "reindex-1",
+    "json_body": {
+     "subject_id": "SUBJECT_A"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/search/reindex"
+   },
+   "response": {
+    "documents_in_index": 2,
+    "documents_total": 2,
+    "embedding_model": null,
+    "embedding_unavailable_reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+    "embeddings": 0,
+    "excluded": 0,
+    "indexed": 2,
+    "project_id": "PROJECT_A",
+    "subject_id": "SUBJECT_A",
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "重建索引：同键重放同一报告"
+  },
+  {
+   "case": "SEARCH-03",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "search.reindex:PROJECT_A"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": "reindex-1",
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/search/reindex"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "search.reindex:PROJECT_A"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "重建索引：同键不同科目 409"
+  },
+  {
+   "case": "SEARCH-04",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/search/reindex"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "重建索引：缺少幂等键 409"
+  },
+  {
+   "case": "SEARCH-05",
+   "channels": {
+    "keyword": {
+     "available": true,
+     "b": 0.75,
+     "documents_scored": 2,
+     "hits": 2,
+     "k1": 1.2,
+     "reason": null,
+     "requested": true,
+     "used": true
+    },
+    "vector": {
+     "available": false,
+     "compared": 0,
+     "dimension": null,
+     "documents_with_embeddings": 0,
+     "hits": 0,
+     "is_stub": false,
+     "model": null,
+     "provider": "none",
+     "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+     "requested": true,
+     "skipped_missing_embedding": 0,
+     "skipped_non_positive": 0,
+     "skipped_vector_mismatch": 0,
+     "used": false
+    }
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&limit=10&channel=hybrid"
+   },
+   "response": {
+    "candidate_documents": 2,
+    "channel": "hybrid",
+    "channels": {
+     "keyword": {
+      "available": true,
+      "b": 0.75,
+      "documents_scored": 2,
+      "hits": 2,
+      "k1": 1.2,
+      "reason": null,
+      "requested": true,
+      "used": true
+     },
+     "vector": {
+      "available": false,
+      "compared": 0,
+      "dimension": null,
+      "documents_with_embeddings": 0,
+      "hits": 0,
+      "is_stub": false,
+      "model": null,
+      "provider": "none",
+      "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+      "requested": true,
+      "skipped_missing_embedding": 0,
+      "skipped_non_positive": 0,
+      "skipped_vector_mismatch": 0,
+      "used": false
+     }
+    },
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "limit": 10,
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "project_id": "PROJECT_A",
+    "query": "三角形内角和",
+    "query_tokens": [
+     "三",
+     "角",
+     "形",
+     "内",
+     "和",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "判断A",
+      "document_id": "REF_018",
+      "excerpt": "验收判断：三角形内角和为 180 度。",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 3.804976,
+      "kind": "question",
+      "knowledge_node_id": null,
+      "matched_terms": [
+       "三",
+       "三角",
+       "内",
+       "内角",
+       "和",
+       "形",
+       "形内",
+       "角",
+       "角和",
+       "角形"
+      ],
+      "question_id": "QUESTION_A",
+      "question_version_id": "REF_019",
+      "subject_id": "SUBJECT_A",
+      "vector_rank": null,
+      "vector_score": null
+     },
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "三角形考点",
+      "document_id": "REF_020",
+      "excerpt": "三角形考点",
+      "fused_score": 0.016129,
+      "keyword_rank": 2,
+      "keyword_score": 1.100383,
+      "kind": "node",
+      "knowledge_node_id": "NODE_A",
+      "matched_terms": [
+       "三",
+       "三角",
+       "形",
+       "角",
+       "角形"
+      ],
+      "question_id": null,
+      "question_version_id": null,
+      "subject_id": "SUBJECT_A",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "subject_id": null,
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "result_keys": [
+    "channels",
+    "display_label",
+    "document_id",
+    "excerpt",
+    "fused_score",
+    "keyword_rank",
+    "keyword_score",
+    "kind",
+    "knowledge_node_id",
+    "matched_terms",
+    "question_id",
+    "question_version_id",
+    "subject_id",
+    "vector_rank",
+    "vector_score"
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "检索：混合通道命中题干，向量通道明示未配置",
+   "top": {
+    "display_label": "判断A",
+    "keyword_rank": 1,
+    "kind": "question",
+    "matched_terms": [
+     "三",
+     "三角",
+     "内",
+     "内角",
+     "和",
+     "形",
+     "形内",
+     "角",
+     "角和",
+     "角形"
+    ],
+    "vector_rank": null
+   }
+  },
+  {
+   "case": "SEARCH-06",
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&channel=keyword"
+   },
+   "response": {
+    "candidate_documents": 2,
+    "channel": "keyword",
+    "channels": {
+     "keyword": {
+      "available": true,
+      "b": 0.75,
+      "documents_scored": 2,
+      "hits": 2,
+      "k1": 1.2,
+      "reason": null,
+      "requested": true,
+      "used": true
+     },
+     "vector": {
+      "available": false,
+      "compared": 0,
+      "dimension": null,
+      "documents_with_embeddings": 0,
+      "hits": 0,
+      "is_stub": false,
+      "model": null,
+      "provider": "none",
+      "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+      "requested": false,
+      "skipped_missing_embedding": 0,
+      "skipped_non_positive": 0,
+      "skipped_vector_mismatch": 0,
+      "used": false
+     }
+    },
+    "fusion": null,
+    "limit": 10,
+    "notes": [],
+    "project_id": "PROJECT_A",
+    "query": "三角形内角和",
+    "query_tokens": [
+     "三",
+     "角",
+     "形",
+     "内",
+     "和",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "判断A",
+      "document_id": "REF_018",
+      "excerpt": "验收判断：三角形内角和为 180 度。",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 3.804976,
+      "kind": "question",
+      "knowledge_node_id": null,
+      "matched_terms": [
+       "三",
+       "三角",
+       "内",
+       "内角",
+       "和",
+       "形",
+       "形内",
+       "角",
+       "角和",
+       "角形"
+      ],
+      "question_id": "QUESTION_A",
+      "question_version_id": "REF_019",
+      "subject_id": "SUBJECT_A",
+      "vector_rank": null,
+      "vector_score": null
+     },
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "三角形考点",
+      "document_id": "REF_020",
+      "excerpt": "三角形考点",
+      "fused_score": 0.016129,
+      "keyword_rank": 2,
+      "keyword_score": 1.100383,
+      "kind": "node",
+      "knowledge_node_id": "NODE_A",
+      "matched_terms": [
+       "三",
+       "三角",
+       "形",
+       "角",
+       "角形"
+      ],
+      "question_id": null,
+      "question_version_id": null,
+      "subject_id": "SUBJECT_A",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "subject_id": null,
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "检索：关键词通道单独可用"
+  },
+  {
+   "case": "SEARCH-07",
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&channel=vector"
+   },
+   "response": {
+    "candidate_documents": 2,
+    "channel": "vector",
+    "channels": {
+     "keyword": {
+      "available": true,
+      "b": 0.75,
+      "documents_scored": 2,
+      "hits": 0,
+      "k1": 1.2,
+      "reason": null,
+      "requested": false,
+      "used": false
+     },
+     "vector": {
+      "available": false,
+      "compared": 0,
+      "dimension": null,
+      "documents_with_embeddings": 0,
+      "hits": 0,
+      "is_stub": false,
+      "model": null,
+      "provider": "none",
+      "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+      "requested": true,
+      "skipped_missing_embedding": 0,
+      "skipped_non_positive": 0,
+      "skipped_vector_mismatch": 0,
+      "used": false
+     }
+    },
+    "fusion": null,
+    "limit": 10,
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+     "已请求仅向量通道，但该通道没有可用结果，因此 results 为空：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "project_id": "PROJECT_A",
+    "query": "三角形内角和",
+    "query_tokens": [
+     "三",
+     "角",
+     "形",
+     "内",
+     "和",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和"
+    ],
+    "results": [],
+    "subject_id": null,
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "检索：仅向量通道 200 且结果为空"
+  },
+  {
+   "case": "SEARCH-08",
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=&limit=10&channel=hybrid"
+   },
+   "response": {
+    "candidate_documents": 2,
+    "channel": "hybrid",
+    "channels": {
+     "keyword": {
+      "available": true,
+      "b": 0.75,
+      "documents_scored": 2,
+      "hits": 0,
+      "k1": 1.2,
+      "reason": "查询为空或只包含标点，未产生检索词",
+      "requested": true,
+      "used": false
+     },
+     "vector": {
+      "available": false,
+      "compared": 0,
+      "dimension": null,
+      "documents_with_embeddings": 0,
+      "hits": 0,
+      "is_stub": false,
+      "model": null,
+      "provider": "none",
+      "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+      "requested": true,
+      "skipped_missing_embedding": 0,
+      "skipped_non_positive": 0,
+      "skipped_vector_mismatch": 0,
+      "used": false
+     }
+    },
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "limit": 10,
+    "notes": [
+     "查询为空或只包含标点，未产生检索词，因此没有结果。",
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "project_id": "PROJECT_A",
+    "query": "",
+    "query_tokens": [],
+    "results": [],
+    "subject_id": null,
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "检索：空查询 200 并说明没有检索词"
+  },
+  {
+   "case": "SEARCH-09",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "allowed": [
+      "keyword",
+      "vector",
+      "hybrid"
+     ],
+     "channel": "fuzzy"
+    },
+    "message": "检索通道无效"
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&channel=fuzzy"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "allowed": [
+       "keyword",
+       "vector",
+       "hybrid"
+      ],
+      "channel": "fuzzy"
+     },
+     "message": "检索通道无效"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "检索：无效通道 400"
+  },
+  {
+   "case": "SEARCH-10",
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": "reindex-b",
+    "json_body": {
+     "subject_id": "SUBJECT_B"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_B/search/reindex"
+   },
+   "response": {
+    "documents_in_index": 2,
+    "documents_total": 2,
+    "embedding_model": null,
+    "embedding_unavailable_reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+    "embeddings": 0,
+    "excluded": 0,
+    "indexed": 2,
+    "project_id": "PROJECT_B",
+    "subject_id": "SUBJECT_B",
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "search_document": 2
+   },
+   "status": 200,
+   "title": "重建索引：项目B"
+  },
+  {
+   "case": "SEARCH-11",
+   "contains_project_a_question": false,
+   "contains_project_b_question": true,
+   "op": "SEARCH",
+   "question_ids": [
+    "QUESTION_B"
+   ],
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_B/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&limit=10"
+   },
+   "response": {
+    "candidate_documents": 2,
+    "channel": "hybrid",
+    "channels": {
+     "keyword": {
+      "available": true,
+      "b": 0.75,
+      "documents_scored": 2,
+      "hits": 1,
+      "k1": 1.2,
+      "reason": null,
+      "requested": true,
+      "used": true
+     },
+     "vector": {
+      "available": false,
+      "compared": 0,
+      "dimension": null,
+      "documents_with_embeddings": 0,
+      "hits": 0,
+      "is_stub": false,
+      "model": null,
+      "provider": "none",
+      "reason": "未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。",
+      "requested": true,
+      "skipped_missing_embedding": 0,
+      "skipped_non_positive": 0,
+      "skipped_vector_mismatch": 0,
+      "used": false
+     }
+    },
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "limit": 10,
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "project_id": "PROJECT_B",
+    "query": "三角形内角和",
+    "query_tokens": [
+     "三",
+     "角",
+     "形",
+     "内",
+     "和",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "判断B",
+      "document_id": "REF_021",
+      "excerpt": "验收判断：三角形内角和为 180 度。",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 5.980875,
+      "kind": "question",
+      "knowledge_node_id": null,
+      "matched_terms": [
+       "三",
+       "三角",
+       "内",
+       "内角",
+       "和",
+       "形",
+       "形内",
+       "角",
+       "角和",
+       "角形"
+      ],
+      "question_id": "QUESTION_B",
+      "question_version_id": "REF_022",
+      "subject_id": "SUBJECT_B",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "subject_id": null,
+    "tokenizer_version": "zh-char-ngram-v1"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "检索：项目B同样题干只返回B自己的文档"
+  },
+  {
+   "case": "SEARCH-12",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "科目不存在或不属于该项目"
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/search?q=%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E8%A7%92%E5%92%8C&subject_id=SUBJECT_B"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "科目不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "检索：跨项目科目 404"
+  },
+  {
+   "case": "SEARCH-13",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "op": "SEARCH",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/REF_015/search?q=x"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "检索：未知项目 404"
+  },
+  {
+   "case": "EXP-01",
+   "op": "EXPOSURE",
+   "payload_keys": [
+    "exclusion_reasons",
+    "first_seen_at",
+    "question_id",
+    "reasons",
+    "seen",
+    "sources",
+    "strict_independent_eligible"
+   ],
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_A/exposure"
+   },
+   "response": {
+    "exclusion_reasons": [
+     {
+      "code": "explanation_delivered",
+      "evidence": {
+       "evidence_id": "REF_023",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "explanation_delivered",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本题已下发过讲解，不能作为严格独立首次接触证据"
+     }
+    ],
+    "first_seen_at": "<now>",
+    "question_id": "QUESTION_A",
+    "reasons": [
+     "explanation_delivered"
+    ],
+    "seen": true,
+    "sources": [
+     "exposure_event:explanation_delivered"
+    ],
+    "strict_independent_eligible": false
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "暴露台账：未暴露的题目"
+  },
+  {
+   "case": "EXP-02",
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": "external-seen-1",
+    "json_body": {
+     "note": "我在别处做过这张卷子",
+     "seen": true
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_A/external-seen"
+   },
+   "response": {
+    "exclusion_reasons": [
+     {
+      "code": "external_seen",
+      "evidence": {
+       "evidence_id": "REF_024",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "external_seen",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本人已声明在系统外见过本题（声明不可撤销，不能重新标为严格未见）"
+     },
+     {
+      "code": "explanation_delivered",
+      "evidence": {
+       "evidence_id": "REF_023",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "explanation_delivered",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本题已下发过讲解，不能作为严格独立首次接触证据"
+     }
+    ],
+    "first_seen_at": "<now>",
+    "question_id": "QUESTION_A",
+    "reasons": [
+     "external_seen",
+     "explanation_delivered"
+    ],
+    "seen": true,
+    "sources": [
+     "exposure_event:explanation_delivered",
+     "exposure_event:external_seen"
+    ],
+    "strict_independent_eligible": false
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "practice_exposure_event": 1
+   },
+   "status": 201,
+   "title": "暴露台账：外部已见声明 201"
+  },
+  {
+   "case": "EXP-03",
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": "external-seen-1",
+    "json_body": {
+     "note": "我在别处做过这张卷子",
+     "seen": true
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_A/external-seen"
+   },
+   "response": {
+    "exclusion_reasons": [
+     {
+      "code": "external_seen",
+      "evidence": {
+       "evidence_id": "REF_024",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "external_seen",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本人已声明在系统外见过本题（声明不可撤销，不能重新标为严格未见）"
+     },
+     {
+      "code": "explanation_delivered",
+      "evidence": {
+       "evidence_id": "REF_023",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "explanation_delivered",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本题已下发过讲解，不能作为严格独立首次接触证据"
+     }
+    ],
+    "first_seen_at": "<now>",
+    "question_id": "QUESTION_A",
+    "reasons": [
+     "external_seen",
+     "explanation_delivered"
+    ],
+    "seen": true,
+    "sources": [
+     "exposure_event:explanation_delivered",
+     "exposure_event:external_seen"
+    ],
+    "strict_independent_eligible": false
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "暴露台账：同键重放同一声明"
+  },
+  {
+   "case": "EXP-04",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "questions.external-seen:QUESTION_A"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": "external-seen-1",
+    "json_body": {
+     "note": "改主意",
+     "seen": false
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_A/external-seen"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "questions.external-seen:QUESTION_A"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "暴露台账：同键不同载荷 409"
+  },
+  {
+   "case": "EXP-05",
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_A/exposure"
+   },
+   "response": {
+    "exclusion_reasons": [
+     {
+      "code": "external_seen",
+      "evidence": {
+       "evidence_id": "REF_024",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "external_seen",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本人已声明在系统外见过本题（声明不可撤销，不能重新标为严格未见）"
+     },
+     {
+      "code": "explanation_delivered",
+      "evidence": {
+       "evidence_id": "REF_023",
+       "evidence_type": "exposure_event",
+       "exposure_kind": "explanation_delivered",
+       "project_id": "PROJECT_A",
+       "question_id": "QUESTION_A",
+       "server_time": "<now>",
+       "session_item_id": null
+      },
+      "message": "本题已下发过讲解，不能作为严格独立首次接触证据"
+     }
+    ],
+    "first_seen_at": "<now>",
+    "question_id": "QUESTION_A",
+    "reasons": [
+     "external_seen",
+     "explanation_delivered"
+    ],
+    "seen": true,
+    "sources": [
+     "exposure_event:explanation_delivered",
+     "exposure_event:external_seen"
+    ],
+    "strict_independent_eligible": false
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "暴露台账：声明后读取 seen=true 且不再是严格独立"
+  },
+  {
+   "case": "EXP-06",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题目不存在或不属于该项目"
+   },
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/questions/REF_015/exposure"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题目不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "暴露台账：未知题目 404"
+  },
+  {
+   "case": "EXP-07",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题目不存在或不属于该项目"
+   },
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_A/questions/QUESTION_B/exposure"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题目不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "暴露台账：别项目的题目 404"
+  },
+  {
+   "case": "EXP-08",
+   "op": "EXPOSURE",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT_B/questions/QUESTION_B/exposure"
+   },
+   "response": {
+    "exclusion_reasons": [],
+    "first_seen_at": null,
+    "question_id": "QUESTION_B",
+    "reasons": [],
+    "seen": false,
+    "sources": [],
+    "strict_independent_eligible": true
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "暴露台账：未声明过的题目仍是严格独立"
+  },
+  {
+   "case": "PLAN-05",
+   "op": "PLAN",
+   "request": {
+    "idempotency_key": "plan-generate-2",
+    "json_body": {
+     "refresh": true
+    },
+    "method": "POST",
+    "path": "/api/v1/study-plans/today/generate"
+   },
+   "response": {
+    "backlog": [],
+    "notes": [
+     "未指定项目比例：按进行中项目等分",
+     "B8 探针项目B：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目B：仍有 41 分钟未分配（没有能完整容纳的合格题目）",
+     "B8 探针项目A：未诊断内容预留 9 分钟，本日实际安排 2 分钟（无更多合格未诊断题）",
+     "B8 探针项目A：仍有 41 分钟未分配（没有能完整容纳的合格题目）"
+    ],
+    "plan": {
+     "allocated_minutes": 8,
+     "allocation": [
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_B",
+       "project_name": "B8 探针项目B"
+      },
+      {
+       "minutes": 45,
+       "percent": 50.0,
+       "project_id": "PROJECT_A",
+       "project_name": "B8 探针项目A"
+      }
+     ],
+     "daily_budget_minutes": 90,
+     "generated_at": "<now>",
+     "plan_date": "<now>",
+     "plan_id": "REF_025",
+     "revision": 2,
+     "rotation_offset": 1,
+     "rule_version": "p0-1",
+     "timezone": "Asia/Shanghai"
+    },
+    "progress_notes": [],
+    "tasks": [
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_B",
+      "knowledge_node_name": "专业考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_026",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_B",
+      "question_id": "QUESTION_B",
+      "question_label": "判断B",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_B",
+      "task_id": "REF_027",
+      "task_kind": "general_practice"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": "NODE_A",
+      "knowledge_node_name": "三角形考点",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "undiagnosed_node"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_028",
+      "task_kind": "undiagnosed_probe"
+     },
+     {
+      "available_now": true,
+      "deficit_notice": "",
+      "delay_anchor_at": null,
+      "delay_hours": null,
+      "due_at": null,
+      "estimated_minutes": 2,
+      "evidence_ids": [],
+      "knowledge_node_id": null,
+      "knowledge_node_name": "",
+      "not_before": null,
+      "pairing_version": null,
+      "project_id": "PROJECT_A",
+      "question_id": "QUESTION_A",
+      "question_label": "判断A",
+      "reason_codes": [
+       "general_practice"
+      ],
+      "status": "pending",
+      "subject_id": "SUBJECT_A",
+      "task_id": "REF_029",
+      "task_kind": "general_practice"
+     }
+    ]
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_outbox_event": 1,
+    "learning_study_plan": 1,
+    "learning_study_task": 4
+   },
+   "status": 200,
+   "title": "今日计划：刷新生成新修订（未开始任务被新修订替换）"
+  }
+ ],
+ "environment": {
+  "clock": "seed timestamps derive from build time; service-written instants are scrubbed to <now>",
+  "database": "postgresql (throw-away test database)",
+  "django_settings": "config.settings.test",
+  "routes": "real Ninja router via django.test.Client",
+  "vector_channel": "no embedding provider configured (AI_PROVIDER=stub has no embeddings)"
+ },
+ "generated_by": "dsh-plugin/scripts/probe_b8_learning.py",
+ "schema_version": 1
+}

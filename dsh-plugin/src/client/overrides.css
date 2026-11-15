@@ -1,0 +1,25 @@
+/*
+ * DSH shell integration.
+ *
+ * `app.css` is fully scoped to `.acepass-root` and resolves every colour from the
+ * shell's `--dsw-*` tokens, so light / dark / system (and third-party DSH themes)
+ * apply without a panel palette. This file only pins the panel to the shell's
+ * slot geometry; nothing here may target a shell element.
+ */
+.acepass-root {
+  height: 100%;
+  overflow: auto;
+  background: var(--ap-bg);
+  color: var(--ap-text);
+}
+
+.acepass-root .app {
+  min-height: 100%;
+}
+
+/* The top bar must stay reachable while the panel's own scroller moves. */
+.acepass-root .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}

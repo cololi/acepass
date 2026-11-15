@@ -1,0 +1,2530 @@
+{
+ "cases": [
+  {
+   "case": "P01",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {
+     "error_code": "ai_not_configured"
+    },
+    "message": "生成变式需要配置 AI 能力：未配置可生成变式的文本模型；请配置 provider 或人工录入变式"
+   },
+   "jobs_after": 0,
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-no-provider",
+    "json_body": {
+     "count": 1,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {
+      "error_code": "ai_not_configured"
+     },
+     "message": "生成变式需要配置 AI 能力：未配置可生成变式的文本模型；请配置 provider 或人工录入变式"
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "runs": [
+    {
+     "attempts": 1,
+     "capability": "propose_variant",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "error_code": "ai_not_configured",
+     "error_message": "当前 provider 不声明 propose_variant 能力（未配置文本模型）",
+     "input_snapshot": {
+      "avoid_stem_count": 1,
+      "content_digest": "7a835bb3ee743f4da6f86ac998cff54a892fb81e5f154150eb956d3717c66c0b",
+      "engine": "p2-propose-variant-v1"
+     },
+     "is_stub": false,
+     "latency_ms": null,
+     "model_identifier": "",
+     "prompt_tokens": null,
+     "prompt_version": "p2-propose-variant-v1",
+     "provider": "none",
+     "request_summary": {
+      "difficulty_note": "",
+      "node_id": "NODE",
+      "question_type": "single_choice",
+      "requested_count": 1,
+      "source_question_version_id": "VERSION",
+      "subject_id": "SUBJECT"
+     },
+     "status": "unavailable",
+     "validation_keys": []
+    }
+   ],
+   "status": 503,
+   "title": "no provider: one unavailable run, no job"
+  },
+  {
+   "case": "P02",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "必须提供 source_question_id 或 source_version_id"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-no-source",
+    "json_body": {
+     "node_id": "NODE"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "必须提供 source_question_id 或 source_version_id"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "neither source id is a 400"
+  },
+  {
+   "case": "P03",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "count 必须至少为 1"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-count",
+    "json_body": {
+     "count": 0,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "count 必须至少为 1"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "count=0 is a 400"
+  },
+  {
+   "case": "P04",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "源题目版本不存在或不属于该项目"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-src",
+    "json_body": {
+     "node_id": "NODE",
+     "source_version_id": "REF_012"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "源题目版本不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "unknown source version is a 404"
+  },
+  {
+   "case": "P05",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考点不存在或不属于该项目"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-node",
+    "json_body": {
+     "node_id": "REF_012",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考点不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "unknown node is a 404"
+  },
+  {
+   "case": "P06",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "只能从已发布的题目版本生成变式：草稿内容还没有经过人工发布"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-draft",
+    "json_body": {
+     "node_id": "NODE",
+     "source_version_id": "DRAFT_VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "只能从已发布的题目版本生成变式：草稿内容还没有经过人工发布"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a draft version cannot be a source"
+  },
+  {
+   "case": "P07",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "共享材料题不能生成变式；请选择它的子题作为源题"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-material",
+    "json_body": {
+     "node_id": "NODE",
+     "source_version_id": "MATERIAL_VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "共享材料题不能生成变式；请选择它的子题作为源题"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a material cannot be a source"
+  },
+  {
+   "case": "P08",
+   "error_envelope": {
+    "code": "purpose_not_allowed",
+    "details": {
+     "action": "用于生成变式",
+     "question_id": "REF_013",
+     "reason": "sealed_question_policy"
+    },
+    "message": "封存内容不可用于生成变式：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-sealed",
+    "json_body": {
+     "node_id": "NODE",
+     "source_version_id": "SEALED_VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "purpose_not_allowed",
+     "details": {
+      "action": "用于生成变式",
+      "question_id": "REF_013",
+      "reason": "sealed_question_policy"
+     },
+     "message": "封存内容不可用于生成变式：该题已被保留策略（holdout）封存：不参与练习、检索、AI 生成提示、导出与原页预览"
+    }
+   },
+   "row_delta": {},
+   "status": 403,
+   "title": "a sealed question cannot be a source"
+  },
+  {
+   "candidate": {
+    "answer_source_type": "ai_derived",
+    "answer_status_known": false,
+    "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+    "display_label": "AI变式·Q1",
+    "extractor_version": "p2-propose-variant-v1",
+    "id": "REF_015",
+    "is_stub_output": true,
+    "job_id": "REF_014",
+    "needs_manual_structure": null,
+    "practice_max_score": "2.00",
+    "question_type": "single_choice",
+    "review_issue_codes": [
+     "answer_unknown",
+     "no_source_region"
+    ],
+    "review_issues": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "status": "draft",
+    "variant_node_id": "NODE",
+    "variant_of_version_id": "VERSION",
+    "variant_prompt_version": "p2-propose-variant-v1"
+   },
+   "case": "P09",
+   "job": {
+    "extractor_version": "p2-propose-variant-v1",
+    "id": "REF_014",
+    "input_kind": "ai_variant",
+    "input_text": "ai-variant:VERSION:NODE:同考点换数:1",
+    "problems": [
+     {
+      "code": "ai_variant_not_published",
+      "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+      "prompt_version": "p2-propose-variant-v1",
+      "severity": "info",
+      "source_version_id": "VERSION"
+     }
+    ],
+    "status": "awaiting_review"
+   },
+   "op": "O19",
+   "outbox_rows": 0,
+   "request": {
+    "idempotency_key": "b5-ok-1",
+    "json_body": {
+     "count": 1,
+     "difficulty_note": "同考点换数",
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "candidates": [
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_015",
+      "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_014",
+      "llm_run_id": "REF_016",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     }
+    ],
+    "count": 1,
+    "count_capped": false,
+    "is_stub": true,
+    "job_id": "REF_014",
+    "job_status": "awaiting_review",
+    "model": "probe-model",
+    "node_id": "NODE",
+    "node_name": "一元二次方程",
+    "notes": [],
+    "nothing_passed": false,
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     }
+    ],
+    "project_id": "PROJECT",
+    "prompt_version": "p2-propose-variant-v1",
+    "provider": "probe-scripted",
+    "requested_count": 1,
+    "source_question_id": "QUESTION",
+    "source_version_id": "VERSION",
+    "subject_id": "SUBJECT",
+    "validation": {
+     "accepted": 1,
+     "blocking_problem_count": 0,
+     "count": 1,
+     "nothing_passed": false,
+     "rejected": 0,
+     "requested_count": 1
+    }
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "ingestion_import_candidate": 1,
+    "ingestion_import_job": 1
+   },
+   "runs": [
+    {
+     "attempts": 1,
+     "capability": "propose_variant",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "",
+     "error_message": "",
+     "input_snapshot": {
+      "avoid_stem_count": 1,
+      "content_digest": "7a835bb3ee743f4da6f86ac998cff54a892fb81e5f154150eb956d3717c66c0b",
+      "engine": "p2-propose-variant-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p2-propose-variant-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "difficulty_note": "同考点换数",
+      "node_id": "NODE",
+      "question_type": "single_choice",
+      "requested_count": 1,
+      "source_question_version_id": "VERSION",
+      "subject_id": "SUBJECT"
+     },
+     "status": "succeeded",
+     "validation_keys": [
+      "accepted",
+      "content_digest",
+      "independent_problems",
+      "index",
+      "problems",
+      "validation_problems"
+     ]
+    }
+   ],
+   "status": 201,
+   "title": "a valid proposal becomes an awaiting-review candidate"
+  },
+  {
+   "case": "P10",
+   "job_delta": 0,
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-ok-1",
+    "json_body": {
+     "count": 1,
+     "difficulty_note": "同考点换数",
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "candidates": [
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_015",
+      "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_014",
+      "llm_run_id": "REF_016",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     }
+    ],
+    "count": 1,
+    "count_capped": false,
+    "is_stub": true,
+    "job_id": "REF_014",
+    "job_status": "awaiting_review",
+    "model": "probe-model",
+    "node_id": "NODE",
+    "node_name": "一元二次方程",
+    "notes": [],
+    "nothing_passed": false,
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     }
+    ],
+    "project_id": "PROJECT",
+    "prompt_version": "p2-propose-variant-v1",
+    "provider": "probe-scripted",
+    "requested_count": 1,
+    "source_question_id": "QUESTION",
+    "source_version_id": "VERSION",
+    "subject_id": "SUBJECT",
+    "validation": {
+     "accepted": 1,
+     "blocking_problem_count": 0,
+     "count": 1,
+     "nothing_passed": false,
+     "rejected": 0,
+     "requested_count": 1
+    }
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "the same key replays the stored 201"
+  },
+  {
+   "case": "P11",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "variants.propose:PROJECT"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-ok-1",
+    "json_body": {
+     "count": 2,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "variants.propose:PROJECT"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "the same key with another body conflicts"
+  },
+  {
+   "candidate": {
+    "answer_source_type": "ai_derived",
+    "answer_status_known": false,
+    "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+    "display_label": "AI变式·Q1",
+    "extractor_version": "p2-propose-variant-v1",
+    "id": "REF_018",
+    "is_stub_output": true,
+    "job_id": "REF_017",
+    "needs_manual_structure": null,
+    "practice_max_score": "2.00",
+    "question_type": "single_choice",
+    "review_issue_codes": [
+     "answer_unknown",
+     "no_source_region",
+     "duplicate_pending_proposal",
+     "duplicate_candidate"
+    ],
+    "review_issues": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     },
+     {
+      "candidate_id": "REF_015",
+      "code": "duplicate_pending_proposal",
+      "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+      "path": "content",
+      "severity": "blocking"
+     },
+     {
+      "candidate_id": "REF_015",
+      "code": "duplicate_candidate",
+      "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "status": "draft",
+    "variant_node_id": "NODE",
+    "variant_of_version_id": "VERSION",
+    "variant_prompt_version": "p2-propose-variant-v1"
+   },
+   "case": "P12",
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-dup",
+    "json_body": {
+     "count": 1,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "candidates": [
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "candidate_id": "REF_015",
+        "code": "duplicate_pending_proposal",
+        "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "path": "content",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_018",
+      "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_017",
+      "llm_run_id": "REF_019",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       },
+       {
+        "candidate_id": "REF_015",
+        "code": "duplicate_pending_proposal",
+        "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "path": "content",
+        "severity": "blocking"
+       },
+       {
+        "candidate_id": "REF_015",
+        "code": "duplicate_candidate",
+        "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     }
+    ],
+    "count": 1,
+    "count_capped": false,
+    "is_stub": true,
+    "job_id": "REF_017",
+    "job_status": "awaiting_review",
+    "model": "probe-model",
+    "node_id": "NODE",
+    "node_name": "一元二次方程",
+    "notes": [
+     "1 个候选全部未通过校验，已全部保留在候选中等待人工处理：没有任何内容通过校验，因此本次不会发布任何变式。"
+    ],
+    "nothing_passed": true,
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     },
+     {
+      "candidate_id": "REF_015",
+      "code": "duplicate_pending_proposal",
+      "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+      "path": "content",
+      "severity": "blocking"
+     },
+     {
+      "candidate_id": "REF_015",
+      "code": "duplicate_candidate",
+      "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+      "severity": "warning"
+     }
+    ],
+    "project_id": "PROJECT",
+    "prompt_version": "p2-propose-variant-v1",
+    "provider": "probe-scripted",
+    "requested_count": 1,
+    "source_question_id": "QUESTION",
+    "source_version_id": "VERSION",
+    "subject_id": "SUBJECT",
+    "validation": {
+     "accepted": 0,
+     "blocking_problem_count": 1,
+     "count": 1,
+     "nothing_passed": true,
+     "rejected": 1,
+     "requested_count": 1
+    }
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "ingestion_import_candidate": 1,
+    "ingestion_import_job": 1
+   },
+   "status": 201,
+   "title": "a duplicate of the pending candidate is rejected but kept"
+  },
+  {
+   "case": "P13",
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-cap",
+    "json_body": {
+     "count": 5,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "candidates": [
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_021",
+      "content_digest": "c1d78eaf70b2ec8e62a8102d02cfccf27c026c8e02d5eec137a2900f68c6d33c",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_020",
+      "llm_run_id": "REF_022",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     },
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_023",
+      "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_020",
+      "llm_run_id": "REF_024",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     },
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "candidate_id": "REF_023",
+        "code": "duplicate_pending_proposal",
+        "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "path": "content",
+        "severity": "blocking"
+       }
+      ],
+      "candidate_id": "REF_025",
+      "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+      "created_at": "<now>",
+      "is_stub_output": true,
+      "job_id": "REF_020",
+      "llm_run_id": "REF_026",
+      "node_id": "NODE",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [
+       {
+        "code": "answer_unknown",
+        "message": "答案缺失或不确定，不能发布为计分题",
+        "severity": "blocking"
+       },
+       {
+        "code": "no_source_region",
+        "message": "缺少来源区域；题目必须可追溯到原文或原图",
+        "severity": "warning"
+       },
+       {
+        "candidate_id": "REF_023",
+        "code": "duplicate_pending_proposal",
+        "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "path": "content",
+        "severity": "blocking"
+       },
+       {
+        "candidate_id": "REF_023",
+        "code": "duplicate_candidate",
+        "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+        "severity": "warning"
+       }
+      ],
+      "source_question_id": "QUESTION",
+      "source_version_id": "VERSION",
+      "status": "draft"
+     }
+    ],
+    "count": 3,
+    "count_capped": true,
+    "is_stub": true,
+    "job_id": "REF_020",
+    "job_status": "awaiting_review",
+    "model": "probe-model",
+    "node_id": "NODE",
+    "node_name": "一元二次方程",
+    "notes": [
+     "单次最多生成 3 道变式：请求 5 道，已按上限执行 3 道（如需更多请分批提出）。"
+    ],
+    "nothing_passed": false,
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     },
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     },
+     {
+      "code": "answer_unknown",
+      "message": "答案缺失或不确定，不能发布为计分题",
+      "severity": "blocking"
+     },
+     {
+      "code": "no_source_region",
+      "message": "缺少来源区域；题目必须可追溯到原文或原图",
+      "severity": "warning"
+     },
+     {
+      "candidate_id": "REF_023",
+      "code": "duplicate_pending_proposal",
+      "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+      "path": "content",
+      "severity": "blocking"
+     },
+     {
+      "candidate_id": "REF_023",
+      "code": "duplicate_candidate",
+      "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+      "severity": "warning"
+     }
+    ],
+    "project_id": "PROJECT",
+    "prompt_version": "p2-propose-variant-v1",
+    "provider": "probe-scripted",
+    "requested_count": 5,
+    "source_question_id": "QUESTION",
+    "source_version_id": "VERSION",
+    "subject_id": "SUBJECT",
+    "validation": {
+     "accepted": 2,
+     "blocking_problem_count": 1,
+     "count": 3,
+     "nothing_passed": false,
+     "rejected": 1,
+     "requested_count": 5
+    }
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 3,
+    "ingestion_import_candidate": 3,
+    "ingestion_import_job": 1
+   },
+   "run_count": 3,
+   "status": 201,
+   "title": "the batch is capped at three"
+  },
+  {
+   "candidates": [
+    {
+     "answer_source_type": "ai_derived",
+     "answer_status_known": false,
+     "content_digest": "cc6a159f56f56d5b195005a0266f938b46a567d9df8530200417e25aa695ecc8",
+     "display_label": "AI变式·Q1",
+     "extractor_version": "p2-propose-variant-v1",
+     "id": "REF_027",
+     "is_stub_output": true,
+     "job_id": "REF_028",
+     "needs_manual_structure": null,
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "review_issue_codes": [
+      "answer_unknown",
+      "no_source_region"
+     ],
+     "review_issues": [
+      {
+       "code": "answer_unknown",
+       "message": "答案缺失或不确定，不能发布为计分题",
+       "severity": "blocking"
+      },
+      {
+       "code": "no_source_region",
+       "message": "缺少来源区域；题目必须可追溯到原文或原图",
+       "severity": "warning"
+      }
+     ],
+     "revision": 1,
+     "status": "draft",
+     "variant_node_id": "NODE",
+     "variant_of_version_id": "VERSION",
+     "variant_prompt_version": "p2-propose-variant-v1"
+    }
+   ],
+   "case": "P14",
+   "error_envelope": {
+    "code": "dependency_unavailable",
+    "details": {
+     "error_code": "ai_timeout"
+    },
+    "message": "生成变式失败：scripted timeout"
+   },
+   "job": {
+    "last_error": "变式生成失败：scripted timeout",
+    "status": "failed"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-midfail",
+    "json_body": {
+     "count": 2,
+     "node_id": "NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "dependency_unavailable",
+     "details": {
+      "error_code": "ai_timeout"
+     },
+     "message": "生成变式失败：scripted timeout"
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 2,
+    "ingestion_import_candidate": 1,
+    "ingestion_import_job": 1
+   },
+   "runs": [
+    {
+     "attempts": 1,
+     "capability": "propose_variant",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "error_code": "ai_timeout",
+     "error_message": "scripted timeout",
+     "input_snapshot": {
+      "avoid_stem_count": 1,
+      "content_digest": "7a835bb3ee743f4da6f86ac998cff54a892fb81e5f154150eb956d3717c66c0b",
+      "engine": "p2-propose-variant-v1"
+     },
+     "is_stub": true,
+     "latency_ms": null,
+     "model_identifier": "",
+     "prompt_tokens": null,
+     "prompt_version": "p2-propose-variant-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "difficulty_note": "",
+      "node_id": "NODE",
+      "question_type": "single_choice",
+      "requested_count": 2,
+      "source_question_version_id": "VERSION",
+      "subject_id": "SUBJECT"
+     },
+     "status": "timeout",
+     "validation_keys": []
+    },
+    {
+     "attempts": 1,
+     "capability": "propose_variant",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "",
+     "error_message": "",
+     "input_snapshot": {
+      "avoid_stem_count": 1,
+      "content_digest": "7a835bb3ee743f4da6f86ac998cff54a892fb81e5f154150eb956d3717c66c0b",
+      "engine": "p2-propose-variant-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p2-propose-variant-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "difficulty_note": "",
+      "node_id": "NODE",
+      "question_type": "single_choice",
+      "requested_count": 2,
+      "source_question_version_id": "VERSION",
+      "subject_id": "SUBJECT"
+     },
+     "status": "succeeded",
+     "validation_keys": [
+      "accepted",
+      "content_digest",
+      "independent_problems",
+      "index",
+      "problems",
+      "validation_problems"
+     ]
+    }
+   ],
+   "status": 503,
+   "title": "a second-call failure keeps the first candidate and both runs"
+  },
+  {
+   "case": "P15",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考点不存在或不属于该项目"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-foreign-node",
+    "json_body": {
+     "node_id": "OTHER_NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考点不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a node from another project is a 404"
+  },
+  {
+   "case": "P16",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "源题目版本不存在或不属于该项目"
+   },
+   "op": "O19",
+   "request": {
+    "idempotency_key": "b5-foreign-source",
+    "json_body": {
+     "node_id": "OTHER_NODE",
+     "source_version_id": "VERSION"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/OTHER_PROJECT/variants/propose"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "源题目版本不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "a version from another project is a 404"
+  },
+  {
+   "case": "P17",
+   "first_job_candidate_codes": [
+    [
+     "answer_unknown",
+     "no_source_region"
+    ]
+   ],
+   "listed_input_kinds": [
+    "ai_variant"
+   ],
+   "listed_job_count": 4,
+   "op": "O20",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/variants?limit=500"
+   },
+   "response": {
+    "count": 4,
+    "jobs": [
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_027",
+        "content_digest": "cc6a159f56f56d5b195005a0266f938b46a567d9df8530200417e25aa695ecc8",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_028",
+        "llm_run_id": "REF_029",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_028",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "failed",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 3,
+      "candidate_status_counts": {
+       "draft": 3
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_021",
+        "content_digest": "c1d78eaf70b2ec8e62a8102d02cfccf27c026c8e02d5eec137a2900f68c6d33c",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_022",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       },
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_023",
+        "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_024",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       },
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_025",
+        "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_026",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_candidate",
+          "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_020",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       },
+       {
+        "code": "variant_count_capped",
+        "message": "单次最多生成 3 道变式：请求 5 道，已按上限执行 3 道（如需更多请分批提出）。",
+        "severity": "warning"
+       },
+       {
+        "candidate_id": "REF_025",
+        "code": "variant_rejected",
+        "codes": [
+         "duplicate_pending_proposal"
+        ],
+        "message": "第 3 个候选未通过独立校验，已保留为待校对候选：同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "severity": "warning"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_018",
+        "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_017",
+        "llm_run_id": "REF_019",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_candidate",
+          "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_017",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       },
+       {
+        "candidate_id": "REF_018",
+        "code": "variant_rejected",
+        "codes": [
+         "duplicate_pending_proposal"
+        ],
+        "message": "第 1 个候选未通过独立校验，已保留为待校对候选：同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "severity": "warning"
+       },
+       {
+        "code": "no_variant_usable",
+        "message": "1 个候选全部未通过校验，已全部保留在候选中等待人工处理：没有任何内容通过校验，因此本次不会发布任何变式。",
+        "severity": "warning"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_015",
+        "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_014",
+        "llm_run_id": "REF_016",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_014",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     }
+    ],
+    "limit": 50
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "variant jobs are listed newest first"
+  },
+  {
+   "case": "P18",
+   "op": "O20",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/variants?limit=500"
+   },
+   "response": {
+    "count": 4,
+    "jobs": [
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_027",
+        "content_digest": "cc6a159f56f56d5b195005a0266f938b46a567d9df8530200417e25aa695ecc8",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_028",
+        "llm_run_id": "REF_029",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_028",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "failed",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 3,
+      "candidate_status_counts": {
+       "draft": 3
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_021",
+        "content_digest": "c1d78eaf70b2ec8e62a8102d02cfccf27c026c8e02d5eec137a2900f68c6d33c",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_022",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       },
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_023",
+        "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_024",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       },
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_025",
+        "content_digest": "8f4298f5dfc37511d3c6745c439659ff4b893434899c5bc7a6de60c1b5b2ad5e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_020",
+        "llm_run_id": "REF_026",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_023",
+          "code": "duplicate_candidate",
+          "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_020",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       },
+       {
+        "code": "variant_count_capped",
+        "message": "单次最多生成 3 道变式：请求 5 道，已按上限执行 3 道（如需更多请分批提出）。",
+        "severity": "warning"
+       },
+       {
+        "candidate_id": "REF_025",
+        "code": "variant_rejected",
+        "codes": [
+         "duplicate_pending_proposal"
+        ],
+        "message": "第 3 个候选未通过独立校验，已保留为待校对候选：同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "severity": "warning"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_018",
+        "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_017",
+        "llm_run_id": "REF_019",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_pending_proposal",
+          "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+          "path": "content",
+          "severity": "blocking"
+         },
+         {
+          "candidate_id": "REF_015",
+          "code": "duplicate_candidate",
+          "message": "题库中疑似已有相同结构的候选，请确认是否为重复录入",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_017",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       },
+       {
+        "candidate_id": "REF_018",
+        "code": "variant_rejected",
+        "codes": [
+         "duplicate_pending_proposal"
+        ],
+        "message": "第 1 个候选未通过独立校验，已保留为待校对候选：同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+        "severity": "warning"
+       },
+       {
+        "code": "no_variant_usable",
+        "message": "1 个候选全部未通过校验，已全部保留在候选中等待人工处理：没有任何内容通过校验，因此本次不会发布任何变式。",
+        "severity": "warning"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     },
+     {
+      "candidate_count": 1,
+      "candidate_status_counts": {
+       "draft": 1
+      },
+      "candidates": [
+       {
+        "answer_needs_confirmation": true,
+        "answer_source_type": "ai_derived",
+        "awaiting_human_review": true,
+        "blocking_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         }
+        ],
+        "candidate_id": "REF_015",
+        "content_digest": "3002ee2fb168832739ebfe5760c55e7200d145570bd10c4e56b72492989e220e",
+        "created_at": "<now>",
+        "is_stub_output": true,
+        "job_id": "REF_014",
+        "llm_run_id": "REF_016",
+        "node_id": "NODE",
+        "publication_question_id": null,
+        "publication_version_id": null,
+        "question_type": "single_choice",
+        "review_issues": [
+         {
+          "code": "answer_unknown",
+          "message": "答案缺失或不确定，不能发布为计分题",
+          "severity": "blocking"
+         },
+         {
+          "code": "no_source_region",
+          "message": "缺少来源区域；题目必须可追溯到原文或原图",
+          "severity": "warning"
+         }
+        ],
+        "source_question_id": "QUESTION",
+        "source_version_id": "VERSION",
+        "status": "draft"
+       }
+      ],
+      "created_at": "<now>",
+      "extractor_version": "p2-propose-variant-v1",
+      "input_kind": "ai_variant",
+      "job_id": "REF_014",
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选：必须通过确定性校验并由人工核对答案后，才能走原有发布流程。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "VERSION"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "PROJECT",
+      "status": "awaiting_review",
+      "subject_id": "SUBJECT"
+     }
+    ],
+    "limit": 50
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "limit is clamped to 1..50"
+  },
+  {
+   "case": "P19",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "query",
+        "limit"
+       ],
+       "msg": "Input should be a valid integer, unable to parse string as an integer",
+       "type": "int_parsing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "op": "O20",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/variants?limit=abc"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "query",
+         "limit"
+        ],
+        "msg": "Input should be a valid integer, unable to parse string as an integer",
+        "type": "int_parsing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "a non-integer limit is a schema error"
+  },
+  {
+   "case": "P20",
+   "op": "EXTRACT",
+   "outbox_topics": [
+    "ingestion.extract_candidate"
+   ],
+   "response": {
+    "candidate_revision": 1,
+    "extractor_version": "vision-v1",
+    "input_kind": "image_ai",
+    "problems": [
+     {
+      "code": "vision_extraction_queued",
+      "message": "图片已保存为私有来源，已排入视觉识别任务；识别结果仍需人工对照原图校对后才能发布。（当前为测试/演示 stub，输出不代表真实模型识别，必须完整人工核对）",
+      "severity": "warning"
+     }
+    ]
+   },
+   "row_delta": {
+    "audit_outbox_event": 1,
+    "ingestion_import_candidate": 1,
+    "ingestion_import_job": 1
+   },
+   "status": 201,
+   "title": "queueing vision work creates image_ai + one outbox row"
+  },
+  {
+   "candidate_row": {
+    "answer_source_type": null,
+    "answer_status_known": true,
+    "content_digest": null,
+    "display_label": "识别题1",
+    "extractor_version": "vision-v1",
+    "id": "IMAGE_CANDIDATE",
+    "is_stub_output": true,
+    "job_id": "IMAGE_JOB",
+    "needs_manual_structure": true,
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "review_issue_codes": [],
+    "review_issues": [],
+    "revision": 2,
+    "status": "ready",
+    "variant_node_id": null,
+    "variant_of_version_id": null,
+    "variant_prompt_version": null
+   },
+   "case": "P21",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE",
+    "document_id": "DOCUMENT",
+    "import_job_id": "IMAGE_JOB"
+   },
+   "response": {
+    "candidate_answer_status_known": true,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": true,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 2,
+    "job_problem_codes": [
+     "vision_extraction_queued",
+     "vision_extracted_stub"
+    ],
+    "machine_payload_keys": [
+     "extractor",
+     "is_stub_output",
+     "model",
+     "prompt_version",
+     "provider",
+     "raw_excerpt"
+    ],
+    "machine_stale": null,
+    "outbox_status": "pending",
+    "result": "ok",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "",
+     "error_message": "",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE",
+      "document_id": "DOCUMENT",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p0-extract-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "capability": "extract_question",
+      "document_id": "DOCUMENT"
+     },
+     "status": "succeeded",
+     "validation_keys": [
+      "accepted",
+      "problems"
+     ]
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "a valid vision result opens manual proofreading (one succeeded run)"
+  },
+  {
+   "case": "P22",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE_2",
+    "document_id": "DOCUMENT_2",
+    "import_job_id": "IMAGE_JOB_2"
+   },
+   "response": {
+    "candidate_answer_status_known": false,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": false,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 1,
+    "job_problem_codes": [
+     "duplicate_input",
+     "vision_extraction_queued",
+     "vision_extraction_failed"
+    ],
+    "machine_payload_keys": [
+     "answer_payload",
+     "answer_status_known",
+     "content",
+     "display_label",
+     "needs_manual_structure",
+     "question_type"
+    ],
+    "machine_stale": null,
+    "outbox_status": "pending",
+    "result": "invalid_output",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "ai_invalid_output",
+     "error_message": "模型返回的不是有效 JSON",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE_2",
+      "document_id": "DOCUMENT_2",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p0-extract-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "capability": "extract_question"
+     },
+     "status": "rejected",
+     "validation_keys": []
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "invalid model JSON becomes a rejected run, never a crash"
+  },
+  {
+   "case": "P23",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE_2",
+    "document_id": "DOCUMENT_2",
+    "import_job_id": "IMAGE_JOB_2"
+   },
+   "response": {
+    "candidate_answer_status_known": false,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": false,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 1,
+    "job_problem_codes": [
+     "duplicate_input",
+     "vision_extraction_queued",
+     "vision_extraction_failed",
+     "vision_extraction_failed"
+    ],
+    "machine_payload_keys": [
+     "answer_payload",
+     "answer_status_known",
+     "content",
+     "display_label",
+     "needs_manual_structure",
+     "question_type"
+    ],
+    "machine_stale": null,
+    "outbox_status": "pending",
+    "result": "rejected",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "ai_invalid_output",
+     "error_message": "题干不能为空",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE_2",
+      "document_id": "DOCUMENT_2",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p0-extract-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "capability": "extract_question",
+      "document_id": "DOCUMENT_2"
+     },
+     "status": "rejected",
+     "validation_keys": [
+      "accepted",
+      "problems"
+     ]
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "a validator rejection keeps the manual candidate"
+  },
+  {
+   "case": "P24",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE_2",
+    "document_id": "DOCUMENT_2",
+    "import_job_id": "IMAGE_JOB_2"
+   },
+   "response": {
+    "candidate_answer_status_known": false,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": false,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 1,
+    "job_problem_codes": [
+     "duplicate_input",
+     "vision_extraction_queued",
+     "vision_extraction_failed",
+     "vision_extraction_failed",
+     "vision_extraction_failed"
+    ],
+    "machine_payload_keys": [
+     "answer_payload",
+     "answer_status_known",
+     "content",
+     "display_label",
+     "needs_manual_structure",
+     "question_type"
+    ],
+    "machine_stale": null,
+    "outbox_status": "pending",
+    "result": "unavailable",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "error_code": "ai_not_configured",
+     "error_message": "未配置 AI 能力（ACEPASS_AI_PROVIDER=none）",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE_2",
+      "document_id": "DOCUMENT_2",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": false,
+     "latency_ms": null,
+     "model_identifier": "",
+     "prompt_tokens": null,
+     "prompt_version": "p0-extract-v1",
+     "provider": "none",
+     "request_summary": {
+      "capability": "extract_question"
+     },
+     "status": "unavailable",
+     "validation_keys": []
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "an unconfigured provider is an audited manual degradation"
+  },
+  {
+   "case": "P25",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE_3",
+    "document_id": "DOCUMENT_3",
+    "import_job_id": "IMAGE_JOB_3"
+   },
+   "response": {
+    "candidate_answer_status_known": false,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": false,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 2,
+    "job_problem_codes": [
+     "duplicate_input",
+     "vision_extraction_queued",
+     "vision_extracted_stale"
+    ],
+    "machine_payload_keys": [
+     "applied_revision",
+     "extraction_started_revision",
+     "extractor",
+     "is_stub_output",
+     "model",
+     "pending_clean_payload",
+     "prompt_version",
+     "provider",
+     "raw_excerpt",
+     "stale_revision"
+    ],
+    "machine_stale": true,
+    "outbox_status": "pending",
+    "result": "ok",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": 22,
+     "cost_cents": "0.0000",
+     "cost_known": true,
+     "error_code": "",
+     "error_message": "",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE_3",
+      "document_id": "DOCUMENT_3",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": true,
+     "latency_ms": "<latency>",
+     "model_identifier": "probe-model",
+     "prompt_tokens": 11,
+     "prompt_version": "p0-extract-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "capability": "extract_question",
+      "document_id": "DOCUMENT_3"
+     },
+     "status": "succeeded",
+     "validation_keys": [
+      "accepted",
+      "problems"
+     ]
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "a human edit during the call wins; the late result is kept aside"
+  },
+  {
+   "case": "P26",
+   "op": "EXTRACT",
+   "request": {
+    "candidate_id": "IMAGE_CANDIDATE_4",
+    "document_id": "ORPHAN_DOCUMENT",
+    "import_job_id": "IMAGE_JOB_4"
+   },
+   "response": {
+    "candidate_answer_status_known": false,
+    "candidate_extractor_version": "vision-v1",
+    "candidate_is_stub_output": false,
+    "candidate_needs_manual_structure": true,
+    "candidate_revision": 1,
+    "job_problem_codes": [
+     "vision_extraction_queued",
+     "vision_extraction_failed"
+    ],
+    "machine_payload_keys": [
+     "answer_payload",
+     "answer_status_known",
+     "content",
+     "display_label",
+     "needs_manual_structure",
+     "question_type"
+    ],
+    "machine_stale": null,
+    "outbox_status": "pending",
+    "result": "missing_source_image",
+    "run": {
+     "attempts": 1,
+     "capability": "extract_question",
+     "completion_tokens": null,
+     "cost_cents": null,
+     "cost_known": false,
+     "error_code": "missing_source_image",
+     "error_message": "来源文档没有保存原始图片",
+     "input_snapshot": {
+      "candidate_id": "IMAGE_CANDIDATE_4",
+      "document_id": "ORPHAN_DOCUMENT",
+      "extractor_version": "vision-v1"
+     },
+     "is_stub": false,
+     "latency_ms": null,
+     "model_identifier": "",
+     "prompt_tokens": null,
+     "prompt_version": "p0-extract-v1",
+     "provider": "probe-scripted",
+     "request_summary": {
+      "reason": "missing_source_image"
+     },
+     "status": "failed",
+     "validation_keys": []
+    }
+   },
+   "row_delta": {
+    "audit_llm_run": 1
+   },
+   "status": 200,
+   "title": "a document without an asset row is missing_source_image"
+  }
+ ],
+ "database": "postgresql (throw-away test database)"
+}

@@ -1,0 +1,93 @@
+{
+  "name": "@acepass/dsh-plugin",
+  "version": "0.1.0-alpha.1",
+  "description": "AcePass for DeepSeek Harness: exam-score-oriented practice, weak-point repair and learning verification (native Node/TypeScript port).",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "cordis.patch.yml"
+  ],
+  "engines": {
+    "node": ">=24",
+    "dsh": ">=0.2.0-rc.2 <0.3"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/build-client.mjs",
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "golden:fsrs": "../backend/.venv/bin/python scripts/gen_fsrs_golden.py > tests/golden/fsrs.json",
+    "sdk:extract": "node scripts/extract-sdk.mjs",
+    "verify": "npm run typecheck && npm run build && npm test && npm run test:dsh && node scripts/load-smoke.mjs",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.client.json",
+    "smoke": "npm run build && node scripts/load-smoke.mjs",
+    "acceptance:seed": "node scripts/acceptance-seed.mjs",
+    "db:backup": "node scripts/db-backup.mjs",
+    "db:restore": "node scripts/db-restore.mjs",
+    "db:verify": "node scripts/db-restore.mjs --verify-only",
+    "db:reconcile": "node --experimental-strip-types scripts/reconcile_db.mjs",
+    "retire:check": "node scripts/retirement-check.mjs",
+    "test:dsh": "ELECTRON_RUN_AS_NODE=1 \"/Applications/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness\" --test --experimental-strip-types tests/*.test.ts",
+    "golden:expr": "../backend/.venv/bin/python scripts/gen_expr_golden.py > tests/golden/expressions.json",
+    "golden:grading": "../backend/.venv/bin/python scripts/gen_grading_golden.py > tests/golden/grading.json",
+    "golden:decimal": "../backend/.venv/bin/python scripts/gen_decimal_golden.py > tests/golden/decimal.json",
+    "golden": "npm run golden:fsrs && npm run golden:expr && npm run golden:decimal && npm run golden:grading && npm run golden:evidence-state && npm run golden:contamination && npm run golden:evidence && npm run golden:planner && npm run golden:pyfmt && npm run golden:ingestion-text && npm run golden:ingestion-layout && npm run golden:ingestion-review && npm run golden:ingestion-publish && npm run golden:ingestion-b3 && npm run golden:ingestion-b4-pdf && npm run golden:ingestion-b4-imports && npm run golden:ingestion-b5 && npm run golden:analytics-b6",
+    "golden:evidence-state": "../backend/.venv/bin/python scripts/gen_evidence_state_golden.py > tests/golden/evidence_state.json",
+    "golden:contamination": "../backend/.venv/bin/python scripts/gen_contamination_golden.py",
+    "golden:evidence": "../backend/.venv/bin/python scripts/gen_evidence_golden.py",
+    "golden:planner": "../backend/.venv/bin/python scripts/gen_planner_golden.py",
+    "golden:ingestion-text": "../backend/.venv/bin/python scripts/gen_ingestion_text_golden.py > tests/golden/ingestion_text.json",
+    "golden:ingestion-layout": "../backend/.venv/bin/python scripts/gen_ingestion_layout_golden.py",
+    "golden:ingestion-review": "../backend/.venv/bin/python scripts/gen_ingestion_review_golden.py",
+    "golden:pyfmt": "../backend/.venv/bin/python scripts/gen_pyfmt_golden.py > tests/golden/pyfmt.json",
+    "golden:ai-prompts": "../backend/.venv/bin/python scripts/gen_ai_prompts_golden.py > tests/golden/ai_prompts.json",
+    "schema": "../backend/.venv/bin/python scripts/gen_schema.py > src/store/schema.generated.ts",
+    "golden:ai-validators": "../backend/.venv/bin/python scripts/gen_ai_validators_golden.py > tests/golden/ai_validators.json",
+    "golden:ai-runtime": "../backend/.venv/bin/python scripts/gen_ai_runtime_golden.py > tests/golden/ai_runtime.json",
+    "golden:ai": "npm run golden:ai-prompts && npm run golden:ai-validators && npm run golden:ai-runtime",
+    "golden:ingestion-publish": "../backend/.venv/bin/python scripts/gen_ingestion_publish_golden.py",
+    "golden:ingestion-b3": "../backend/.venv/bin/python scripts/gen_ingestion_b3_golden.py",
+    "deps:sharp": "npm install --prefix .deps --no-audit --no-fund",
+    "golden:ingestion-b4-pdf": "../backend/.venv/bin/python scripts/gen_ingestion_b4_pdf_golden.py",
+    "golden:ingestion-b4-imports": "../backend/.venv/bin/python scripts/gen_ingestion_b4_imports_golden.py",
+    "deps:pdfjs": "npm install --prefix .deps --no-audit --no-fund",
+    "golden:ingestion-b5": "../backend/.venv/bin/python scripts/gen_ingestion_b5_variants_golden.py",
+    "golden:analytics-b6": "../backend/.venv/bin/python scripts/gen_analytics_b6_golden.py",
+    "retire:d0": "node --experimental-strip-types scripts/d0-check.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3",
+    "@deepseek-ai/dsh-tools": ">=0.2.0-rc.2 <0.3"
+  },
+  "dependencies": {
+    "sharp": "0.35.5",
+    "pdfjs-dist": "6.5.438"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2",
+    "@types/node": "^24.0.0"
+  }
+}

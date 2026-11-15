@@ -1,0 +1,860 @@
+{
+ "generated_by": "dsh-plugin/scripts/gen_b8_learning_golden.py",
+ "memory": {
+  "card": {
+   "desired_retention": 0.9,
+   "lapses": 1,
+   "learning_step": 0,
+   "params_version": "fsrs-4.5-default-v1",
+   "phase": "relearning",
+   "reps": 3,
+   "scheduler_version": "fsrs-4.5-default-v1"
+  },
+  "rebuild": {
+   "compared_fields": [
+    "phase",
+    "stability",
+    "difficulty",
+    "reps",
+    "lapses",
+    "learning_step",
+    "due_at",
+    "last_reviewed_at",
+    "scheduler_version",
+    "params_version"
+   ],
+   "differing_fields": [],
+   "log_count": 3,
+   "matches": true,
+   "rebuilt": {
+    "difficulty": 6.901155,
+    "due_at": "2026-03-16T19:01:00+00:00",
+    "lapses": 1,
+    "last_reviewed_at": "2026-03-16T19:00:00+00:00",
+    "learning_step": 0,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "relearning",
+    "reps": 3,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 2.8412080411210447
+   },
+   "stored": {
+    "difficulty": 6.901155,
+    "due_at": "2026-03-16T19:01:00+00:00",
+    "lapses": 1,
+    "last_reviewed_at": "2026-03-16T19:00:00+00:00",
+    "learning_step": 0,
+    "params_version": "fsrs-4.5-default-v1",
+    "phase": "relearning",
+    "reps": 3,
+    "scheduler_version": "fsrs-4.5-default-v1",
+    "stability": 2.8412080411210447
+   },
+   "unknown_params_versions": []
+  },
+  "reviews": [
+   {
+    "difficulty": 5.1618,
+    "due_at": "2026-03-01T19:10:00+00:00",
+    "elapsed_days": 0.0,
+    "interval_days": 0.006944444444444444,
+    "is_lapse": false,
+    "lapses": 0,
+    "phase": "learning",
+    "phase_before": "new",
+    "rating": "good",
+    "reps": 1,
+    "retrievability": 1.0,
+    "reviewed_at": "2026-03-01T19:00:00+00:00",
+    "scheduled_days": 0.0,
+    "stability": 3.7145
+   },
+   {
+    "difficulty": 5.1618,
+    "due_at": "2026-03-16T19:00:00+00:00",
+    "elapsed_days": 3.0,
+    "interval_days": 12.0,
+    "is_lapse": false,
+    "lapses": 0,
+    "phase": "review",
+    "phase_before": "learning",
+    "rating": "good",
+    "reps": 2,
+    "retrievability": 0.9169112760382788,
+    "reviewed_at": "2026-03-04T19:00:00+00:00",
+    "scheduled_days": 0.006944444444444444,
+    "stability": 12.2623505597587
+   },
+   {
+    "difficulty": 6.901155,
+    "due_at": "2026-03-16T19:01:00+00:00",
+    "elapsed_days": 12.0,
+    "interval_days": 0.0006944444444444445,
+    "is_lapse": true,
+    "lapses": 1,
+    "phase": "relearning",
+    "phase_before": "review",
+    "rating": "again",
+    "reps": 3,
+    "retrievability": 0.9018348514726674,
+    "reviewed_at": "2026-03-16T19:00:00+00:00",
+    "scheduled_days": 12.0,
+    "stability": 2.8412080411210447
+   }
+  ]
+ },
+ "schema_version": 1,
+ "search": {
+  "bm25_query": "三角形内角和",
+  "bm25_ranked": [
+   {
+    "rank": 1,
+    "ref": "N1",
+    "score": 6.629879
+   },
+   {
+    "rank": 2,
+    "ref": "Q1",
+    "score": 6.456566
+   }
+  ],
+  "corpus": [
+   {
+    "doc_length": 14,
+    "kind": "node",
+    "ref": "N1",
+    "term_frequencies": {
+     "三": 1,
+     "三角": 1,
+     "内": 1,
+     "内角": 1,
+     "和": 1,
+     "形": 1,
+     "形考": 1,
+     "点": 1,
+     "考": 1,
+     "考点": 1,
+     "角": 2,
+     "角和": 1,
+     "角形": 1
+    },
+    "text": "三角形考点\n内角和",
+    "tokens": [
+     "三",
+     "角",
+     "形",
+     "考",
+     "点",
+     "三角",
+     "角形",
+     "形考",
+     "考点",
+     "内",
+     "角",
+     "和",
+     "内角",
+     "角和"
+    ]
+   },
+   {
+    "doc_length": 7,
+    "kind": "node",
+    "ref": "N2",
+    "term_frequencies": {
+     "点": 1,
+     "算": 1,
+     "算考": 1,
+     "考": 1,
+     "考点": 1,
+     "运": 1,
+     "运算": 1
+    },
+    "text": "运算考点",
+    "tokens": [
+     "运",
+     "算",
+     "考",
+     "点",
+     "运算",
+     "算考",
+     "考点"
+    ]
+   },
+   {
+    "doc_length": 22,
+    "kind": "question",
+    "ref": "Q1",
+    "term_frequencies": {
+     "180": 1,
+     "三": 1,
+     "三角": 1,
+     "为": 1,
+     "内": 1,
+     "内角": 1,
+     "判": 1,
+     "判断": 1,
+     "和": 1,
+     "和为": 1,
+     "度": 1,
+     "形": 1,
+     "形内": 1,
+     "收": 1,
+     "收判": 1,
+     "断": 1,
+     "角": 2,
+     "角和": 1,
+     "角形": 1,
+     "验": 1,
+     "验收": 1
+    },
+    "text": "验收判断：三角形内角和为 180 度。",
+    "tokens": [
+     "验",
+     "收",
+     "判",
+     "断",
+     "验收",
+     "收判",
+     "判断",
+     "三",
+     "角",
+     "形",
+     "内",
+     "角",
+     "和",
+     "为",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和",
+     "和为",
+     "180",
+     "度"
+    ]
+   },
+   {
+    "doc_length": 16,
+    "kind": "question",
+    "ref": "Q2",
+    "term_frequencies": {
+     "12": 1,
+     "6": 1,
+     "一": 1,
+     "一半": 1,
+     "判": 1,
+     "判断": 1,
+     "半": 1,
+     "半是": 1,
+     "收": 1,
+     "收判": 1,
+     "断": 1,
+     "是": 1,
+     "的": 1,
+     "的一": 1,
+     "验": 1,
+     "验收": 1
+    },
+    "text": "验收判断：12 的一半是 6。",
+    "tokens": [
+     "验",
+     "收",
+     "判",
+     "断",
+     "验收",
+     "收判",
+     "判断",
+     "12",
+     "的",
+     "一",
+     "半",
+     "是",
+     "的一",
+     "一半",
+     "半是",
+     "6"
+    ]
+   }
+  ],
+  "excerpt_cases": [
+   {
+    "expected": "验收判断：三角形内角和为 180 度。",
+    "terms": [
+     "三角"
+    ],
+    "text": "验收判断：三角形内角和为 180 度。"
+   },
+   {
+    "expected": "验收判断：三角形内角和为 180 度。",
+    "terms": [
+     "内角",
+     "三角"
+    ],
+    "text": "验收判断：三角形内角和为 180 度。"
+   },
+   {
+    "expected": "验收判断：三角形内角和为 180 度。",
+    "terms": [
+     "不存在的词"
+    ],
+    "text": "验收判断：三角形内角和为 180 度。"
+   },
+   {
+    "expected": "短文本",
+    "terms": [
+     "短"
+    ],
+    "text": "短文本"
+   },
+   {
+    "expected": "…前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前三角形内角和后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后…",
+    "terms": [
+     "三角形内角和"
+    ],
+    "text": "前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前前三角形内角和后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后后"
+   }
+  ],
+  "queries": [
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 2,
+     "reason": null,
+     "requested": true,
+     "used": true
+    },
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "三角形内角和",
+    "query_tokens": [
+     "三",
+     "角",
+     "形",
+     "内",
+     "和",
+     "三角",
+     "角形",
+     "形内",
+     "内角",
+     "角和"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "三角形考点",
+      "excerpt": "三角形考点 内角和",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 6.629879,
+      "kind": "node",
+      "matched_terms": [
+       "三",
+       "三角",
+       "内",
+       "内角",
+       "和",
+       "形",
+       "角",
+       "角和",
+       "角形"
+      ],
+      "ref": "N1",
+      "vector_rank": null,
+      "vector_score": null
+     },
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "判断-1",
+      "excerpt": "验收判断：三角形内角和为 180 度。",
+      "fused_score": 0.016129,
+      "keyword_rank": 2,
+      "keyword_score": 6.456566,
+      "kind": "question",
+      "matched_terms": [
+       "三",
+       "三角",
+       "内",
+       "内角",
+       "和",
+       "形",
+       "形内",
+       "角",
+       "角和",
+       "角形"
+      ],
+      "ref": "Q1",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   },
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 1,
+     "reason": null,
+     "requested": true,
+     "used": true
+    },
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "12 的一半",
+    "query_tokens": [
+     "12",
+     "的",
+     "一",
+     "半",
+     "的一",
+     "一半"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "判断-2",
+      "excerpt": "验收判断：12 的一半是 6。",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 6.981787,
+      "kind": "question",
+      "matched_terms": [
+       "12",
+       "一",
+       "一半",
+       "半",
+       "的",
+       "的一"
+      ],
+      "ref": "Q2",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   },
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 0,
+     "reason": null,
+     "requested": true,
+     "used": false
+    },
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "bm25",
+    "query_tokens": [
+     "bm25"
+    ],
+    "results": [],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   },
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 2,
+     "reason": null,
+     "requested": true,
+     "used": true
+    },
+    "notes": [
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "考点",
+    "query_tokens": [
+     "考",
+     "点",
+     "考点"
+    ],
+    "results": [
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "运算考点",
+      "excerpt": "运算考点",
+      "fused_score": 0.016393,
+      "keyword_rank": 1,
+      "keyword_score": 2.648788,
+      "kind": "node",
+      "matched_terms": [
+       "点",
+       "考",
+       "考点"
+      ],
+      "ref": "N2",
+      "vector_rank": null,
+      "vector_score": null
+     },
+     {
+      "channels": [
+       "keyword"
+      ],
+      "display_label": "三角形考点",
+      "excerpt": "三角形考点 内角和",
+      "fused_score": 0.016129,
+      "keyword_rank": 2,
+      "keyword_score": 2.123615,
+      "kind": "node",
+      "matched_terms": [
+       "点",
+       "考",
+       "考点"
+      ],
+      "ref": "N1",
+      "vector_rank": null,
+      "vector_score": null
+     }
+    ],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   },
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 0,
+     "reason": "查询为空或只包含标点，未产生检索词",
+     "requested": true,
+     "used": false
+    },
+    "notes": [
+     "查询为空或只包含标点，未产生检索词，因此没有结果。",
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "",
+    "query_tokens": [],
+    "results": [],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   },
+   {
+    "candidate_documents": 4,
+    "fusion": {
+     "k": 60,
+     "method": "rrf"
+    },
+    "keyword": {
+     "hits": 0,
+     "reason": "查询为空或只包含标点，未产生检索词",
+     "requested": true,
+     "used": false
+    },
+    "notes": [
+     "查询为空或只包含标点，未产生检索词，因此没有结果。",
+     "向量通道不可用，未参与排序：未配置向量化模型（embedding provider）：关键词检索可用，向量检索与混合排序不可用。设置 ACEPASS_AI_PROVIDER=openai_compatible 并配置 ACEPASS_AI_BASE_URL、ACEPASS_AI_API_KEY、ACEPASS_AI_EMBEDDING_MODEL 后启用。"
+    ],
+    "query": "，。",
+    "query_tokens": [],
+    "results": [],
+    "vector": {
+     "available": false,
+     "documents_with_embeddings": 0,
+     "is_stub": false,
+     "provider": "none",
+     "requested": true,
+     "used": false
+    }
+   }
+  ],
+  "tokenizer_version": "zh-char-ngram-v1"
+ },
+ "tokenizer": [
+  {
+   "term_frequencies": {
+    "180": 1,
+    "三": 1,
+    "三角": 1,
+    "为": 1,
+    "内": 1,
+    "内角": 1,
+    "判": 1,
+    "判断": 1,
+    "和": 1,
+    "和为": 1,
+    "度": 1,
+    "形": 1,
+    "形内": 1,
+    "收": 1,
+    "收判": 1,
+    "断": 1,
+    "角": 2,
+    "角和": 1,
+    "角形": 1,
+    "验": 1,
+    "验收": 1
+   },
+   "text": "验收判断：三角形内角和为 180 度。",
+   "tokens": [
+    "验",
+    "收",
+    "判",
+    "断",
+    "验收",
+    "收判",
+    "判断",
+    "三",
+    "角",
+    "形",
+    "内",
+    "角",
+    "和",
+    "为",
+    "三角",
+    "角形",
+    "形内",
+    "内角",
+    "角和",
+    "和为",
+    "180",
+    "度"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "一": 1,
+    "一项": 1,
+    "下": 1,
+    "下列": 1,
+    "于": 1,
+    "列": 1,
+    "列哪": 1,
+    "哪": 1,
+    "哪一": 1,
+    "等": 1,
+    "等于": 1,
+    "项": 1,
+    "项等": 1
+   },
+   "text": "下列哪一项等于 3 + 4 × 2？",
+   "tokens": [
+    "下",
+    "列",
+    "哪",
+    "一",
+    "项",
+    "等",
+    "于",
+    "下列",
+    "列哪",
+    "哪一",
+    "一项",
+    "项等",
+    "等于",
+    "3",
+    "4",
+    "2"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "判": 1,
+    "判断": 1,
+    "断": 1,
+    "断题": 1,
+    "题": 1
+   },
+   "text": "判断题",
+   "tokens": [
+    "判",
+    "断",
+    "题",
+    "判断",
+    "断题"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "3": 1,
+    "abc12": 1,
+    "第": 1,
+    "题": 1
+   },
+   "text": "ＡＢＣ１２，第 3 题",
+   "tokens": [
+    "abc12",
+    "第",
+    "3",
+    "题"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "3.14": 1,
+    "50%": 1,
+    "bm25": 1,
+    "与": 1,
+    "检": 1,
+    "检索": 1,
+    "索": 1
+   },
+   "text": "BM25 检索 3.14 与 50%",
+   "tokens": [
+    "bm25",
+    "检",
+    "索",
+    "检索",
+    "3.14",
+    "与",
+    "50%"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "与": 1,
+    "与呼": 1,
+    "作": 2,
+    "作用": 2,
+    "光": 1,
+    "光合": 1,
+    "合": 1,
+    "合作": 1,
+    "吸": 1,
+    "吸作": 1,
+    "呼": 1,
+    "呼吸": 1,
+    "用": 2,
+    "用与": 1
+   },
+   "text": "光合作用与呼吸作用",
+   "tokens": [
+    "光",
+    "合",
+    "作",
+    "用",
+    "与",
+    "呼",
+    "吸",
+    "作",
+    "用",
+    "光合",
+    "合作",
+    "作用",
+    "用与",
+    "与呼",
+    "呼吸",
+    "吸作",
+    "作用"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "个": 1,
+    "分": 1,
+    "分隔": 1,
+    "多": 1,
+    "多个": 1,
+    "白": 1,
+    "空": 1,
+    "空白": 1,
+    "隔": 1
+   },
+   "text": "  多个   空白\t分隔  ",
+   "tokens": [
+    "多",
+    "个",
+    "多个",
+    "空",
+    "白",
+    "空白",
+    "分",
+    "隔",
+    "分隔"
+   ]
+  },
+  {
+   "term_frequencies": {
+    "emoji": 1,
+    "不": 1,
+    "不算": 1,
+    "算": 1,
+    "算词": 1,
+    "词": 1
+   },
+   "text": "emoji 😀 不算词",
+   "tokens": [
+    "emoji",
+    "不",
+    "算",
+    "词",
+    "不算",
+    "算词"
+   ]
+  },
+  {
+   "term_frequencies": {},
+   "text": "",
+   "tokens": []
+  },
+  {
+   "term_frequencies": {},
+   "text": "，，。！？",
+   "tokens": []
+  }
+ ],
+ "tokenizer_version": "zh-char-ngram-v1"
+}

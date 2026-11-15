@@ -1,0 +1,9 @@
+# AcePass composition for a DSH profile. Applied as a bundle layer; the plugin
+# declares its own `inject` list, so only the entry itself is inserted here.
+- insert:
+    - id: acepass
+      name: '@acepass/dsh-plugin'
+      config:
+        dataRoot: ''          # '' => <workspace>/.acepass
+        provider: ''          # '' => follow the session's model selection
+        model: ''

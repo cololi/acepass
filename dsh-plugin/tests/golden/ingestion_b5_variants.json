@@ -1,0 +1,5041 @@
+{
+ "answer_consistency": [
+  {
+   "expected": [],
+   "input": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "下列哪个是二次方程？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "question_type": "single_choice",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "single_choice_ok"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.correct_option_unknown",
+     "message": "正确选项 opt_z 不在题干选项中",
+     "path": "answer_payload",
+     "severity": "blocking"
+    },
+    {
+     "code": "answer.correct_option_not_in_options",
+     "message": "正确选项 opt_z 不在变式选项中",
+     "path": "answer_payload.correct_option_id",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "correct_option_id": "opt_z",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "下列哪个是二次方程？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "question_type": "single_choice",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "single_choice_unknown_option"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.correct_options_duplicate",
+     "message": "正确选项集合存在重复 ID",
+     "path": "answer_payload",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "correct_option_ids": [
+      "opt_a",
+      "opt_a"
+     ],
+     "kind": "multiple_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "以下哪些成立？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "question_type": "multiple_choice",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "multiple_choice_duplicate_correct"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.tf_value_missing",
+     "message": "判断题必须给出布尔标准答案（false 不等于未答）",
+     "path": "answer_payload",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "kind": "true_false",
+     "value": "true"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "该命题成立。"
+      }
+     ]
+    },
+    "question_type": "true_false",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "true_false_wrong_value_type"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.blank_accepted_values_missing",
+     "message": "空位 b1 没有可接受答案，无法判定对错",
+     "path": "answer_payload.blanks.b1",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "blanks": {
+      "b1": {
+       "accepted_values": [
+        " ",
+        ""
+       ]
+      }
+     },
+     "kind": "fill_blank"
+    },
+    "content": {
+     "blanks": [
+      {
+       "blank_id": "b1",
+       "label": "解"
+      }
+     ],
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "方程的解是 ____。"
+      }
+     ]
+    },
+    "question_type": "fill_blank",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "fill_blank_accepted_values_missing"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.blanks_missing",
+     "message": "填空题必须按空位给出答案",
+     "path": "answer_payload.blanks",
+     "severity": "blocking"
+    },
+    {
+     "code": "answer.blank_answer_missing",
+     "message": "空位 b1 没有答案",
+     "path": "answer_payload.blanks",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "blanks": {},
+     "kind": "fill_blank"
+    },
+    "content": {
+     "blanks": [
+      {
+       "blank_id": "b1",
+       "label": "解"
+      }
+     ],
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "方程的解是 ____。"
+      }
+     ]
+    },
+    "question_type": "fill_blank",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "fill_blank_answer_missing"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.rubric_total_mismatch",
+     "message": "评分点合计 3.00 与声明的总分 4.00 不一致：无法按点判分",
+     "path": "rubric_total_score",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "kind": "constructed_response",
+     "rubric_required": true
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "证明该命题。"
+      }
+     ]
+    },
+    "question_type": "constructed_response",
+    "rubric_criteria": [
+     {
+      "criterion_id": "c1",
+      "max_score": "2.00",
+      "text": "关键步骤"
+     },
+     {
+      "criterion_id": "c2",
+      "max_score": "1.00",
+      "text": "结论"
+     }
+    ],
+    "stated_rubric_total": "4.00"
+   },
+   "name": "constructed_response_total_mismatch"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.rubric_total_missing",
+     "message": "大题没有给出 rubric 总分，无法核对",
+     "path": "rubric_total_score",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "kind": "constructed_response",
+     "rubric_required": true
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "证明该命题。"
+      }
+     ]
+    },
+    "question_type": "constructed_response",
+    "rubric_criteria": [
+     {
+      "criterion_id": "c1",
+      "max_score": "2.00",
+      "text": "关键步骤"
+     }
+    ],
+    "stated_rubric_total": null
+   },
+   "name": "constructed_response_total_missing"
+  },
+  {
+   "expected": [
+    {
+     "code": "answer.rubric_total_invalid",
+     "message": "rubric 总分不是十进制数",
+     "path": "rubric_total_score",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {
+     "kind": "constructed_response",
+     "rubric_required": true
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "证明该命题。"
+      }
+     ]
+    },
+    "question_type": "constructed_response",
+    "rubric_criteria": [
+     {
+      "criterion_id": "c1",
+      "max_score": "2.00",
+      "text": "关键步骤"
+     }
+    ],
+    "stated_rubric_total": "两分"
+   },
+   "name": "constructed_response_total_invalid"
+  },
+  {
+   "expected": [
+    {
+     "code": "variant_type_not_scorable",
+     "message": "共享材料不能作为变式（material 不产生可判定答案）",
+     "path": "type",
+     "severity": "blocking"
+    }
+   ],
+   "input": {
+    "answer_payload": {},
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "共享材料"
+      }
+     ]
+    },
+    "question_type": "material",
+    "rubric_criteria": null,
+    "stated_rubric_total": null
+   },
+   "name": "material_is_never_scorable"
+  }
+ ],
+ "checks": [
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "2797c538270e531f7dd861765e9ff9deb7be30963cc5d0caa9e3499b31fdab22",
+    "origin_type": "ai_generated",
+    "problems": [],
+    "source_version_id": "0b5aa725-a181-522c-89b6-0b6b035253a9"
+   },
+   "name": "clean_variant",
+   "node_id": "5654942a-9812-5550-b2fa-2978a91d1970",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "一个全新的变式题干。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "3a824b9e-ea44-517f-b65f-cce7e3adf4d3",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_clean@example.invalid",
+      "id": "d9f16aef-28a3-5825-8523-ce77d32462ab",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "3a824b9e-ea44-517f-b65f-cce7e3adf4d3",
+      "is_archived": false,
+      "name": "项目-checks_clean",
+      "owner_id": "d9f16aef-28a3-5825-8523-ce77d32462ab",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "855cee19-a5c4-5eb7-86d5-dacb249c3c03",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "3a824b9e-ea44-517f-b65f-cce7e3adf4d3",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "0ab8eb39-74a3-5643-8d68-1cc8bede511d",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "3a824b9e-ea44-517f-b65f-cce7e3adf4d3",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "b5e2fe6e-ccf4-501a-9d94-3b51ded5654c",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "855cee19-a5c4-5eb7-86d5-dacb249c3c03",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "940ddead-c905-5a44-898f-7fb8c81d1672",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "0ab8eb39-74a3-5643-8d68-1cc8bede511d",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "5654942a-9812-5550-b2fa-2978a91d1970",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "b5e2fe6e-ccf4-501a-9d94-3b51ded5654c",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "5c701147-2493-5be2-a463-1003f8a39ef5",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "940ddead-c905-5a44-898f-7fb8c81d1672",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "7eef7cca-7e3f-5190-8bb8-f6799c3df383",
+      "is_disputed": false,
+      "question_version_id": "0b5aa725-a181-522c-89b6-0b6b035253a9",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "97151cd0-c85f-5ddd-8a66-6188a97cdd8f",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "855cee19-a5c4-5eb7-86d5-dacb249c3c03",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "1731a8906866482b731464e313f42d4cefa00dd6ddd36f8eeefcfb7091cd5b14",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "0b5aa725-a181-522c-89b6-0b6b035253a9",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "97151cd0-c85f-5ddd-8a66-6188a97cdd8f",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "0b5aa725-a181-522c-89b6-0b6b035253a9"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "37830c3b30ce45ee1be0bf0c004c78b9c9d13264adeaade4363568c2a40cced6",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "duplicate_published_question",
+      "display_label": "Q1",
+      "message": "变式内容与已发布题目版本完全相同：不能再次作为新变式发布",
+      "path": "content",
+      "question_id": "41e04947-e866-5958-9dfa-7044562d118c",
+      "question_version_id": "f941b046-6738-528a-89b4-b2679db53fd2",
+      "severity": "blocking"
+     },
+     {
+      "code": "variant_duplicates_source",
+      "message": "变式题干与源题题干完全相同：它不是有效变式",
+      "path": "content.blocks",
+      "severity": "blocking",
+      "source_version_id": "f941b046-6738-528a-89b4-b2679db53fd2"
+     }
+    ],
+    "source_version_id": "f941b046-6738-528a-89b4-b2679db53fd2"
+   },
+   "name": "variant_duplicates_source_stem",
+   "node_id": "18a57496-9dff-5980-9fff-0a858f695390",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "原题题干完全相同。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "52a2c222-7a5d-506f-91ba-3e074c0e0b3a",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_source_stem@example.invalid",
+      "id": "fce1c38b-0aad-5622-b0b1-b7f507a466b7",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "52a2c222-7a5d-506f-91ba-3e074c0e0b3a",
+      "is_archived": false,
+      "name": "项目-checks_source_stem",
+      "owner_id": "fce1c38b-0aad-5622-b0b1-b7f507a466b7",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "4d1c913d-6dfe-5a29-a03a-96618f37e4f4",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "52a2c222-7a5d-506f-91ba-3e074c0e0b3a",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "c2561be7-8cab-5b82-8b7f-82643bb4890b",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "52a2c222-7a5d-506f-91ba-3e074c0e0b3a",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "9c213ee1-56bf-5662-ba22-4905c5596c34",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "4d1c913d-6dfe-5a29-a03a-96618f37e4f4",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "fa7f8afa-77b2-5476-b50b-c29bdcadacb4",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "c2561be7-8cab-5b82-8b7f-82643bb4890b",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "18a57496-9dff-5980-9fff-0a858f695390",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "9c213ee1-56bf-5662-ba22-4905c5596c34",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "e3bc4e11-78a6-547f-8914-cca238f618b1",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "fa7f8afa-77b2-5476-b50b-c29bdcadacb4",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "711e1626-3c37-5049-afe9-0549936dc453",
+      "is_disputed": false,
+      "question_version_id": "f941b046-6738-528a-89b4-b2679db53fd2",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "41e04947-e866-5958-9dfa-7044562d118c",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "4d1c913d-6dfe-5a29-a03a-96618f37e4f4",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题题干完全相同。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "37830c3b30ce45ee1be0bf0c004c78b9c9d13264adeaade4363568c2a40cced6",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "f941b046-6738-528a-89b4-b2679db53fd2",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "41e04947-e866-5958-9dfa-7044562d118c",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "f941b046-6738-528a-89b4-b2679db53fd2"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "eb2093828aa82765a2806ccf9d2f93e63582c2d183baf6335610f58cc6d16faf",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "duplicate_published_question",
+      "display_label": "已发布变式",
+      "message": "变式内容与已发布题目版本完全相同：不能再次作为新变式发布",
+      "path": "content",
+      "question_id": "5599294f-f3c4-5e02-bd0f-2353fd997b29",
+      "question_version_id": "016114af-f5ba-5f87-9969-b067bbb824e5",
+      "severity": "blocking"
+     }
+    ],
+    "source_version_id": "814ceaf9-2c60-5939-975f-2636c5d48882"
+   },
+   "name": "duplicate_published",
+   "node_id": "c67f0897-7d51-53b4-adb2-ecd922134756",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "已发布过的变式题干。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "f0c60dae-396a-5d03-af2d-fc405513b425",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_published@example.invalid",
+      "id": "4ffc7b1f-cf7e-5bdd-b48c-b9f3dfc3d314",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "f0c60dae-396a-5d03-af2d-fc405513b425",
+      "is_archived": false,
+      "name": "项目-checks_published",
+      "owner_id": "4ffc7b1f-cf7e-5bdd-b48c-b9f3dfc3d314",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "e857b5fc-2daa-5cab-9af1-e822eb4ec1a2",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "f0c60dae-396a-5d03-af2d-fc405513b425",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "2024b0ab-5a95-552d-b1fb-8067c65f07ad",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "f0c60dae-396a-5d03-af2d-fc405513b425",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "7137d7e5-51c4-5973-affd-c8738c066b32",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "e857b5fc-2daa-5cab-9af1-e822eb4ec1a2",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "8849653f-c3ca-5e84-89ca-50a1d8f69601",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "2024b0ab-5a95-552d-b1fb-8067c65f07ad",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "c67f0897-7d51-53b4-adb2-ecd922134756",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "7137d7e5-51c4-5973-affd-c8738c066b32",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "0bbe8c99-574c-50ce-8733-1c2c7c57d01a",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "8849653f-c3ca-5e84-89ca-50a1d8f69601",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "36af35d1-7b61-582c-8a63-ba6e006b8683",
+      "is_disputed": false,
+      "question_version_id": "814ceaf9-2c60-5939-975f-2636c5d48882",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     },
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:13:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "4a11f547-1f51-5521-9832-64892b52ffd5",
+      "is_disputed": false,
+      "question_version_id": "016114af-f5ba-5f87-9969-b067bbb824e5",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:13:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "d58ddd11-32e4-5b37-88da-6005710d4f4c",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "e857b5fc-2daa-5cab-9af1-e822eb4ec1a2",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     },
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:11:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "已发布变式",
+      "family_id": null,
+      "id": "5599294f-f3c4-5e02-bd0f-2353fd997b29",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "e857b5fc-2daa-5cab-9af1-e822eb4ec1a2",
+      "updated_at": "2026-05-01T00:11:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题一：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "e57881213693665bf1a41839f6080bf7bf75066a0040aba5c3a430ce0abe2c2f",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "814ceaf9-2c60-5939-975f-2636c5d48882",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "d58ddd11-32e4-5b37-88da-6005710d4f4c",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     },
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "已发布过的变式题干。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "eb2093828aa82765a2806ccf9d2f93e63582c2d183baf6335610f58cc6d16faf",
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "016114af-f5ba-5f87-9969-b067bbb824e5",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "5599294f-f3c4-5e02-bd0f-2353fd997b29",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:12:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "814ceaf9-2c60-5939-975f-2636c5d48882"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "a5ea87923067892a5cd574674747606e623ceab85bd7373fdc9518563b84acf5",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "duplicate_published_question",
+      "display_label": "族内已发布",
+      "message": "变式内容与已发布题目版本完全相同：不能再次作为新变式发布",
+      "path": "content",
+      "question_id": "70295664-394f-52af-bbee-ae9f4c54cc20",
+      "question_version_id": "cdf91306-92ef-5b24-8837-6efbadea1843",
+      "severity": "blocking"
+     },
+     {
+      "code": "duplicate_family_question",
+      "family_id": "8dde41d8-cd22-5787-8952-0955ebf89f5e",
+      "message": "同一题目家族中已存在完全相同内容的已发布题目，不能重复生成",
+      "path": "content",
+      "question_id": "70295664-394f-52af-bbee-ae9f4c54cc20",
+      "severity": "blocking"
+     }
+    ],
+    "source_version_id": "a83b847e-a242-59d2-9850-68dc8b21aaa2"
+   },
+   "name": "duplicate_family",
+   "node_id": "480a2b9f-e066-56cc-a96d-017cc70f6e10",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "家族里已经出现过的题干。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "3ce91538-cdfa-539d-ba98-9471215a1098",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_family@example.invalid",
+      "id": "3c64a727-bd3a-503b-bca1-d09e4d84196f",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "3ce91538-cdfa-539d-ba98-9471215a1098",
+      "is_archived": false,
+      "name": "项目-checks_family",
+      "owner_id": "3c64a727-bd3a-503b-bca1-d09e4d84196f",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "4e8a4178-3cbb-5511-b866-d9b40bf38740",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "3ce91538-cdfa-539d-ba98-9471215a1098",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "b412c7de-0603-5ab0-94b6-adaa955c6fd6",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "3ce91538-cdfa-539d-ba98-9471215a1098",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "2dc1939d-7ce7-5170-8a6f-10032e86172c",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "4e8a4178-3cbb-5511-b866-d9b40bf38740",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "5d507417-6d03-5bac-be8f-3924c27088d0",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "b412c7de-0603-5ab0-94b6-adaa955c6fd6",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "480a2b9f-e066-56cc-a96d-017cc70f6e10",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "2dc1939d-7ce7-5170-8a6f-10032e86172c",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "4e366477-3189-5954-a996-55cb8e9c5961",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "5d507417-6d03-5bac-be8f-3924c27088d0",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:11:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "bf69cc18-7290-5e03-963c-4a0920351f9d",
+      "is_disputed": false,
+      "question_version_id": "a83b847e-a242-59d2-9850-68dc8b21aaa2",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:11:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     },
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:14:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "2e4cdc1c-03fd-5fd5-84a3-4a1470255d0f",
+      "is_disputed": false,
+      "question_version_id": "cdf91306-92ef-5b24-8837-6efbadea1843",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:14:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_family": [
+     {
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "id": "8dde41d8-cd22-5787-8952-0955ebf89f5e",
+      "merged_at": null,
+      "merged_into_id": null,
+      "name": "二次方程族",
+      "note": "",
+      "relation_confirmed": false,
+      "revision": 1,
+      "subject_id": "4e8a4178-3cbb-5511-b866-d9b40bf38740",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": "8dde41d8-cd22-5787-8952-0955ebf89f5e",
+      "id": "a198f92c-ea85-56e2-8072-70aab73656b0",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "4e8a4178-3cbb-5511-b866-d9b40bf38740",
+      "updated_at": "2026-05-01T00:09:00+00:00"
+     },
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "族内已发布",
+      "family_id": "8dde41d8-cd22-5787-8952-0955ebf89f5e",
+      "id": "70295664-394f-52af-bbee-ae9f4c54cc20",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "4e8a4178-3cbb-5511-b866-d9b40bf38740",
+      "updated_at": "2026-05-01T00:12:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "族内原题：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "3e0dce9831913f824b4dabb327b8a1247d378f1457afb894298787ea1c818ce1",
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "a83b847e-a242-59d2-9850-68dc8b21aaa2",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "a198f92c-ea85-56e2-8072-70aab73656b0",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     },
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "家族里已经出现过的题干。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "a5ea87923067892a5cd574674747606e623ceab85bd7373fdc9518563b84acf5",
+      "created_at": "2026-05-01T00:13:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "cdf91306-92ef-5b24-8837-6efbadea1843",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "70295664-394f-52af-bbee-ae9f4c54cc20",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:13:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "a83b847e-a242-59d2-9850-68dc8b21aaa2"
+  },
+  {
+   "exclude_candidate_id": "43e2ef3c-2633-52c5-bc28-46ef38d531e8",
+   "expected": {
+    "content_digest": "94a6895639f79ca97a3590905524961448c0ee539902abae5baff44652a31255",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "candidate_id": "1f455d81-6c60-569a-bb2d-898f54e5f6d5",
+      "code": "duplicate_pending_proposal",
+      "message": "同一批候选中已存在完全相同的变式：重复提案不会产生第二道题",
+      "path": "content",
+      "severity": "blocking"
+     }
+    ],
+    "source_version_id": "2111ff7e-0a26-5410-9236-8bcce995ac09"
+   },
+   "name": "duplicate_pending_proposal",
+   "node_id": "3c7eef85-427f-5139-b5fe-b7593400a25c",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "同一批里重复出现的变式。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_pending@example.invalid",
+      "id": "67b5c668-e418-5e2d-a0d6-2792893b5879",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+      "is_archived": false,
+      "name": "项目-checks_pending",
+      "owner_id": "67b5c668-e418-5e2d-a0d6-2792893b5879",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "5d01f685-9a36-51e6-ad62-d08f928a1457",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "a205f4c5-1fb5-5197-a14a-c16cf23c896f",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "43f44b3f-4468-5583-b84f-b2dbec15989b",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "5d01f685-9a36-51e6-ad62-d08f928a1457",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "c8a258ad-59c7-5d8f-9372-8e6d56aaabe5",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "a205f4c5-1fb5-5197-a14a-c16cf23c896f",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "ingestion_import_candidate": [
+     {
+      "answer_match": {},
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "draft_payload": {
+       "answer_payload": {
+        "correct_option_id": "opt_b",
+        "kind": "single_choice"
+       },
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "同一批里重复出现的变式。"
+         }
+        ],
+        "options": [
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项A"
+           }
+          ],
+          "id": "opt_a",
+          "label": "A"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项B"
+           }
+          ],
+          "id": "opt_b",
+          "label": "B"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项C"
+           }
+          ],
+          "id": "opt_c",
+          "label": "C"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项D"
+           }
+          ],
+          "id": "opt_d",
+          "label": "D"
+         }
+        ]
+       },
+       "question_type": "single_choice",
+       "variant_node_id": "3c7eef85-427f-5139-b5fe-b7593400a25c",
+       "variant_of_question_id": "a41cbdc3-20d8-5ad2-9ea5-32b0026fef41",
+       "variant_of_version_id": "2111ff7e-0a26-5410-9236-8bcce995ac09"
+      },
+      "duplicate_of_candidate_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "id": "1f455d81-6c60-569a-bb2d-898f54e5f6d5",
+      "is_stub_output": false,
+      "job_id": "f38ec8e9-e36f-5c37-abf8-a46453dd3cf4",
+      "layout_review_confirmed_at": null,
+      "layout_review_note": "",
+      "machine_payload": {},
+      "paper_revision_id": null,
+      "parent_candidate_id": null,
+      "project_id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "review_issues": [],
+      "reviewed_at": null,
+      "reviewed_by_id": null,
+      "revision": 1,
+      "source_position_key": "",
+      "status": "draft",
+      "subject_id": "5d01f685-9a36-51e6-ad62-d08f928a1457",
+      "updated_at": "2026-05-01T00:12:00+00:00"
+     }
+    ],
+    "ingestion_import_job": [
+     {
+      "attempts": 0,
+      "created_at": "2026-05-01T00:11:00+00:00",
+      "created_by_id": "67b5c668-e418-5e2d-a0d6-2792893b5879",
+      "duplicate_of_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "finished_at": null,
+      "id": "f38ec8e9-e36f-5c37-abf8-a46453dd3cf4",
+      "input_fingerprint": "pending-fingerprint",
+      "input_kind": "ai_variant",
+      "input_text": "ai-variant:pending:no-node::1",
+      "last_error": "",
+      "max_attempts": 3,
+      "page_diagnostics": [],
+      "problems": [],
+      "progress_percent": 0,
+      "project_id": "0a53f670-6c33-5483-88cf-0073a0f4d9a8",
+      "started_at": null,
+      "status": "awaiting_review",
+      "subject_id": "5d01f685-9a36-51e6-ad62-d08f928a1457",
+      "updated_at": "2026-05-01T00:11:00+00:00"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "3c7eef85-427f-5139-b5fe-b7593400a25c",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "43f44b3f-4468-5583-b84f-b2dbec15989b",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "cdc07c05-cf45-5242-810d-85de27d2d097",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "c8a258ad-59c7-5d8f-9372-8e6d56aaabe5",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "9ba41b7c-ac9b-5cc1-b0a7-b65442bd49e1",
+      "is_disputed": false,
+      "question_version_id": "2111ff7e-0a26-5410-9236-8bcce995ac09",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "a41cbdc3-20d8-5ad2-9ea5-32b0026fef41",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "5d01f685-9a36-51e6-ad62-d08f928a1457",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题三：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "68aa5de3281191836f9a6d7fc8a030ce516165185a5823e9a55201ec14b80a88",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "2111ff7e-0a26-5410-9236-8bcce995ac09",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "a41cbdc3-20d8-5ad2-9ea5-32b0026fef41",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "2111ff7e-0a26-5410-9236-8bcce995ac09"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "62b3e5c0abf945eb5903f0d2c4514c50676d164a323030da6cf803d1d78ab48f",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "node_subject_mismatch",
+      "message": "目标考点不属于该题目的科目大纲：变式不能挂到别的科目的考点上",
+      "node_id": "b7beabbf-7184-5a13-a90d-1c5c1cf78520",
+      "path": "node_id",
+      "severity": "blocking"
+     }
+    ],
+    "source_version_id": "ae187b88-7440-5225-abb7-46e456c3e883"
+   },
+   "name": "node_subject_mismatch",
+   "node_id": "b7beabbf-7184-5a13-a90d-1c5c1cf78520",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "跨科目考点的变式题干。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "8a023225-a348-55e6-bf6a-12368e5e8b5a",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_node@example.invalid",
+      "id": "1d1468ab-8e67-5dc4-b5ab-e2c3b25ce247",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "8a023225-a348-55e6-bf6a-12368e5e8b5a",
+      "is_archived": false,
+      "name": "项目-checks_node",
+      "owner_id": "1d1468ab-8e67-5dc4-b5ab-e2c3b25ce247",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "4e0f787a-497d-54f0-afc4-0a8b62185aae",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "8a023225-a348-55e6-bf6a-12368e5e8b5a",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "6ae62fed-d7d5-5d92-8960-e4c7f5278018",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "8a023225-a348-55e6-bf6a-12368e5e8b5a",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "906f75a9-915e-5ea3-afcf-a36798b04f87",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "4e0f787a-497d-54f0-afc4-0a8b62185aae",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "092a4699-c318-5ed5-a7c8-2a98104bbd17",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "6ae62fed-d7d5-5d92-8960-e4c7f5278018",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "5fd51ed4-302c-569d-ac67-9694df055873",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "906f75a9-915e-5ea3-afcf-a36798b04f87",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "b7beabbf-7184-5a13-a90d-1c5c1cf78520",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "092a4699-c318-5ed5-a7c8-2a98104bbd17",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "b1e220c9-4989-546c-850c-3ab72ed76000",
+      "is_disputed": false,
+      "question_version_id": "ae187b88-7440-5225-abb7-46e456c3e883",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "8660517e-2b8f-595b-81de-8c9d42e4f053",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "4e0f787a-497d-54f0-afc4-0a8b62185aae",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题四：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "56173f52caab188fe2693afcc4bba31fdc29c1166fbaac98a39710eda7ace906",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "ae187b88-7440-5225-abb7-46e456c3e883",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "8660517e-2b8f-595b-81de-8c9d42e4f053",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "ae187b88-7440-5225-abb7-46e456c3e883"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "24e29b0d7fb73137028e24b5f76003be4b84e93d0aadcf892a3aa3d4f9663ec4",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "node_syllabus_not_published",
+      "message": "目标考点所在大纲尚未发布：发布变式前需要先发布大纲",
+      "node_id": "0f47b113-c307-53af-8a92-d64a4fec72f4",
+      "path": "node_id",
+      "severity": "warning"
+     }
+    ],
+    "source_version_id": "73a463c6-1058-5725-8d4c-ad111807daf5"
+   },
+   "name": "node_syllabus_not_published",
+   "node_id": "0f47b113-c307-53af-8a92-d64a4fec72f4",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "大纲尚未发布时的变式题干。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "a80bdd28-a948-5c7b-97c8-ab45710dae30",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_syllabus@example.invalid",
+      "id": "4ef66e40-0d43-5513-a0d5-963c88157c48",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "a80bdd28-a948-5c7b-97c8-ab45710dae30",
+      "is_archived": false,
+      "name": "项目-checks_syllabus",
+      "owner_id": "4ef66e40-0d43-5513-a0d5-963c88157c48",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "81ace3c8-ddab-52f7-afa2-9ef6be2d703f",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "a80bdd28-a948-5c7b-97c8-ab45710dae30",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "7239e1ce-ecaf-5de1-9e38-5d6b0bb7312a",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "a80bdd28-a948-5c7b-97c8-ab45710dae30",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "07f1d75c-2f63-5f88-8c92-7651907a2e10",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "draft",
+      "subject_id": "81ace3c8-ddab-52f7-afa2-9ef6be2d703f",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "468f788e-2a73-50d6-bb17-d13493efd8c3",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "7239e1ce-ecaf-5de1-9e38-5d6b0bb7312a",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "0f47b113-c307-53af-8a92-d64a4fec72f4",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "07f1d75c-2f63-5f88-8c92-7651907a2e10",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "9e1496b4-b913-51a2-9f3e-5cf78a4b9ffd",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "468f788e-2a73-50d6-bb17-d13493efd8c3",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "8d013787-9415-5ef8-961b-4c2d814e77bd",
+      "is_disputed": false,
+      "question_version_id": "73a463c6-1058-5725-8d4c-ad111807daf5",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "097bbd74-84c5-5c78-adaf-4a90a71ba0f7",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "81ace3c8-ddab-52f7-afa2-9ef6be2d703f",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题五：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "8850b4b53c94f1d2bde2d93e30a675ab0fd2343e3c9bd565d0adcc28178fc69d",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "73a463c6-1058-5725-8d4c-ad111807daf5",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "097bbd74-84c5-5c78-adaf-4a90a71ba0f7",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "73a463c6-1058-5725-8d4c-ad111807daf5"
+  },
+  {
+   "exclude_candidate_id": null,
+   "expected": {
+    "content_digest": "9b33ca95cb17902df7ef9563949743ac73c6f67641e7d8b66e3812fab53048d1",
+    "origin_type": "ai_generated",
+    "problems": [
+     {
+      "code": "answer.correct_option_unknown",
+      "message": "正确选项 opt_z 不在题干选项中",
+      "path": "answer_payload",
+      "severity": "blocking"
+     },
+     {
+      "code": "answer.correct_option_not_in_options",
+      "message": "正确选项 opt_z 不在变式选项中",
+      "path": "answer_payload.correct_option_id",
+      "severity": "blocking"
+     }
+    ],
+    "source_version_id": "5a7518d8-0bd9-5010-a611-2cd05841b26b"
+   },
+   "name": "answer_unknown_option",
+   "node_id": "266d320a-4f93-5b88-abb1-b67093781e0c",
+   "payload": {
+    "answer_payload": {
+     "correct_option_id": "opt_z",
+     "kind": "single_choice"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "答案指向不存在选项的变式。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null
+   },
+   "project_id": "87c024f4-0f93-5182-a1c0-a9821e287f4b",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-checks_answer@example.invalid",
+      "id": "f8801a5e-c99c-55b7-bbb5-5b6a0a20690e",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "87c024f4-0f93-5182-a1c0-a9821e287f4b",
+      "is_archived": false,
+      "name": "项目-checks_answer",
+      "owner_id": "f8801a5e-c99c-55b7-bbb5-5b6a0a20690e",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "45025b29-6f70-54d9-9e1c-5ab6cbc96e8e",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "87c024f4-0f93-5182-a1c0-a9821e287f4b",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "7864407a-9db4-504e-a474-80078384fe8c",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "87c024f4-0f93-5182-a1c0-a9821e287f4b",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "6bbaa49f-2c81-5f87-9917-58c76aaa182b",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "45025b29-6f70-54d9-9e1c-5ab6cbc96e8e",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "528bfbde-6da8-564c-8afd-1467f7f24e24",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "7864407a-9db4-504e-a474-80078384fe8c",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "266d320a-4f93-5b88-abb1-b67093781e0c",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "6bbaa49f-2c81-5f87-9917-58c76aaa182b",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "2fa11335-cd31-5e94-86d5-5a9f8e6b17c9",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "528bfbde-6da8-564c-8afd-1467f7f24e24",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "b64b855f-9f84-5f1d-b245-c6554669177d",
+      "is_disputed": false,
+      "question_version_id": "5a7518d8-0bd9-5010-a611-2cd05841b26b",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "9de9602a-57dc-5406-9c44-31d162a91ca9",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "45025b29-6f70-54d9-9e1c-5ab6cbc96e8e",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题六：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "851d5c4bb880bcc5e488fb512ab40e83b4843459f21025ce1137e440d1f60ee1",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "5a7518d8-0bd9-5010-a611-2cd05841b26b",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "9de9602a-57dc-5406-9c44-31d162a91ca9",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   },
+   "source_version_id": "5a7518d8-0bd9-5010-a611-2cd05841b26b"
+  }
+ ],
+ "draft_payload": [
+  {
+   "expected": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "answer_source_type": "ai_derived",
+    "answer_status_known": false,
+    "answer_verification": {
+     "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+     "requires_human_confirmation": true,
+     "source_type": "ai_derived",
+     "verification_status": "pending"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "变式题干一。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "display_label": "AI变式·Q1",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null,
+    "variant_content_digest": "45c04c2a124ee1ecbad1a040cccbc714dc1a0a30d4368a49c9a7ae199496da51",
+    "variant_llm_run_id": "00000000-0000-4000-8000-000000000001",
+    "variant_node_id": "021cee50-8061-5e8f-a4c8-d4c026ac82fe",
+    "variant_of_question_id": "005693ab-8209-588a-9715-2c16a380071c",
+    "variant_of_version_id": "dca2515f-3730-57d9-ad15-3a667780d167",
+    "variant_prompt_version": "p2-propose-variant-v1"
+   },
+   "input": {
+    "clean": {
+     "answer_payload": {
+      "correct_option_id": "opt_b",
+      "kind": "single_choice"
+     },
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "变式题干一。"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项A"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项B"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项C"
+         }
+        ],
+        "id": "opt_c",
+        "label": "C"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项D"
+         }
+        ],
+        "id": "opt_d",
+        "label": "D"
+       }
+      ]
+     },
+     "difficulty_note": "提高一档",
+     "doubts": [],
+     "practice_max_score": null,
+     "question_type": "single_choice",
+     "rationale": "换了情境但考点相同",
+     "rubric_criteria": [],
+     "rubric_total_score": null
+    },
+    "content_digest": "45c04c2a124ee1ecbad1a040cccbc714dc1a0a30d4368a49c9a7ae199496da51",
+    "node_id": "021cee50-8061-5e8f-a4c8-d4c026ac82fe",
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "source": {
+     "display_label": "Q1",
+     "question_id": "005693ab-8209-588a-9715-2c16a380071c",
+     "question_type": "single_choice",
+     "version_id": "dca2515f-3730-57d9-ad15-3a667780d167"
+    }
+   },
+   "name": "with_node"
+  },
+  {
+   "expected": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "answer_source_type": "ai_derived",
+    "answer_status_known": false,
+    "answer_verification": {
+     "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+     "requires_human_confirmation": true,
+     "source_type": "ai_derived",
+     "verification_status": "pending"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "变式题干二。"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "difficulty_note": "提高一档",
+    "display_label": "AI变式·Q1",
+    "doubts": [],
+    "practice_max_score": null,
+    "question_type": "single_choice",
+    "rationale": "换了情境但考点相同",
+    "rubric_criteria": [],
+    "rubric_total_score": null,
+    "variant_content_digest": "4306decbd02c6f923a1830ca4c6dfbf97c12b9da5f48838596dfbbf516e4dbb1",
+    "variant_llm_run_id": "00000000-0000-4000-8000-000000000001",
+    "variant_node_id": "",
+    "variant_of_question_id": "005693ab-8209-588a-9715-2c16a380071c",
+    "variant_of_version_id": "dca2515f-3730-57d9-ad15-3a667780d167",
+    "variant_prompt_version": "p2-propose-variant-v1"
+   },
+   "input": {
+    "clean": {
+     "answer_payload": {
+      "correct_option_id": "opt_b",
+      "kind": "single_choice"
+     },
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "变式题干二。"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项A"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项B"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项C"
+         }
+        ],
+        "id": "opt_c",
+        "label": "C"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项D"
+         }
+        ],
+        "id": "opt_d",
+        "label": "D"
+       }
+      ]
+     },
+     "difficulty_note": "提高一档",
+     "doubts": [],
+     "practice_max_score": null,
+     "question_type": "single_choice",
+     "rationale": "换了情境但考点相同",
+     "rubric_criteria": [],
+     "rubric_total_score": null
+    },
+    "content_digest": "4306decbd02c6f923a1830ca4c6dfbf97c12b9da5f48838596dfbbf516e4dbb1",
+    "node_id": null,
+    "run_id": "00000000-0000-4000-8000-000000000001",
+    "source": {
+     "display_label": "Q1",
+     "question_id": "005693ab-8209-588a-9715-2c16a380071c",
+     "question_type": "single_choice",
+     "version_id": "dca2515f-3730-57d9-ad15-3a667780d167"
+    }
+   },
+   "name": "without_node"
+  },
+  {
+   "expected": {
+    "answer_payload": {
+     "kind": "constructed_response",
+     "rubric_required": true
+    },
+    "answer_source_type": "ai_derived",
+    "answer_status_known": false,
+    "answer_verification": {
+     "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+     "requires_human_confirmation": true,
+     "source_type": "ai_derived",
+     "verification_status": "pending"
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "说明该结论的证明思路。"
+      }
+     ]
+    },
+    "difficulty_note": "同类换数",
+    "display_label": "AI变式·Q1",
+    "doubts": [
+     "符号约定可能需要说明"
+    ],
+    "practice_max_score": "5.00",
+    "question_type": "constructed_response",
+    "rationale": "只改数值",
+    "rubric_criteria": [
+     {
+      "criterion_id": "c1",
+      "max_score": "2.00",
+      "required": true,
+      "text": "思路"
+     },
+     {
+      "criterion_id": "c2",
+      "max_score": "3.00",
+      "required": true,
+      "text": "结论"
+     }
+    ],
+    "rubric_total_score": "5.00",
+    "variant_content_digest": "d5d8087a9091d1248ca0ce857192e0597423636b156088941501ff43673e75eb",
+    "variant_llm_run_id": "00000000-0000-4000-8000-000000000002",
+    "variant_node_id": "021cee50-8061-5e8f-a4c8-d4c026ac82fe",
+    "variant_of_question_id": "005693ab-8209-588a-9715-2c16a380071c",
+    "variant_of_version_id": "dca2515f-3730-57d9-ad15-3a667780d167",
+    "variant_prompt_version": "p2-propose-variant-v1"
+   },
+   "input": {
+    "clean": {
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "说明该结论的证明思路。"
+       }
+      ]
+     },
+     "difficulty_note": "同类换数",
+     "doubts": [
+      "符号约定可能需要说明"
+     ],
+     "practice_max_score": null,
+     "question_type": "constructed_response",
+     "rationale": "只改数值",
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "max_score": "2.00",
+       "required": true,
+       "text": "思路"
+      },
+      {
+       "criterion_id": "c2",
+       "max_score": "3.00",
+       "required": true,
+       "text": "结论"
+      }
+     ],
+     "rubric_total_score": "5.00"
+    },
+    "content_digest": "d5d8087a9091d1248ca0ce857192e0597423636b156088941501ff43673e75eb",
+    "node_id": "021cee50-8061-5e8f-a4c8-d4c026ac82fe",
+    "run_id": "00000000-0000-4000-8000-000000000002",
+    "source": {
+     "display_label": "Q1",
+     "question_id": "005693ab-8209-588a-9715-2c16a380071c",
+     "question_type": "constructed_response",
+     "version_id": "dca2515f-3730-57d9-ad15-3a667780d167"
+    }
+   },
+   "name": "constructed_response_rubric_score"
+  }
+ ],
+ "notes": [
+  "Rows are seeded with uuid5 identities and fixed timestamps; replay them in SQLite.",
+  "`checks[].payload` is a raw proposed payload (not the stored draft) like the Python call.",
+  "`review` expects the problems recomputed from the stored row, not the stored review_issues."
+ ],
+ "now": "2026-05-01T00:00:00+00:00",
+ "proposed_score": [
+  {
+   "expected": "3.50",
+   "input": {
+    "answer_payload": {},
+    "clean": {
+     "rubric_criteria": [
+      {
+       "max_score": "2.00"
+      },
+      {
+       "max_score": "1.50"
+      }
+     ]
+    },
+    "content": {
+     "blocks": []
+    },
+    "question_type": "constructed_response"
+   },
+   "name": "constructed_response_sum"
+  },
+  {
+   "expected": "5.00",
+   "input": {
+    "answer_payload": {},
+    "clean": {
+     "rubric_criteria": [],
+     "rubric_total_score": "5.00"
+    },
+    "content": {
+     "blocks": []
+    },
+    "question_type": "constructed_response"
+   },
+   "name": "constructed_response_stated_fallback"
+  },
+  {
+   "expected": "3.00",
+   "input": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "clean": {
+     "practice_max_score": "3.00",
+     "rubric_criteria": []
+    },
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "题干"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "question_type": "single_choice"
+   },
+   "name": "declared_score_wins"
+  },
+  {
+   "expected": "3.00",
+   "input": {
+    "answer_payload": {
+     "blanks": {
+      "b1": {
+       "max_score": "1.00"
+      },
+      "b2": {
+       "max_score": "2.00"
+      }
+     },
+     "kind": "fill_blank"
+    },
+    "clean": {},
+    "content": {
+     "blanks": [],
+     "blocks": []
+    },
+    "question_type": "fill_blank"
+   },
+   "name": "fill_blank_answer_sum"
+  },
+  {
+   "expected": "3.50",
+   "input": {
+    "answer_payload": {
+     "blanks": {},
+     "kind": "fill_blank"
+    },
+    "clean": {},
+    "content": {
+     "blanks": [
+      {
+       "blank_id": "b1",
+       "max_score": "1.00"
+      },
+      {
+       "blank_id": "b2",
+       "max_score": "2.50"
+      }
+     ],
+     "blocks": []
+    },
+    "question_type": "fill_blank"
+   },
+   "name": "fill_blank_declared_sum"
+  },
+  {
+   "expected": null,
+   "input": {
+    "answer_payload": {
+     "correct_option_id": "opt_b",
+     "kind": "single_choice"
+    },
+    "clean": {},
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "题干"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项A"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项B"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项C"
+        }
+       ],
+       "id": "opt_c",
+       "label": "C"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "选项D"
+        }
+       ],
+       "id": "opt_d",
+       "label": "D"
+      }
+     ]
+    },
+    "question_type": "single_choice"
+   },
+   "name": "nothing_declared"
+  }
+ ],
+ "review": [
+  {
+   "candidate_id": "fe1d2321-bfc2-51de-a272-50197fa88938",
+   "expected": [],
+   "name": "stored_candidate_revalidated",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-review@example.invalid",
+      "id": "c58d325b-1f34-5a43-a613-a04d35daa20e",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "7cbf8a7f-8637-57b8-b68b-eb1e08b2f216",
+      "is_archived": false,
+      "name": "项目-review",
+      "owner_id": "c58d325b-1f34-5a43-a613-a04d35daa20e",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "977d184a-5399-5d9e-bf8d-c2b67a4c7d49",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "7cbf8a7f-8637-57b8-b68b-eb1e08b2f216",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "4e433d32-a3a1-5e81-8cea-cb0aa31dd1bc",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "7cbf8a7f-8637-57b8-b68b-eb1e08b2f216",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "c07c59fc-ccd8-55af-b45e-aec538a0b6cd",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "977d184a-5399-5d9e-bf8d-c2b67a4c7d49",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "815407f9-c716-53d9-8cbc-9b159eb56370",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "4e433d32-a3a1-5e81-8cea-cb0aa31dd1bc",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "ingestion_import_candidate": [
+     {
+      "answer_match": {},
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "draft_payload": {
+       "answer_payload": {
+        "correct_option_id": "opt_b",
+        "kind": "single_choice"
+       },
+       "answer_source_type": "ai_derived",
+       "answer_status_known": false,
+       "answer_verification": {
+        "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+        "requires_human_confirmation": true,
+        "source_type": "ai_derived",
+        "verification_status": "pending"
+       },
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "待复核的变式题干。"
+         }
+        ],
+        "options": [
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项A"
+           }
+          ],
+          "id": "opt_a",
+          "label": "A"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项B"
+           }
+          ],
+          "id": "opt_b",
+          "label": "B"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项C"
+           }
+          ],
+          "id": "opt_c",
+          "label": "C"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项D"
+           }
+          ],
+          "id": "opt_d",
+          "label": "D"
+         }
+        ]
+       },
+       "difficulty_note": "提高一档",
+       "display_label": "AI变式·Q1",
+       "doubts": [],
+       "practice_max_score": null,
+       "question_type": "single_choice",
+       "rationale": "换了情境但考点相同",
+       "rubric_criteria": [],
+       "rubric_total_score": null,
+       "variant_content_digest": "bcfe05f03daacc95c01bd491ae37e97934dda06e7fa45ba861e2f5b1d86c1047",
+       "variant_llm_run_id": "10bdaa71-0343-597f-b862-77571aadd6b2",
+       "variant_node_id": "99468064-048f-5c3d-900e-3f54e45b2fa5",
+       "variant_of_question_id": "26bd8fce-2465-502b-b3e3-4aa8259685a7",
+       "variant_of_version_id": "c2003e18-10f5-5ba8-8a4d-be32286c7991",
+       "variant_prompt_version": "p2-propose-variant-v1"
+      },
+      "duplicate_of_candidate_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "id": "fe1d2321-bfc2-51de-a272-50197fa88938",
+      "is_stub_output": false,
+      "job_id": "f68fbc7e-7032-5751-82ef-776bc2feee85",
+      "layout_review_confirmed_at": null,
+      "layout_review_note": "",
+      "machine_payload": {
+       "content_digest": "bcfe05f03daacc95c01bd491ae37e97934dda06e7fa45ba861e2f5b1d86c1047",
+       "llm_run_id": "run-1",
+       "producer": "ai_variant",
+       "variant_node_id": "99468064-048f-5c3d-900e-3f54e45b2fa5",
+       "variant_of_version_id": "c2003e18-10f5-5ba8-8a4d-be32286c7991"
+      },
+      "paper_revision_id": null,
+      "parent_candidate_id": null,
+      "project_id": "7cbf8a7f-8637-57b8-b68b-eb1e08b2f216",
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "review_issues": [],
+      "reviewed_at": null,
+      "reviewed_by_id": null,
+      "revision": 1,
+      "source_position_key": "",
+      "status": "draft",
+      "subject_id": "977d184a-5399-5d9e-bf8d-c2b67a4c7d49",
+      "updated_at": "2026-05-01T00:12:00+00:00"
+     }
+    ],
+    "ingestion_import_job": [
+     {
+      "attempts": 0,
+      "created_at": "2026-05-01T00:11:00+00:00",
+      "created_by_id": "c58d325b-1f34-5a43-a613-a04d35daa20e",
+      "duplicate_of_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "finished_at": null,
+      "id": "f68fbc7e-7032-5751-82ef-776bc2feee85",
+      "input_fingerprint": "review-fingerprint",
+      "input_kind": "ai_variant",
+      "input_text": "ai-variant:review:no-node::1",
+      "last_error": "",
+      "max_attempts": 3,
+      "page_diagnostics": [],
+      "problems": [],
+      "progress_percent": 0,
+      "project_id": "7cbf8a7f-8637-57b8-b68b-eb1e08b2f216",
+      "started_at": null,
+      "status": "awaiting_review",
+      "subject_id": "977d184a-5399-5d9e-bf8d-c2b67a4c7d49",
+      "updated_at": "2026-05-01T00:11:00+00:00"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "99468064-048f-5c3d-900e-3f54e45b2fa5",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "c07c59fc-ccd8-55af-b45e-aec538a0b6cd",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "b846f96b-6dfc-53dd-ad6b-c519b7c715ed",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "815407f9-c716-53d9-8cbc-9b159eb56370",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "af59b452-05d3-585b-b850-5c5b013d4b4d",
+      "is_disputed": false,
+      "question_version_id": "c2003e18-10f5-5ba8-8a4d-be32286c7991",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "26bd8fce-2465-502b-b3e3-4aa8259685a7",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "977d184a-5399-5d9e-bf8d-c2b67a4c7d49",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题七：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "dadf2eac15143ea51834a9b3292de682941dd84001ae8bc930e4629e3548a6de",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "c2003e18-10f5-5ba8-8a4d-be32286c7991",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "26bd8fce-2465-502b-b3e3-4aa8259685a7",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   }
+  },
+  {
+   "candidate_id": "3bf1f69b-11af-5c66-8fa9-0cee8b65bfde",
+   "expected": [
+    {
+     "code": "variant_source_missing",
+     "message": "找不到变式的源题版本：无法验证它是否构成有效变式",
+     "path": "variant_of_version_id",
+     "severity": "blocking"
+    }
+   ],
+   "name": "variant_source_missing",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-review_source_missing@example.invalid",
+      "id": "63b6724b-df96-59f8-97c4-6e03104ab6a0",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "8b59975d-406c-5398-a789-027074b9f93c",
+      "is_archived": false,
+      "name": "项目-review_source_missing",
+      "owner_id": "63b6724b-df96-59f8-97c4-6e03104ab6a0",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "4ba7532f-d41d-5508-8421-d6aec1adda53",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "8b59975d-406c-5398-a789-027074b9f93c",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "966853d3-1c7f-596c-996f-b91ff9b7f1b4",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "8b59975d-406c-5398-a789-027074b9f93c",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "c41f7867-4a5f-5231-848b-f441c6d9f2c3",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "4ba7532f-d41d-5508-8421-d6aec1adda53",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "1364c1fa-b36c-529e-a8cf-576984447f8d",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "966853d3-1c7f-596c-996f-b91ff9b7f1b4",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "ingestion_import_candidate": [
+     {
+      "answer_match": {},
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "draft_payload": {
+       "answer_payload": {},
+       "content": {},
+       "question_type": "single_choice"
+      },
+      "duplicate_of_candidate_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "id": "3bf1f69b-11af-5c66-8fa9-0cee8b65bfde",
+      "is_stub_output": false,
+      "job_id": "a9a0fd29-726b-52b3-b7a0-a5f9dca463b1",
+      "layout_review_confirmed_at": null,
+      "layout_review_note": "",
+      "machine_payload": {},
+      "paper_revision_id": null,
+      "parent_candidate_id": null,
+      "project_id": "8b59975d-406c-5398-a789-027074b9f93c",
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "review_issues": [],
+      "reviewed_at": null,
+      "reviewed_by_id": null,
+      "revision": 1,
+      "source_position_key": "",
+      "status": "draft",
+      "subject_id": "4ba7532f-d41d-5508-8421-d6aec1adda53",
+      "updated_at": "2026-05-01T00:09:00+00:00"
+     }
+    ],
+    "ingestion_import_job": [
+     {
+      "attempts": 0,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": "63b6724b-df96-59f8-97c4-6e03104ab6a0",
+      "duplicate_of_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "finished_at": null,
+      "id": "a9a0fd29-726b-52b3-b7a0-a5f9dca463b1",
+      "input_fingerprint": "missing-fingerprint",
+      "input_kind": "ai_variant",
+      "input_text": "ai-variant:missing:no-node::1",
+      "last_error": "",
+      "max_attempts": 3,
+      "page_diagnostics": [],
+      "problems": [],
+      "progress_percent": 0,
+      "project_id": "8b59975d-406c-5398-a789-027074b9f93c",
+      "started_at": null,
+      "status": "awaiting_review",
+      "subject_id": "4ba7532f-d41d-5508-8421-d6aec1adda53",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "aefe07df-93e4-5ee9-9840-bc5885bd4898",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "c41f7867-4a5f-5231-848b-f441c6d9f2c3",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "4a1ca40b-7035-581d-8238-4398d1bce99a",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "1364c1fa-b36c-529e-a8cf-576984447f8d",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ]
+   }
+  }
+ ],
+ "summaries": [
+  {
+   "expected": {
+    "candidate_count": 2,
+    "candidate_status_counts": {
+     "draft": 1,
+     "ready": 1
+    },
+    "candidates": [
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [],
+      "candidate_id": "64d24205-03f5-5bbf-91f0-325a543f71f9",
+      "content_digest": "6e473014989addc64a3986717bb18dfa629749338bc8edd908ae8a453511c37d",
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "is_stub_output": false,
+      "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+      "llm_run_id": "3980a64e-57e3-5127-aaaa-0bd669a93ac6",
+      "node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [],
+      "source_question_id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+      "source_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+      "status": "draft"
+     },
+     {
+      "answer_needs_confirmation": true,
+      "answer_source_type": "ai_derived",
+      "awaiting_human_review": true,
+      "blocking_issues": [],
+      "candidate_id": "97914074-4c8f-5f8b-9f4e-501aad277229",
+      "content_digest": "e7117fae644735d59e25eb4dbf91266abae73d5d1cc03f02d631f99e71cc0706",
+      "created_at": "2026-05-01T00:13:00+00:00",
+      "is_stub_output": false,
+      "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+      "llm_run_id": "3980a64e-57e3-5127-aaaa-0bd669a93ac6",
+      "node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "question_type": "single_choice",
+      "review_issues": [],
+      "source_question_id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+      "source_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+      "status": "ready"
+     }
+    ],
+    "created_at": "2026-05-01T00:11:00+00:00",
+    "extractor_version": "p2-propose-variant-v1",
+    "input_kind": "ai_variant",
+    "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+    "problems": [
+     {
+      "code": "ai_variant_not_published",
+      "message": "变式由模型生成，只会成为待校对候选。",
+      "prompt_version": "p2-propose-variant-v1",
+      "severity": "info",
+      "source_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2"
+     }
+    ],
+    "progress_percent": 0,
+    "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+    "status": "awaiting_review",
+    "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654"
+   },
+   "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+   "name": "variant_job_summary",
+   "rows": {
+    "accounts_user": [
+     {
+      "date_joined": "2026-05-01T00:00:00+00:00",
+      "display_name": "变式作者",
+      "email": "b5-summary@example.invalid",
+      "id": "37908bc5-d15b-57da-b0cf-350874443273",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "last_login": null,
+      "password": "!b5-golden-unusable-password-marker"
+     }
+    ],
+    "exams_project": [
+     {
+      "archived_at": null,
+      "created_at": "2026-05-01T00:01:00+00:00",
+      "description": "",
+      "display_order": 0,
+      "id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "is_archived": false,
+      "name": "项目-summary",
+      "owner_id": "37908bc5-d15b-57da-b0cf-350874443273",
+      "target_date": null,
+      "target_score": null,
+      "updated_at": "2026-05-01T00:01:00+00:00"
+     }
+    ],
+    "exams_subject": [
+     {
+      "code": "MATH",
+      "created_at": "2026-05-01T00:02:00+00:00",
+      "display_order": 0,
+      "id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "name": "数学",
+      "pass_score": null,
+      "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:02:00+00:00"
+     },
+     {
+      "code": "PHY",
+      "created_at": "2026-05-01T00:03:00+00:00",
+      "display_order": 0,
+      "id": "2919790c-d6ad-5206-835a-ec608ebcb97c",
+      "name": "物理",
+      "pass_score": null,
+      "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "total_score": null,
+      "updated_at": "2026-05-01T00:03:00+00:00"
+     }
+    ],
+    "exams_syllabus_version": [
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:04:00+00:00",
+      "created_by_id": null,
+      "id": "03dfc10a-50d8-5524-83d4-d81d83e0c0e4",
+      "is_user_provisional": false,
+      "name": "数学大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "updated_at": "2026-05-01T00:04:00+00:00",
+      "version_label": "2026"
+     },
+     {
+      "applies_from": null,
+      "applies_to": null,
+      "created_at": "2026-05-01T00:05:00+00:00",
+      "created_by_id": null,
+      "id": "bd864a67-9fe0-5bbf-bfc3-9c602b0f0d08",
+      "is_user_provisional": false,
+      "name": "物理大纲",
+      "published_at": null,
+      "review_status": "draft",
+      "source_document_id": null,
+      "status": "published",
+      "subject_id": "2919790c-d6ad-5206-835a-ec608ebcb97c",
+      "updated_at": "2026-05-01T00:05:00+00:00",
+      "version_label": "2026"
+     }
+    ],
+    "ingestion_import_candidate": [
+     {
+      "answer_match": {},
+      "created_at": "2026-05-01T00:12:00+00:00",
+      "draft_payload": {
+       "answer_payload": {
+        "correct_option_id": "opt_b",
+        "kind": "single_choice"
+       },
+       "answer_source_type": "ai_derived",
+       "answer_status_known": false,
+       "answer_verification": {
+        "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+        "requires_human_confirmation": true,
+        "source_type": "ai_derived",
+        "verification_status": "pending"
+       },
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "汇总变式题干一。"
+         }
+        ],
+        "options": [
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项A"
+           }
+          ],
+          "id": "opt_a",
+          "label": "A"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项B"
+           }
+          ],
+          "id": "opt_b",
+          "label": "B"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项C"
+           }
+          ],
+          "id": "opt_c",
+          "label": "C"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项D"
+           }
+          ],
+          "id": "opt_d",
+          "label": "D"
+         }
+        ]
+       },
+       "difficulty_note": "提高一档",
+       "display_label": "AI变式·Q1",
+       "doubts": [],
+       "practice_max_score": null,
+       "question_type": "single_choice",
+       "rationale": "换了情境但考点相同",
+       "rubric_criteria": [],
+       "rubric_total_score": null,
+       "variant_content_digest": "6e473014989addc64a3986717bb18dfa629749338bc8edd908ae8a453511c37d",
+       "variant_llm_run_id": "3980a64e-57e3-5127-aaaa-0bd669a93ac6",
+       "variant_node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+       "variant_of_question_id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+       "variant_of_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+       "variant_prompt_version": "p2-propose-variant-v1"
+      },
+      "duplicate_of_candidate_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "id": "64d24205-03f5-5bbf-91f0-325a543f71f9",
+      "is_stub_output": false,
+      "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+      "layout_review_confirmed_at": null,
+      "layout_review_note": "",
+      "machine_payload": {
+       "content_digest": "6e473014989addc64a3986717bb18dfa629749338bc8edd908ae8a453511c37d",
+       "llm_run_id": "run-1",
+       "producer": "ai_variant",
+       "variant_node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+       "variant_of_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2"
+      },
+      "paper_revision_id": null,
+      "parent_candidate_id": null,
+      "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "review_issues": [],
+      "reviewed_at": null,
+      "reviewed_by_id": null,
+      "revision": 1,
+      "source_position_key": "",
+      "status": "draft",
+      "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "updated_at": "2026-05-01T00:12:00+00:00"
+     },
+     {
+      "answer_match": {},
+      "created_at": "2026-05-01T00:13:00+00:00",
+      "draft_payload": {
+       "answer_payload": {
+        "correct_option_id": "opt_b",
+        "kind": "single_choice"
+       },
+       "answer_source_type": "ai_derived",
+       "answer_status_known": false,
+       "answer_verification": {
+        "note": "AI 推导答案：发布前必须由人工核对并确认（answer_status_known=true）",
+        "requires_human_confirmation": true,
+        "source_type": "ai_derived",
+        "verification_status": "pending"
+       },
+       "content": {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "汇总变式题干二。"
+         }
+        ],
+        "options": [
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项A"
+           }
+          ],
+          "id": "opt_a",
+          "label": "A"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项B"
+           }
+          ],
+          "id": "opt_b",
+          "label": "B"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项C"
+           }
+          ],
+          "id": "opt_c",
+          "label": "C"
+         },
+         {
+          "blocks": [
+           {
+            "kind": "text",
+            "text": "选项D"
+           }
+          ],
+          "id": "opt_d",
+          "label": "D"
+         }
+        ]
+       },
+       "difficulty_note": "提高一档",
+       "display_label": "AI变式·Q1",
+       "doubts": [],
+       "practice_max_score": null,
+       "question_type": "single_choice",
+       "rationale": "换了情境但考点相同",
+       "rubric_criteria": [],
+       "rubric_total_score": null,
+       "variant_content_digest": "e7117fae644735d59e25eb4dbf91266abae73d5d1cc03f02d631f99e71cc0706",
+       "variant_llm_run_id": "3980a64e-57e3-5127-aaaa-0bd669a93ac6",
+       "variant_node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+       "variant_of_question_id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+       "variant_of_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+       "variant_prompt_version": "p2-propose-variant-v1"
+      },
+      "duplicate_of_candidate_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "id": "97914074-4c8f-5f8b-9f4e-501aad277229",
+      "is_stub_output": false,
+      "job_id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+      "layout_review_confirmed_at": null,
+      "layout_review_note": "",
+      "machine_payload": {
+       "content_digest": "e7117fae644735d59e25eb4dbf91266abae73d5d1cc03f02d631f99e71cc0706",
+       "llm_run_id": "run-2",
+       "producer": "ai_variant",
+       "variant_node_id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+       "variant_of_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2"
+      },
+      "paper_revision_id": null,
+      "parent_candidate_id": null,
+      "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "review_issues": [],
+      "reviewed_at": null,
+      "reviewed_by_id": null,
+      "revision": 1,
+      "source_position_key": "",
+      "status": "ready",
+      "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "updated_at": "2026-05-01T00:13:00+00:00"
+     }
+    ],
+    "ingestion_import_job": [
+     {
+      "attempts": 0,
+      "created_at": "2026-05-01T00:11:00+00:00",
+      "created_by_id": "37908bc5-d15b-57da-b0cf-350874443273",
+      "duplicate_of_id": null,
+      "extractor_version": "p2-propose-variant-v1",
+      "finished_at": null,
+      "id": "1adc1947-51e7-5407-92f2-0bdfb203e0a1",
+      "input_fingerprint": "summary-fingerprint",
+      "input_kind": "ai_variant",
+      "input_text": "ai-variant:summary:no-node::2",
+      "last_error": "",
+      "max_attempts": 3,
+      "page_diagnostics": [],
+      "problems": [
+       {
+        "code": "ai_variant_not_published",
+        "message": "变式由模型生成，只会成为待校对候选。",
+        "prompt_version": "p2-propose-variant-v1",
+        "severity": "info",
+        "source_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2"
+       }
+      ],
+      "progress_percent": 0,
+      "project_id": "20cb098b-886e-5ace-90fe-d064ae6561f2",
+      "started_at": null,
+      "status": "awaiting_review",
+      "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "updated_at": "2026-05-01T00:11:00+00:00"
+     }
+    ],
+    "knowledge_node": [
+     {
+      "aliases": [],
+      "canonical_name": "一元二次方程",
+      "code": "",
+      "created_at": "2026-05-01T00:06:00+00:00",
+      "display_order": 0,
+      "id": "d3aa8f47-b70b-524a-a2bd-39c4373fd5ee",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "03dfc10a-50d8-5524-83d4-d81d83e0c0e4",
+      "updated_at": "2026-05-01T00:06:00+00:00"
+     },
+     {
+      "aliases": [],
+      "canonical_name": "牛顿第二定律",
+      "code": "",
+      "created_at": "2026-05-01T00:07:00+00:00",
+      "display_order": 0,
+      "id": "b1335739-9e3d-567e-abc0-5e25a9a0c08b",
+      "is_unclassified": false,
+      "kind": "point",
+      "parent_id": null,
+      "syllabus_version_id": "bd864a67-9fe0-5bbf-bfc3-9c602b0f0d08",
+      "updated_at": "2026-05-01T00:07:00+00:00"
+     }
+    ],
+    "question_bank_answer_key_version": [
+     {
+      "answer_payload": {
+       "correct_option_id": "opt_b",
+       "kind": "single_choice"
+      },
+      "check_basis": "fixture",
+      "checked_at": null,
+      "checked_by_id": null,
+      "created_at": "2026-05-01T00:10:00+00:00",
+      "created_by_id": null,
+      "dispute_reason": "",
+      "explanation_blocks": [],
+      "id": "77ace895-ef14-5a90-871f-c09223326fb9",
+      "is_disputed": false,
+      "question_version_id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+      "source_region_id": null,
+      "source_type": "user",
+      "supersedes_id": null,
+      "updated_at": "2026-05-01T00:10:00+00:00",
+      "verification_status": "checked",
+      "version": 1
+     }
+    ],
+    "question_bank_question": [
+     {
+      "content_lineage_id": null,
+      "created_at": "2026-05-01T00:08:00+00:00",
+      "created_by_id": null,
+      "current_published_version_id": null,
+      "display_label": "Q1",
+      "family_id": null,
+      "id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+      "is_demo": true,
+      "origin_type": "user_authored",
+      "subject_id": "24e11a94-3afc-536e-94da-7319f12b2654",
+      "updated_at": "2026-05-01T00:08:00+00:00"
+     }
+    ],
+    "question_bank_question_version": [
+     {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "原题八：求方程的根。"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项A"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项B"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项C"
+          }
+         ],
+         "id": "opt_c",
+         "label": "C"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "选项D"
+          }
+         ],
+         "id": "opt_d",
+         "label": "D"
+        }
+       ]
+      },
+      "content_digest": "6a180f4f36bae62875cea3ec97e378b73da08115c9f63dba9fbb5e1d6e2b5594",
+      "created_at": "2026-05-01T00:09:00+00:00",
+      "created_by_id": null,
+      "estimated_seconds": null,
+      "id": "73268f94-3f50-55f2-986f-da5d0fddf2b2",
+      "material_child_version_ids": [],
+      "parent_material_version_id": null,
+      "practice_max_score": null,
+      "published_at": "2026-05-01T00:00:00+00:00",
+      "question_id": "4d4015ee-0659-57e8-a4f7-d37b1c6f49ff",
+      "question_type": "single_choice",
+      "revision_reason": "fixture",
+      "source_note": "",
+      "status": "published",
+      "updated_at": "2026-05-01T00:09:00+00:00",
+      "version": 1,
+      "withdrawn_at": null,
+      "withdrawn_reason": ""
+     }
+    ]
+   }
+  }
+ ]
+}

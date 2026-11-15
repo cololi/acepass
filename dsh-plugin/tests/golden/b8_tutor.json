@@ -1,0 +1,318 @@
+{
+ "generated_by": "dsh-plugin/scripts/gen_b8_tutor_golden.py",
+ "projections": {
+  "ai_run": {
+   "keys": [
+    "attempts",
+    "capability",
+    "completion_tokens",
+    "cost_cents",
+    "cost_known",
+    "created_at",
+    "error_code",
+    "id",
+    "is_stub",
+    "latency_ms",
+    "model",
+    "prompt_tokens",
+    "prompt_version",
+    "provider",
+    "status"
+   ]
+  },
+  "ai_status": {
+   "capabilities": {
+    "diagnose": false,
+    "embed": false,
+    "estimate_grade": false,
+    "explain": false,
+    "extract_question": false,
+    "propose_variant": false,
+    "suggest_tags": false,
+    "transcribe_handwriting": false
+   },
+   "configured": false,
+   "is_stub": false,
+   "keys": [
+    "capabilities",
+    "configured",
+    "is_stub",
+    "max_retries",
+    "message",
+    "p0_capabilities",
+    "provider",
+    "total_timeout_seconds"
+   ],
+   "max_retries": 2,
+   "message": "AI 未配置：可正常使用手动录题、作答、判分与复习；图片识别和按需讲解需配置 provider。",
+   "p0_capabilities": [
+    "extract_question",
+    "explain"
+   ],
+   "provider": "none",
+   "total_timeout_seconds": 90
+  },
+  "diagnosis": {
+   "cause_keys": [
+    "attempt_id",
+    "created_at",
+    "diagnosis_id",
+    "error_type",
+    "evidence",
+    "llm_run_id",
+    "note",
+    "origin",
+    "status"
+   ],
+   "follow_up_keys": [
+    "answer_text",
+    "answered_at",
+    "attempt_id",
+    "evidence_kind",
+    "follow_up_id",
+    "llm_run_id",
+    "question",
+    "status",
+    "why"
+   ],
+   "keys": [
+    "attempt_id",
+    "causes",
+    "follow_up_questions",
+    "is_stub",
+    "knowledge_state_changed",
+    "llm_run_id",
+    "missing_information",
+    "note",
+    "origin",
+    "prompt_version",
+    "recorded",
+    "requested_by",
+    "scores_changed",
+    "status"
+   ]
+  },
+  "diagnosis_follow_up": {
+   "keys": [
+    "answer_text",
+    "answered_at",
+    "attempt_id",
+    "evidence_kind",
+    "follow_up_id",
+    "llm_run_id",
+    "question",
+    "status",
+    "why"
+   ]
+  },
+  "error_envelope": {
+   "keys": [
+    "code",
+    "details",
+    "message"
+   ]
+  },
+  "estimate": {
+   "criteria_keys": [
+    "criterion_id",
+    "estimated_score",
+    "max_score",
+    "method",
+    "missing_evidence",
+    "rationale",
+    "status"
+   ],
+   "empty_state_keys": [
+    "attempt_id",
+    "confirmed_total_unchanged",
+    "estimate",
+    "has_estimate",
+    "is_inert",
+    "message"
+   ],
+   "keys": [
+    "attempt_id",
+    "confirmed_score",
+    "confirmed_total_unchanged",
+    "created_at",
+    "criteria",
+    "estimated_score",
+    "grade_event_id",
+    "is_fully_confirmed",
+    "is_inert",
+    "is_stub",
+    "kind",
+    "max_score",
+    "method",
+    "model",
+    "overall_note",
+    "pending_max_score",
+    "prompt_version",
+    "provider",
+    "rubric_revision",
+    "rubric_version_id",
+    "status"
+   ],
+   "state_keys": [
+    "attempt_id",
+    "confirmed_total_unchanged",
+    "estimate",
+    "has_estimate",
+    "is_inert",
+    "message"
+   ]
+  },
+  "transcription": {
+   "keys": [
+    "asset_id",
+    "attempt_id",
+    "confidence",
+    "confirmed_text",
+    "decided_at",
+    "doubts",
+    "is_confirmed",
+    "is_stub",
+    "llm_run_id",
+    "note",
+    "origin",
+    "prompt_version",
+    "raw_text",
+    "status",
+    "transcription_id"
+   ]
+  },
+  "transcription_list": {
+   "keys": [
+    "attachment_asset_ids",
+    "attempt_id",
+    "gate_open",
+    "pending_asset_ids",
+    "transcription_required",
+    "transcriptions"
+   ]
+  },
+  "tutor_job": {
+   "keys": [
+    "citations",
+    "delivered_at",
+    "error_code",
+    "error_message",
+    "is_stale",
+    "is_stub",
+    "missing_information",
+    "model",
+    "prompt_version",
+    "provider",
+    "purpose",
+    "result_blocks",
+    "reveals_answer",
+    "segment_count",
+    "session_item_id",
+    "status",
+    "suggested_next",
+    "tutor_job_id",
+    "tutor_session_id"
+   ],
+   "read_keys": [
+    "citations",
+    "delivered_at",
+    "error_code",
+    "error_message",
+    "is_stale",
+    "is_stub",
+    "missing_information",
+    "model",
+    "prompt_version",
+    "provider",
+    "purpose",
+    "result_blocks",
+    "reveals_answer",
+    "segment_count",
+    "session_item_id",
+    "status",
+    "suggested_next",
+    "tutor_job_id",
+    "tutor_session_id"
+   ],
+   "unavailable": {
+    "error_code": "ai_not_configured",
+    "is_stub": false,
+    "result_blocks": [],
+    "segment_count": 0,
+    "status": "unavailable"
+   }
+  },
+  "tutor_segments": {
+   "keys": [
+    "is_stale",
+    "segment_count",
+    "segments",
+    "stale_reason",
+    "status",
+    "tutor_job_id"
+   ],
+   "segment_keys": [
+    "digest",
+    "index",
+    "is_stale",
+    "items",
+    "kind",
+    "text"
+   ],
+   "unavailable": {
+    "is_stale": false,
+    "keys": [
+     "is_stale",
+     "segment_count",
+     "segments",
+     "stale_reason",
+     "status",
+     "tutor_job_id"
+    ],
+    "segment_count": 0
+   }
+  },
+  "tutor_session": {
+   "keys": [
+    "answer_key_version_id",
+    "attempt_id",
+    "created_at",
+    "prompt_version",
+    "purpose",
+    "question_version_id",
+    "session_item_id",
+    "tutor_session_id"
+   ]
+  },
+  "tutor_stream": {
+   "done_keys": [
+    "citation_count",
+    "is_stale",
+    "last_event_id",
+    "segment_count",
+    "status",
+    "tutor_job_id"
+   ],
+   "events": [
+    "status",
+    "done"
+   ],
+   "segment_keys": [],
+   "status_keys": [
+    "citation_count",
+    "finalized",
+    "is_stale",
+    "is_stub",
+    "last_event_id",
+    "segment_count",
+    "status",
+    "tutor_job_id"
+   ],
+   "unavailable_events": [
+    "status",
+    "done"
+   ]
+  }
+ },
+ "source": "docs/dsh-migration/17-b8-tutor-probe.json (real Django, config.settings.test)"
+}

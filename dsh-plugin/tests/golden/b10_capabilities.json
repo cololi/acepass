@@ -1,0 +1,104 @@
+{
+ "answer_change_dedupe": {
+  "key_template": "answer-change:<answer_key_version_id>:<epoch-seconds>",
+  "next_second_events": 2,
+  "same_second_events": 1
+ },
+ "dispute": {
+  "affected_for_two_attempts": 2,
+  "comment": "答案争议：答案与来源不一致，需重新核对",
+  "event": {
+   "confirmed_score": null,
+   "grader_is_self": false,
+   "is_fully_confirmed": false,
+   "is_superseded": false,
+   "kind": "invalidation",
+   "max_score": "2.00",
+   "method": "mixed",
+   "parts": [
+    {
+     "detail": {
+      "reason": "答案进入争议，原判分不再作为正式分数"
+     },
+     "max_score": "2.00",
+     "method": null,
+     "part_id": "choice",
+     "score": null,
+     "status": "pending_review"
+    }
+   ],
+   "pending_max_score": "2.00",
+   "rule_version": "p0-1",
+   "status": "pending_review"
+  },
+  "grading_revision_delta": 1,
+  "invalidation_reason": "答案与来源不一致，需重新核对",
+  "part_keys": [
+   "detail",
+   "max_score",
+   "method",
+   "part_id",
+   "score",
+   "status"
+  ],
+  "previous_is_superseded": true,
+  "rule_snapshot_copied": true
+ },
+ "evidence_invalidation": {
+  "active_after": 0,
+  "invalidated_at_set": true,
+  "invalidated_reason": "答案版本进入争议",
+  "returned": 6,
+  "rows_per_attempt": 6,
+  "second_call": 0
+ },
+ "generated_by": "scripts/probe_b10_capabilities.py",
+ "mock_exam_expiry": {
+  "before_deadline_status": "active",
+  "events": 1,
+  "expired_at_is_the_observed_moment": true,
+  "finished_at_is_deadline": true,
+  "revealed_at_is_deadline": true,
+  "second_sweep_events": 1
+ },
+ "note": "Django 真实函数在一张一次性 test DB 上产生的向量；ids/时间/规则快照已剔除。Node 侧用等价夹具重放同样的断言。",
+ "practice_finish": {
+  "revealed_at": null
+ },
+ "repeat_dispute": {
+  "affected": 2,
+  "events_added": 0
+ },
+ "session_finish": {
+  "dedupe_template": "session-finished:<session_id>",
+  "event_topic": "learning.on_session_finished",
+  "events": 1,
+  "payload_keys": [
+   "session_id"
+  ],
+  "revealed_equals_finished": true,
+  "status": "finished",
+  "task_completed_at_equals_finished": true,
+  "task_status": "completed"
+ },
+ "session_refresh": {
+  "attempts": 3,
+  "evidence_per_attempt": [
+   6,
+   6,
+   6
+  ],
+  "returned": 3,
+  "state": {
+   "best_summary": "independent",
+   "distinct_question_count": 3,
+   "distinct_template_count": 0,
+   "has_delayed_correct": false,
+   "independent_correct_count": 3,
+   "needs_review": false,
+   "rule_version": "p0-1",
+   "summary": "independent"
+  }
+ },
+ "source": "var/b10/f4-probe.json"
+}

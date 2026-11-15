@@ -1,0 +1,7431 @@
+{
+ "parse": [
+  {
+   "text": "",
+   "structure_only": false,
+   "segments": []
+  },
+  {
+   "text": "",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "   \n\t\n",
+   "structure_only": false,
+   "segments": []
+  },
+  {
+   "text": "   \n\t\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "一、单项选择题\n二、多项选择题\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "一、单项选择题\n二、多项选择题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "一、单项选择题\n二、多项选择题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "一、单项选择题\n二、多项选择题\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪些是偶数？\n【题型】多选\n【选项】\nA. 2\nB. 3\nC. 4\n【答案】AC\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪些是偶数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪些是偶数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "multiple_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "2"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "3"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "multiple_choice",
+      "correct_option_ids": [
+       "opt_a",
+       "opt_c"
+      ],
+      "policy": "exact_match"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪些是偶数？\n【题型】多选\n【选项】\nA. 2\nB. 3\nC. 4\n【答案】AC\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪些是偶数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪些是偶数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "multiple_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "2"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "3"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "multiple_choice",
+      "correct_option_ids": [
+       "opt_a",
+       "opt_c"
+      ],
+      "policy": "exact_match"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】结果保留一位小数，约为 __，另一空为 __。\n【答案】10.0; -2\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "结果保留一位小数，约为 __，另一空为 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "10.0"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-2"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "结果保留一位小数，约为 __，另一空为 __。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】结果保留一位小数，约为 __，另一空为 __。\n【答案】10.0; -2\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "结果保留一位小数，约为 __，另一空为 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "10.0"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-2"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "结果保留一位小数，约为 __，另一空为 __。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【材料】阅读下面的段落，回答问题。\n段落第一行。\n【子题1】\n【题干】第一问？\n【答案】A\n【子题2】\n【题干】第二问？\n【答案】B\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "阅读下面的段落，回答问题。\n段落第一行。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "阅读下面的段落，回答问题。\n段落第一行。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】阅读下面的段落，回答问题。\n段落第一行。\n【子题1】\n【题干】第一问？\n【答案】A\n【子题2】\n【题干】第二问？\n【答案】B\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "阅读下面的段落，回答问题。\n段落第一行。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "阅读下面的段落，回答问题。\n段落第一行。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料一】第一段材料。\n【小题 1】【题型】单选\n【题干】问题一？\n【答案】A\n【材料二】第二段材料。\n【设问2】\n【题干】问题二？\n【答案】B\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "一",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一段材料。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一段材料。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题一？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题一？",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "material",
+     "display_label": "二",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二段材料。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二段材料。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m3",
+     "child_local_ids": [
+      "q4"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题二？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题二？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q4",
+     "parent_local_id": "m3"
+    }
+   ]
+  },
+  {
+   "text": "【材料一】第一段材料。\n【小题 1】【题型】单选\n【题干】问题一？\n【答案】A\n【材料二】第二段材料。\n【设问2】\n【题干】问题二？\n【答案】B\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "一",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一段材料。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一段材料。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题一？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题一？",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "material",
+     "display_label": "二",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二段材料。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二段材料。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m3",
+     "child_local_ids": [
+      "q4"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题二？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题二？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q4",
+     "parent_local_id": "m3"
+    }
+   ]
+  },
+  {
+   "text": "【子题1】【题型】单选\n【题干】内联标签\n【选项】A. 甲\nB. 乙\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "【子题1】【题型】单选\n【题干】内联标签\n【选项】A. 甲\n【答案】A"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "【子题1】【题型】单选\n【题干】内联标签\n【选项】A. 甲\n【答案】A",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【子题1】【题型】单选\n【题干】内联标签\n【选项】A. 甲\nB. 乙\n【答案】A\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "1．【题型】单选\n【题干】带印题号的一题\n【选项】A. 甲\nB. 乙\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "带印题号的一题"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "带印题号的一题",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "1．【题型】单选\n【题干】带印题号的一题\n【选项】A. 甲\nB. 乙\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "带印题号的一题"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "带印题号的一题",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "一、单项选择题\n1. 下列说法正确的是（ ）\nA. 甲\nB. 乙\nC. 丙\n2、第二题\nD. 丁\nE. 戊\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "一、单项选择题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "一、单项选择题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列说法正确的是（ ）"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "丙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列说法正确的是（ ）",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二题"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_d",
+        "label": "D",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "丁"
+         }
+        ]
+       },
+       {
+        "id": "opt_e",
+        "label": "E",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "戊"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二题",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "一、单项选择题\n1. 下列说法正确的是（ ）\nA. 甲\nB. 乙\nC. 丙\n2、第二题\nD. 丁\nE. 戊\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "【题型】判断\n【题干】地球是圆的。\n【答案】对\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "地球是圆的。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "true_false",
+      "value": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "地球是圆的。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】判断\n【题干】地球是圆的。\n【答案】对\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "地球是圆的。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "true_false",
+      "value": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "地球是圆的。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】大题\n【题干】请说明推导过程。\n【答案】略\n【评分标准】列出已知条件 2 分\n推导正确 3 分\n结论与单位 5 分\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "rubric",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "请说明推导过程。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "请说明推导过程。",
+     "parse_issues": [],
+     "practice_max_score": null,
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "text": "列出已知条件",
+       "max_score": "2",
+       "required": true
+      },
+      {
+       "criterion_id": "c2",
+       "text": "推导正确",
+       "max_score": "3",
+       "required": true
+      },
+      {
+       "criterion_id": "c3",
+       "text": "结论与单位",
+       "max_score": "5",
+       "required": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "text": "【题型】大题\n【题干】请说明推导过程。\n【答案】略\n【评分标准】列出已知条件 2 分\n推导正确 3 分\n结论与单位 5 分\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "rubric",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "请说明推导过程。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "请说明推导过程。",
+     "parse_issues": [],
+     "practice_max_score": null,
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "text": "列出已知条件",
+       "max_score": "2",
+       "required": true
+      },
+      {
+       "criterion_id": "c2",
+       "text": "推导正确",
+       "max_score": "3",
+       "required": true
+      },
+      {
+       "criterion_id": "c3",
+       "text": "结论与单位",
+       "max_score": "5",
+       "required": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "text": "【题型】连线\n【题干】把左右两列连起来。\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "把左右两列连起来。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "把左右两列连起来。",
+     "parse_issues": [
+      "未识别的题型声明“连线”，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】连线\n【题干】把左右两列连起来。\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "把左右两列连起来。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "把左右两列连起来。",
+     "parse_issues": [
+      "未识别的题型声明“连线”，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】两个空：__ 和 __。\n【答案】只有一空\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "两个空：__ 和 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "两个空：__ 和 __。",
+     "parse_issues": [
+      "答案数量（1）与空位数（2）不一致，请核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】两个空：__ 和 __。\n【答案】只有一空\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "两个空：__ 和 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "两个空：__ 和 __。",
+     "parse_issues": [
+      "答案数量（1）与空位数（2）不一致，请核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下面哪一项正确？\n【选项】\nA. 甲\nB. 乙\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下面哪一项正确？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下面哪一项正确？",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下面哪一项正确？\n【选项】\nA. 甲\nB. 乙\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下面哪一项正确？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下面哪一项正确？",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】下面哪一项正确？\n【选项】\nA. 甲\nB. 乙\n【答案】Z\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下面哪一项正确？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下面哪一项正确？",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】下面哪一项正确？\n【选项】\nA. 甲\nB. 乙\n【答案】Z\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下面哪一项正确？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下面哪一项正确？",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】判断\n【题干】太阳从西边升起。\n【答案】错误\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "太阳从西边升起。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "true_false",
+      "value": false
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "太阳从西边升起。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】判断\n【题干】太阳从西边升起。\n【答案】错误\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "太阳从西边升起。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "true_false",
+      "value": false
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "太阳从西边升起。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】判断\n【题干】太阳从东边升起。\n【答案】说不清\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "太阳从东边升起。"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "太阳从东边升起。",
+     "parse_issues": [
+      "判断题答案无法解析为真/假，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】判断\n【题干】太阳从东边升起。\n【答案】说不清\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "太阳从东边升起。"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "太阳从东边升起。",
+     "parse_issues": [
+      "判断题答案无法解析为真/假，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【提示】这是材料里的说明文字\n【子题】问题？\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文\n【提示】这是材料里的说明文字"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文\n【提示】这是材料里的说明文字",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【提示】这是材料里的说明文字\n【子题】问题？\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文\n【提示】这是材料里的说明文字"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文\n【提示】这是材料里的说明文字",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "问题？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "问题？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【子题】\n【题干】没有编号的子题\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "没有编号的子题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "没有编号的子题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【子题】\n【题干】没有编号的子题\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "没有编号的子题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "没有编号的子题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【子题1】\n【题干】子题一\n【答案】A\n【子题1】\n【题干】子题一重复\n【答案】B\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一重复"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一重复",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料正文\n【子题1】\n【题干】子题一\n【答案】A\n【子题1】\n【题干】子题一重复\n【答案】B\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一重复"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一重复",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【题干】长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+     "parse_issues": [
+      "未声明题型且题干较长，已暂按大题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+     "parse_issues": [
+      "未声明题型且题干较长，已暂按大题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题",
+     "parse_issues": [
+      "未声明题型且题干较长，已暂按大题处理，请校对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "😀🎯题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题题",
+     "parse_issues": [
+      "未声明题型且题干较长，已暂按大题处理，请校对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【　题干　】 前后有空白 \n【答案】　A　\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "前后有空白"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "前后有空白 ",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【　题干　】 前后有空白 \n【答案】　A　\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "前后有空白"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "前后有空白 ",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】第一行\r\n【选项】\u000bA. 甲\u001cB. 乙 【答案】A尾行",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一行"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "第一行",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】第一行\r\n【选项】\u000bA. 甲\u001cB. 乙 【答案】A尾行",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一行"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "第一行",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】大题\n【题干】说明理由。\n【答案】略\n【评分标准】论点清晰\n（2 分）论据充分（2分）\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "rubric",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "说明理由。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "说明理由。",
+     "parse_issues": [],
+     "practice_max_score": null,
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "text": "论点清晰",
+       "max_score": "0",
+       "required": true
+      },
+      {
+       "criterion_id": "c2",
+       "text": "论据充分",
+       "max_score": "2",
+       "required": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "text": "【题型】大题\n【题干】说明理由。\n【答案】略\n【评分标准】论点清晰\n（2 分）论据充分（2分）\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "constructed_response",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "rubric",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "说明理由。"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "constructed_response",
+      "rubric_required": true
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "说明理由。",
+     "parse_issues": [],
+     "practice_max_score": null,
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "text": "论点清晰",
+       "max_score": "0",
+       "required": true
+      },
+      {
+       "criterion_id": "c2",
+       "text": "论据充分",
+       "max_score": "2",
+       "required": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料\n【1】第一小问\n【答案】A\n【2】第二小问\n【答案】B\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一小问"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一小问",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二小问"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二小问",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【材料】材料\n【1】第一小问\n【答案】A\n【2】第二小问\n【答案】B\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一小问"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一小问",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二小问"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二小问",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ]
+  },
+  {
+   "text": "【题干】题一\n【答案】A\n【题干】题二\n【题型】填空\n【题干】题二题干 __\n【答案】乙\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题一"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题一",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题二"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题二",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题二题干 __"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "乙"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "题二题干 __",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】题一\n【答案】A\n【题干】题二\n【题型】填空\n【题干】题二题干 __\n【答案】乙\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题一"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题一",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题二"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题二",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题二题干 __"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "乙"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "题二题干 __",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n【题干】下列哪些是偶数？\n【题型】多选\n【选项】\nA. 2\nB. 3\nC. 4\n【答案】AC\n【题型】填空题\n【题干】结果保留一位小数，约为 __，另一空为 __。\n【答案】10.0; -2\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪些是偶数？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "下列哪些是偶数？",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    },
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "结果保留一位小数，约为 __，另一空为 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "10.0"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-2"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "结果保留一位小数，约为 __，另一空为 __。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n【题干】下列哪些是偶数？\n【题型】多选\n【选项】\nA. 2\nB. 3\nC. 4\n【答案】AC\n【题型】填空题\n【题干】结果保留一位小数，约为 __，另一空为 __。\n【答案】10.0; -2\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪些是偶数？"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "下列哪些是偶数？",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    },
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "结果保留一位小数，约为 __，另一空为 __。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "10.0"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-2"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "结果保留一位小数，约为 __，另一空为 __。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n【材料】阅读下面的段落，回答问题。\n段落第一行。\n【子题1】\n【题干】第一问？\n【答案】A\n【子题2】\n【题干】第二问？\n【答案】B\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    },
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "阅读下面的段落，回答问题。\n段落第一行。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "阅读下面的段落，回答问题。\n段落第一行。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m3",
+     "child_local_ids": [
+      "q4",
+      "q5"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q4",
+     "parent_local_id": "m3"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q5",
+     "parent_local_id": "m3"
+    }
+   ]
+  },
+  {
+   "text": "【题干】下列哪一项是质数？\n【题型】单选\n【选项】\nA. 4\nB. 7\nC. 9\n【答案】B\n【解析】7 只有 1 和 7 两个因数。\n【考点】质数\n【分值】5\n【材料】阅读下面的段落，回答问题。\n段落第一行。\n【子题1】\n【题干】第一问？\n【答案】A\n【子题2】\n【题干】第二问？\n【答案】B\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    },
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "阅读下面的段落，回答问题。\n段落第一行。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "阅读下面的段落，回答问题。\n段落第一行。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m3",
+     "child_local_ids": [
+      "q4",
+      "q5"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q4",
+     "parent_local_id": "m3"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q5",
+     "parent_local_id": "m3"
+    }
+   ]
+  },
+  {
+   "text": "第一行没有编号\n第二行\n1. 第一题\nA. 选项\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一行没有编号\n第二行"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一行没有编号\n第二行",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一题"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "选项"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一题",
+     "parse_issues": [
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "第一行没有编号\n第二行\n1. 第一题\nA. 选项\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "【题干】   \n【答案】\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "【题干】   \n【答案】"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "【题干】   \n【答案】",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】   \n【答案】\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁\n【答案】abcd\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁",
+     "parse_issues": [
+      "判断题答案无法解析为真/假，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁\n【答案】abcd\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "true_false",
+     "display_label": "",
+     "structure_signals": [
+      "answer"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第 1 题 下列说法正确的是（ ）\nA) 甲\nB、乙\nC）丙\nD：丁",
+     "parse_issues": [
+      "判断题答案无法解析为真/假，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【 题型 】 单选题 \n【 题干 】 有空格 \n【 选项 】 A . 甲 \n【 答案 】 A \n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "有空格"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "有空格 ",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【 题型 】 单选题 \n【 题干 】 有空格 \n【 选项 】 A . 甲 \n【 答案 】 A \n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "有空格"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "有空格 ",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】答案是 A。\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】答案是 A。\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】选A项\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】选A项\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【子题1】\n【题干】孤儿子题\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "【子题1】\n【题干】孤儿子题\n【答案】A"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "【子题1】\n【题干】孤儿子题\n【答案】A",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【子题1】\n【题干】孤儿子题\n【答案】A\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "【材料】只有材料正文。\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "只有材料正文。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "只有材料正文。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": []
+    }
+   ]
+  },
+  {
+   "text": "【材料】只有材料正文。\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "只有材料正文。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "只有材料正文。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": []
+    }
+   ]
+  },
+  {
+   "text": "【材料一】第一段\n【材料二】第二段\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "一",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一段"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一段",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": []
+    },
+    {
+     "question_type": "material",
+     "display_label": "二",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二段"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二段",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m2",
+     "child_local_ids": []
+    }
+   ]
+  },
+  {
+   "text": "【材料一】第一段\n【材料二】第二段\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "一",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一段"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一段",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": []
+    },
+    {
+     "question_type": "material",
+     "display_label": "二",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二段"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二段",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m2",
+     "child_local_ids": []
+    }
+   ]
+  },
+  {
+   "text": "【题干】\n纯文本行\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "纯文本行"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "\n纯文本行",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】\n纯文本行\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "纯文本行"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "\n纯文本行",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【评分标准】\n【评分点】步骤分 2 分\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "【评分标准】\n【评分点】步骤分 2 分"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "【评分标准】\n【评分点】步骤分 2 分",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【评分标准】\n【评分点】步骤分 2 分\n",
+   "structure_only": true,
+   "segments": []
+  },
+  {
+   "text": "【题干】x\n【选项】a. 甲\nb. 乙\nc. 丙\n【答案】ac\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "multiple_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "丙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "multiple_choice",
+      "correct_option_ids": [
+       "opt_a",
+       "opt_c"
+      ],
+      "policy": "exact_match"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】x\n【选项】a. 甲\nb. 乙\nc. 丙\n【答案】ac\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "multiple_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "丙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "multiple_choice",
+      "correct_option_ids": [
+       "opt_a",
+       "opt_c"
+      ],
+      "policy": "exact_match"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】材料题\n【题干】材料式题干\n【答案】略\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料式题干"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料式题干",
+     "parse_issues": [
+      "该题型暂不支持从文本解析答案。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】材料题\n【题干】材料式题干\n【答案】略\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料式题干"
+       }
+      ]
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料式题干",
+     "parse_issues": [
+      "该题型暂不支持从文本解析答案。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】。\n【答案】A\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】。\n【答案】A\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "\t【题干】\t制表符\r\n【答案】\tA\r\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "制表符"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "制表符",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "\t【题干】\t制表符\r\n【答案】\tA\r\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "制表符"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "制表符",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】第一题\n【答案】A\n没有标签的裸行\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题干】第一题\n【答案】A\n没有标签的裸行\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【constructor】x\n【题干】正常\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "正常"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "正常",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【constructor】x\n【题干】正常\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "正常"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "正常",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】constructor\n【题干】x\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "未识别的题型声明“constructor”，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】constructor\n【题干】x\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "未识别的题型声明“constructor”，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【toString】材料正文\n【题干】题\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【toString】材料正文\n【题干】题\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "题"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "题",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】AB\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "题型标注为单选，但答案解析出多个选项（opt_a, opt_b），已取第一个，请校对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】单选\n【题干】x\n【选项】A. 甲\nB. 乙\n【答案】AB\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "x"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "x",
+     "parse_issues": [
+      "题型标注为单选，但答案解析出多个选项（opt_a, opt_b），已取第一个，请校对。"
+     ],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】速度 __ m/s，温度为 __ ℃。\n【答案】-3.5; -40\n",
+   "structure_only": false,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "速度 __ m/s，温度为 __ ℃。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "-3.5"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-40"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "速度 __ m/s，温度为 __ ℃。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  },
+  {
+   "text": "【题型】填空题\n【题干】速度 __ m/s，温度为 __ ℃。\n【答案】-3.5; -40\n",
+   "structure_only": true,
+   "segments": [
+    {
+     "question_type": "fill_blank",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "速度 __ m/s，温度为 __ ℃。"
+       }
+      ],
+      "blanks": [
+       {
+        "blank_id": "b1",
+        "label": "第1空"
+       },
+       {
+        "blank_id": "b2",
+        "label": "第2空"
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "fill_blank",
+      "blank_order_matters": true,
+      "blanks": {
+       "b1": {
+        "accepted_values": [
+         "-3.5"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       },
+       "b2": {
+        "accepted_values": [
+         "-40"
+        ],
+        "normalization": {
+         "strip_whitespace": true,
+         "fullwidth_to_halfwidth": true
+        },
+        "max_score": null,
+        "mismatch_policy": "review"
+       }
+      }
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "速度 __ m/s，温度为 __ ℃。",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ]
+  }
+ ],
+ "answer_page": [
+  {
+   "text": "参考答案\n1. A\n2. B\n3. C\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     },
+     {
+      "label": "3",
+      "raw": "C"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 3
+   }
+  },
+  {
+   "text": "1、A\n2、D\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "D"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "第1题 A\n第2题 B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "（1）A\n（2）B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "答案\n1. A\n解析：因为……\n2. B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A\n解析：因为……"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "【参考答案】\n1. 对\n2. 错\n3. 正确\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "对"
+     },
+     {
+      "label": "2",
+      "raw": "错"
+     },
+     {
+      "label": "3",
+      "raw": "正确"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 3
+   }
+  },
+  {
+   "text": "【答案】\n1. A\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     }
+    ],
+    "unparsed": [
+     "【答案】"
+    ],
+    "entry_count": 1
+   }
+  },
+  {
+   "text": "1. 长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长\n2. B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [
+     "1. 长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长"
+    ],
+    "entry_count": 1
+   }
+  },
+  {
+   "text": "1. 这是一句普通的解释，不是答案。\n2. 好的。\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "这是一句普通的解释，不是答案。"
+     },
+     {
+      "label": "2",
+      "raw": "好的。"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "没有编号的说明文字\n1. A\n收尾的话\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A\n收尾的话"
+     }
+    ],
+    "unparsed": [
+     "没有编号的说明文字"
+    ],
+    "entry_count": 1
+   }
+  },
+  {
+   "text": "1. A\n2. B\n1. A\n2. B\n1. A\n2. B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     },
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     },
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 6
+   }
+  },
+  {
+   "text": "1）A\n2）B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "1: A\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 1
+   }
+  },
+  {
+   "text": "1. A\n2. B\n3. C\n4. D\n5. X\n6. X\n7. X\n8. X\n9. X\n10. X\n11. X\n12. X\n13. X\n14. X\n15. X\n16. X\n17. X\n18. X\n19. X\n20. X\n21. X\n22. X\n23. X\n24. X\n25. X\n26. X\n27. X\n28. X\n29. X\n30. X\n31. X\n32. X\n33. X\n34. X\n35. X\n36. X\n37. X\n38. X\n39. X\n40. X\n41. X\n42. X\n43. X\n44. X\n45. X\n46. X\n47. X\n48. X\n49. X\n50. X\n51. X\n52. X\n53. X\n54. X\n55. X\n56. X\n57. X\n58. X\n59. X\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     },
+     {
+      "label": "3",
+      "raw": "C"
+     },
+     {
+      "label": "4",
+      "raw": "D"
+     },
+     {
+      "label": "5",
+      "raw": "X"
+     },
+     {
+      "label": "6",
+      "raw": "X"
+     },
+     {
+      "label": "7",
+      "raw": "X"
+     },
+     {
+      "label": "8",
+      "raw": "X"
+     },
+     {
+      "label": "9",
+      "raw": "X"
+     },
+     {
+      "label": "10",
+      "raw": "X"
+     },
+     {
+      "label": "11",
+      "raw": "X"
+     },
+     {
+      "label": "12",
+      "raw": "X"
+     },
+     {
+      "label": "13",
+      "raw": "X"
+     },
+     {
+      "label": "14",
+      "raw": "X"
+     },
+     {
+      "label": "15",
+      "raw": "X"
+     },
+     {
+      "label": "16",
+      "raw": "X"
+     },
+     {
+      "label": "17",
+      "raw": "X"
+     },
+     {
+      "label": "18",
+      "raw": "X"
+     },
+     {
+      "label": "19",
+      "raw": "X"
+     },
+     {
+      "label": "20",
+      "raw": "X"
+     },
+     {
+      "label": "21",
+      "raw": "X"
+     },
+     {
+      "label": "22",
+      "raw": "X"
+     },
+     {
+      "label": "23",
+      "raw": "X"
+     },
+     {
+      "label": "24",
+      "raw": "X"
+     },
+     {
+      "label": "25",
+      "raw": "X"
+     },
+     {
+      "label": "26",
+      "raw": "X"
+     },
+     {
+      "label": "27",
+      "raw": "X"
+     },
+     {
+      "label": "28",
+      "raw": "X"
+     },
+     {
+      "label": "29",
+      "raw": "X"
+     },
+     {
+      "label": "30",
+      "raw": "X"
+     },
+     {
+      "label": "31",
+      "raw": "X"
+     },
+     {
+      "label": "32",
+      "raw": "X"
+     },
+     {
+      "label": "33",
+      "raw": "X"
+     },
+     {
+      "label": "34",
+      "raw": "X"
+     },
+     {
+      "label": "35",
+      "raw": "X"
+     },
+     {
+      "label": "36",
+      "raw": "X"
+     },
+     {
+      "label": "37",
+      "raw": "X"
+     },
+     {
+      "label": "38",
+      "raw": "X"
+     },
+     {
+      "label": "39",
+      "raw": "X"
+     },
+     {
+      "label": "40",
+      "raw": "X"
+     },
+     {
+      "label": "41",
+      "raw": "X"
+     },
+     {
+      "label": "42",
+      "raw": "X"
+     },
+     {
+      "label": "43",
+      "raw": "X"
+     },
+     {
+      "label": "44",
+      "raw": "X"
+     },
+     {
+      "label": "45",
+      "raw": "X"
+     },
+     {
+      "label": "46",
+      "raw": "X"
+     },
+     {
+      "label": "47",
+      "raw": "X"
+     },
+     {
+      "label": "48",
+      "raw": "X"
+     },
+     {
+      "label": "49",
+      "raw": "X"
+     },
+     {
+      "label": "50",
+      "raw": "X"
+     },
+     {
+      "label": "51",
+      "raw": "X"
+     },
+     {
+      "label": "52",
+      "raw": "X"
+     },
+     {
+      "label": "53",
+      "raw": "X"
+     },
+     {
+      "label": "54",
+      "raw": "X"
+     },
+     {
+      "label": "55",
+      "raw": "X"
+     },
+     {
+      "label": "56",
+      "raw": "X"
+     },
+     {
+      "label": "57",
+      "raw": "X"
+     },
+     {
+      "label": "58",
+      "raw": "X"
+     },
+     {
+      "label": "59",
+      "raw": "X"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 59
+   }
+  },
+  {
+   "text": "【参考答案】\n第 1 题：A\n第 2 题：B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "1．A\n2．B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "答案页\n1. A\n2. B\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     },
+     {
+      "label": "2",
+      "raw": "B"
+     }
+    ],
+    "unparsed": [],
+    "entry_count": 2
+   }
+  },
+  {
+   "text": "参考答案\n",
+   "result": {
+    "entries": [],
+    "unparsed": [],
+    "entry_count": 0
+   }
+  },
+  {
+   "text": "【解析】\n1. A\n",
+   "result": {
+    "entries": [
+     {
+      "label": "1",
+      "raw": "A"
+     }
+    ],
+    "unparsed": [
+     "【解析】"
+    ],
+    "entry_count": 1
+   }
+  }
+ ],
+ "match": [
+  {
+   "name": "labels_match",
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "options",
+      "question_type",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "带印题号的一题"
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_a"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [],
+     "source_excerpt": "带印题号的一题",
+     "parse_issues": [],
+     "practice_max_score": null
+    }
+   ],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "A"
+    },
+    {
+     "label": "2",
+     "raw": "B"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": true,
+      "method": "label",
+      "label": "1",
+      "raw": "A",
+      "answer_payload": {
+       "kind": "single_choice",
+       "correct_option_id": "opt_a"
+      },
+      "parse_issue": null
+     }
+    ],
+    "matched_count": 1,
+    "position_matched_count": 0,
+    "entry_count": 2,
+    "unmatched_entry_labels": [
+     "2"
+    ]
+   }
+  },
+  {
+   "name": "position_fallback",
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    }
+   ],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "B"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "B"
+     },
+     {
+      "matched": false,
+      "reason": "no_answer_entry"
+     }
+    ],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 1,
+    "unmatched_entry_labels": [
+     "1"
+    ]
+   }
+  },
+  {
+   "name": "material_parent_skipped",
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "阅读下面的段落，回答问题。\n段落第一行。"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "阅读下面的段落，回答问题。\n段落第一行。",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第一问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第一问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "2",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "第二问？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "第二问？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "A"
+    },
+    {
+     "label": "2",
+     "raw": "B"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": false,
+      "reason": "material_parent"
+     },
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "A"
+     },
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "B"
+     }
+    ],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 2,
+    "unmatched_entry_labels": []
+   }
+  },
+  {
+   "name": "duplicate_labels_fall_back_to_position",
+   "segments": [
+    {
+     "question_type": "material",
+     "display_label": "",
+     "structure_signals": [
+      "material"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "材料正文"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "材料正文",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null,
+     "local_id": "m1",
+     "child_local_ids": [
+      "q2",
+      "q3"
+     ]
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q2",
+     "parent_local_id": "m1"
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "1",
+     "structure_signals": [
+      "answer",
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "子题一重复"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "子题一重复",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "答案未匹配到任何选项 ID，请手工选择。"
+     ],
+     "practice_max_score": null,
+     "local_id": "q3",
+     "parent_local_id": "m1"
+    }
+   ],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "A"
+    },
+    {
+     "label": "1",
+     "raw": "B"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": false,
+      "reason": "material_parent"
+     },
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "A"
+     },
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "B"
+     }
+    ],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 2,
+    "unmatched_entry_labels": []
+   }
+  },
+  {
+   "name": "unusable_answer_value",
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    }
+   ],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "说不清"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": false,
+      "reason": "answer_value_unusable",
+      "raw": "说不清"
+     },
+     {
+      "matched": false,
+      "reason": "no_answer_entry"
+     }
+    ],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 1,
+    "unmatched_entry_labels": [
+     "1"
+    ]
+   }
+  },
+  {
+   "name": "no_entries",
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "stem"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "下列哪一项是质数？"
+       }
+      ],
+      "options": []
+     },
+     "answer_payload": {},
+     "answer_status_known": false,
+     "explanation_blocks": [],
+     "source_excerpt": "下列哪一项是质数？",
+     "parse_issues": [
+      "未能确定题型，已暂按单选题处理，请校对。",
+      "未提供答案；发布前必须填写并人工核对。"
+     ],
+     "practice_max_score": null
+    },
+    {
+     "question_type": "single_choice",
+     "display_label": "",
+     "structure_signals": [
+      "answer",
+      "explanation",
+      "knowledge",
+      "max_score",
+      "options",
+      "question_type"
+     ],
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": ""
+       }
+      ],
+      "options": [
+       {
+        "id": "opt_a",
+        "label": "A",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "4"
+         }
+        ]
+       },
+       {
+        "id": "opt_b",
+        "label": "B",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "7"
+         }
+        ]
+       },
+       {
+        "id": "opt_c",
+        "label": "C",
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "9"
+         }
+        ]
+       }
+      ]
+     },
+     "answer_payload": {
+      "kind": "single_choice",
+      "correct_option_id": "opt_b"
+     },
+     "answer_status_known": true,
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "7 只有 1 和 7 两个因数。"
+      }
+     ],
+     "source_excerpt": "",
+     "parse_issues": [],
+     "practice_max_score": "5",
+     "knowledge_hint": "质数"
+    }
+   ],
+   "entries": [],
+   "result": {
+    "results": [
+     {
+      "matched": false,
+      "reason": "no_answer_entry"
+     },
+     {
+      "matched": false,
+      "reason": "no_answer_entry"
+     }
+    ],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 0,
+    "unmatched_entry_labels": []
+   }
+  },
+  {
+   "name": "unmatched_labels_and_missing_display_label",
+   "segments": [
+    {
+     "question_type": "single_choice",
+     "content": {
+      "options": [
+       {
+        "id": "opt_a"
+       }
+      ]
+     }
+    },
+    {
+     "question_type": "material"
+    }
+   ],
+   "entries": [
+    {
+     "label": "7",
+     "raw": "A"
+    },
+    {
+     "label": "9",
+     "raw": "B"
+    }
+   ],
+   "result": {
+    "results": [
+     {
+      "matched": true,
+      "method": "position",
+      "label": "7",
+      "raw": "A",
+      "answer_payload": {
+       "kind": "single_choice",
+       "correct_option_id": "opt_a"
+      },
+      "parse_issue": null
+     },
+     {
+      "matched": false,
+      "reason": "material_parent"
+     }
+    ],
+    "matched_count": 1,
+    "position_matched_count": 1,
+    "entry_count": 2,
+    "unmatched_entry_labels": [
+     "7",
+     "9"
+    ]
+   }
+  },
+  {
+   "name": "empty_segment_list",
+   "segments": [],
+   "entries": [
+    {
+     "label": "1",
+     "raw": "A"
+    }
+   ],
+   "result": {
+    "results": [],
+    "matched_count": 0,
+    "position_matched_count": 0,
+    "entry_count": 1,
+    "unmatched_entry_labels": [
+     "1"
+    ]
+   }
+  }
+ ],
+ "source_pages": [
+  {
+   "name": "two_pages",
+   "text": "第一题题干\n第二题题干\n",
+   "page_map": [
+    [
+     1,
+     0,
+     6
+    ],
+    [
+     2,
+     6,
+     13
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": "第一题题干"
+    },
+    {
+     "source_excerpt": "第二题题干"
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "第一题题干",
+     "source_char_start": 0,
+     "source_page_index": 1
+    },
+    {
+     "source_excerpt": "第二题题干",
+     "source_char_start": 6,
+     "source_page_index": 1
+    }
+   ]
+  },
+  {
+   "name": "multiline_excerpt_uses_first_line",
+   "text": "开头\n第一行题干\n第二行\n结尾\n",
+   "page_map": [
+    [
+     1,
+     0,
+     7
+    ],
+    [
+     2,
+     7,
+     14
+    ],
+    [
+     3,
+     14,
+     17
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": "第一行题干\n第二行"
+    },
+    {
+     "source_excerpt": "结尾"
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "第一行题干\n第二行",
+     "source_char_start": 3,
+     "source_page_index": 1
+    },
+    {
+     "source_excerpt": "结尾",
+     "source_char_start": 13,
+     "source_page_index": 2
+    }
+   ]
+  },
+  {
+   "name": "anchor_not_found_falls_back_to_cursor",
+   "text": "甲乙丙丁",
+   "page_map": [
+    [
+     1,
+     0,
+     2
+    ],
+    [
+     2,
+     2,
+     4
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": "不存在"
+    },
+    {
+     "source_excerpt": "丁"
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "不存在",
+     "source_char_start": 0,
+     "source_page_index": 1
+    },
+    {
+     "source_excerpt": "丁",
+     "source_char_start": 3,
+     "source_page_index": 2
+    }
+   ]
+  },
+  {
+   "name": "emoji_offsets_are_code_points",
+   "text": "😀😀\nQ1\nQ2\n",
+   "page_map": [
+    [
+     1,
+     0,
+     4
+    ],
+    [
+     2,
+     4,
+     8
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": "Q1"
+    },
+    {
+     "source_excerpt": "Q2"
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "Q1",
+     "source_char_start": 3,
+     "source_page_index": 1
+    },
+    {
+     "source_excerpt": "Q2",
+     "source_char_start": 6,
+     "source_page_index": 2
+    }
+   ]
+  },
+  {
+   "name": "offset_outside_page_map_is_null",
+   "text": "甲乙",
+   "page_map": [
+    [
+     1,
+     0,
+     0
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": "乙"
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "乙",
+     "source_char_start": 1,
+     "source_page_index": 1
+    }
+   ]
+  },
+  {
+   "name": "empty_text",
+   "text": "",
+   "page_map": [
+    [
+     1,
+     0,
+     0
+    ]
+   ],
+   "segments": [
+    {
+     "source_excerpt": ""
+    }
+   ],
+   "result": [
+    {
+     "source_excerpt": "",
+     "source_char_start": 0,
+     "source_page_index": 1
+    }
+   ]
+  }
+ ],
+ "continuations": [
+  {
+   "name": "sentence_continues",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一题的开头没有结束\n"
+    },
+    {
+     "page_index": 2,
+     "text": "也没有结束，继续。\n"
+    }
+   ],
+   "result": [
+    {
+     "from_page": 1,
+     "to_page": 2,
+     "last_line": "第一题的开头没有结束",
+     "first_line": "也没有结束，继续。",
+     "reason": "line_continues_across_page_break"
+    }
+   ]
+  },
+  {
+   "name": "terminal_punctuation_blocks",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一题结束了。\n"
+    },
+    {
+     "page_index": 2,
+     "text": "继续的句子\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "next_page_starts_heading",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一题没有结束\n"
+    },
+    {
+     "page_index": 2,
+     "text": "一、单项选择题\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "next_page_starts_label",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一题没有结束\n"
+    },
+    {
+     "page_index": 2,
+     "text": "【题干】新题\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "next_page_starts_option",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "下列说法正确的是（ ）\n"
+    },
+    {
+     "page_index": 2,
+     "text": "A. 甲\n"
+    }
+   ],
+   "result": [
+    {
+     "from_page": 1,
+     "to_page": 2,
+     "last_line": "下列说法正确的是（ ）",
+     "first_line": "A. 甲",
+     "reason": "line_continues_across_page_break"
+    }
+   ]
+  },
+  {
+   "name": "closing_quote_then_terminal",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "他说：“结束。”）\n"
+    },
+    {
+     "page_index": 2,
+     "text": "继续\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "empty_page_skipped",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "\n"
+    },
+    {
+     "page_index": 2,
+     "text": "继续\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "single_page",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "只有一页\n"
+    }
+   ],
+   "result": []
+  },
+  {
+   "name": "three_pages_two_breaks",
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一页没有结束\n"
+    },
+    {
+     "page_index": 2,
+     "text": "第二页也没有结束\n"
+    },
+    {
+     "page_index": 3,
+     "text": "第三页结束。\n"
+    }
+   ],
+   "result": [
+    {
+     "from_page": 1,
+     "to_page": 2,
+     "last_line": "第一页没有结束",
+     "first_line": "第二页也没有结束",
+     "reason": "line_continues_across_page_break"
+    },
+    {
+     "from_page": 2,
+     "to_page": 3,
+     "last_line": "第二页也没有结束",
+     "first_line": "第三页结束。",
+     "reason": "line_continues_across_page_break"
+    }
+   ]
+  }
+ ],
+ "cross_page": [
+  {
+   "name": "segment_spans_two_pages_confirmed",
+   "text": "第一页末尾\n第二页开头继续\n第二题\n",
+   "page_map": [
+    [
+     1,
+     0,
+     6
+    ],
+    [
+     2,
+     6,
+     15
+    ],
+    [
+     3,
+     15,
+     19
+    ]
+   ],
+   "segments": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "第一页末尾\n第二页开头继续",
+     "source_page_index": 1
+    },
+    {
+     "source_char_start": 15,
+     "source_excerpt": "第二题",
+     "source_page_index": 3
+    }
+   ],
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一页末尾\n"
+    },
+    {
+     "page_index": 2,
+     "text": "第二页开头继续\n"
+    },
+    {
+     "page_index": 3,
+     "text": "第二题\n"
+    }
+   ],
+   "result": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "第一页末尾\n第二页开头继续",
+     "source_page_index": 1,
+     "source_char_end": 15,
+     "source_spans": [
+      {
+       "page_index": 1,
+       "char_start": 0,
+       "char_end": 6,
+       "text": "第一页末尾\n"
+      },
+      {
+       "page_index": 2,
+       "char_start": 6,
+       "char_end": 15,
+       "text": "第二页开头继续\n第"
+      }
+     ],
+     "continues_on_pages": [
+      1,
+      2
+     ]
+    },
+    {
+     "source_char_start": 15,
+     "source_excerpt": "第二题",
+     "source_page_index": 3,
+     "source_char_end": 18,
+     "source_spans": [
+      {
+       "page_index": 3,
+       "char_start": 15,
+       "char_end": 18,
+       "text": "二题\n"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "segment_spans_two_pages_not_confirmed",
+   "text": "第一页末尾\n第二页开头继续\n",
+   "page_map": [
+    [
+     1,
+     0,
+     6
+    ],
+    [
+     2,
+     6,
+     15
+    ]
+   ],
+   "segments": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "第一页末尾\n第二页开头继续",
+     "source_page_index": 1
+    }
+   ],
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "第一页末尾\n"
+    },
+    {
+     "page_index": 2,
+     "text": "第二页开头继续\n"
+    }
+   ],
+   "result": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "第一页末尾\n第二页开头继续",
+     "source_page_index": 1,
+     "source_char_end": 14,
+     "source_spans": [
+      {
+       "page_index": 1,
+       "char_start": 0,
+       "char_end": 6,
+       "text": "第一页末尾\n"
+      },
+      {
+       "page_index": 2,
+       "char_start": 6,
+       "char_end": 14,
+       "text": "第二页开头继续\n"
+      }
+     ],
+     "continues_on_pages": [
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "name": "single_page_segment",
+   "text": "只有一页\n",
+   "page_map": [
+    [
+     1,
+     0,
+     4
+    ]
+   ],
+   "segments": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "只有一页"
+    }
+   ],
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "只有一页\n"
+    }
+   ],
+   "result": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "只有一页",
+     "source_char_end": 5,
+     "source_spans": [
+      {
+       "page_index": 1,
+       "char_start": 0,
+       "char_end": 4,
+       "text": "只有一页"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "blank_span_skipped_and_fallback",
+   "text": "甲\n乙\n",
+   "page_map": [
+    [
+     1,
+     0,
+     1
+    ],
+    [
+     2,
+     1,
+     3
+    ],
+    [
+     3,
+     3,
+     4
+    ]
+   ],
+   "segments": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "甲"
+    },
+    {
+     "source_char_start": 2,
+     "source_excerpt": "乙"
+    }
+   ],
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "甲\n"
+    },
+    {
+     "page_index": 2,
+     "text": "乙\n"
+    }
+   ],
+   "result": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "甲",
+     "source_char_end": 2,
+     "source_spans": [
+      {
+       "page_index": 1,
+       "char_start": 0,
+       "char_end": 1,
+       "text": "甲"
+      }
+     ]
+    },
+    {
+     "source_char_start": 2,
+     "source_excerpt": "乙",
+     "source_char_end": 4,
+     "source_spans": [
+      {
+       "page_index": 2,
+       "char_start": 2,
+       "char_end": 3,
+       "text": "乙"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "emoji_span_slices_code_points",
+   "text": "😀甲\n乙😀\n",
+   "page_map": [
+    [
+     1,
+     0,
+     3
+    ],
+    [
+     2,
+     3,
+     6
+    ]
+   ],
+   "segments": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "😀甲\n乙😀",
+     "source_page_index": 1
+    }
+   ],
+   "pages": [
+    {
+     "page_index": 1,
+     "text": "😀甲\n"
+    },
+    {
+     "page_index": 2,
+     "text": "乙😀\n"
+    }
+   ],
+   "result": [
+    {
+     "source_char_start": 0,
+     "source_excerpt": "😀甲\n乙😀",
+     "source_page_index": 1,
+     "source_char_end": 6,
+     "source_spans": [
+      {
+       "page_index": 1,
+       "char_start": 0,
+       "char_end": 3,
+       "text": "😀甲\n"
+      },
+      {
+       "page_index": 2,
+       "char_start": 3,
+       "char_end": 6,
+       "text": "乙😀\n"
+      }
+     ],
+     "continues_on_pages": [
+      1,
+      2
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1159 @@
+{
+ "created": {
+  "from_a": 1,
+  "from_b": 1
+ },
+ "expect": {
+  "delay_status_at_now": {
+   "anchor_source": "prior_attempt",
+   "not_before": "2026-04-02T10:35:00+00:00",
+   "reason": "延迟验证需等待：还需约 23.58 小时（锚点 prior_attempt）",
+   "recomputed_not_before": null,
+   "required": true,
+   "satisfied": false,
+   "stored_not_before": "2026-04-02T10:35:00+00:00"
+  },
+  "knowledge_map": {
+   "nodes": [
+    {
+     "evidence": {
+      "as_of": "2026-04-01T09:00:00+00:00",
+      "best_summary": "delayed_verified",
+      "distinct_question_count": 2,
+      "distinct_template_count": 1,
+      "downgrade_reason": "",
+      "has_delayed_correct": true,
+      "independent_correct_count": 2,
+      "needs_review": false,
+      "rule_version": "p2-c04",
+      "summary": "independent"
+     },
+     "id": "196fce62-9490-5676-b9b2-89422e1ab945",
+     "is_unclassified": false,
+     "kind": "point",
+     "name": "alpha",
+     "parent_id": null,
+     "question_count": 2,
+     "syllabus_is_user_provisional": true,
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8"
+    },
+    {
+     "evidence": {
+      "as_of": null,
+      "best_summary": "undiagnosed",
+      "distinct_question_count": 0,
+      "distinct_template_count": 0,
+      "downgrade_reason": "",
+      "has_delayed_correct": false,
+      "independent_correct_count": 0,
+      "needs_review": false,
+      "rule_version": null,
+      "summary": "undiagnosed"
+     },
+     "id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+     "is_unclassified": false,
+     "kind": "point",
+     "name": "beta",
+     "parent_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+     "question_count": 1,
+     "syllabus_is_user_provisional": true,
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8"
+    },
+    {
+     "evidence": {
+      "as_of": null,
+      "best_summary": "undiagnosed",
+      "distinct_question_count": 0,
+      "distinct_template_count": 0,
+      "downgrade_reason": "",
+      "has_delayed_correct": false,
+      "independent_correct_count": 0,
+      "needs_review": false,
+      "rule_version": null,
+      "summary": "undiagnosed"
+     },
+     "id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+     "is_unclassified": false,
+     "kind": "point",
+     "name": "gamma",
+     "parent_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+     "question_count": 1,
+     "syllabus_is_user_provisional": true,
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8"
+    },
+    {
+     "evidence": {
+      "as_of": "2026-04-01T09:00:00+00:00",
+      "best_summary": "independent",
+      "distinct_question_count": 2,
+      "distinct_template_count": 1,
+      "downgrade_reason": "",
+      "has_delayed_correct": false,
+      "independent_correct_count": 2,
+      "needs_review": true,
+      "rule_version": "p2-c04",
+      "summary": "needs_review"
+     },
+     "id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+     "is_unclassified": false,
+     "kind": "point",
+     "name": "delta",
+     "parent_id": null,
+     "question_count": 0,
+     "syllabus_is_user_provisional": true,
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8"
+    }
+   ],
+   "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+  },
+  "pairing_detail": {
+   "candidates": [
+    {
+     "display_label": "Q-A",
+     "id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+     "question_type": "single_choice"
+    },
+    {
+     "display_label": "Q-B",
+     "id": "79fff767-985b-5174-958b-20fff0c0364e",
+     "question_type": "single_choice"
+    }
+   ],
+   "pairing": {
+    "baseline_question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "delay_hours": 24,
+    "delayed_question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "gap": "",
+    "id": "9e260540-5c75-50aa-8af0-0fde050dc44f",
+    "immediate_question_id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "is_active": true,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "node_name": "alpha",
+    "note": "A/B/C 配对",
+    "pairing_version": 1,
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "reviewed_at": "2026-04-01T08:00:00+00:00",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+   }
+  },
+  "pairings": [
+   {
+    "baseline_question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "delay_hours": 24,
+    "delayed_question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "gap": "",
+    "id": "9e260540-5c75-50aa-8af0-0fde050dc44f",
+    "immediate_question_id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "is_active": true,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "node_name": "alpha",
+    "note": "A/B/C 配对",
+    "pairing_version": 1,
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "reviewed_at": "2026-04-01T08:00:00+00:00",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+   },
+   {
+    "baseline_question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "delay_hours": 48,
+    "delayed_question_id": null,
+    "gap": "缺少延迟验证题（C 题）：到期后只能用原题重复练习，不计入延迟验证证据",
+    "id": "ef523aa1-3fba-5d5f-8329-f5bfdc9990d8",
+    "immediate_question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "is_active": true,
+    "node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "node_name": "gamma",
+    "note": "缺少 C 题",
+    "pairing_version": 1,
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "reviewed_at": "2026-04-01T08:01:00+00:00",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+   }
+  ],
+  "prerequisites": {
+   "delta": {
+    "node_id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+    "node_name": "delta",
+    "prerequisites": [
+     {
+      "node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+      "node_name": "beta",
+      "state": "undiagnosed"
+     }
+    ],
+    "unmet": [
+     {
+      "node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+      "node_name": "beta",
+      "reason": "prerequisite_undiagnosed",
+      "state": "undiagnosed"
+     }
+    ]
+   },
+   "gamma": {
+    "node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "node_name": "gamma",
+    "prerequisites": [
+     {
+      "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+      "node_name": "alpha",
+      "state": "independent"
+     }
+    ],
+    "unmet": []
+   }
+  },
+  "relations": {
+   "edge_count": 3,
+   "edges": [
+    {
+     "from_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+     "from_node_name": "alpha",
+     "id": "5c29d5c8-1bde-52f1-97ca-8d16236b7601",
+     "is_active": true,
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+     "to_node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+     "to_node_name": "gamma"
+    },
+    {
+     "from_node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+     "from_node_name": "beta",
+     "id": "1679d7a5-875d-547c-80fa-e455d1139235",
+     "is_active": true,
+     "note": "",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+     "to_node_id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+     "to_node_name": "delta"
+    },
+    {
+     "from_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+     "from_node_name": "alpha",
+     "id": "d3ace1ed-fa46-550c-8c2c-c35b379b62db",
+     "is_active": true,
+     "note": "同源",
+     "relation_type": "related",
+     "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+     "to_node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+     "to_node_name": "beta"
+    }
+   ],
+   "generated_at": "2026-04-01T11:00:00+00:00",
+   "node_count": 4,
+   "unmet_prerequisites": []
+  },
+  "review_tasks": [
+   {
+    "anchor_source": "trigger_event",
+    "delay_anchor_at": "2026-04-01T10:35:00+00:00",
+    "delay_hours": 24,
+    "missing_question_reason": "",
+    "not_before": "2026-04-02T10:35:00+00:00",
+    "was_started": false
+   }
+  ],
+  "tasks": [
+   {
+    "deficit_notice": "缺少合格的C题：配对 ef523aa1-3fba-5d5f-8329-f5bfdc9990d8 未关联可用C题，到期后只能用原题重复练习，不计入延迟验证证据。",
+    "delay_anchor_at": null,
+    "due_at": null,
+    "estimated_minutes": 0,
+    "invalidated_reason": "缺少合格的C题",
+    "knowledge_node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "not_before": null,
+    "origin_session_item_id": null,
+    "pairing_version": 1,
+    "question_id": null,
+    "reason_codes": [
+     "missing_paired_question",
+     "missing_delayed"
+    ],
+    "rule_version": "p0-1",
+    "status": "invalidated",
+    "task_kind": "delayed_verification",
+    "trigger_event": "missing_paired_question"
+   },
+   {
+    "deficit_notice": "",
+    "delay_anchor_at": "2026-04-01T10:35:00+00:00",
+    "due_at": "2026-04-02T10:35:00+00:00",
+    "estimated_minutes": 1,
+    "invalidated_reason": "",
+    "knowledge_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "not_before": "2026-04-02T10:35:00+00:00",
+    "origin_session_item_id": "68390565-f217-5cfc-be0d-9b3ab8667bb1",
+    "pairing_version": 1,
+    "question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "reason_codes": [
+     "delayed_verification",
+     "delay_24h",
+     "trigger_event"
+    ],
+    "rule_version": "p0-1",
+    "status": "pending",
+    "task_kind": "delayed_verification",
+    "trigger_event": "paired_immediate_graded"
+   },
+   {
+    "deficit_notice": "",
+    "delay_anchor_at": null,
+    "due_at": null,
+    "estimated_minutes": 1,
+    "invalidated_reason": "",
+    "knowledge_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "not_before": null,
+    "origin_session_item_id": "e81e3992-a7a1-5a43-a606-00868052023a",
+    "pairing_version": 1,
+    "question_id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "reason_codes": [
+     "paired_immediate",
+     "same_knowledge_node"
+    ],
+    "rule_version": "p0-1",
+    "status": "pending",
+    "task_kind": "paired_immediate",
+    "trigger_event": "confirmed_grade"
+   }
+  ],
+  "templates": [
+   {
+    "description": "模板 alpha-template",
+    "id": "eee26c40-533c-5819-942b-4adedf6d681b",
+    "name": "alpha-template",
+    "review_status": "approved",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+   },
+   {
+    "description": "模板 beta-template",
+    "id": "df837247-29bc-504d-b6a3-ce91c72e5252",
+    "name": "beta-template",
+    "review_status": "approved",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5"
+   }
+  ]
+ },
+ "now": "2026-04-01T11:00:00+00:00",
+ "submitted_at": {
+  "a": "2026-04-01T10:00:00+00:00",
+  "b": "2026-04-01T10:35:00+00:00"
+ },
+ "symbols": {
+  "attempt_a": "b9df7b41-4758-5bcf-b970-c437e1333ad1",
+  "attempt_b": "f82827f7-b870-55f0-97f4-31b98ba9c0aa",
+  "item_a": "e81e3992-a7a1-5a43-a606-00868052023a",
+  "item_b": "68390565-f217-5cfc-be0d-9b3ab8667bb1",
+  "node_alpha": "196fce62-9490-5676-b9b2-89422e1ab945",
+  "node_beta": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+  "node_delta": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+  "node_gamma": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+  "owner": "a45212b6-143e-55ad-b138-786fb7c7523f",
+  "pairing_alpha": "9e260540-5c75-50aa-8af0-0fde050dc44f",
+  "pairing_gamma": "ef523aa1-3fba-5d5f-8329-f5bfdc9990d8",
+  "project": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+  "question_Q-A": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+  "question_Q-B": "79fff767-985b-5174-958b-20fff0c0364e",
+  "question_Q-C": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+  "subject": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+  "version_Q-A": "101d005e-994b-5252-b3fa-eb60888a12e7",
+  "version_Q-B": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+  "version_Q-C": "314f9d9d-6744-5bd2-b05d-4ec3b674fea7"
+ },
+ "tables": {
+  "accounts_user": [
+   {
+    "date_joined": "2026-04-01T00:01:00+00:00",
+    "display_name": "B8 黄金",
+    "email": "golden-b8@example.invalid",
+    "id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false,
+    "last_login": null,
+    "password": "GoldenPass!2026"
+   }
+  ],
+  "exams_project": [
+   {
+    "archived_at": null,
+    "created_at": "2026-04-01T00:02:00+00:00",
+    "description": "",
+    "display_order": 0,
+    "id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "is_archived": false,
+    "name": "知识黄金项目",
+    "owner_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "target_date": null,
+    "target_score": null,
+    "updated_at": "2026-04-01T00:02:00+00:00"
+   }
+  ],
+  "exams_subject": [
+   {
+    "code": "MATH",
+    "created_at": "2026-04-01T00:03:00+00:00",
+    "display_order": 0,
+    "id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "name": "数学",
+    "pass_score": "60.00",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "total_score": "100.00",
+    "updated_at": "2026-04-01T00:03:00+00:00"
+   }
+  ],
+  "exams_syllabus_version": [
+   {
+    "applies_from": null,
+    "applies_to": null,
+    "created_at": "2026-04-01T00:04:00+00:00",
+    "created_by_id": null,
+    "id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "is_user_provisional": true,
+    "name": "数学大纲",
+    "published_at": null,
+    "review_status": "draft",
+    "source_document_id": null,
+    "status": "published",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:04:00+00:00",
+    "version_label": "2026"
+   }
+  ],
+  "knowledge_node": [
+   {
+    "aliases": [],
+    "canonical_name": "alpha",
+    "code": "ALPHA",
+    "created_at": "2026-04-01T00:05:00+00:00",
+    "display_order": 0,
+    "id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "is_unclassified": false,
+    "kind": "point",
+    "parent_id": null,
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:05:00+00:00"
+   },
+   {
+    "aliases": [],
+    "canonical_name": "beta",
+    "code": "BETA",
+    "created_at": "2026-04-01T00:06:00+00:00",
+    "display_order": 1,
+    "id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+    "is_unclassified": false,
+    "kind": "point",
+    "parent_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:06:00+00:00"
+   },
+   {
+    "aliases": [],
+    "canonical_name": "gamma",
+    "code": "GAMMA",
+    "created_at": "2026-04-01T00:07:00+00:00",
+    "display_order": 2,
+    "id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "is_unclassified": false,
+    "kind": "point",
+    "parent_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:07:00+00:00"
+   },
+   {
+    "aliases": [],
+    "canonical_name": "delta",
+    "code": "DELTA",
+    "created_at": "2026-04-01T00:08:00+00:00",
+    "display_order": 3,
+    "id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+    "is_unclassified": false,
+    "kind": "point",
+    "parent_id": null,
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:08:00+00:00"
+   }
+  ],
+  "knowledge_question_mapping": [
+   {
+    "created_at": "2026-04-01T00:15:00+00:00",
+    "id": "99550e8a-784a-56b7-b17b-9b708d821406",
+    "is_primary": true,
+    "mapping_revision": 1,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "note": "",
+    "question_version_id": "101d005e-994b-5252-b3fa-eb60888a12e7",
+    "score_weight": "1.0000",
+    "template_id": null,
+    "updated_at": "2026-04-01T00:15:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:20:00+00:00",
+    "id": "bb6d64f0-8391-5566-bfc1-2a7708ce5b10",
+    "is_primary": true,
+    "mapping_revision": 1,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "note": "",
+    "question_version_id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "score_weight": "0.5000",
+    "template_id": null,
+    "updated_at": "2026-04-01T00:20:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:21:00+00:00",
+    "id": "fab78108-b33c-56a0-9b3f-b07f8cb0ce85",
+    "is_primary": true,
+    "mapping_revision": 1,
+    "node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+    "note": "",
+    "question_version_id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "score_weight": "0.5000",
+    "template_id": null,
+    "updated_at": "2026-04-01T00:21:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:26:00+00:00",
+    "id": "3a228437-e146-56be-939c-ded323bc0fd9",
+    "is_primary": true,
+    "mapping_revision": 1,
+    "node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "note": "",
+    "question_version_id": "314f9d9d-6744-5bd2-b05d-4ec3b674fea7",
+    "score_weight": "1.0000",
+    "template_id": null,
+    "updated_at": "2026-04-01T00:26:00+00:00"
+   }
+  ],
+  "knowledge_question_template": [
+   {
+    "confirmed_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "created_at": "2026-04-01T00:09:00+00:00",
+    "description": "模板 alpha-template",
+    "id": "eee26c40-533c-5819-942b-4adedf6d681b",
+    "name": "alpha-template",
+    "review_status": "approved",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:09:00+00:00"
+   },
+   {
+    "confirmed_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "created_at": "2026-04-01T00:10:00+00:00",
+    "description": "模板 beta-template",
+    "id": "df837247-29bc-504d-b6a3-ce91c72e5252",
+    "name": "beta-template",
+    "review_status": "approved",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:10:00+00:00"
+   }
+  ],
+  "knowledge_relation": [
+   {
+    "created_at": "2026-04-01T00:29:00+00:00",
+    "created_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "from_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "id": "5c29d5c8-1bde-52f1-97ca-8d16236b7601",
+    "is_active": true,
+    "note": "先学 alpha",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "to_node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "updated_at": "2026-04-01T00:29:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:30:00+00:00",
+    "created_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "from_node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+    "id": "1679d7a5-875d-547c-80fa-e455d1139235",
+    "is_active": true,
+    "note": "",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "to_node_id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+    "updated_at": "2026-04-01T00:30:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:31:00+00:00",
+    "created_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "from_node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "id": "d3ace1ed-fa46-550c-8c2c-c35b379b62db",
+    "is_active": true,
+    "note": "同源",
+    "relation_type": "related",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "to_node_id": "a36fa0e6-0d7d-5e14-8d78-6604479d3590",
+    "updated_at": "2026-04-01T00:31:00+00:00"
+   },
+   {
+    "created_at": "2026-04-01T00:32:00+00:00",
+    "created_by_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "from_node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "id": "b2eb5d6c-8177-5b81-9f49-4ab4d83d48c1",
+    "is_active": false,
+    "note": "已停用",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "to_node_id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+    "updated_at": "2026-04-01T00:32:00+00:00"
+   }
+  ],
+  "knowledge_verification_pairing": [
+   {
+    "baseline_question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "created_at": "2026-04-01T00:33:00+00:00",
+    "delay_hours": 24,
+    "delayed_question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "id": "9e260540-5c75-50aa-8af0-0fde050dc44f",
+    "immediate_question_id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "is_active": true,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "note": "A/B/C 配对",
+    "pairing_version": 1,
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "reviewed_at": "2026-04-01T08:00:00+00:00",
+    "reviewer_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:33:00+00:00"
+   },
+   {
+    "baseline_question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "created_at": "2026-04-01T00:34:00+00:00",
+    "delay_hours": 48,
+    "delayed_question_id": null,
+    "id": "ef523aa1-3fba-5d5f-8329-f5bfdc9990d8",
+    "immediate_question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "is_active": true,
+    "node_id": "55b62ff0-4303-50b5-bdd2-244c9e39608c",
+    "note": "缺少 C 题",
+    "pairing_version": 1,
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "reviewed_at": "2026-04-01T08:01:00+00:00",
+    "reviewer_id": "a45212b6-143e-55ad-b138-786fb7c7523f",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:34:00+00:00"
+   }
+  ],
+  "learning_knowledge_state": [
+   {
+    "as_of": "2026-04-01T09:00:00+00:00",
+    "best_summary": "delayed_verified",
+    "created_at": "2026-04-01T00:27:00+00:00",
+    "detail": {
+     "source": "golden"
+    },
+    "distinct_question_count": 2,
+    "distinct_template_count": 1,
+    "downgrade_reason": "",
+    "has_delayed_correct": true,
+    "id": "5d10d164-9915-5dcb-8a39-fd52c43b7173",
+    "independent_correct_count": 2,
+    "needs_review": false,
+    "node_id": "196fce62-9490-5676-b9b2-89422e1ab945",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "projection_version": "p0-1",
+    "recent_independent_attempts": 0,
+    "recent_independent_failures": 0,
+    "rule_version": "p2-c04",
+    "source_evidence_ids": [],
+    "summary": "independent",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:27:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   },
+   {
+    "as_of": "2026-04-01T09:00:00+00:00",
+    "best_summary": "independent",
+    "created_at": "2026-04-01T00:28:00+00:00",
+    "detail": {
+     "source": "golden"
+    },
+    "distinct_question_count": 2,
+    "distinct_template_count": 1,
+    "downgrade_reason": "",
+    "has_delayed_correct": false,
+    "id": "cb9b6b03-5038-53df-ab00-bbab58881391",
+    "independent_correct_count": 2,
+    "needs_review": true,
+    "node_id": "64fe81a2-3d06-5849-b5de-34a4b47c070e",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "projection_version": "p0-1",
+    "recent_independent_attempts": 0,
+    "recent_independent_failures": 0,
+    "rule_version": "p2-c04",
+    "source_evidence_ids": [],
+    "summary": "needs_review",
+    "syllabus_version_id": "c51f3158-bc9e-5997-81b6-6bd31994afa8",
+    "updated_at": "2026-04-01T00:28:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   }
+  ],
+  "practice_attempt": [
+   {
+    "applied_regrade_generation": 0,
+    "attachments": [],
+    "client_active_ms": null,
+    "confidence": "",
+    "created_at": "2026-04-01T00:37:00+00:00",
+    "current_grade_event_id": "ecdd731c-074f-5296-8a1d-4f92bc36aa75",
+    "elapsed_ms": 300000,
+    "grading_revision": 1,
+    "id": "b9df7b41-4758-5bcf-b970-c437e1333ad1",
+    "idempotency_key": "",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "raw_answer": {
+     "selected_option_ids": [
+      "opt_a"
+     ],
+     "type": "single_choice"
+    },
+    "request_digest": "",
+    "session_item_id": "e81e3992-a7a1-5a43-a606-00868052023a",
+    "steps": [],
+    "submitted_at": "2026-04-01T10:00:00+00:00",
+    "updated_at": "2026-04-01T00:39:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   },
+   {
+    "applied_regrade_generation": 0,
+    "attachments": [],
+    "client_active_ms": null,
+    "confidence": "",
+    "created_at": "2026-04-01T00:42:00+00:00",
+    "current_grade_event_id": "3d1a233c-3985-523a-a504-c1bb0f2c6a09",
+    "elapsed_ms": 300000,
+    "grading_revision": 1,
+    "id": "f82827f7-b870-55f0-97f4-31b98ba9c0aa",
+    "idempotency_key": "",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "raw_answer": {
+     "selected_option_ids": [
+      "opt_a"
+     ],
+     "type": "single_choice"
+    },
+    "request_digest": "",
+    "session_item_id": "68390565-f217-5cfc-be0d-9b3ab8667bb1",
+    "steps": [],
+    "submitted_at": "2026-04-01T10:35:00+00:00",
+    "updated_at": "2026-04-01T00:44:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   }
+  ],
+  "practice_grade_event": [
+   {
+    "answer_key_version_id": "965ff9ab-6383-5558-b9a3-146ed280ffb4",
+    "attempt_id": "b9df7b41-4758-5bcf-b970-c437e1333ad1",
+    "comment": "",
+    "confirmed_score": "2.00",
+    "created_at": "2026-04-01T00:38:00+00:00",
+    "estimated_score": null,
+    "grader_id": null,
+    "grader_is_self": false,
+    "grading_revision": 1,
+    "id": "ecdd731c-074f-5296-8a1d-4f92bc36aa75",
+    "invalidation_reason": "",
+    "is_fully_confirmed": true,
+    "is_superseded": false,
+    "kind": "initial",
+    "llm_run_id": null,
+    "max_score": "2.00",
+    "method": "deterministic",
+    "parts": [
+     {
+      "max_score": "2.00",
+      "method": "deterministic",
+      "part_id": "item",
+      "score": "2.00",
+      "status": "confirmed"
+     }
+    ],
+    "pending_max_score": "0.00",
+    "rubric_version_id": null,
+    "rule_snapshot": {},
+    "rule_version": "p0-1",
+    "spec_version_id": null,
+    "status": "confirmed",
+    "supersedes_id": null,
+    "updated_at": "2026-04-01T00:38:00+00:00"
+   },
+   {
+    "answer_key_version_id": "1ccde417-0230-5e15-8b6e-74119d822d05",
+    "attempt_id": "f82827f7-b870-55f0-97f4-31b98ba9c0aa",
+    "comment": "",
+    "confirmed_score": "2.00",
+    "created_at": "2026-04-01T00:43:00+00:00",
+    "estimated_score": null,
+    "grader_id": null,
+    "grader_is_self": false,
+    "grading_revision": 1,
+    "id": "3d1a233c-3985-523a-a504-c1bb0f2c6a09",
+    "invalidation_reason": "",
+    "is_fully_confirmed": true,
+    "is_superseded": false,
+    "kind": "initial",
+    "llm_run_id": null,
+    "max_score": "2.00",
+    "method": "deterministic",
+    "parts": [
+     {
+      "max_score": "2.00",
+      "method": "deterministic",
+      "part_id": "item",
+      "score": "2.00",
+      "status": "confirmed"
+     }
+    ],
+    "pending_max_score": "0.00",
+    "rubric_version_id": null,
+    "rule_snapshot": {},
+    "rule_version": "p0-1",
+    "spec_version_id": null,
+    "status": "confirmed",
+    "supersedes_id": null,
+    "updated_at": "2026-04-01T00:43:00+00:00"
+   }
+  ],
+  "practice_session": [
+   {
+    "created_at": "2026-04-01T00:35:00+00:00",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": "2026-04-01T10:00:00+00:00",
+    "id": "8b0d6a2f-3947-5a9b-a83e-6efce4c1f401",
+    "mode": "practice",
+    "note": "purpose=practice",
+    "origin_task_id": null,
+    "policy_version": "p0-1",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "revealed_at": null,
+    "status": "finished",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:35:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   },
+   {
+    "created_at": "2026-04-01T00:40:00+00:00",
+    "exam_deadline": null,
+    "exam_started_at": null,
+    "expired_at": null,
+    "finished_at": "2026-04-01T10:35:00+00:00",
+    "id": "588f46fc-f009-53b9-a2ce-4c7da490724d",
+    "mode": "practice",
+    "note": "purpose=practice",
+    "origin_task_id": null,
+    "policy_version": "p0-1",
+    "project_id": "ee8858ad-fd09-5fef-9393-4e5a038b2983",
+    "revealed_at": null,
+    "status": "finished",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:40:00+00:00",
+    "user_id": "a45212b6-143e-55ad-b138-786fb7c7523f"
+   }
+  ],
+  "practice_session_item": [
+   {
+    "answer_key_version_id": "965ff9ab-6383-5558-b9a3-146ed280ffb4",
+    "created_at": "2026-04-01T00:36:00+00:00",
+    "draft": {},
+    "draft_revision": 0,
+    "draft_updated_at": null,
+    "first_delivered_at": "2026-04-01T09:55:00+00:00",
+    "id": "e81e3992-a7a1-5a43-a606-00868052023a",
+    "mapping_revision": 1,
+    "max_score": "2.00",
+    "ordinal": 1,
+    "pairing_id": null,
+    "paper_item_id": null,
+    "purpose": "practice",
+    "question_version_id": "101d005e-994b-5252-b3fa-eb60888a12e7",
+    "rubric_version_id": null,
+    "session_id": "8b0d6a2f-3947-5a9b-a83e-6efce4c1f401",
+    "spec_version_id": null,
+    "tutoring_allowed": true,
+    "updated_at": "2026-04-01T00:36:00+00:00"
+   },
+   {
+    "answer_key_version_id": "1ccde417-0230-5e15-8b6e-74119d822d05",
+    "created_at": "2026-04-01T00:41:00+00:00",
+    "draft": {},
+    "draft_revision": 0,
+    "draft_updated_at": null,
+    "first_delivered_at": "2026-04-01T10:30:00+00:00",
+    "id": "68390565-f217-5cfc-be0d-9b3ab8667bb1",
+    "mapping_revision": 1,
+    "max_score": "2.00",
+    "ordinal": 1,
+    "pairing_id": null,
+    "paper_item_id": null,
+    "purpose": "practice",
+    "question_version_id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "rubric_version_id": null,
+    "session_id": "588f46fc-f009-53b9-a2ce-4c7da490724d",
+    "spec_version_id": null,
+    "tutoring_allowed": true,
+    "updated_at": "2026-04-01T00:41:00+00:00"
+   }
+  ],
+  "question_bank_answer_key_version": [
+   {
+    "answer_payload": {
+     "correct_option_id": "opt_a",
+     "kind": "single_choice"
+    },
+    "check_basis": "黄金夹具",
+    "checked_at": null,
+    "checked_by_id": null,
+    "created_at": "2026-04-01T00:13:00+00:00",
+    "created_by_id": null,
+    "dispute_reason": "",
+    "explanation_blocks": [],
+    "id": "965ff9ab-6383-5558-b9a3-146ed280ffb4",
+    "is_disputed": false,
+    "question_version_id": "101d005e-994b-5252-b3fa-eb60888a12e7",
+    "source_region_id": null,
+    "source_type": "user",
+    "supersedes_id": null,
+    "updated_at": "2026-04-01T00:13:00+00:00",
+    "verification_status": "checked",
+    "version": 1
+   },
+   {
+    "answer_payload": {
+     "correct_option_id": "opt_a",
+     "kind": "single_choice"
+    },
+    "check_basis": "黄金夹具",
+    "checked_at": null,
+    "checked_by_id": null,
+    "created_at": "2026-04-01T00:18:00+00:00",
+    "created_by_id": null,
+    "dispute_reason": "",
+    "explanation_blocks": [],
+    "id": "1ccde417-0230-5e15-8b6e-74119d822d05",
+    "is_disputed": false,
+    "question_version_id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "source_region_id": null,
+    "source_type": "user",
+    "supersedes_id": null,
+    "updated_at": "2026-04-01T00:18:00+00:00",
+    "verification_status": "checked",
+    "version": 1
+   },
+   {
+    "answer_payload": {
+     "correct_option_id": "opt_a",
+     "kind": "single_choice"
+    },
+    "check_basis": "黄金夹具",
+    "checked_at": null,
+    "checked_by_id": null,
+    "created_at": "2026-04-01T00:24:00+00:00",
+    "created_by_id": null,
+    "dispute_reason": "",
+    "explanation_blocks": [],
+    "id": "bf09c66a-c418-5233-88a5-dfee3e7f49a0",
+    "is_disputed": false,
+    "question_version_id": "314f9d9d-6744-5bd2-b05d-4ec3b674fea7",
+    "source_region_id": null,
+    "source_type": "user",
+    "supersedes_id": null,
+    "updated_at": "2026-04-01T00:24:00+00:00",
+    "verification_status": "checked",
+    "version": 1
+   }
+  ],
+  "question_bank_question": [
+   {
+    "content_lineage_id": null,
+    "created_at": "2026-04-01T00:11:00+00:00",
+    "created_by_id": null,
+    "current_published_version_id": "101d005e-994b-5252-b3fa-eb60888a12e7",
+    "display_label": "Q-A",
+    "family_id": null,
+    "id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "is_demo": false,
+    "origin_type": "user_authored",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:14:00+00:00"
+   },
+   {
+    "content_lineage_id": null,
+    "created_at": "2026-04-01T00:16:00+00:00",
+    "created_by_id": null,
+    "current_published_version_id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "display_label": "Q-B",
+    "family_id": null,
+    "id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "is_demo": false,
+    "origin_type": "user_authored",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:19:00+00:00"
+   },
+   {
+    "content_lineage_id": null,
+    "created_at": "2026-04-01T00:22:00+00:00",
+    "created_by_id": null,
+    "current_published_version_id": "314f9d9d-6744-5bd2-b05d-4ec3b674fea7",
+    "display_label": "Q-C",
+    "family_id": null,
+    "id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "is_demo": false,
+    "origin_type": "user_authored",
+    "subject_id": "e998c7de-b4d8-596a-ae3c-69fcde8b55e5",
+    "updated_at": "2026-04-01T00:25:00+00:00"
+   }
+  ],
+  "question_bank_question_version": [
+   {
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "黄金题 Q-A：3 + 4 等于多少？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "7"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "8"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      }
+     ]
+    },
+    "content_digest": "f7e2bb4446589b240b5aeb10d11c6daa4a6fd1f072bbbe5f7d461d01ef0292bb",
+    "created_at": "2026-04-01T00:12:00+00:00",
+    "created_by_id": null,
+    "estimated_seconds": 60,
+    "id": "101d005e-994b-5252-b3fa-eb60888a12e7",
+    "material_child_version_ids": [],
+    "parent_material_version_id": null,
+    "practice_max_score": "2.00",
+    "published_at": "2026-04-01T00:00:00+00:00",
+    "question_id": "3f47da00-29af-5a23-8a5c-e5d9a6c20734",
+    "question_type": "single_choice",
+    "revision_reason": "golden",
+    "source_note": "",
+    "status": "published",
+    "updated_at": "2026-04-01T00:12:00+00:00",
+    "version": 1,
+    "withdrawn_at": null,
+    "withdrawn_reason": ""
+   },
+   {
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "黄金题 Q-B：3 + 4 等于多少？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "7"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "8"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      }
+     ]
+    },
+    "content_digest": "0d91d73ecfd906f55710c63111a9d6e702edbd9f10c31d03516a8226026c21b7",
+    "created_at": "2026-04-01T00:17:00+00:00",
+    "created_by_id": null,
+    "estimated_seconds": 60,
+    "id": "65d8348a-dec7-5c48-b600-c0c1859dc267",
+    "material_child_version_ids": [],
+    "parent_material_version_id": null,
+    "practice_max_score": "2.00",
+    "published_at": "2026-04-01T00:00:00+00:00",
+    "question_id": "79fff767-985b-5174-958b-20fff0c0364e",
+    "question_type": "single_choice",
+    "revision_reason": "golden",
+    "source_note": "",
+    "status": "published",
+    "updated_at": "2026-04-01T00:17:00+00:00",
+    "version": 1,
+    "withdrawn_at": null,
+    "withdrawn_reason": ""
+   },
+   {
+    "content": {
+     "blocks": [
+      {
+       "kind": "text",
+       "text": "黄金题 Q-C：3 + 4 等于多少？"
+      }
+     ],
+     "options": [
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "7"
+        }
+       ],
+       "id": "opt_a",
+       "label": "A"
+      },
+      {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "8"
+        }
+       ],
+       "id": "opt_b",
+       "label": "B"
+      }
+     ]
+    },
+    "content_digest": "d4fa520f3dd70e2258f4df61f4ccbad969460e69cad088e7a5357d57445ed78a",
+    "created_at": "2026-04-01T00:23:00+00:00",
+    "created_by_id": null,
+    "estimated_seconds": 60,
+    "id": "314f9d9d-6744-5bd2-b05d-4ec3b674fea7",
+    "material_child_version_ids": [],
+    "parent_material_version_id": null,
+    "practice_max_score": "2.00",
+    "published_at": "2026-04-01T00:00:00+00:00",
+    "question_id": "57e6e0b4-bd54-513a-9ca4-bac02f7a0826",
+    "question_type": "single_choice",
+    "revision_reason": "golden",
+    "source_note": "",
+    "status": "published",
+    "updated_at": "2026-04-01T00:23:00+00:00",
+    "version": 1,
+    "withdrawn_at": null,
+    "withdrawn_reason": ""
+   }
+  ]
+ }
+}

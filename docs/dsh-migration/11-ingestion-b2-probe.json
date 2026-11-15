@@ -1,0 +1,6377 @@
+{
+ "cases": [
+  {
+   "case": "P01",
+   "checks": {
+    "outbox": [],
+    "response_has_question_id": false,
+    "row_delta": {
+     "audit_content_revision": 3,
+     "audit_idempotency_record": 1,
+     "question_bank_answer_key_version": 1,
+     "question_bank_question": 1,
+     "question_bank_question_version": 1,
+     "question_bank_source_link": 1
+    },
+    "stored_body_has_question_id": true,
+    "stored_body_keys": [
+     "answer_match",
+     "child_candidate_ids",
+     "draft_payload",
+     "extractor_version",
+     "id",
+     "is_stub_output",
+     "job_id",
+     "layout_review_confirmed_at",
+     "layout_review_note",
+     "machine_payload",
+     "paper_revision_id",
+     "parent_candidate_id",
+     "publication_paper_item_id",
+     "publication_question_id",
+     "publication_version_id",
+     "question_id",
+     "review_issues",
+     "revision",
+     "source_position_key",
+     "source_regions",
+     "status",
+     "subject_id",
+     "updated_at"
+    ],
+    "stored_resource_type": "import_candidate",
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P01",
+      "publication_version_id": "VERSION_OF_CAND_P01",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P01",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P01的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 c5927ea5-d2fc-49dd-803e-839ccfe74a69 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-ok",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/c5927ea5-d2fc-49dd-803e-839ccfe74a69/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "c5927ea5-d2fc-49dd-803e-839ccfe74a69",
+    "is_stub_output": false,
+    "job_id": "62da6906-0252-4f07-bab9-3279b2f2238c",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+    "publication_version_id": "20766675-f74a-4329-a9d5-4994d58110bf",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "09f783ce-dd9b-40c3-b2a3-b7a63701a95b",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P01的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:18.925468+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "发布一个已校对完成的单选候选"
+  },
+  {
+   "case": "P02",
+   "checks": {
+    "row_delta": {},
+    "same_body_as_P01": true
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-ok",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/c5927ea5-d2fc-49dd-803e-839ccfe74a69/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "c5927ea5-d2fc-49dd-803e-839ccfe74a69",
+    "is_stub_output": false,
+    "job_id": "62da6906-0252-4f07-bab9-3279b2f2238c",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+    "publication_version_id": "20766675-f74a-4329-a9d5-4994d58110bf",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "09f783ce-dd9b-40c3-b2a3-b7a63701a95b",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P01的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:18.925468+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "相同幂等键与相同 body 重放"
+  },
+  {
+   "case": "P03",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "candidates.publish:c5927ea5-d2fc-49dd-803e-839ccfe74a69"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "origin_type": "demo"
+    },
+    "idempotency_key": "b2-publish-ok",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/c5927ea5-d2fc-49dd-803e-839ccfe74a69/publish"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "candidates.publish:c5927ea5-d2fc-49dd-803e-839ccfe74a69"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 409,
+   "title": "相同幂等键但 body 不同"
+  },
+  {
+   "case": "P04",
+   "checks": {
+    "row_delta": {
+     "audit_idempotency_record": 1
+    },
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P01",
+      "publication_version_id": "VERSION_OF_CAND_P01",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P01",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P01的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 c5927ea5-d2fc-49dd-803e-839ccfe74a69 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-again",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/c5927ea5-d2fc-49dd-803e-839ccfe74a69/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "c5927ea5-d2fc-49dd-803e-839ccfe74a69",
+    "is_stub_output": false,
+    "job_id": "62da6906-0252-4f07-bab9-3279b2f2238c",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P01的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P01的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+    "publication_version_id": "20766675-f74a-4329-a9d5-4994d58110bf",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "997e1b04-75d7-4155-a095-b7f4cf93bdfd",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "09f783ce-dd9b-40c3-b2a3-b7a63701a95b",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P01的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:18.925468+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "已发布候选再用新键发布"
+  },
+  {
+   "case": "P05",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "已忽略的候选不能发布"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-ignored",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/268786ac-6942-4bea-9099-82df70c79e68/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "已忽略的候选不能发布"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "已忽略候选不能发布"
+  },
+  {
+   "case": "P06",
+   "checks": {},
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "problems": [
+      {
+       "code": "answer_missing",
+       "message": "尚未填写答案",
+       "severity": "blocking"
+      }
+     ]
+    },
+    "message": "候选仍有未解决的问题，不能发布"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-blocked",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/d35e53f8-95b5-4155-94f5-543e39b46bde/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "problems": [
+       {
+        "code": "answer_missing",
+        "message": "尚未填写答案",
+        "severity": "blocking"
+       }
+      ]
+     },
+     "message": "候选仍有未解决的问题，不能发布"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "仍有 blocking issue 的候选"
+  },
+  {
+   "case": "P07",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "候选不存在或不属于该项目"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-foreign",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/a395b950-cfec-43cf-8750-a9aff34b468c/publish"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "候选不存在或不属于该项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 404,
+   "title": "别的项目的候选"
+  },
+  {
+   "case": "P08",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考试规范版本不存在或不属于该项目"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": "00000000-0000-0000-0000-000000000000"
+    },
+    "idempotency_key": "b2-publish-spec-missing",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/00298848-11b8-4ab2-9c4e-903680903fd8/publish"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考试规范版本不存在或不属于该项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 404,
+   "title": "不存在的考试规范版本"
+  },
+  {
+   "case": "P09",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "只能使用已发布的考试规范版本"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": "1df7cf90-0019-4a33-84a6-b9b32065a8af"
+    },
+    "idempotency_key": "b2-publish-spec-draft",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/0e6b4b9a-be0b-4d55-ae18-3607321c2a1b/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "只能使用已发布的考试规范版本"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "未发布的考试规范版本"
+  },
+  {
+   "case": "P10",
+   "checks": {},
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": "688af8b1-77c8-43e0-a503-3e0ef5970b7e"
+    },
+    "idempotency_key": "b2-publish-spec-other-subject",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/62df0640-8561-4fb9-bc58-29a105cb0722/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P10的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P10的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "62df0640-8561-4fb9-bc58-29a105cb0722",
+    "is_stub_output": false,
+    "job_id": "5025553f-eb48-498b-8cb5-ac06302bf8c6",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P10的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P10的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "7f660c4a-f795-4dce-90fc-c583420bed42",
+    "publication_version_id": "f3eef315-76ca-4b05-8bea-08cf7c36678e",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "7f660c4a-f795-4dce-90fc-c583420bed42",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "1dd9d85c-8eea-44bf-946d-1a70693b1205",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P10的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.072182+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "同项目另一科目的已发布规范（不校验同科目）"
+  },
+  {
+   "case": "P11",
+   "checks": {
+    "row_delta": {},
+    "write_set": {
+     "answer": null,
+     "audit_actions": [],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "ready"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": null,
+     "rubric": null,
+     "source_links": [],
+     "version": null
+    }
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "origin_type": "bogus_origin"
+    },
+    "message": "题目来源类型无效"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "origin_type": "bogus_origin"
+    },
+    "idempotency_key": "b2-publish-bad-origin",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/79d6b903-d36a-49f6-860c-11641a77c263/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "origin_type": "bogus_origin"
+     },
+     "message": "题目来源类型无效"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "非法题目来源类型"
+  },
+  {
+   "case": "P12",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P12",
+      "publication_version_id": "VERSION_OF_CAND_P12",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P12",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P12的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 8665d1b2-26db-489c-af1f-2a57a6addd3b 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": "30d3e239-2ab5-4e4f-8df1-1e41a497ad34"
+    },
+    "idempotency_key": "b2-publish-spec-default",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/8665d1b2-26db-489c-af1f-2a57a6addd3b/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P12的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": null,
+     "question_type": "single_choice",
+     "source_excerpt": "P12的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "8665d1b2-26db-489c-af1f-2a57a6addd3b",
+    "is_stub_output": false,
+    "job_id": "c2ecbf6f-9b7c-4eb1-9cac-44162648b4e8",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P12的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": null,
+     "question_type": "single_choice",
+     "source_excerpt": "P12的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "8cb59804-c33e-4ea3-b0d5-a8742fdd9213",
+    "publication_version_id": "bac81143-40f3-40bb-ae4b-e1431b497610",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "8cb59804-c33e-4ea3-b0d5-a8742fdd9213",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "d5002eec-61cd-49f3-a8d9-dba536c91806",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P12的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.120649+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "未声明分值时采用规范默认分值"
+  },
+  {
+   "case": "P13",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "mapping_revision",
+       "entity_type": "question_knowledge"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P13",
+      "publication_version_id": "VERSION_OF_CAND_P13",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [
+      {
+       "is_primary": true,
+       "mapping_revision": 1,
+       "node": "NODE_1",
+       "note": "",
+       "score_weight": "1.0000",
+       "template_id": null
+      }
+     ],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P13",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P13的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 bac974d4-1460-45e0-986c-b628bc7c9806 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": [
+      "ef1927fb-6372-4479-b43c-08dce3fc1b44"
+     ]
+    },
+    "idempotency_key": "b2-publish-one-node",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/bac974d4-1460-45e0-986c-b628bc7c9806/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P13的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P13的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "bac974d4-1460-45e0-986c-b628bc7c9806",
+    "is_stub_output": false,
+    "job_id": "03beb021-a981-4a5d-8816-8e15004e1b4e",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P13的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P13的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "10bcaa3e-f6bc-445b-a9bc-222a69a48df5",
+    "publication_version_id": "bf8ae7a2-b255-4224-b260-833dff9c1870",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "10bcaa3e-f6bc-445b-a9bc-222a69a48df5",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "5aaabc2d-b161-4b12-b129-a457428f5ef6",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P13的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.159298+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "映射到一个考点"
+  },
+  {
+   "case": "P14",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "mapping_revision",
+       "entity_type": "question_knowledge"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P14",
+      "publication_version_id": "VERSION_OF_CAND_P14",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [
+      {
+       "is_primary": true,
+       "mapping_revision": 1,
+       "node": "NODE_1",
+       "note": "",
+       "score_weight": "0.5000",
+       "template_id": null
+      },
+      {
+       "is_primary": true,
+       "mapping_revision": 1,
+       "node": "NODE_2",
+       "note": "",
+       "score_weight": "0.5000",
+       "template_id": null
+      }
+     ],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P14",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P14的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 dc8c5fdc-df85-4345-907f-5dc0671cad5b 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": [
+      "ef1927fb-6372-4479-b43c-08dce3fc1b44",
+      "efcdfe61-2320-47e0-bd07-d40a3a10edc9"
+     ]
+    },
+    "idempotency_key": "b2-publish-two-nodes",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/dc8c5fdc-df85-4345-907f-5dc0671cad5b/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P14的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P14的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "dc8c5fdc-df85-4345-907f-5dc0671cad5b",
+    "is_stub_output": false,
+    "job_id": "5c97786f-1e69-4abd-9f4b-7bc662c9df89",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P14的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P14的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "76727ae9-1162-45ca-8bff-112d013dedc1",
+    "publication_version_id": "1174d577-048a-40ae-8ff5-289a50da8f24",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "76727ae9-1162-45ca-8bff-112d013dedc1",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "731d897c-3daf-4740-a728-0ace929ca764",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P14的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.199726+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "映射到两个考点（等分）"
+  },
+  {
+   "case": "P15",
+   "checks": {
+    "row_delta": {},
+    "write_set": {
+     "answer": null,
+     "audit_actions": [],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "ready"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": null,
+     "rubric": null,
+     "source_links": [],
+     "version": null
+    }
+   },
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "total": "0.9999999999999999999999999999"
+    },
+    "message": "主要考点权重合计必须为 1（当前 0.9999999999999999999999999999）；未分类分值请映射到显式“未分类”节点"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": [
+      "ef1927fb-6372-4479-b43c-08dce3fc1b44",
+      "efcdfe61-2320-47e0-bd07-d40a3a10edc9",
+      "a187f466-4c94-4132-aed4-7c11e8976dfb"
+     ]
+    },
+    "idempotency_key": "b2-publish-three-nodes",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ddcd8846-d632-4aef-9a9a-00a6b8e1ee5d/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "total": "0.9999999999999999999999999999"
+     },
+     "message": "主要考点权重合计必须为 1（当前 0.9999999999999999999999999999）；未分类分值请映射到显式“未分类”节点"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "映射到三个考点（Decimal 1/3 权重和）"
+  },
+  {
+   "case": "P16",
+   "checks": {
+    "row_delta": {},
+    "write_set": {
+     "answer": null,
+     "audit_actions": [],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "ready"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": null,
+     "rubric": null,
+     "source_links": [],
+     "version": null
+    }
+   },
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考点大纲与题目科目不一致"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": [
+      "5f19bfe7-6f78-4971-865a-31a1ccf52efc"
+     ]
+    },
+    "idempotency_key": "b2-publish-node-scope",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/8fd022ad-cb2f-4a0d-8f2b-dec77350bb68/publish"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考点大纲与题目科目不一致"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 404,
+   "title": "考点属于别的科目大纲"
+  },
+  {
+   "case": "P17",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "kind": "constructed_response",
+       "reference_answer": "参考答案",
+       "rubric_required": true
+      },
+      "check_basis": "与官方答案核对一致",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [
+       {
+        "kind": "text",
+        "text": "解析"
+       }
+      ],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "official",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P17",
+      "publication_version_id": "VERSION_OF_CAND_P17",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": {
+      "checked": true,
+      "criteria": [
+       {
+        "criterion_id": "c1",
+        "max_score": "4.00",
+        "text": "要点一"
+       },
+       {
+        "criterion_id": "c2",
+        "depends_on": [
+         "c1"
+        ],
+        "max_score": "2.00",
+        "text": "要点二"
+       }
+      ],
+      "total_score": "6.00",
+      "usage_note": "",
+      "version": 1
+     },
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P17",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P17的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "6.00",
+      "published_at_is_now": true,
+      "question_type": "constructed_response",
+      "revision_reason": "由导入候选 57df144f-bc1f-4c15-b982-6713853e6a8e 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-constructed",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/57df144f-bc1f-4c15-b982-6713853e6a8e/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "kind": "constructed_response",
+      "reference_answer": "参考答案",
+      "rubric_required": true
+     },
+     "answer_source_type": "official",
+     "answer_status_known": true,
+     "check_basis": "与官方答案核对一致",
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P17的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "解析"
+      }
+     ],
+     "parse_issues": [],
+     "practice_max_score": "6.00",
+     "question_type": "constructed_response",
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "max_score": "4.00",
+       "text": "要点一"
+      },
+      {
+       "criterion_id": "c2",
+       "depends_on": [
+        "c1"
+       ],
+       "max_score": "2.00",
+       "text": "要点二"
+      }
+     ],
+     "rubric_total_score": "6.00",
+     "source_excerpt": "P17的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "57df144f-bc1f-4c15-b982-6713853e6a8e",
+    "is_stub_output": false,
+    "job_id": "b6d1bbd2-2e4c-4227-a78a-2ca95ca819fe",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "kind": "constructed_response",
+      "reference_answer": "参考答案",
+      "rubric_required": true
+     },
+     "answer_source_type": "official",
+     "answer_status_known": true,
+     "check_basis": "与官方答案核对一致",
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P17的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [
+      {
+       "kind": "text",
+       "text": "解析"
+      }
+     ],
+     "parse_issues": [],
+     "practice_max_score": "6.00",
+     "question_type": "constructed_response",
+     "rubric_criteria": [
+      {
+       "criterion_id": "c1",
+       "max_score": "4.00",
+       "text": "要点一"
+      },
+      {
+       "criterion_id": "c2",
+       "depends_on": [
+        "c1"
+       ],
+       "max_score": "2.00",
+       "text": "要点二"
+      }
+     ],
+     "rubric_total_score": "6.00",
+     "source_excerpt": "P17的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "b455923a-6f66-4434-b29c-d98ce6d5dc45",
+    "publication_version_id": "39ef10bb-7a8c-4a8f-b22c-d40c0916edbe",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "b455923a-6f66-4434-b29c-d98ce6d5dc45",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "0f2f4f4a-d17f-4e06-a2b5-77405c55d41f",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P17的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.306025+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "大题：答案+rubric 一并写入"
+  },
+  {
+   "case": "P18",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "errors": {
+      "total_score": [
+       "评分点合计 3.00 与 rubric 总分 6.00 不一致"
+      ]
+     }
+    },
+    "message": "结构校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-rubric-invalid",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/4252c31b-c2c6-4bb0-ad7b-e8b346848c78/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "errors": {
+       "total_score": [
+        "评分点合计 3.00 与 rubric 总分 6.00 不一致"
+       ]
+      }
+     },
+     "message": "结构校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "rubric 合计与总分不一致"
+  },
+  {
+   "case": "P19",
+   "checks": {},
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "problems": [
+      {
+       "code": "blank_total_mismatch",
+       "message": "各空分值合计 2.00 与题目分值 4.00 不一致",
+       "path": "answer.blanks"
+      }
+     ]
+    },
+    "message": "发布前校验未通过"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-blank-total",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba41cf80-392a-44ee-b488-4c247e5c29c5/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "problems": [
+       {
+        "code": "blank_total_mismatch",
+        "message": "各空分值合计 2.00 与题目分值 4.00 不一致",
+        "path": "answer.blanks"
+       }
+      ]
+     },
+     "message": "发布前校验未通过"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "填空各空分值与题目分值不一致"
+  },
+  {
+   "case": "P20",
+   "checks": {
+    "outbox": [
+     {
+      "dedupe_key": "paper-stats:c25ac49e-f553-45ff-8ddb-06665ec905c9:d9454b09-3d38-4555-a255-8d6cb4d745a7",
+      "payload": {
+       "paper_id": "c25ac49e-f553-45ff-8ddb-06665ec905c9"
+      },
+      "status": "processed",
+      "topic": "projection.refresh_paper_stats"
+     }
+    ],
+    "row_delta": {
+     "audit_content_revision": 4,
+     "audit_idempotency_record": 1,
+     "audit_outbox_event": 1,
+     "exams_paper_item": 1,
+     "question_bank_answer_key_version": 1,
+     "question_bank_question": 1,
+     "question_bank_question_version": 1,
+     "question_bank_source_link": 1
+    },
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": "PAPER_ITEM_OF_CAND_P20",
+      "publication_question_id": "QUESTION_OF_CAND_P20",
+      "publication_version_id": "VERSION_OF_CAND_P20",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [
+      {
+       "answer_key_version": "ANSWER_OF_CAND_P20",
+       "is_demo": false,
+       "is_scored": true,
+       "max_score": "2.00",
+       "parent_item_position": null,
+       "position_key": "1",
+       "question_version_is_self": true,
+       "revision_is_candidate_paper": true
+      }
+     ],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P20",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P20的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 78010761-4c59-43c9-b5eb-eaa2ba8ef53d 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-paper-item",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/78010761-4c59-43c9-b5eb-eaa2ba8ef53d/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P20的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P20的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "78010761-4c59-43c9-b5eb-eaa2ba8ef53d",
+    "is_stub_output": false,
+    "job_id": "3c58bd24-0ee1-4791-875c-a8fa66655c06",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P20的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P20的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": "d9454b09-3d38-4555-a255-8d6cb4d745a7",
+    "parent_candidate_id": null,
+    "publication_paper_item_id": "e8d19011-169c-4f2e-b326-707c3a0498ed",
+    "publication_question_id": "fa2a0da6-d2a7-49e3-a626-d29df1b6c438",
+    "publication_version_id": "00bdf8eb-1504-434f-85bc-c3b428c51bd0",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "fa2a0da6-d2a7-49e3-a626-d29df1b6c438",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "1",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "c6bbd8cc-cabd-40bb-be57-0cdb4ab690dd",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P20的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.419251+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "真实试卷候选：写 PaperItem"
+  },
+  {
+   "case": "P21",
+   "checks": {},
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "problems": [
+      {
+       "code": "duplicate_paper_position",
+       "message": "该试卷的题号 1 已发布过版本；重复导入不能再次发布（如需修订请在题库中创建新版本）",
+       "question_id": "fa2a0da6-d2a7-49e3-a626-d29df1b6c438",
+       "question_version_id": "00bdf8eb-1504-434f-85bc-c3b428c51bd0",
+       "severity": "blocking"
+      }
+     ]
+    },
+    "message": "候选仍有未解决的问题，不能发布"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-duplicate-position",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/870372ae-dee5-4eb5-be98-8be9a92c7192/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "problems": [
+       {
+        "code": "duplicate_paper_position",
+        "message": "该试卷的题号 1 已发布过版本；重复导入不能再次发布（如需修订请在题库中创建新版本）",
+        "question_id": "fa2a0da6-d2a7-49e3-a626-d29df1b6c438",
+        "question_version_id": "00bdf8eb-1504-434f-85bc-c3b428c51bd0",
+        "severity": "blocking"
+       }
+      ]
+     },
+     "message": "候选仍有未解决的问题，不能发布"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "同一试卷版本重复卷面号"
+  },
+  {
+   "case": "P22",
+   "checks": {
+    "row_delta": {},
+    "write_set": {
+     "answer": null,
+     "audit_actions": [],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "ready"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": null,
+     "rubric": null,
+     "source_links": [],
+     "version": null
+    }
+   },
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题目科目与试卷科目不一致"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-subject-mismatch",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/3ec53076-3a89-4038-8961-5ca80975f3c4/publish"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题目科目与试卷科目不一致"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 404,
+   "title": "候选科目与试卷科目不一致（整事务回滚）"
+  },
+  {
+   "case": "P23",
+   "checks": {
+    "row_delta": {}
+   },
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "problems": [
+      {
+       "candidate_ids": [
+        "30352bde-f28d-4ed6-8e41-9f2e5bbbe893",
+        "3fd1df83-3de6-49b0-807b-5fd197a9a964"
+       ],
+       "code": "material_children_unpublished",
+       "message": "仍有 2 个子题未发布，材料题的子题关系尚不完整",
+       "severity": "blocking"
+      }
+     ]
+    },
+    "message": "候选仍有未解决的问题，不能发布"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-material-early",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/75f67958-d268-426b-923d-1a14db2cd473/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "problems": [
+       {
+        "candidate_ids": [
+         "30352bde-f28d-4ed6-8e41-9f2e5bbbe893",
+         "3fd1df83-3de6-49b0-807b-5fd197a9a964"
+        ],
+        "code": "material_children_unpublished",
+        "message": "仍有 2 个子题未发布，材料题的子题关系尚不完整",
+        "severity": "blocking"
+       }
+      ]
+     },
+     "message": "候选仍有未解决的问题，不能发布"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "材料题先于子题发布"
+  },
+  {
+   "case": "P24",
+   "checks": {
+    "row_delta": {
+     "audit_content_revision": 5,
+     "audit_idempotency_record": 1,
+     "exams_paper_item": 1,
+     "question_bank_answer_key_version": 1,
+     "question_bank_question": 2,
+     "question_bank_question_version": 2,
+     "question_bank_source_link": 1
+    },
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": "PAPER_ITEM_OF_CAND_CHILD1",
+      "publication_question_id": "QUESTION_OF_CAND_CHILD1",
+      "publication_version_id": "VERSION_OF_CAND_CHILD1",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [
+      {
+       "answer_key_version": "ANSWER_OF_CAND_CHILD1",
+       "is_demo": false,
+       "is_scored": true,
+       "max_score": "2.00",
+       "parent_item_position": null,
+       "position_key": "3.1",
+       "question_version_is_self": true,
+       "revision_is_candidate_paper": true
+      }
+     ],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P23C1",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P23C1的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": "VERSION_OF_CAND_MATERIAL",
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 3fd1df83-3de6-49b0-807b-5fd197a9a964 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-child1",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/3fd1df83-3de6-49b0-807b-5fd197a9a964/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P23C1的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P23C1的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "3fd1df83-3de6-49b0-807b-5fd197a9a964",
+    "is_stub_output": false,
+    "job_id": "a2a4d05e-f0c4-4e7d-8f9c-2bb4e9ce74a2",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P23C1的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P23C1的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": "d9454b09-3d38-4555-a255-8d6cb4d745a7",
+    "parent_candidate_id": "75f67958-d268-426b-923d-1a14db2cd473",
+    "publication_paper_item_id": "5cee477a-52c3-4160-96d4-caaee4f0a148",
+    "publication_question_id": "dd9feb36-47cd-492d-9d19-a660e91f6762",
+    "publication_version_id": "12744210-f792-4a66-8339-0e1d4c3a8400",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "dd9feb36-47cd-492d-9d19-a660e91f6762",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "3.1",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "cd15e1a1-65a3-41eb-89d5-9d1be0e01578",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P23C1的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.629524+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "先发布材料题的第一个子题"
+  },
+  {
+   "case": "P25",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": "PAPER_ITEM_OF_CAND_CHILD2",
+      "publication_question_id": "QUESTION_OF_CAND_CHILD2",
+      "publication_version_id": "VERSION_OF_CAND_CHILD2",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [
+      {
+       "answer_key_version": "ANSWER_OF_CAND_CHILD2",
+       "is_demo": false,
+       "is_scored": true,
+       "max_score": "2.00",
+       "parent_item_position": null,
+       "position_key": "3.2",
+       "question_version_is_self": true,
+       "revision_is_candidate_paper": true
+      }
+     ],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P23C2",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P23C2的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": "VERSION_OF_CAND_MATERIAL",
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 30352bde-f28d-4ed6-8e41-9f2e5bbbe893 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-child2",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/30352bde-f28d-4ed6-8e41-9f2e5bbbe893/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P23C2的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P23C2的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "30352bde-f28d-4ed6-8e41-9f2e5bbbe893",
+    "is_stub_output": false,
+    "job_id": "1f590de4-b6d6-4837-a717-595137816569",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P23C2的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P23C2的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": "d9454b09-3d38-4555-a255-8d6cb4d745a7",
+    "parent_candidate_id": "75f67958-d268-426b-923d-1a14db2cd473",
+    "publication_paper_item_id": "3ba5990c-d5ab-48aa-9624-9c22211a9b79",
+    "publication_question_id": "a6e45cb3-1929-4fd8-9e8f-c6e84a726641",
+    "publication_version_id": "262032ec-1047-4ad8-8a19-55d884b6f6fd",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "a6e45cb3-1929-4fd8-9e8f-c6e84a726641",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "3.2",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "8358cbbb-e3ec-4a0f-818a-14c581d00cfd",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P23C2的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.670868+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "发布第二个子题"
+  },
+  {
+   "case": "P26",
+   "checks": {
+    "row_delta": {
+     "audit_content_revision": 2,
+     "audit_idempotency_record": 1,
+     "exams_paper_item": 1,
+     "question_bank_source_link": 1
+    },
+    "write_set": {
+     "answer": null,
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": "PAPER_ITEM_OF_CAND_MATERIAL",
+      "publication_question_id": "QUESTION_OF_CAND_MATERIAL",
+      "publication_version_id": "VERSION_OF_CAND_MATERIAL",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [
+      {
+       "answer_key_version": null,
+       "is_demo": false,
+       "is_scored": false,
+       "max_score": "0.00",
+       "parent_item_position": null,
+       "position_key": "3",
+       "question_version_is_self": true,
+       "revision_is_candidate_paper": true
+      }
+     ],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P23M",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "共享材料"
+        }
+       ],
+       "options": []
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [
+       "VERSION_OF_CAND_CHILD1",
+       "VERSION_OF_CAND_CHILD2"
+      ],
+      "parent_material_version": null,
+      "practice_max_score": null,
+      "published_at_is_now": true,
+      "question_type": "material",
+      "revision_reason": "由导入候选 75f67958-d268-426b-923d-1a14db2cd473 的材料题版本",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-material",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/75f67958-d268-426b-923d-1a14db2cd473/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [
+     "3fd1df83-3de6-49b0-807b-5fd197a9a964",
+     "30352bde-f28d-4ed6-8e41-9f2e5bbbe893"
+    ],
+    "draft_payload": {
+     "answer_payload": {},
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "共享材料"
+       }
+      ],
+      "options": []
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "material",
+     "source_excerpt": "P23M的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "75f67958-d268-426b-923d-1a14db2cd473",
+    "is_stub_output": false,
+    "job_id": "b4cbc7e6-3751-4be5-b91d-6e60e7c9fc49",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {},
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "共享材料"
+       }
+      ],
+      "options": []
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "material",
+     "source_excerpt": "P23M的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": "d9454b09-3d38-4555-a255-8d6cb4d745a7",
+    "parent_candidate_id": null,
+    "publication_paper_item_id": "6f97e1d0-da1e-4eac-99d2-62d0ee110d12",
+    "publication_question_id": "e7c9d324-9837-4f71-88ef-43c91783e4ce",
+    "publication_version_id": "a9fb51b0-3016-4022-a781-95a43465b324",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "e7c9d324-9837-4f71-88ef-43c91783e4ce",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "3",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "04b42f15-4793-4690-bfd7-0087878c7358",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P23M的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.718694+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "子题都发布后发布材料题"
+  },
+  {
+   "case": "P27",
+   "checks": {
+    "write_set": {
+     "answer": null,
+     "audit_actions": [],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": null,
+      "publication_version_id": null,
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "draft"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": null,
+     "rubric": null,
+     "source_links": [],
+     "version": null
+    }
+   },
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "problems": [
+      {
+       "code": "variant_source_missing",
+       "message": "找不到变式的源题版本：无法验证它是否构成有效变式",
+       "path": "variant_of_version_id",
+       "severity": "blocking"
+      }
+     ]
+    },
+    "message": "候选仍有未解决的问题，不能发布"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "origin_type": "user_authored"
+    },
+    "idempotency_key": "b2-publish-ai-variant",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/6170dd0d-c4e9-4289-a053-a416fadf5a7d/publish"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "problems": [
+       {
+        "code": "variant_source_missing",
+        "message": "找不到变式的源题版本：无法验证它是否构成有效变式",
+        "path": "variant_of_version_id",
+        "severity": "blocking"
+       }
+      ]
+     },
+     "message": "候选仍有未解决的问题，不能发布"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 422,
+   "title": "ai_variant 任务强制 ai_generated 来源"
+  },
+  {
+   "case": "P28",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P28",
+      "publication_version_id": "VERSION_OF_CAND_P28",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "请求标签",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P28",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P28的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": 90,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 3980d3dc-a399-44f2-af26-95a3c9ff15fd 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "display_label": "请求标签"
+    },
+    "idempotency_key": "b2-publish-label",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/3980d3dc-a399-44f2-af26-95a3c9ff15fd/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P28的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "payload 标签",
+     "estimated_seconds": 90,
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P28的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "3980d3dc-a399-44f2-af26-95a3c9ff15fd",
+    "is_stub_output": false,
+    "job_id": "a21fd493-aaca-446a-a168-049439f8220b",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P28的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "payload 标签",
+     "estimated_seconds": 90,
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P28的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "ccf8fce3-e1ab-400d-a23c-15550e843271",
+    "publication_version_id": "7f2a55ee-7a2f-4dd1-b71d-b7dcb7e9af7a",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "ccf8fce3-e1ab-400d-a23c-15550e843271",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "99eeb54a-51cb-4743-aaa5-01417d6d7ee9",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P28的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.772029+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "请求 display_label 优先于 payload；estimated_seconds 落库"
+  },
+  {
+   "case": "P29",
+   "checks": {},
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": null,
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/bbe7a65d-8397-49b0-bf21-83c86d5c7a7c/publish"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 409,
+   "title": "缺少 Idempotency-Key"
+  },
+  {
+   "case": "P30",
+   "checks": {},
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考试规范版本不存在或不属于该项目"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": "00000000-0000-0000-0000-000000000000"
+    },
+    "idempotency_key": null,
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/bbe7a65d-8397-49b0-bf21-83c86d5c7a7c/publish"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考试规范版本不存在或不属于该项目"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 404,
+   "title": "规范不存在且缺少幂等键：先报 404"
+  },
+  {
+   "case": "P31",
+   "checks": {},
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": [
+     1,
+     2
+    ],
+    "idempotency_key": "b2-publish-array-body",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/bbe7a65d-8397-49b0-bf21-83c86d5c7a7c/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P29的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P29的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "bbe7a65d-8397-49b0-bf21-83c86d5c7a7c",
+    "is_stub_output": false,
+    "job_id": "8ac81098-fceb-4c48-82d6-9b4ccf540168",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P29的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P29的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "9568bfab-71ef-402e-a877-20a98a7eb8d6",
+    "publication_version_id": "7220275c-ad1d-42db-b5fe-20d0ea06745b",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "9568bfab-71ef-402e-a877-20a98a7eb8d6",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "c06a713f-e56e-478f-a4bd-20868c86fb5d",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P29的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.816645+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "body 是数组"
+  },
+  {
+   "case": "P32",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P32",
+      "publication_version_id": "VERSION_OF_CAND_P32",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P32",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P32的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 9ec683e9-5bb2-42f4-a414-765500c156fa 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-estimated-null",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/9ec683e9-5bb2-42f4-a414-765500c156fa/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P32的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P32的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "9ec683e9-5bb2-42f4-a414-765500c156fa",
+    "is_stub_output": false,
+    "job_id": "a5e3e1f4-1381-48e9-9cb7-e7237aa1d5be",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P32的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P32的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "b2dff4bf-00f1-4290-bae5-a491beed7805",
+    "publication_version_id": "cca47c5b-b7a7-4f5d-bdf0-554f3af789b5",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "b2dff4bf-00f1-4290-bae5-a491beed7805",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "83306635-8d3c-46f9-89fb-4794dde6bfb2",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P32的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.848532+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "estimated_seconds 缺省为 null"
+  },
+  {
+   "case": "P33",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": "PAPER_ITEM_OF_CAND_P33",
+      "publication_question_id": "QUESTION_OF_CAND_P33",
+      "publication_version_id": "VERSION_OF_CAND_P33",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [
+      {
+       "answer_key_version": "ANSWER_OF_CAND_P33",
+       "is_demo": false,
+       "is_scored": true,
+       "max_score": "2.00",
+       "parent_item_position": null,
+       "position_key": "卷面标签",
+       "question_version_is_self": true,
+       "revision_is_candidate_paper": true
+      }
+     ],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "卷面标签",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P33",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P33的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 f1679d99-2de9-4c96-a0b9-41734a239d1e 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-position-fallback",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/f1679d99-2de9-4c96-a0b9-41734a239d1e/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P33的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "卷面标签",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P33的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "f1679d99-2de9-4c96-a0b9-41734a239d1e",
+    "is_stub_output": false,
+    "job_id": "16bdae13-a505-4ad8-a10d-0ce359b89191",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P33的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "卷面标签",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P33的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": "a869b390-c865-4544-80a3-820789051809",
+    "parent_candidate_id": null,
+    "publication_paper_item_id": "110cd0b2-76d6-4852-91d4-5ebfc47db1c5",
+    "publication_question_id": "7bdd3a43-8c86-4c46-a103-334f94d0f563",
+    "publication_version_id": "b5a2b66d-5033-46f4-af12-8f7cdcd3a8ed",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "7bdd3a43-8c86-4c46-a103-334f94d0f563",
+      "severity": "warning"
+     },
+     {
+      "code": "duplicate_label",
+      "message": "该科目已存在相同题号/标签：卷面标签",
+      "question_id": "7bdd3a43-8c86-4c46-a103-334f94d0f563",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "f651fdb3-0d17-4ac3-bfe1-d3a83e1de156",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P33的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.898004+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "无 source_position_key 时用 payload.display_label"
+  },
+  {
+   "case": "P34",
+   "checks": {
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P34",
+      "publication_version_id": "VERSION_OF_CAND_P34",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "",
+      "family_id": null,
+      "is_demo": true,
+      "origin_type": "demo"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P34",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P34的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 639d30fd-58da-4c17-bb62-00beddf547a8 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "origin_type": "demo"
+    },
+    "idempotency_key": "b2-publish-demo-origin",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/639d30fd-58da-4c17-bb62-00beddf547a8/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P34的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P34的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "639d30fd-58da-4c17-bb62-00beddf547a8",
+    "is_stub_output": false,
+    "job_id": "d55b8506-d663-4636-8fa9-a6780b0ad8c4",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P34的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P34的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "eef19804-91e1-48ea-8612-c1d3ea5b41de",
+    "publication_version_id": "0ebd3949-0e61-44c2-b949-0f09babd3a71",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "eef19804-91e1-48ea-8612-c1d3ea5b41de",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "ae809a42-5726-4006-a84d-6e82c38da475",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P34的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.943081+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "origin_type=demo 时 is_demo=true"
+  },
+  {
+   "case": "P35",
+   "checks": {
+    "published_label_length": 200,
+    "write_set": {
+     "answer": {
+      "answer_payload": {
+       "correct_option_id": "opt_a",
+       "kind": "single_choice"
+      },
+      "check_basis": "人工校对确认（导入流程）",
+      "checked": true,
+      "checked_by_is_actor": true,
+      "explanation_blocks": [],
+      "is_disputed": false,
+      "source_region": null,
+      "source_type": "user",
+      "supersedes": null,
+      "verification_status": "checked",
+      "version": 1
+     },
+     "audit_actions": [
+      {
+       "action": "create_draft",
+       "entity_type": "question_version"
+      },
+      {
+       "action": "create",
+       "entity_type": "answer_key_version"
+      },
+      {
+       "action": "publish",
+       "entity_type": "question_version"
+      }
+     ],
+     "candidate": {
+      "publication_paper_item_id": null,
+      "publication_question_id": "QUESTION_OF_CAND_P35",
+      "publication_version_id": "VERSION_OF_CAND_P35",
+      "reviewed_at": null,
+      "revision": 1,
+      "status": "published"
+     },
+     "mappings": [],
+     "paper_items": [],
+     "question": {
+      "content_lineage_id": null,
+      "current_published_version_is_self": true,
+      "display_label": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+      "family_id": null,
+      "is_demo": false,
+      "origin_type": "user_authored"
+     },
+     "rubric": null,
+     "source_links": [
+      {
+       "note": "",
+       "region": "REGION_P35",
+       "role": "stem"
+      }
+     ],
+     "version": {
+      "content": {
+       "blocks": [
+        {
+         "kind": "text",
+         "text": "P35的题干"
+        }
+       ],
+       "options": [
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "甲"
+          }
+         ],
+         "id": "opt_a",
+         "label": "A"
+        },
+        {
+         "blocks": [
+          {
+           "kind": "text",
+           "text": "乙"
+          }
+         ],
+         "id": "opt_b",
+         "label": "B"
+        }
+       ]
+      },
+      "content_digest_length": 64,
+      "estimated_seconds": null,
+      "material_child_version_ids": [],
+      "parent_material_version": null,
+      "practice_max_score": "2.00",
+      "published_at_is_now": true,
+      "question_type": "single_choice",
+      "revision_reason": "由导入候选 4f3c5880-734b-4b6d-ae59-44160e912ae6 发布",
+      "source_note": "",
+      "status": "published",
+      "version": 1
+     }
+    }
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {},
+    "idempotency_key": "b2-publish-long-label",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/4f3c5880-734b-4b6d-ae59-44160e912ae6/publish"
+   },
+   "response": {
+    "answer_match": {},
+    "child_candidate_ids": [],
+    "draft_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P35的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P35的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "extractor_version": "text-structure-v1",
+    "id": "4f3c5880-734b-4b6d-ae59-44160e912ae6",
+    "is_stub_output": false,
+    "job_id": "f482c36b-40ac-424a-be48-bd03c24502db",
+    "layout_review_confirmed_at": null,
+    "layout_review_note": "",
+    "machine_payload": {
+     "answer_payload": {
+      "correct_option_id": "opt_a",
+      "kind": "single_choice"
+     },
+     "answer_status_known": true,
+     "content": {
+      "blocks": [
+       {
+        "kind": "text",
+        "text": "P35的题干"
+       }
+      ],
+      "options": [
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "甲"
+         }
+        ],
+        "id": "opt_a",
+        "label": "A"
+       },
+       {
+        "blocks": [
+         {
+          "kind": "text",
+          "text": "乙"
+         }
+        ],
+        "id": "opt_b",
+        "label": "B"
+       }
+      ]
+     },
+     "display_label": "长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+     "explanation_blocks": [],
+     "parse_issues": [],
+     "practice_max_score": "2.00",
+     "question_type": "single_choice",
+     "source_excerpt": "P35的题干",
+     "structure_signals": [
+      "stem",
+      "options",
+      "answer"
+     ]
+    },
+    "paper_revision_id": null,
+    "parent_candidate_id": null,
+    "publication_paper_item_id": null,
+    "publication_question_id": "211dc388-91de-44a5-b2e0-8bd1dabcfd72",
+    "publication_version_id": "5193bdfb-a99f-4e3c-96c6-0ba0f9b298dd",
+    "review_issues": [
+     {
+      "code": "duplicate_published",
+      "message": "已存在内容完全相同的已发布版本，导入前请确认不要重复统计",
+      "question_id": "211dc388-91de-44a5-b2e0-8bd1dabcfd72",
+      "severity": "warning"
+     }
+    ],
+    "revision": 1,
+    "source_position_key": "",
+    "source_regions": [
+     {
+      "crop_asset_id": null,
+      "document_asset_id": null,
+      "document_id": "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f",
+      "document_title": "B2 探针来源文档",
+      "document_type": "text",
+      "height": 0.05,
+      "id": "9596155f-94aa-4634-8a48-3da968c967ac",
+      "page_index": 1,
+      "role": "stem_crop",
+      "text_span": "P35的题干",
+      "width": 1.0,
+      "x": 0.0,
+      "y": 0.0
+     }
+    ],
+    "status": "published",
+    "subject_id": "0311a3c0-1469-46a0-b090-ebe990d49dbc",
+    "updated_at": "2026-11-06T19:24:19.991576+00:00"
+   },
+   "response_field_order": [
+    "id",
+    "job_id",
+    "subject_id",
+    "status",
+    "revision",
+    "review_issues",
+    "is_stub_output",
+    "extractor_version",
+    "draft_payload",
+    "machine_payload",
+    "source_regions",
+    "publication_question_id",
+    "publication_version_id",
+    "publication_paper_item_id",
+    "parent_candidate_id",
+    "child_candidate_ids",
+    "source_position_key",
+    "paper_revision_id",
+    "answer_match",
+    "layout_review_confirmed_at",
+    "layout_review_note",
+    "updated_at"
+   ],
+   "status": 200,
+   "title": "display_label 超过 200 字符被截断"
+  },
+  {
+   "case": "P36",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "node_ids"
+       ],
+       "msg": "Input should be a valid list",
+       "type": "list_type"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": "abc"
+    },
+    "idempotency_key": "b2-schema-node-ids",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba7c3530-dccb-4a4b-86b4-8df5c03846ab/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "node_ids"
+        ],
+        "msg": "Input should be a valid list",
+        "type": "list_type"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "node_ids 是字符串"
+  },
+  {
+   "case": "P37",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "node_ids",
+        0
+       ],
+       "msg": "Input should be a valid string",
+       "type": "string_type"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "node_ids": [
+      1
+     ]
+    },
+    "idempotency_key": "b2-schema-node-item",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba7c3530-dccb-4a4b-86b4-8df5c03846ab/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "node_ids",
+         0
+        ],
+        "msg": "Input should be a valid string",
+        "type": "string_type"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "node_ids 里有非字符串"
+  },
+  {
+   "case": "P38",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "origin_type"
+       ],
+       "msg": "Input should be a valid string",
+       "type": "string_type"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "origin_type": 123
+    },
+    "idempotency_key": "b2-schema-origin",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba7c3530-dccb-4a4b-86b4-8df5c03846ab/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "origin_type"
+        ],
+        "msg": "Input should be a valid string",
+        "type": "string_type"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "origin_type 不是字符串"
+  },
+  {
+   "case": "P39",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "display_label"
+       ],
+       "msg": "Input should be a valid string",
+       "type": "string_type"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "display_label": null
+    },
+    "idempotency_key": "b2-schema-label",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba7c3530-dccb-4a4b-86b4-8df5c03846ab/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "display_label"
+        ],
+        "msg": "Input should be a valid string",
+        "type": "string_type"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "display_label 是 null"
+  },
+  {
+   "case": "P40",
+   "checks": {},
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "exam_spec_version_id"
+       ],
+       "msg": "Input should be a valid string",
+       "type": "string_type"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "kind": "case",
+   "op": "O18",
+   "request": {
+    "body": {
+     "exam_spec_version_id": 123
+    },
+    "idempotency_key": "b2-schema-spec",
+    "method": "POST",
+    "path": "/api/v1/projects/2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3/import-candidates/ba7c3530-dccb-4a4b-86b4-8df5c03846ab/publish"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "exam_spec_version_id"
+        ],
+        "msg": "Input should be a valid string",
+        "type": "string_type"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "response_field_order": [
+    "error"
+   ],
+   "status": 400,
+   "title": "exam_spec_version_id 不是字符串"
+  }
+ ],
+ "fixtures": {
+  "jobs": [
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P01",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "ignored"
+    ],
+    "job": "JOB_P05",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "draft"
+    ],
+    "job": "JOB_P06",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P07",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P08",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P09",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P10",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P11",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P12",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P13",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P14",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P15",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P16",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P17",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P18",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P19",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P20",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "draft"
+    ],
+    "job": "JOB_P21",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P22",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P23M",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P23C1",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P23C2",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "draft"
+    ],
+    "job": "JOB_P27",
+    "status": "awaiting_review"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P28",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P29",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P32",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P33",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P34",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "published"
+    ],
+    "job": "JOB_P35",
+    "status": "completed"
+   },
+   {
+    "candidate_statuses": [
+     "ready"
+    ],
+    "job": "JOB_P36",
+    "status": "awaiting_review"
+   }
+  ],
+  "paper_item_count": 5,
+  "paper_items": [
+   {
+    "is_scored": true,
+    "max_score": "2.00",
+    "paper": "PAPER2",
+    "parent_position": null,
+    "position_key": "卷面标签",
+    "revision": 1
+   },
+   {
+    "is_scored": true,
+    "max_score": "2.00",
+    "paper": "PAPER",
+    "parent_position": null,
+    "position_key": "1",
+    "revision": 1
+   },
+   {
+    "is_scored": false,
+    "max_score": "0.00",
+    "paper": "PAPER",
+    "parent_position": null,
+    "position_key": "3",
+    "revision": 1
+   },
+   {
+    "is_scored": true,
+    "max_score": "2.00",
+    "paper": "PAPER",
+    "parent_position": "3",
+    "position_key": "3.1",
+    "revision": 1
+   },
+   {
+    "is_scored": true,
+    "max_score": "2.00",
+    "paper": "PAPER",
+    "parent_position": "3",
+    "position_key": "3.2",
+    "revision": 1
+   }
+  ]
+ },
+ "symbols": {
+  "00298848-11b8-4ab2-9c4e-903680903fd8": "CAND_P08",
+  "00bdf8eb-1504-434f-85bc-c3b428c51bd0": "VERSION_OF_CAND_P20",
+  "022bd399-86c2-4d25-b469-94823fac6d19": "ANSWER_OF_CAND_P35",
+  "0311a3c0-1469-46a0-b090-ebe990d49dbc": "SUBJECT_A1",
+  "03beb021-a981-4a5d-8816-8e15004e1b4e": "JOB_P13",
+  "04b42f15-4793-4690-bfd7-0087878c7358": "REGION_P23M",
+  "06a3ea66-e172-4e62-8e10-dda717aab0a4": "USER_OTHER",
+  "07fd88a8-e032-4cae-89fa-631bd263f1e0": "ANSWER_OF_CAND_P14",
+  "09f783ce-dd9b-40c3-b2a3-b7a63701a95b": "REGION_P01",
+  "0e6b4b9a-be0b-4d55-ae18-3607321c2a1b": "CAND_P09",
+  "0ebd3949-0e61-44c2-b949-0f09babd3a71": "VERSION_OF_CAND_P34",
+  "0f2f4f4a-d17f-4e06-a2b5-77405c55d41f": "REGION_P17",
+  "0f47d50d-cc5a-44c5-b0e9-33663de6fbbe": "REGION_P18",
+  "0fb9fee3-35df-40c9-bc59-664da16882f8": "REGION_P27",
+  "10bcaa3e-f6bc-445b-a9bc-222a69a48df5": "QUESTION_OF_CAND_P13",
+  "110cd0b2-76d6-4852-91d4-5ebfc47db1c5": "PAPER_ITEM_OF_CAND_P33",
+  "1174d577-048a-40ae-8ff5-289a50da8f24": "VERSION_OF_CAND_P14",
+  "121f5e53-f0cd-4210-8551-0184ff269488": "ANSWER_OF_CAND_P20",
+  "12744210-f792-4a66-8339-0e1d4c3a8400": "VERSION_OF_CAND_CHILD1",
+  "16299447-9fc0-494a-9e03-8dd7060811bc": "ANSWER_OF_CAND_CHILD2",
+  "16bdae13-a505-4ad8-a10d-0ce359b89191": "JOB_P33",
+  "1dd9d85c-8eea-44bf-946d-1a70693b1205": "REGION_P10",
+  "1df7cf90-0019-4a33-84a6-b9b32065a8af": "SPEC_A1_DRAFT",
+  "1f590de4-b6d6-4837-a717-595137816569": "JOB_P23C2",
+  "20766675-f74a-4329-a9d5-4994d58110bf": "VERSION_OF_CAND_P01",
+  "211dc388-91de-44a5-b2e0-8bd1dabcfd72": "QUESTION_OF_CAND_P35",
+  "2236dd49-d7d7-44ff-8af6-0b2a95a1c2c3": "PROJECT_A",
+  "262032ec-1047-4ad8-8a19-55d884b6f6fd": "VERSION_OF_CAND_CHILD2",
+  "268786ac-6942-4bea-9099-82df70c79e68": "CAND_P05",
+  "29420aba-9062-4d99-bd17-ed85c25dc4fe": "REGION_P05",
+  "2b0e9ec3-903e-42b7-ade7-6bcee94bbf04": "REGION_P11",
+  "2bc5df7d-818e-4e2b-a419-76fc0d4fcf1d": "JOB_P06",
+  "2bf74a99-291f-4bf2-b208-5a50da3f6e51": "JOB_P15",
+  "2daa560a-7047-46ac-aa9b-a4b332758776": "ANSWER_OF_CAND_P33",
+  "30352bde-f28d-4ed6-8e41-9f2e5bbbe893": "CAND_CHILD2",
+  "30d3e239-2ab5-4e4f-8df1-1e41a497ad34": "SPEC_A1",
+  "336634ee-43a6-4f45-bbbc-86fb8b7959af": "JOB_P36",
+  "3980d3dc-a399-44f2-af26-95a3c9ff15fd": "CAND_P28",
+  "39ef10bb-7a8c-4a8f-b22c-d40c0916edbe": "VERSION_OF_CAND_P17",
+  "3aba966c-bf85-4ab4-b5f0-bae10e9bc065": "SYLLABUS_A1",
+  "3ba5990c-d5ab-48aa-9624-9c22211a9b79": "PAPER_ITEM_OF_CAND_CHILD2",
+  "3c58bd24-0ee1-4791-875c-a8fa66655c06": "JOB_P20",
+  "3ec53076-3a89-4038-8961-5ca80975f3c4": "CAND_P22",
+  "3fd1df83-3de6-49b0-807b-5fd197a9a964": "CAND_CHILD1",
+  "423f62cf-3337-4c03-963c-4e97fb3be988": "ANSWER_OF_CAND_P34",
+  "4252c31b-c2c6-4bb0-ad7b-e8b346848c78": "CAND_P18",
+  "436cb128-a278-4037-8c10-fe0b3e8fe92e": "REGION_P21",
+  "477b0e5b-2a20-4f20-8c85-94f99012bac2": "ANSWER_OF_CAND_P13",
+  "4f015d86-be28-45b0-9f03-9d84a279420d": "REGION_P09",
+  "4f3c5880-734b-4b6d-ae59-44160e912ae6": "CAND_P35",
+  "5025553f-eb48-498b-8cb5-ac06302bf8c6": "JOB_P10",
+  "5193bdfb-a99f-4e3c-96c6-0ba0f9b298dd": "VERSION_OF_CAND_P35",
+  "535dc411-0121-4d98-bf19-6103354599fb": "ANSWER_OF_CAND_CHILD1",
+  "536979e3-8783-49a4-984f-7ca24262be4b": "ANSWER_OF_CAND_P17",
+  "561769b5-995b-4389-aebf-2dcca554ed5f": "JOB_P21",
+  "57df144f-bc1f-4c15-b982-6713853e6a8e": "CAND_P17",
+  "5aaabc2d-b161-4b12-b129-a457428f5ef6": "REGION_P13",
+  "5c97786f-1e69-4abd-9f4b-7bc662c9df89": "JOB_P14",
+  "5cee477a-52c3-4160-96d4-caaee4f0a148": "PAPER_ITEM_OF_CAND_CHILD1",
+  "5f19bfe7-6f78-4971-865a-31a1ccf52efc": "NODE_A2",
+  "6170dd0d-c4e9-4289-a053-a416fadf5a7d": "CAND_P27",
+  "62da6906-0252-4f07-bab9-3279b2f2238c": "JOB_P01",
+  "62df0640-8561-4fb9-bc58-29a105cb0722": "CAND_P10",
+  "639d30fd-58da-4c17-bb62-00beddf547a8": "CAND_P34",
+  "65bc1811-2a23-4c3e-ae6e-8768cef00444": "PROJECT_B",
+  "688af8b1-77c8-43e0-a503-3e0ef5970b7e": "SPEC_A2",
+  "6de8e9e0-4a56-4321-96fd-ef85cdd729af": "REGION_P19",
+  "6e3c27d5-94f9-40c0-8a21-308af89be1e7": "REGION_P08",
+  "6f676f76-03e3-4ac8-b7ab-cc7ed8696de1": "USER_OWNER",
+  "6f97e1d0-da1e-4eac-99d2-62d0ee110d12": "PAPER_ITEM_OF_CAND_MATERIAL",
+  "731d897c-3daf-4740-a728-0ace929ca764": "REGION_P14",
+  "75f67958-d268-426b-923d-1a14db2cd473": "CAND_MATERIAL",
+  "76727ae9-1162-45ca-8bff-112d013dedc1": "QUESTION_OF_CAND_P14",
+  "78010761-4c59-43c9-b5eb-eaa2ba8ef53d": "CAND_P20",
+  "79d6b903-d36a-49f6-860c-11641a77c263": "CAND_P11",
+  "7bd23208-42e1-4484-98b9-87ca70082cde": "JOB_P27",
+  "7bdd3a43-8c86-4c46-a103-334f94d0f563": "QUESTION_OF_CAND_P33",
+  "7f2a55ee-7a2f-4dd1-b71d-b7dcb7e9af7a": "VERSION_OF_CAND_P28",
+  "83306635-8d3c-46f9-89fb-4794dde6bfb2": "REGION_P32",
+  "8358cbbb-e3ec-4a0f-818a-14c581d00cfd": "REGION_P23C2",
+  "8665d1b2-26db-489c-af1f-2a57a6addd3b": "CAND_P12",
+  "870372ae-dee5-4eb5-be98-8be9a92c7192": "CAND_P21",
+  "8981c26c-9dca-4962-b5a7-a8dee7c93537": "SUBJECT_A2",
+  "8ac81098-fceb-4c48-82d6-9b4ccf540168": "JOB_P29",
+  "8cb59804-c33e-4ea3-b0d5-a8742fdd9213": "QUESTION_OF_CAND_P12",
+  "8f1fcf58-c259-4335-9eed-e25067a5acb3": "ANSWER_OF_CAND_P12",
+  "8fd022ad-cb2f-4a0d-8f2b-dec77350bb68": "CAND_P16",
+  "9596155f-94aa-4634-8a48-3da968c967ac": "REGION_P35",
+  "997e1b04-75d7-4155-a095-b7f4cf93bdfd": "QUESTION_OF_CAND_P01",
+  "99eeb54a-51cb-4743-aaa5-01417d6d7ee9": "REGION_P28",
+  "9b378b6d-80ee-49f4-b5ad-24ab40a04c6a": "JOB_P09",
+  "9cdc10ca-8edf-4153-80d8-fc84c43eba6c": "REGION_P06",
+  "9ec683e9-5bb2-42f4-a414-765500c156fa": "CAND_P32",
+  "a17b1fc4-2a3b-4833-82e9-bcd5fd34cb45": "JOB_P05",
+  "a187f466-4c94-4132-aed4-7c11e8976dfb": "NODE_3",
+  "a21fd493-aaca-446a-a168-049439f8220b": "JOB_P28",
+  "a2964cd6-5c6e-4ae9-b5d5-f2f2d514d534": "REGION_P16",
+  "a2a4d05e-f0c4-4e7d-8f9c-2bb4e9ce74a2": "JOB_P23C1",
+  "a388cbc8-309a-4e16-8d83-f78060ced83b": "ANSWER_OF_CAND_P01",
+  "a395b950-cfec-43cf-8750-a9aff34b468c": "CAND_P07",
+  "a5e3e1f4-1381-48e9-9cb7-e7237aa1d5be": "JOB_P32",
+  "a6e45cb3-1929-4fd8-9e8f-c6e84a726641": "QUESTION_OF_CAND_CHILD2",
+  "a78a00cb-9d60-4903-b967-2f94e2a8d390": "REGION_P36",
+  "a869b390-c865-4544-80a3-820789051809": "PAPER_REVISION2",
+  "a9fb51b0-3016-4022-a781-95a43465b324": "VERSION_OF_CAND_MATERIAL",
+  "ae809a42-5726-4006-a84d-6e82c38da475": "REGION_P34",
+  "b2dff4bf-00f1-4290-bae5-a491beed7805": "QUESTION_OF_CAND_P32",
+  "b455923a-6f66-4434-b29c-d98ce6d5dc45": "QUESTION_OF_CAND_P17",
+  "b4cbc7e6-3751-4be5-b91d-6e60e7c9fc49": "JOB_P23M",
+  "b5a2b66d-5033-46f4-af12-8f7cdcd3a8ed": "VERSION_OF_CAND_P33",
+  "b5bed23b-6b62-42f6-a7aa-5735ec536930": "SUBJECT_B1",
+  "b6d1bbd2-2e4c-4227-a78a-2ca95ca819fe": "JOB_P17",
+  "b832ca22-814d-43f5-9333-f3bbc6dbf440": "ANSWER_OF_CAND_P32",
+  "ba41cf80-392a-44ee-b488-4c247e5c29c5": "CAND_P19",
+  "ba7c3530-dccb-4a4b-86b4-8df5c03846ab": "CAND_P36",
+  "ba87dd53-71e5-4303-abc7-cf5055050c17": "JOB_P08",
+  "bac81143-40f3-40bb-ae4b-e1431b497610": "VERSION_OF_CAND_P12",
+  "bac974d4-1460-45e0-986c-b628bc7c9806": "CAND_P13",
+  "bad9824c-6edc-4886-b5c3-9f752575dc11": "JOB_P07",
+  "bb4b65bd-52f0-4185-8c66-6a0289c895c9": "JOB_P19",
+  "bbe7a65d-8397-49b0-bf21-83c86d5c7a7c": "CAND_P29",
+  "bf8ae7a2-b255-4224-b260-833dff9c1870": "VERSION_OF_CAND_P13",
+  "c06a713f-e56e-478f-a4bd-20868c86fb5d": "REGION_P29",
+  "c25ac49e-f553-45ff-8ddb-06665ec905c9": "PAPER",
+  "c2ecbf6f-9b7c-4eb1-9cac-44162648b4e8": "JOB_P12",
+  "c307d7d6-9f34-44c6-9aa0-fd19ebd81469": "JOB_P22",
+  "c5927ea5-d2fc-49dd-803e-839ccfe74a69": "CAND_P01",
+  "c6bbd8cc-cabd-40bb-be57-0cdb4ab690dd": "REGION_P20",
+  "ca7e11a3-452f-4537-9ee8-ccc9e51cb818": "JOB_P16",
+  "cca47c5b-b7a7-4f5d-bdf0-554f3af789b5": "VERSION_OF_CAND_P32",
+  "ccf8fce3-e1ab-400d-a23c-15550e843271": "QUESTION_OF_CAND_P28",
+  "cd15e1a1-65a3-41eb-89d5-9d1be0e01578": "REGION_P23C1",
+  "cf676834-cea5-4cce-ab3b-035dfb864216": "ANSWER_OF_CAND_P28",
+  "d35e53f8-95b5-4155-94f5-543e39b46bde": "CAND_P06",
+  "d5002eec-61cd-49f3-a8d9-dba536c91806": "REGION_P12",
+  "d55b8506-d663-4636-8fa9-a6780b0ad8c4": "JOB_P34",
+  "d9454b09-3d38-4555-a255-8d6cb4d745a7": "PAPER_REVISION",
+  "dc8c5fdc-df85-4345-907f-5dc0671cad5b": "CAND_P14",
+  "dd9feb36-47cd-492d-9d19-a660e91f6762": "QUESTION_OF_CAND_CHILD1",
+  "ddcd8846-d632-4aef-9a9a-00a6b8e1ee5d": "CAND_P15",
+  "e635117a-00cc-42fc-84b5-f868611547b1": "REGION_P15",
+  "e7bde1cb-c6ac-4ed7-8d45-d9a60341461f": "DOCUMENT",
+  "e7c9d324-9837-4f71-88ef-43c91783e4ce": "QUESTION_OF_CAND_MATERIAL",
+  "e887e739-c9ec-4791-8717-c1985d6ce3df": "REGION_P22",
+  "e8d19011-169c-4f2e-b326-707c3a0498ed": "PAPER_ITEM_OF_CAND_P20",
+  "eef19804-91e1-48ea-8612-c1d3ea5b41de": "QUESTION_OF_CAND_P34",
+  "ef1927fb-6372-4479-b43c-08dce3fc1b44": "NODE_1",
+  "efcdfe61-2320-47e0-bd07-d40a3a10edc9": "NODE_2",
+  "f1679d99-2de9-4c96-a0b9-41734a239d1e": "CAND_P33",
+  "f482c36b-40ac-424a-be48-bd03c24502db": "JOB_P35",
+  "f5d228e1-1f87-4dad-a343-b85291b8e889": "JOB_P18",
+  "f651fdb3-0d17-4ac3-bfe1-d3a83e1de156": "REGION_P33",
+  "f7309e71-6dbf-4069-8375-f9fd90bc5a2b": "PAPER2",
+  "fa2a0da6-d2a7-49e3-a626-d29df1b6c438": "QUESTION_OF_CAND_P20",
+  "fbce2b59-fcc2-4dca-9b2e-acbd707f4129": "JOB_P11"
+ }
+}

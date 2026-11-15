@@ -1,0 +1,133 @@
+{
+ "note": "canonical = json.dumps(sort_keys=True, ensure_ascii=False, default=str, separators=(',',':'))",
+ "cases": [
+  {
+   "json": "{}",
+   "canonical": "{}",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  {
+   "json": "[]",
+   "canonical": "[]",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+   "json": "{\"b\":1,\"a\":2}",
+   "canonical": "{\"a\":2,\"b\":1}",
+   "sha256": "d3626ac30a87e6f7a6428233b3c68299976865fa5508e4267c5415c76af7a772"
+  },
+  {
+   "json": "{\"a\":1.0,\"b\":1}",
+   "canonical": "{\"a\":1.0,\"b\":1}",
+   "sha256": "e88f180ac4892b48447f5bd4649a675502aabb5579a7063de96103c5c64e5a87"
+  },
+  {
+   "json": "{\"score\":0.1,\"bonus\":0.2}",
+   "canonical": "{\"bonus\":0.2,\"score\":0.1}",
+   "sha256": "50d46d0441ce33dc88c8fdbe814936d4d6db613a9f28f86f97e3f89037acfef3"
+  },
+  {
+   "json": "{\"x\":1e300,\"y\":1e-7,\"z\":-0.0}",
+   "canonical": "{\"x\":1e+300,\"y\":1e-07,\"z\":-0.0}",
+   "sha256": "898525d0ac837cb55ca0298ba8c651debdcb06ba49d640a9efc0b8ca9564a38b"
+  },
+  {
+   "json": "{\"n\":123456789012345678901234567890}",
+   "canonical": "{\"n\":123456789012345678901234567890}",
+   "sha256": "03b8f78ef5e8a305f4cda82942db0c6accec4046b40457ae19055ea5e4fff2ac"
+  },
+  {
+   "json": "{\"f\":3.141592653589793}",
+   "canonical": "{\"f\":3.141592653589793}",
+   "sha256": "e29e1c543a1326961abf9a7e87f6551eb260a5b734e3d065ad619fc0a76fe1a8"
+  },
+  {
+   "json": "{\"name\":\"中文\",\"emoji\":\"📚\",\"tab\":\"a\\tb\",\"newline\":\"a\\nb\",\"quote\":\"a\\\"b\",\"backslash\":\"a\\\\b\"}",
+   "canonical": "{\"backslash\":\"a\\\\b\",\"emoji\":\"📚\",\"name\":\"中文\",\"newline\":\"a\\nb\",\"quote\":\"a\\\"b\",\"tab\":\"a\\tb\"}",
+   "sha256": "1fd63850e04cc18da130df2701d5dbbeaa7e77190e85bf421bad9b9d68a3617c"
+  },
+  {
+   "json": "{\"empty\":\"\",\"null\":null,\"true\":true,\"false\":false}",
+   "canonical": "{\"empty\":\"\",\"false\":false,\"null\":null,\"true\":true}",
+   "sha256": "10b37986ae58e205b38bb41727b4b9b615bf09bd7a2fdf43872f9249451b1510"
+  },
+  {
+   "json": "{\"nested\":{\"z\":[1,2,{\"y\":[]}],\"a\":{}}}",
+   "canonical": "{\"nested\":{\"a\":{},\"z\":[1,2,{\"y\":[]}]}}",
+   "sha256": "799d68a1e6e8ff95ebc1baa65cfb0c2140b81f04ba24086d1da06dd7382d0816"
+  },
+  {
+   "json": "{\"ids\":[\"b\",\"a\",\"c\"],\"order_matters\":[3,1,2]}",
+   "canonical": "{\"ids\":[\"b\",\"a\",\"c\"],\"order_matters\":[3,1,2]}",
+   "sha256": "308eea0fd211962f69654cf51ec42b5547820f111b244c69f227473351608444"
+  },
+  {
+   "json": "{\"deep\":{\"a\":{\"b\":{\"c\":{\"d\":{\"e\":1}}}}}}",
+   "canonical": "{\"deep\":{\"a\":{\"b\":{\"c\":{\"d\":{\"e\":1}}}}}}",
+   "sha256": "ae437ca939983a0147e5c1d7b82a6caf251a229af515b01426883a8bb7692ee3"
+  },
+  {
+   "json": "{\"unicode_escape\":\"\\u00e9\\u4e2d\"}",
+   "canonical": "{\"unicode_escape\":\"é中\"}",
+   "sha256": "bd82c76f098b155b61f27c8a692ca80b2b294413f63a342dfab080fe4a0739c6"
+  },
+  {
+   "json": "{\"long\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+   "canonical": "{\"long\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+   "sha256": "b42c8e13c25538155b0d2b0862b77a77ded653eb81a743a442f97bd0216383a5"
+  },
+  {
+   "json": "{\"control\":\"\\u0001\\u001f\\u007f\"}",
+   "canonical": "{\"control\":\"\\u0001\\u001f\"}",
+   "sha256": "21484d02f7ffc97f66e3929e0abae40eceda84d61b2fe28a1f47506d519bd973"
+  },
+  {
+   "json": "{\"mixed\":[1,\"1\",1.0,true,null,{\"k\":false}]}",
+   "canonical": "{\"mixed\":[1,\"1\",1.0,true,null,{\"k\":false}]}",
+   "sha256": "0c510acce44041e8b30d68eccfed47aea2972e5a376d8df684fbd062f3b9d379"
+  },
+  {
+   "json": "{\"n\":-9223372036854775808}",
+   "canonical": "{\"n\":-9223372036854775808}",
+   "sha256": "bef2d002efa1e5cb6c97e2738e7f311f87d3bbb75dd3a860d55052aa0128e978"
+  },
+  {
+   "json": "{\"n\":9223372036854775807}",
+   "canonical": "{\"n\":9223372036854775807}",
+   "sha256": "faf5d00c8f17856eac0c8cae6eae118ca936a9ae1af9de80da15dcc33e844a9d"
+  },
+  {
+   "json": "{\"price\":\"12.50\",\"qty\":2}",
+   "canonical": "{\"price\":\"12.50\",\"qty\":2}",
+   "sha256": "9d6c07d93bca446dd51ac1eb20bcd1cea0e5ee5c21cdcfca60bb4944448b83ce"
+  },
+  {
+   "python_only": {
+    "amount": "12.50"
+   },
+   "canonical": "{\"amount\":\"12.50\"}",
+   "sha256": "b8a5fa3ead3a18272ad86f0a4881714cdfa0e918dd5f79de983e59a191f1ec93"
+  },
+  {
+   "python_only": {
+    "amount": "0.0001"
+   },
+   "canonical": "{\"amount\":\"0.0001\"}",
+   "sha256": "76e16745368ea09febebf2eb1eb5de6c15b44d606b93052a0cd817157be05404"
+  },
+  {
+   "python_only": {
+    "when": "2026-01-01 12:00:00.000500"
+   },
+   "canonical": "{\"when\":\"2026-01-01 12:00:00.000500\"}",
+   "sha256": "1fcfddbba7ebfc7696294416cdede39f8c8cc0a69127211414d04fa129509eee"
+  },
+  {
+   "python_only": {
+    "uid": "0b6f5f0a-1f0e-4c4a-9a3e-1234567890ab"
+   },
+   "canonical": "{\"uid\":\"0b6f5f0a-1f0e-4c4a-9a3e-1234567890ab\"}",
+   "sha256": "c6a9eaf05409d12042e15ee6f622d808d7ca7689c4cc8a6b245cdf8ae1d3d5fb"
+  }
+ ]
+}

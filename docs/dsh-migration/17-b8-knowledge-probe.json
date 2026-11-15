@@ -1,0 +1,1686 @@
+{
+ "cases": [
+  {
+   "case": "T01",
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/question-templates"
+   },
+   "response": [],
+   "row_delta": {},
+   "status": 200,
+   "title": "模板列表为空"
+  },
+  {
+   "case": "T02",
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "description": "两步运算",
+     "name": "  计算题  ",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-templates"
+   },
+   "response": {
+    "description": "两步运算",
+    "id": "REF_018",
+    "name": "计算题",
+    "review_status": "approved",
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {
+    "knowledge_question_template": 1
+   },
+   "status": 201,
+   "title": "创建模板（201，名称去空白后成为身份）"
+  },
+  {
+   "case": "T03",
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "description": "更新说明",
+     "name": "计算题",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-templates"
+   },
+   "response": {
+    "description": "更新说明",
+    "id": "REF_018",
+    "name": "计算题",
+    "review_status": "approved",
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "同名模板复用同一行，description 更新"
+  },
+  {
+   "case": "T04",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "模板名称不能为空"
+   },
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "name": "   ",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-templates"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "模板名称不能为空"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "空名称被拒"
+  },
+  {
+   "case": "T05",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "body",
+        "payload",
+        "subject_id"
+       ],
+       "msg": "Field required",
+       "type": "missing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "name": "缺科目"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-templates"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "body",
+         "payload",
+         "subject_id"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "缺 subject_id 是体校验 400"
+  },
+  {
+   "case": "T06",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "科目不存在或不属于该项目"
+   },
+   "op": "templates",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/question-templates?subject_id=OTHER_SUBJECT"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "科目不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "跨项目科目越权 404"
+  },
+  {
+   "case": "P01",
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-1",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_ALPHA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "baseline_question_id": "QUESTION_A",
+    "delay_hours": 24,
+    "delayed_question_id": null,
+    "gap": "缺少延迟验证题（C 题）：到期后只能用原题重复练习，不计入延迟验证证据",
+    "id": "REF_019",
+    "immediate_question_id": "QUESTION_B",
+    "is_active": true,
+    "node_id": "NODE_ALPHA",
+    "node_name": "alpha",
+    "note": "探针配对",
+    "pairing_version": 1,
+    "project_id": "PROJECT",
+    "reviewed_at": "<now>",
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "knowledge_verification_pairing": 1
+   },
+   "status": 201,
+   "title": "创建 A/B 配对（201，gap 明示缺 C）"
+  },
+  {
+   "case": "P02",
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-1",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_ALPHA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "baseline_question_id": "QUESTION_A",
+    "delay_hours": 24,
+    "delayed_question_id": null,
+    "gap": "缺少延迟验证题（C 题）：到期后只能用原题重复练习，不计入延迟验证证据",
+    "id": "REF_019",
+    "immediate_question_id": "QUESTION_B",
+    "is_active": true,
+    "node_id": "NODE_ALPHA",
+    "node_name": "alpha",
+    "note": "探针配对",
+    "pairing_version": 1,
+    "project_id": "PROJECT",
+    "reviewed_at": "<now>",
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "同键同载荷重放"
+  },
+  {
+   "case": "P03",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {
+     "reason": "same_key_different_payload",
+     "route_scope": "pairings.create:PROJECT"
+    },
+    "message": "相同幂等键使用了不同请求内容"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-1",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "QUESTION_C",
+     "node_id": "NODE_ALPHA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {
+      "reason": "same_key_different_payload",
+      "route_scope": "pairings.create:PROJECT"
+     },
+     "message": "相同幂等键使用了不同请求内容"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "同键异载荷 409"
+  },
+  {
+   "case": "P04",
+   "error_envelope": {
+    "code": "idempotency_conflict",
+    "details": {},
+    "message": "缺少 Idempotency-Key 请求头"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_BETA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "idempotency_conflict",
+     "details": {},
+     "message": "缺少 Idempotency-Key 请求头"
+    }
+   },
+   "row_delta": {},
+   "status": 409,
+   "title": "缺 Idempotency-Key 409"
+  },
+  {
+   "case": "P05",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考点不存在或不属于该科目"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-2",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "OTHER_NODE",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考点不存在或不属于该科目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "考点不属于该科目 404"
+  },
+  {
+   "case": "P06",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "B 题不存在或不属于该科目"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-3",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "immediate_question_id": "REF_020",
+     "node_id": "NODE_ALPHA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "B 题不存在或不属于该科目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "B 题不存在 404"
+  },
+  {
+   "case": "P07",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "延迟验证间隔至少 1 小时"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-4",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 0,
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_BETA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "延迟验证间隔至少 1 小时"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "delay_hours=0 被拒"
+  },
+  {
+   "case": "P08",
+   "error_envelope": {
+    "code": "structure_invalid",
+    "details": {
+     "errors": {
+      "immediate_question": [
+       "B/C 题必须是不同于基准题的其他稳定题目"
+      ]
+     }
+    },
+    "message": "结构校验失败"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-5",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "delayed_question_id": "QUESTION_B",
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_BETA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "error": {
+     "code": "structure_invalid",
+     "details": {
+      "errors": {
+       "immediate_question": [
+        "B/C 题必须是不同于基准题的其他稳定题目"
+       ]
+      }
+     },
+     "message": "结构校验失败"
+    }
+   },
+   "row_delta": {},
+   "status": 422,
+   "title": "B/C 与基准题重复 → 422 structure_invalid"
+  },
+  {
+   "case": "P09",
+   "op": "pairings",
+   "request": {
+    "idempotency_key": "probe-pairing-6",
+    "json_body": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "delayed_question_id": "QUESTION_C",
+     "immediate_question_id": "QUESTION_B",
+     "node_id": "NODE_ALPHA",
+     "note": "探针配对",
+     "subject_id": "SUBJECT"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": {
+    "baseline_question_id": "QUESTION_A",
+    "delay_hours": 24,
+    "delayed_question_id": "QUESTION_C",
+    "gap": "",
+    "id": "REF_021",
+    "immediate_question_id": "QUESTION_B",
+    "is_active": true,
+    "node_id": "NODE_ALPHA",
+    "node_name": "alpha",
+    "note": "探针配对",
+    "pairing_version": 2,
+    "project_id": "PROJECT",
+    "reviewed_at": "<now>",
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "knowledge_verification_pairing": 1
+   },
+   "status": 201,
+   "title": "补齐 C 题是第 2 版（gap 为空）"
+  },
+  {
+   "case": "P10",
+   "op": "pairings",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/verification-pairings"
+   },
+   "response": [
+    {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "delayed_question_id": "QUESTION_C",
+     "gap": "",
+     "id": "REF_021",
+     "immediate_question_id": "QUESTION_B",
+     "is_active": true,
+     "node_id": "NODE_ALPHA",
+     "node_name": "alpha",
+     "note": "探针配对",
+     "pairing_version": 2,
+     "project_id": "PROJECT",
+     "reviewed_at": "<now>",
+     "subject_id": "SUBJECT"
+    },
+    {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "delayed_question_id": null,
+     "gap": "缺少延迟验证题（C 题）：到期后只能用原题重复练习，不计入延迟验证证据",
+     "id": "REF_019",
+     "immediate_question_id": "QUESTION_B",
+     "is_active": true,
+     "node_id": "NODE_ALPHA",
+     "node_name": "alpha",
+     "note": "探针配对",
+     "pairing_version": 1,
+     "project_id": "PROJECT",
+     "reviewed_at": "<now>",
+     "subject_id": "SUBJECT"
+    }
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "配对列表（新版本在前）"
+  },
+  {
+   "case": "P11",
+   "op": "pairings",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/verification-pairings/REF_019"
+   },
+   "response": {
+    "candidates": [
+     {
+      "display_label": "Q-A",
+      "id": "QUESTION_A",
+      "question_type": "single_choice"
+     },
+     {
+      "display_label": "Q-X",
+      "id": "QUESTION_X",
+      "question_type": "single_choice"
+     }
+    ],
+    "pairing": {
+     "baseline_question_id": "QUESTION_A",
+     "delay_hours": 24,
+     "delayed_question_id": null,
+     "gap": "缺少延迟验证题（C 题）：到期后只能用原题重复练习，不计入延迟验证证据",
+     "id": "REF_019",
+     "immediate_question_id": "QUESTION_B",
+     "is_active": true,
+     "node_id": "NODE_ALPHA",
+     "node_name": "alpha",
+     "note": "探针配对",
+     "pairing_version": 1,
+     "project_id": "PROJECT",
+     "reviewed_at": "<now>",
+     "subject_id": "SUBJECT"
+    }
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "配对详情含候选题"
+  },
+  {
+   "case": "P12",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "项目不存在或无权访问"
+   },
+   "op": "pairings",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/OTHER_PROJECT/verification-pairings/REF_019"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "项目不存在或无权访问"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "他人项目的配对详情 404"
+  },
+  {
+   "case": "K01",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "errors": [
+      {
+       "loc": [
+        "query",
+        "subject_id"
+       ],
+       "msg": "Field required",
+       "type": "missing"
+      }
+     ]
+    },
+    "message": "请求参数校验失败"
+   },
+   "op": "knowledge_map",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-map"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "errors": [
+       {
+        "loc": [
+         "query",
+         "subject_id"
+        ],
+        "msg": "Field required",
+        "type": "missing"
+       }
+      ]
+     },
+     "message": "请求参数校验失败"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "缺 subject_id 是查询校验 400"
+  },
+  {
+   "case": "K02",
+   "op": "knowledge_map",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-map?subject_id=SUBJECT"
+   },
+   "response": {
+    "nodes": [
+     {
+      "evidence": {
+       "as_of": null,
+       "best_summary": "undiagnosed",
+       "distinct_question_count": 0,
+       "distinct_template_count": 0,
+       "downgrade_reason": "",
+       "has_delayed_correct": false,
+       "independent_correct_count": 0,
+       "needs_review": false,
+       "rule_version": null,
+       "summary": "undiagnosed"
+      },
+      "id": "NODE_ALPHA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "alpha",
+      "parent_id": null,
+      "question_count": 2,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     },
+     {
+      "evidence": {
+       "as_of": null,
+       "best_summary": "undiagnosed",
+       "distinct_question_count": 0,
+       "distinct_template_count": 0,
+       "downgrade_reason": "",
+       "has_delayed_correct": false,
+       "independent_correct_count": 0,
+       "needs_review": false,
+       "rule_version": null,
+       "summary": "undiagnosed"
+      },
+      "id": "NODE_BETA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "beta",
+      "parent_id": null,
+      "question_count": 1,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     },
+     {
+      "evidence": {
+       "as_of": null,
+       "best_summary": "undiagnosed",
+       "distinct_question_count": 0,
+       "distinct_template_count": 0,
+       "downgrade_reason": "",
+       "has_delayed_correct": false,
+       "independent_correct_count": 0,
+       "needs_review": false,
+       "rule_version": null,
+       "summary": "undiagnosed"
+      },
+      "id": "NODE_GAMMA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "gamma",
+      "parent_id": null,
+      "question_count": 1,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     }
+    ],
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "知识地图（无状态时 undiagnosed）"
+  },
+  {
+   "case": "K03",
+   "op": "knowledge_map",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-map?subject_id=SUBJECT"
+   },
+   "response": {
+    "nodes": [
+     {
+      "evidence": {
+       "as_of": "<now>",
+       "best_summary": "delayed_verified",
+       "distinct_question_count": 2,
+       "distinct_template_count": 1,
+       "downgrade_reason": "",
+       "has_delayed_correct": true,
+       "independent_correct_count": 2,
+       "needs_review": false,
+       "rule_version": "p2-c04",
+       "summary": "independent"
+      },
+      "id": "NODE_ALPHA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "alpha",
+      "parent_id": null,
+      "question_count": 2,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     },
+     {
+      "evidence": {
+       "as_of": null,
+       "best_summary": "undiagnosed",
+       "distinct_question_count": 0,
+       "distinct_template_count": 0,
+       "downgrade_reason": "",
+       "has_delayed_correct": false,
+       "independent_correct_count": 0,
+       "needs_review": false,
+       "rule_version": null,
+       "summary": "undiagnosed"
+      },
+      "id": "NODE_BETA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "beta",
+      "parent_id": null,
+      "question_count": 1,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     },
+     {
+      "evidence": {
+       "as_of": null,
+       "best_summary": "undiagnosed",
+       "distinct_question_count": 0,
+       "distinct_template_count": 0,
+       "downgrade_reason": "",
+       "has_delayed_correct": false,
+       "independent_correct_count": 0,
+       "needs_review": false,
+       "rule_version": null,
+       "summary": "undiagnosed"
+      },
+      "id": "NODE_GAMMA",
+      "is_unclassified": false,
+      "kind": "point",
+      "name": "gamma",
+      "parent_id": null,
+      "question_count": 1,
+      "syllabus_is_user_provisional": true,
+      "syllabus_version_id": "SYLLABUS"
+     }
+    ],
+    "subject_id": "SUBJECT"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "有状态行时投影真实证据"
+  },
+  {
+   "case": "K04",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "科目不存在或不属于该项目"
+   },
+   "op": "knowledge_map",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-map?subject_id=OTHER_SUBJECT"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "科目不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "他人项目科目越权 404"
+  },
+  {
+   "case": "R01",
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-1",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_GAMMA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "from_node_id": "NODE_ALPHA",
+    "from_node_name": "alpha",
+    "id": "REF_022",
+    "is_active": true,
+    "note": "先学 alpha",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "SYLLABUS",
+    "to_node_id": "NODE_GAMMA",
+    "to_node_name": "gamma"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "knowledge_relation": 1
+   },
+   "status": 201,
+   "title": "加边（201）"
+  },
+  {
+   "case": "R02",
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-1",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_GAMMA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "from_node_id": "NODE_ALPHA",
+    "from_node_name": "alpha",
+    "id": "REF_022",
+    "is_active": true,
+    "note": "先学 alpha",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "SYLLABUS",
+    "to_node_id": "NODE_GAMMA",
+    "to_node_name": "gamma"
+   },
+   "row_delta": {},
+   "status": 201,
+   "title": "同键重放"
+  },
+  {
+   "case": "R03",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "cycle_names": [
+      "gamma",
+      "alpha",
+      "gamma"
+     ],
+     "cycle_node_ids": [
+      "NODE_GAMMA",
+      "NODE_ALPHA",
+      "NODE_GAMMA"
+     ]
+    },
+    "message": "加入该关系会形成环，已拒绝"
+   },
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-2",
+    "json_body": {
+     "from_node_id": "NODE_GAMMA",
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_ALPHA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "cycle_names": [
+       "gamma",
+       "alpha",
+       "gamma"
+      ],
+      "cycle_node_ids": [
+       "NODE_GAMMA",
+       "NODE_ALPHA",
+       "NODE_GAMMA"
+      ]
+     },
+     "message": "加入该关系会形成环，已拒绝"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "反向成环 → 400 + cycle_names"
+  },
+  {
+   "case": "R04",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {},
+    "message": "考点不能以自身为前置或相关关系"
+   },
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-3",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_ALPHA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {},
+     "message": "考点不能以自身为前置或相关关系"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "自环被拒"
+  },
+  {
+   "case": "R05",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "relation_type": "depends_on"
+    },
+    "message": "未知的关系类型"
+   },
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-4",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "先学 alpha",
+     "relation_type": "depends_on",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_BETA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "relation_type": "depends_on"
+     },
+     "message": "未知的关系类型"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "未知关系类型被拒"
+  },
+  {
+   "case": "R06",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "大纲版本不存在或不属于该项目"
+   },
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-5",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "先学 alpha",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "OTHER_SYLLABUS",
+     "to_node_id": "NODE_GAMMA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "大纲版本不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "跨项目大纲 404"
+  },
+  {
+   "case": "R07",
+   "op": "relations",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "edge_count": 1,
+    "edges": [
+     {
+      "from_node_id": "NODE_ALPHA",
+      "from_node_name": "alpha",
+      "id": "REF_022",
+      "is_active": true,
+      "note": "先学 alpha",
+      "relation_type": "prerequisite",
+      "syllabus_version_id": "SYLLABUS",
+      "to_node_id": "NODE_GAMMA",
+      "to_node_name": "gamma"
+     }
+    ],
+    "generated_at": "<now>",
+    "node_count": 3,
+    "unmet_prerequisites": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "图（1 条边 / 3 个考点）"
+  },
+  {
+   "case": "R08",
+   "op": "relations",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "DELETE",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations/REF_022?reason=方向写错"
+   },
+   "response": {
+    "from_node_id": "NODE_ALPHA",
+    "from_node_name": "alpha",
+    "id": "REF_022",
+    "is_active": false,
+    "note": "方向写错",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "SYLLABUS",
+    "to_node_id": "NODE_GAMMA",
+    "to_node_name": "gamma"
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "停用边（200，行保留）"
+  },
+  {
+   "case": "R09",
+   "op": "relations",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "edge_count": 0,
+    "edges": [],
+    "generated_at": "<now>",
+    "node_count": 3,
+    "unmet_prerequisites": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "停用后图里没有活跃边"
+  },
+  {
+   "case": "R10",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "关系不存在或不属于该项目"
+   },
+   "op": "relations",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "DELETE",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations/OTHER_NODE"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "关系不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "停用未知关系 404"
+  },
+  {
+   "case": "R11",
+   "op": "relations",
+   "request": {
+    "idempotency_key": "probe-relation-6",
+    "json_body": {
+     "from_node_id": "NODE_ALPHA",
+     "note": "再来一次",
+     "relation_type": "prerequisite",
+     "syllabus_version_id": "SYLLABUS",
+     "to_node_id": "NODE_GAMMA"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/knowledge-relations"
+   },
+   "response": {
+    "from_node_id": "NODE_ALPHA",
+    "from_node_name": "alpha",
+    "id": "REF_022",
+    "is_active": true,
+    "note": "再来一次",
+    "relation_type": "prerequisite",
+    "syllabus_version_id": "SYLLABUS",
+    "to_node_id": "NODE_GAMMA",
+    "to_node_name": "gamma"
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1
+   },
+   "status": 201,
+   "title": "重新加边复活同一行"
+  },
+  {
+   "case": "Q01",
+   "op": "prerequisites",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-nodes/NODE_GAMMA/prerequisites"
+   },
+   "response": {
+    "node_id": "NODE_GAMMA",
+    "node_name": "gamma",
+    "prerequisites": [
+     {
+      "node_id": "NODE_ALPHA",
+      "node_name": "alpha",
+      "state": "independent"
+     }
+    ],
+    "unmet": []
+   },
+   "row_delta": {},
+   "status": 200,
+   "title": "依赖考点的前置（未诊断视为未满足）"
+  },
+  {
+   "case": "Q02",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "考点不存在或不属于该项目"
+   },
+   "op": "prerequisites",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/knowledge-nodes/OTHER_NODE/prerequisites"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "考点不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "考点不存在 404"
+  },
+  {
+   "case": "A01",
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/question-versions/VERSION_A/tag-suggestions"
+   },
+   "response": [],
+   "row_delta": {},
+   "status": 200,
+   "title": "无模型时列表为空"
+  },
+  {
+   "case": "A02",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {},
+    "message": "未配置可用的文本模型，无法生成标签建议"
+   },
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": "probe-tags-1",
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-versions/VERSION_A/tag-suggestions"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {},
+     "message": "未配置可用的文本模型，无法生成标签建议"
+    }
+   },
+   "row_delta": {},
+   "status": 503,
+   "title": "无模型时生成 → 503 ai_not_configured"
+  },
+  {
+   "case": "A03",
+   "error_envelope": {
+    "code": "ai_not_configured",
+    "details": {},
+    "message": "未配置可用的文本模型，无法生成标签建议"
+   },
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": "probe-tags-1",
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-versions/VERSION_A/tag-suggestions"
+   },
+   "response": {
+    "error": {
+     "code": "ai_not_configured",
+     "details": {},
+     "message": "未配置可用的文本模型，无法生成标签建议"
+    }
+   },
+   "row_delta": {},
+   "status": 503,
+   "title": "失败后同键可重试（claim 已释放）"
+  },
+  {
+   "case": "A04",
+   "error_envelope": {
+    "code": "not_found",
+    "details": {},
+    "message": "题目版本不存在或不属于该项目"
+   },
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/question-versions/OTHER_NODE/tag-suggestions"
+   },
+   "response": {
+    "error": {
+     "code": "not_found",
+     "details": {},
+     "message": "题目版本不存在或不属于该项目"
+    }
+   },
+   "row_delta": {},
+   "status": 404,
+   "title": "未知版本 404"
+  },
+  {
+   "case": "A05",
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": "probe-tags-2",
+    "json_body": {},
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/question-versions/VERSION_A/tag-suggestions"
+   },
+   "response": {
+    "accepted_mapping_revision": null,
+    "created_at": "<now>",
+    "decided_at": null,
+    "decision_note": "",
+    "id": "REF_023",
+    "is_stub": true,
+    "latest_mappings": [
+     {
+      "is_primary": true,
+      "node_id": "NODE_ALPHA",
+      "node_name": "alpha",
+      "weight": "1.0000"
+     }
+    ],
+    "model_identifier": "",
+    "project_id": "PROJECT",
+    "prompt_version": "p1-suggest-tags-v1",
+    "proposals": [
+     {
+      "confidence": 0.9,
+      "name": "gamma",
+      "rationale": "题干涉及 gamma"
+     }
+    ],
+    "question_label": "Q-A",
+    "question_version_id": "VERSION_A",
+    "status": "proposed",
+    "unresolved_names": []
+   },
+   "row_delta": {
+    "audit_idempotency_record": 1,
+    "audit_llm_run": 1,
+    "knowledge_tag_suggestion": 1
+   },
+   "status": 201,
+   "title": "脚本化模型只产候选（is_stub 记录）"
+  },
+  {
+   "case": "A06",
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "node_names": [
+      "gamma"
+     ],
+     "note": "人工核对"
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tag-suggestions/REF_023/accept"
+   },
+   "response": {
+    "added_node_names": [
+     "gamma"
+    ],
+    "mapping_revision": 2,
+    "status": "accepted",
+    "suggestion_id": "REF_023",
+    "unresolved_names": []
+   },
+   "row_delta": {
+    "knowledge_question_mapping": 2
+   },
+   "status": 200,
+   "title": "采纳写入新的辅助映射修订（权重 0）"
+  },
+  {
+   "case": "A07",
+   "error_envelope": {
+    "code": "invalid_input",
+    "details": {
+     "status": "accepted"
+    },
+    "message": "该建议已被处理，不能重复采纳"
+   },
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": null,
+    "json_body": {
+     "node_names": [
+      "gamma"
+     ]
+    },
+    "method": "POST",
+    "path": "/api/v1/projects/PROJECT/tag-suggestions/REF_023/accept"
+   },
+   "response": {
+    "error": {
+     "code": "invalid_input",
+     "details": {
+      "status": "accepted"
+     },
+     "message": "该建议已被处理，不能重复采纳"
+    }
+   },
+   "row_delta": {},
+   "status": 400,
+   "title": "重复采纳被拒"
+  },
+  {
+   "case": "A08",
+   "op": "tag_suggestions",
+   "request": {
+    "idempotency_key": null,
+    "json_body": null,
+    "method": "GET",
+    "path": "/api/v1/projects/PROJECT/question-versions/VERSION_A/tag-suggestions"
+   },
+   "response": [
+    {
+     "accepted_mapping_revision": 2,
+     "created_at": "<now>",
+     "decided_at": "<now>",
+     "decision_note": "人工核对",
+     "id": "REF_023",
+     "is_stub": true,
+     "latest_mappings": [
+      {
+       "is_primary": true,
+       "node_id": "NODE_ALPHA",
+       "node_name": "alpha",
+       "weight": "1.0000"
+      },
+      {
+       "is_primary": false,
+       "node_id": "NODE_GAMMA",
+       "node_name": "gamma",
+       "weight": "0.0000"
+      }
+     ],
+     "model_identifier": "",
+     "project_id": "PROJECT",
+     "prompt_version": "p1-suggest-tags-v1",
+     "proposals": [
+      {
+       "confidence": 0.9,
+       "name": "gamma",
+       "rationale": "题干涉及 gamma"
+      }
+     ],
+     "question_label": "Q-A",
+     "question_version_id": "VERSION_A",
+     "status": "accepted",
+     "unresolved_names": []
+    }
+   ],
+   "row_delta": {},
+   "status": 200,
+   "title": "标签建议列表（含 latest_mappings）"
+  },
+  {
+   "case": "S01",
+   "op": "pairing_service",
+   "request": {
+    "attempt_id": "REF_025",
+    "method": "service",
+    "path": "pairing.on_attempt_graded"
+   },
+   "response": {
+    "b_task": {
+     "deficit_notice": "",
+     "delay_anchor_at": null,
+     "due_at": null,
+     "estimated_minutes": 1,
+     "id": "REF_026",
+     "invalidated_reason": "",
+     "knowledge_node_id": "NODE_ALPHA",
+     "not_before": null,
+     "origin_session_item_id": "REF_027",
+     "pairing_version": 3,
+     "question_id": "QUESTION_B",
+     "reason_codes": [
+      "paired_immediate",
+      "same_knowledge_node"
+     ],
+     "rule_version": "p0-1",
+     "status": "pending",
+     "task_kind": "paired_immediate",
+     "trigger_event": "confirmed_grade"
+    },
+    "created": 3
+   },
+   "row_delta": {
+    "learning_study_task": 3,
+    "practice_attempt": 1
+   },
+   "status": "service",
+   "title": "A 判分后创建一个 B（每个活跃配对各一个；本库有 3 个 A 配对）"
+  },
+  {
+   "case": "S02",
+   "op": "pairing_service",
+   "request": {
+    "attempt_id": "REF_025",
+    "method": "service",
+    "path": "pairing.on_attempt_graded"
+   },
+   "response": {
+    "created": 0,
+    "paired_immediate_count": 1
+   },
+   "row_delta": {},
+   "status": "service",
+   "title": "重放同一 attempt 不产生第二个任务"
+  },
+  {
+   "case": "S03",
+   "op": "pairing_service",
+   "request": {
+    "attempt_id": "REF_028",
+    "method": "service",
+    "path": "pairing.on_attempt_graded"
+   },
+   "response": {
+    "anchor_equals_b_submission": true,
+    "b_version_id": "VERSION_B",
+    "c_task": {
+     "deficit_notice": "",
+     "delay_anchor_at": "<now>",
+     "due_at": "<now>",
+     "estimated_minutes": 1,
+     "id": "REF_029",
+     "invalidated_reason": "",
+     "knowledge_node_id": "NODE_ALPHA",
+     "not_before": "<now>",
+     "origin_session_item_id": "REF_030",
+     "pairing_version": 3,
+     "question_id": "QUESTION_C",
+     "reason_codes": [
+      "delayed_verification",
+      "delay_24h",
+      "trigger_event"
+     ],
+     "rule_version": "p0-1",
+     "status": "pending",
+     "task_kind": "delayed_verification",
+     "trigger_event": "paired_immediate_graded"
+    },
+    "created": 2,
+    "not_before_minus_anchor_hours": 24.0,
+    "review_task": {
+     "anchor_source": "trigger_event",
+     "delay_hours": 24,
+     "not_before_matches_task": true,
+     "was_started": false
+    }
+   },
+   "row_delta": {
+    "learning_review_task": 2,
+    "learning_study_task": 3,
+    "practice_attempt": 1
+   },
+   "status": "service",
+   "title": "B 判分后创建 C（锚点是 B 的提交时间）"
+  },
+  {
+   "case": "S04",
+   "op": "pairing_service",
+   "request": {
+    "method": "service",
+    "path": "pairing.delayed_interval_status"
+   },
+   "response": {
+    "anchor_source": "prior_attempt",
+    "has_not_before": true,
+    "reason": "延迟验证需等待：还需约 23.50 小时（锚点 prior_attempt）",
+    "required": true,
+    "satisfied": false
+   },
+   "row_delta": {},
+   "status": "service",
+   "title": "到期前 delayed_interval_status 不可开始"
+  },
+  {
+   "case": "S05",
+   "op": "pairing_service",
+   "request": {
+    "method": "service",
+    "path": "fixture.move_deadline"
+   },
+   "response": {
+    "anchor_source": "prior_attempt",
+    "has_not_before": true,
+    "reason": "",
+    "required": true,
+    "satisfied": true
+   },
+   "row_delta": {},
+   "status": "service",
+   "title": "把 C 的截止时间挪到过去后可开始（夹具链的最后一步）"
+  },
+  {
+   "case": "S06",
+   "op": "pairing_service",
+   "request": {
+    "method": "service",
+    "path": "pairing.reconcile_delayed_tasks"
+   },
+   "response": {
+    "c_not_before_is_after_later_attempt": true,
+    "interval": {
+     "anchor_source": "prior_attempt",
+     "has_not_before": true,
+     "reason": "延迟验证需等待：还需约 23.83 小时（锚点 prior_attempt）",
+     "required": true,
+     "satisfied": false
+    },
+    "reason_codes": [
+     "delayed_verification",
+     "delay_24h",
+     "trigger_event",
+     "anchor_updated"
+    ],
+    "reconciled": 2
+   },
+   "row_delta": {
+    "learning_study_task": 3,
+    "practice_attempt": 1
+   },
+   "status": "service",
+   "title": "新的训练事件把待开始的 C 顺延（reconcile）"
+  }
+ ],
+ "database": "postgresql (throw-away test database)",
+ "settings": "config.settings.test (AI_PROVIDER overridden to none for the 503 cases)",
+ "symbols": {
+  "REF_018": "e8fdd574-0ac4-4ee0-9863-985694b6e0ed",
+  "REF_019": "0405860a-2b90-4658-9ebf-b0a78191c30b",
+  "REF_020": "00000000-0000-0000-0000-000000000000",
+  "REF_021": "34003a61-87fa-461c-8a45-23897320e8fb",
+  "REF_022": "0b130613-f3d9-43a8-95d9-657e63042b02",
+  "REF_023": "3f8e8a66-5b1c-4bce-8854-1e52bd820d2b",
+  "REF_025": "e3a640e6-96c8-4802-9f8f-c845f999b72d",
+  "REF_026": "93ce3c8c-013a-4630-9215-f429f2a3e300",
+  "REF_027": "76da7063-55ed-4a5d-91a4-d63f4b1f8c68",
+  "REF_028": "57ca956f-3d9f-4b88-8b88-e4235b5081ea",
+  "REF_029": "de97ab2c-2201-457b-aa3c-8afee0c4015e",
+  "REF_030": "ce624b88-c601-430b-a4d1-fdafc99ad9ca"
+ }
+}
