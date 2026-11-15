@@ -42,3 +42,9 @@ var/
 
 # Local TLS material for the compose stack (never commit private keys)
 infra/docker/certs/
+
+# Delivery artifacts (archives are handoff material, not source)
+*.zip
+
+# Documentation assets are committed; keep the raw capture working dirs out
+dsh-plugin/var/

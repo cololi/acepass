@@ -1,0 +1,21 @@
+# 统一换行：仓库内文本一律 LF。
+* text=auto eol=lf
+
+# 二进制资源不做行尾转换。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.zip binary
+
+# 语言统计：文档不参与代码行数，锁文件与黄金夹具视为生成物。
+docs/** linguist-documentation
+*.md linguist-documentation
+frontend/package-lock.json linguist-generated
+dsh-plugin/tests/golden/** linguist-generated
+dsh-plugin/tests/fixtures/** linguist-generated
+backend/requirements/lock.txt linguist-generated
