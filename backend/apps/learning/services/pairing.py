@@ -25,6 +25,15 @@ from apps.question_bank.models import Question
 
 logger = logging.getLogger("apps.learning.pairing")
 
+#: Rows describing the *same* training action can disagree by a few milliseconds:
+#: the attempt row carries the request's ``moment``, while the answer-reveal
+#: exposure written right after it carries the server clock. Reading that skew as
+#: "a new training event" pushed the deadline forward by the grading latency and
+#: made a task that had just been brought forward unstartable — on a slower CI
+#: runner this failed 1 of 501 tests while passing locally. Only a gap larger
+#: than this tolerance is a genuinely new event.
+ANCHOR_MOVE_TOLERANCE = timedelta(seconds=1)
+
 
 def _published_version(question: Question):
     if question.current_published_version_id:
@@ -357,8 +366,10 @@ def delayed_interval_status(*, task: StudyTask, now=None) -> dict:
     # from the same rows the task was built from changes nothing — while a manual
     # correction of ``not_before`` (an operator bringing a check forward) must stay
     # a correction rather than being silently undone on the next request.
+    # Timestamps closer together than ``ANCHOR_MOVE_TOLERANCE`` are the same
+    # training action seen through two rows, not a new event.
     recomputed = None
-    if anchor is not None and (stored_anchor is None or anchor > stored_anchor):
+    if anchor is not None and (stored_anchor is None or anchor - stored_anchor > ANCHOR_MOVE_TOLERANCE):
         recomputed = anchor + timedelta(hours=delay_hours)
     required_at = max(value for value in (task.not_before, recomputed) if value is not None)
     if moment < required_at:

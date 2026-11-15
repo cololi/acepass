@@ -147,7 +147,7 @@ npx tsc -b && npx vite build     # 类型检查 + 生产构建
 npx playwright test              # 真实浏览器：桌面 + 移动端
 ```
 
-最近的完整记录：后端 **501 passed**、ruff/check/makemigrations 干净、浏览器主套件 **78 passed**、
+最近的完整记录：后端 **503 passed**、ruff/check/makemigrations 干净、浏览器主套件 **78 passed**、
 stub 专跑 **8 passed**、三组归档反例原样通过。数字与逐条规定见
 [实现状态](docs/implementation-status.md) 与 [验收结果](docs/acceptance-results.md)。
 
